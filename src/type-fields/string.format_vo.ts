@@ -2,6 +2,7 @@ import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TString = string;
 
@@ -19,17 +20,17 @@ export class FString extends TypeField<TString> {
     super(value, fieldPath);
   }
 
+  static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
+    return TypeGuard.isString(value, fieldPath, 1, 255);
+  }
+
   static create(
     raw: TString,
     fieldPath = "String",
   ): Result<FString, ExceptionValidation> {
-    const inst = new FString(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FString.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FString(raw, fieldPath));
   }
 
   static createOrThrow(raw: TString, fieldPath = "String"): FString {
@@ -42,12 +43,7 @@ export class FString extends TypeField<TString> {
     value: TString,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    // Validação da classe pai
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    return ok(true);
+    return FString.validateRaw(value, fieldPath);
   }
 
   override toString(): string {
@@ -59,7 +55,7 @@ export class FString extends TypeField<TString> {
   }
 
   override getDescription(): string {
-    return "Texto simples sem formatação específica. Campo genérico para armazenar qualquer tipo de string, utilizado quando não há regras específicas de validação ou formatação.";
+    return "Texto simples sem formatação específica.";
   }
 
   override getShortDescription(): string {

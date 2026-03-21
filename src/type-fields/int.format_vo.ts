@@ -1,11 +1,12 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TInt = number;
 
-export class FInt extends TypeField<TInt> {
+export class FInt extends TypeField<TInt, string> {
   override readonly typeInference = "FInt";
 
   override readonly config: ITypeFieldConfig<TInt> = {
@@ -20,17 +21,24 @@ export class FInt extends TypeField<TInt> {
     super(value, fieldPath);
   }
 
+  static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
+    const base = TypeGuard.isNumber(value, fieldPath, -2147483648, 2147483647, 0);
+    if (!base.success) return base;
+    if (!Number.isInteger(value)) {
+      return err(
+        ExceptionValidation.create(fieldPath, "Valor deve ser um número inteiro"),
+      );
+    }
+    return OK_TRUE;
+  }
+
   static create(
     raw: TInt,
     fieldPath = "Int",
   ): Result<FInt, ExceptionValidation> {
-    const inst = new FInt(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FInt.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FInt(raw, fieldPath));
   }
 
   static createOrThrow(raw: TInt, fieldPath = "Int"): FInt {
@@ -43,25 +51,7 @@ export class FInt extends TypeField<TInt> {
     value: TInt,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    // Validação da classe pai
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    // Validações customizadas
-
-    const validateInteger: (value: TInt) => boolean = (value) =>
-      Number.isInteger(value);
-    if (!validateInteger(value)) {
-      return err(
-        ExceptionValidation.create(
-          fieldPath,
-          "Valor deve ser um número inteiro",
-        ),
-      );
-    }
-
-    return ok(true);
+    return FInt.validateRaw(value, fieldPath);
   }
 
   override toString(): string {

@@ -25,7 +25,8 @@ export abstract class Exceptions extends Error {
   public readonly uri: string;
   public readonly field?: string;
   public readonly code: string;
-  private readonly _stack: string | undefined;
+  private _lazyStack: string | undefined;
+  private _stackCaptured = false;
   public readonly typeInference: string = "Exceptions";
   public readonly additionalFields?: Record<string, unknown>;
   public readonly retriable: boolean;
@@ -55,14 +56,16 @@ export abstract class Exceptions extends Error {
     this.additionalFields = additionalFields;
     this.retriable = retriable;
 
-    // Stack customizada com base no título da exceção
-    this._stack = new Error(title).stack;
-
     Object.setPrototypeOf(this, new.target.prototype);
   }
 
+  /** Stack trace lazy — só captura quando acessado (logging, debug) */
   override get stack(): string | undefined {
-    return this._stack;
+    if (!this._stackCaptured) {
+      this._lazyStack = new Error(this.title).stack;
+      this._stackCaptured = true;
+    }
+    return this._lazyStack;
   }
 
   toJson(): Record<string, unknown> {

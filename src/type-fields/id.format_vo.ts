@@ -1,10 +1,14 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 import { v7 as uuidv7 } from "uuid";
 
 export type TId = string;
+
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export class FId extends TypeField<TId> {
   override readonly typeInference = "FId";
@@ -20,18 +24,21 @@ export class FId extends TypeField<TId> {
     super(value, fieldPath);
   }
 
-  static create(raw: TId, fieldPath = "Id"): Result<FId, ExceptionValidation> {
-    const parseId: (value: unknown) => TId = (value) => {
-      return typeof value === "string" ? value.trim() : String(value);
-    };
-    const parsedValue = parseId(raw);
-    const inst = new FId(parsedValue, fieldPath);
-    const validation = inst.validate(parsedValue, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
+  static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
+    const base = TypeGuard.isString(value, fieldPath, 36, 36);
+    if (!base.success) return base;
+    const trimmed = (value as string).trim();
+    if (!UUID_REGEX.test(trimmed)) {
+      return err(ExceptionValidation.create(fieldPath, "ID deve ser um UUID válido"));
     }
-    return ok(inst);
+    return OK_TRUE;
+  }
+
+  static create(raw: TId, fieldPath = "Id"): Result<FId, ExceptionValidation> {
+    const validation = FId.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    const trimmed = (raw as string).trim();
+    return ok(new FId(trimmed, fieldPath));
   }
 
   static createOrThrow(raw: TId, fieldPath = "Id"): FId {
@@ -53,21 +60,7 @@ export class FId extends TypeField<TId> {
     value: TId,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    const baseValidation = super.validate(value, fieldPath);
-    if (isFailure(baseValidation)) return baseValidation;
-
-    const validateUuid: (value: TId) => boolean = (value) => {
-      const uuidRegex =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      return uuidRegex.test(value);
-    };
-    if (!validateUuid(value)) {
-      return err(
-        ExceptionValidation.create(fieldPath, "ID deve ser um UUID válido"),
-      );
-    }
-
-    return ok(true);
+    return FId.validateRaw(value, fieldPath);
   }
 
   override toString(): string {

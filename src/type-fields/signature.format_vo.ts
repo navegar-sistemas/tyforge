@@ -1,12 +1,15 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TSignature = string;
 
 export class FSignature extends TypeField<TSignature> {
   override readonly typeInference = "FSignature";
+
+  private static readonly BASE64_REGEX = /^[A-Za-z0-9+/]+=*$/;
 
   override readonly config: ITypeFieldConfig<TSignature> = {
     jsonSchemaType: "string",
@@ -19,17 +22,34 @@ export class FSignature extends TypeField<TSignature> {
     super(value, fieldPath);
   }
 
+  static validateRaw(
+    value: unknown,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    const base = TypeGuard.isString(value, fieldPath, 64, 512);
+    if (!base.success) return base;
+
+    const str = value as string;
+    const cleanValue = str.replace(/\s/g, "");
+    if (!FSignature.BASE64_REGEX.test(cleanValue) || cleanValue.length < 64) {
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Assinatura deve ser uma string base64 válida",
+        ),
+      );
+    }
+
+    return OK_TRUE;
+  }
+
   static create(
     raw: TSignature,
     fieldPath = "Signature",
   ): Result<FSignature, ExceptionValidation> {
-    const inst = new FSignature(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FSignature.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FSignature(raw, fieldPath));
   }
 
   static createOrThrow(raw: TSignature, fieldPath = "Signature"): FSignature {
@@ -42,27 +62,7 @@ export class FSignature extends TypeField<TSignature> {
     value: TSignature,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    // Validação da classe pai
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    // Validações customizadas
-
-    const validateBase64: (value: TSignature) => boolean = (value) => {
-      const cleanValue = value.replace(/\s/g, "");
-      return /^[A-Za-z0-9+/]+=*$/.test(cleanValue) && cleanValue.length >= 64;
-    };
-    if (!validateBase64(value)) {
-      return err(
-        ExceptionValidation.create(
-          fieldPath,
-          "Assinatura deve ser uma string base64 válida",
-        ),
-      );
-    }
-
-    return ok(true);
+    return FSignature.validateRaw(value, fieldPath);
   }
 
   override toString(): string {

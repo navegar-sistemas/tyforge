@@ -13,6 +13,9 @@ interface Failure<E> {
 }
 
 export const ok = <T>(value: T): Result<T, never> => ({ success: true, value });
+
+/** Singleton imutável para validações que retornam true — zero alocação no hot path */
+export const OK_TRUE: Result<true, never> = Object.freeze({ success: true as const, value: true });
 export const err = <E>(error: E): Result<never, E> => ({
   success: false,
   error,

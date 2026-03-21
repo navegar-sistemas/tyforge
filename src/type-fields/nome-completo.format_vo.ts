@@ -2,6 +2,7 @@ import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TNomeCompleto = string;
 
@@ -19,17 +20,20 @@ export class FNomeCompleto extends TypeField<TNomeCompleto> {
     super(value, fieldPath);
   }
 
+  static validateRaw(
+    value: unknown,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    return TypeGuard.isString(value, fieldPath, 2, 140);
+  }
+
   static create(
     raw: TNomeCompleto,
     fieldPath = "NomeCompleto",
   ): Result<FNomeCompleto, ExceptionValidation> {
-    const inst = new FNomeCompleto(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FNomeCompleto.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FNomeCompleto(raw, fieldPath));
   }
 
   static createOrThrow(
@@ -45,12 +49,7 @@ export class FNomeCompleto extends TypeField<TNomeCompleto> {
     value: TNomeCompleto,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    // Validação da classe pai
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    return ok(true);
+    return FNomeCompleto.validateRaw(value, fieldPath);
   }
 
   override toString(): string {

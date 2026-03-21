@@ -1,6 +1,6 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 
 export const OBoolInt = {
@@ -11,7 +11,7 @@ export const OBoolInt = {
 export type TKeyBoolInt = keyof typeof OBoolInt;
 export type TBoolInt = (typeof OBoolInt)[TKeyBoolInt];
 
-export class FBoolInt extends TypeField<TBoolInt> {
+export class FBoolInt extends TypeField<TBoolInt, string> {
   override readonly typeInference = "FBoolInt";
 
   override readonly config: ITypeFieldConfig<TBoolInt> = {
@@ -27,17 +27,19 @@ export class FBoolInt extends TypeField<TBoolInt> {
     super(value, fieldPath);
   }
 
+  static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
+    const resolved = FBoolInt.resolveEnum(OBoolInt, value, fieldPath);
+    if (!resolved.success) return err(resolved.error);
+    return OK_TRUE;
+  }
+
   static create(
     raw: TBoolInt,
     fieldPath = "BoolInt",
   ): Result<FBoolInt, ExceptionValidation> {
-    const inst = new FBoolInt(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FBoolInt.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FBoolInt(raw, fieldPath));
   }
 
   static createOrThrow(raw: TBoolInt, fieldPath = "BoolInt"): FBoolInt {
@@ -50,25 +52,7 @@ export class FBoolInt extends TypeField<TBoolInt> {
     value: TBoolInt,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    // Validação da classe pai
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    // Validações customizadas
-
-    const validateBoolInt: (value: TBoolInt) => boolean = (value) =>
-      value === 0 || value === 1;
-    if (!validateBoolInt(value)) {
-      return err(
-        ExceptionValidation.create(
-          fieldPath,
-          "Valor deve ser 0 (inválido) ou 1 (válido)",
-        ),
-      );
-    }
-
-    return ok(true);
+    return FBoolInt.validateRaw(value, fieldPath);
   }
 
   override toString(): string {

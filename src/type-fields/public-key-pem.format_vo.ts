@@ -1,12 +1,17 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TPublicKeyPem = string;
 
 export class FPublicKeyPem extends TypeField<TPublicKeyPem> {
   override readonly typeInference = "FPublicKeyPem";
+
+  private static readonly PEM_BEGIN = "-----BEGIN PUBLIC KEY-----";
+  private static readonly PEM_END = "-----END PUBLIC KEY-----";
+  private static readonly BASE64_REGEX = /^[A-Za-z0-9+/=]+$/;
 
   override readonly config: ITypeFieldConfig<TPublicKeyPem> = {
     jsonSchemaType: "string",
@@ -19,17 +24,44 @@ export class FPublicKeyPem extends TypeField<TPublicKeyPem> {
     super(value, fieldPath);
   }
 
+  static validateRaw(
+    value: unknown,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    const base = TypeGuard.isString(value, fieldPath, 100, 1000);
+    if (!base.success) return base;
+
+    const str = value as string;
+    if (
+      !str.includes(FPublicKeyPem.PEM_BEGIN) ||
+      !str.includes(FPublicKeyPem.PEM_END)
+    ) {
+      return err(
+        ExceptionValidation.create(fieldPath, "Chave pública PEM inválida"),
+      );
+    }
+
+    const base64 = str
+      .replace(FPublicKeyPem.PEM_BEGIN, "")
+      .replace(FPublicKeyPem.PEM_END, "")
+      .replace(/\s/g, "");
+
+    if (!FPublicKeyPem.BASE64_REGEX.test(base64) || base64.length < 100) {
+      return err(
+        ExceptionValidation.create(fieldPath, "Chave pública PEM inválida"),
+      );
+    }
+
+    return OK_TRUE;
+  }
+
   static create(
     raw: TPublicKeyPem,
     fieldPath = "PublicKeyPem",
   ): Result<FPublicKeyPem, ExceptionValidation> {
-    const inst = new FPublicKeyPem(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FPublicKeyPem.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FPublicKeyPem(raw, fieldPath));
   }
 
   static createOrThrow(
@@ -45,33 +77,7 @@ export class FPublicKeyPem extends TypeField<TPublicKeyPem> {
     value: TPublicKeyPem,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    // Validação da classe pai
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    // Validações customizadas
-
-    const validatePem: (value: TPublicKeyPem) => boolean = (value) => {
-      if (
-        !value.includes("-----BEGIN PUBLIC KEY-----") ||
-        !value.includes("-----END PUBLIC KEY-----")
-      )
-        return false;
-      const base64 = value
-        .replace("-----BEGIN PUBLIC KEY-----", "")
-        .replace("-----END PUBLIC KEY-----", "")
-        .replace(/\s/g, "");
-      if (!/^[A-Za-z0-9+/=]+$/.test(base64)) return false;
-      return base64.length >= 100;
-    };
-    if (!validatePem(value)) {
-      return err(
-        ExceptionValidation.create(fieldPath, "Chave pública PEM inválida"),
-      );
-    }
-
-    return ok(true);
+    return FPublicKeyPem.validateRaw(value, fieldPath);
   }
 
   override toString(): string {

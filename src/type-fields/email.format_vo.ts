@@ -1,11 +1,13 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TEmail = string;
 
-export class FEmail extends TypeField<TEmail> {
+export class FEmail extends TypeField<TEmail, string> {
+  private static readonly EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   override readonly typeInference = "FEmail";
 
   override readonly config: ITypeFieldConfig<TEmail> = {
@@ -19,17 +21,22 @@ export class FEmail extends TypeField<TEmail> {
     super(value, fieldPath);
   }
 
+  static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
+    const base = TypeGuard.isString(value, fieldPath, 5, 200);
+    if (!base.success) return base;
+    if (!FEmail.EMAIL_REGEX.test(value as string)) {
+      return err(ExceptionValidation.create(fieldPath, "Email deve ter formato válido"));
+    }
+    return OK_TRUE;
+  }
+
   static create(
     raw: TEmail,
     fieldPath = "Email",
   ): Result<FEmail, ExceptionValidation> {
-    const inst = new FEmail(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FEmail.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FEmail(raw, fieldPath));
   }
 
   static createOrThrow(raw: TEmail, fieldPath = "Email"): FEmail {
@@ -42,24 +49,7 @@ export class FEmail extends TypeField<TEmail> {
     value: TEmail,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    // Validação da classe pai
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    // Validações customizadas
-
-    const validateEmail: (value: TEmail) => boolean = (value) => {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(value);
-    };
-    if (!validateEmail(value)) {
-      return err(
-        ExceptionValidation.create(fieldPath, "Email deve ter formato válido"),
-      );
-    }
-
-    return ok(true);
+    return FEmail.validateRaw(value, fieldPath);
   }
 
   override toString(): string {
@@ -67,13 +57,11 @@ export class FEmail extends TypeField<TEmail> {
   }
 
   override formatted(): string {
-    const formatEmail: (value: TEmail) => TEmail = (value) =>
-      value.toLowerCase().trim();
-    return formatEmail(this.getValue());
+    return this.getValue().toLowerCase().trim();
   }
 
   override getDescription(): string {
-    return "Endereço de email eletrônico válido seguindo o padrão RFC 5322. Deve conter um símbolo @ e um domínio válido. Utilizado para comunicação e identificação de usuários no sistema.";
+    return "Endereço de email eletrônico válido seguindo o padrão RFC 5322.";
   }
 
   override getShortDescription(): string {

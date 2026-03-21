@@ -2,6 +2,7 @@ import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TIdReq = string;
 
@@ -19,17 +20,17 @@ export class FIdReq extends TypeField<TIdReq> {
     super(value, fieldPath);
   }
 
+  static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
+    return TypeGuard.isString(value, fieldPath, 1, 36);
+  }
+
   static create(
     raw: TIdReq,
     fieldPath = "IdReq",
   ): Result<FIdReq, ExceptionValidation> {
-    const inst = new FIdReq(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FIdReq.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FIdReq(raw, fieldPath));
   }
 
   static createOrThrow(raw: TIdReq, fieldPath = "IdReq"): FIdReq {
@@ -42,15 +43,7 @@ export class FIdReq extends TypeField<TIdReq> {
     value: TIdReq,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    // Validação da classe pai
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    // Validações customizadas simplificadas
-    // Aceita qualquer string não vazia (flexível para APIs externas)
-
-    return ok(true);
+    return FIdReq.validateRaw(value, fieldPath);
   }
 
   override toString(): string {

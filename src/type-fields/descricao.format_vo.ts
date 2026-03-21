@@ -2,6 +2,7 @@ import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TDescricao = string;
 
@@ -19,17 +20,20 @@ export class FDescricao extends TypeField<TDescricao> {
     super(value, fieldPath);
   }
 
+  static validateRaw(
+    value: unknown,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    return TypeGuard.isString(value, fieldPath, 1, 1000);
+  }
+
   static create(
     raw: TDescricao,
     fieldPath = "Descricao",
   ): Result<FDescricao, ExceptionValidation> {
-    const inst = new FDescricao(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FDescricao.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FDescricao(raw, fieldPath));
   }
 
   static createOrThrow(raw: TDescricao, fieldPath = "Descricao"): FDescricao {
@@ -42,12 +46,7 @@ export class FDescricao extends TypeField<TDescricao> {
     value: TDescricao,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    // Validação da classe pai
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    return ok(true);
+    return FDescricao.validateRaw(value, fieldPath);
   }
 
   override toString(): string {

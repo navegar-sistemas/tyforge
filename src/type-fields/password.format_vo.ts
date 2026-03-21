@@ -1,7 +1,8 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TPassword = string;
 
@@ -15,21 +16,49 @@ export class FPassword extends TypeField<TPassword> {
     serializeAsString: false,
   };
 
+  private static readonly UPPERCASE_REGEX = /[A-Z]/;
+  private static readonly LOWERCASE_REGEX = /[a-z]/;
+  private static readonly DIGIT_REGEX = /[0-9]/;
+  private static readonly SPECIAL_REGEX =
+    /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
+
   private constructor(value: TPassword, fieldPath: string) {
     super(value, fieldPath);
+  }
+
+  static validateRaw(
+    value: unknown,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    const base = TypeGuard.isString(value, fieldPath, 8, 128);
+    if (!base.success) return base;
+
+    const str = value as string;
+    if (
+      str.length < 8 ||
+      !FPassword.UPPERCASE_REGEX.test(str) ||
+      !FPassword.LOWERCASE_REGEX.test(str) ||
+      !FPassword.DIGIT_REGEX.test(str) ||
+      !FPassword.SPECIAL_REGEX.test(str)
+    ) {
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Senha deve ter no mínimo 8 caracteres, incluindo maiúscula, minúscula, número e caractere especial",
+        ),
+      );
+    }
+
+    return OK_TRUE;
   }
 
   static create(
     raw: TPassword,
     fieldPath = "Password",
   ): Result<FPassword, ExceptionValidation> {
-    const inst = new FPassword(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FPassword.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FPassword(raw, fieldPath));
   }
 
   static createOrThrow(raw: TPassword, fieldPath = "Password"): FPassword {
@@ -42,31 +71,7 @@ export class FPassword extends TypeField<TPassword> {
     value: TPassword,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    // Validação da classe pai
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    // Validações customizadas
-
-    const validatePassword: (value: TPassword) => boolean = (value) => {
-      if (value.length < 8) return false;
-      if (!/[A-Z]/.test(value)) return false;
-      if (!/[a-z]/.test(value)) return false;
-      if (!/[0-9]/.test(value)) return false;
-      if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value)) return false;
-      return true;
-    };
-    if (!validatePassword(value)) {
-      return err(
-        ExceptionValidation.create(
-          fieldPath,
-          "Senha deve ter no mínimo 8 caracteres, incluindo maiúscula, minúscula, número e caractere especial",
-        ),
-      );
-    }
-
-    return ok(true);
+    return FPassword.validateRaw(value, fieldPath);
   }
 
   override toString(): string {

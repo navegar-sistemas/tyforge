@@ -1,11 +1,12 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TPageSize = number;
 
-export class FPageSize extends TypeField<TPageSize> {
+export class FPageSize extends TypeField<TPageSize, string> {
   override readonly typeInference = "FPageSize";
 
   override readonly config: ITypeFieldConfig<TPageSize> = {
@@ -20,17 +21,50 @@ export class FPageSize extends TypeField<TPageSize> {
     super(value, fieldPath);
   }
 
+  static validateRaw(
+    value: unknown,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    const base = TypeGuard.isNumber(value, fieldPath, 1, 100, 0);
+    if (!base.success) return base;
+
+    if (!Number.isInteger(value)) {
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Valor deve ser um número inteiro",
+        ),
+      );
+    }
+
+    if ((value as number) < 1) {
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Tamanho da página deve ser maior que 0",
+        ),
+      );
+    }
+
+    if ((value as number) > 100) {
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Tamanho da página não pode exceder 100",
+        ),
+      );
+    }
+
+    return OK_TRUE;
+  }
+
   static create(
     raw: TPageSize,
     fieldPath = "PageSize",
   ): Result<FPageSize, ExceptionValidation> {
-    const inst = new FPageSize(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FPageSize.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FPageSize(raw, fieldPath));
   }
 
   static createOrThrow(raw: TPageSize, fieldPath = "PageSize"): FPageSize {
@@ -43,43 +77,7 @@ export class FPageSize extends TypeField<TPageSize> {
     value: TPageSize,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    // Validação da classe pai
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    // Validações customizadas
-
-    const validateInteger: (value: TPageSize) => boolean = (value) =>
-      Number.isInteger(value);
-    if (!validateInteger(value)) {
-      return err(
-        ExceptionValidation.create(
-          fieldPath,
-          "Valor deve ser um número inteiro",
-        ),
-      );
-    }
-
-    if (value < 1) {
-      return err(
-        ExceptionValidation.create(
-          fieldPath,
-          "Tamanho da página deve ser maior que 0",
-        ),
-      );
-    }
-
-    if (value > 100) {
-      return err(
-        ExceptionValidation.create(
-          fieldPath,
-          "Tamanho da página não pode exceder 100",
-        ),
-      );
-    }
-
-    return ok(true);
+    return FPageSize.validateRaw(value, fieldPath);
   }
 
   override toString(): string {

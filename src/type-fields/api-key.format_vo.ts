@@ -1,7 +1,8 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 import { v4 as uuidv4, validate, version } from "uuid";
 
 export type TApiKey = string;
@@ -20,17 +21,29 @@ export class FApiKey extends TypeField<TApiKey> {
     super(value, fieldPath);
   }
 
+  static validateRaw(
+    value: unknown,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    const base = TypeGuard.isString(value, fieldPath, 36, 36);
+    if (!base.success) return base;
+
+    if (!validate(value as string)) {
+      return err(
+        ExceptionValidation.create(fieldPath, "ApiKey deve ser UUID valido"),
+      );
+    }
+
+    return OK_TRUE;
+  }
+
   static create(
     raw: TApiKey,
     fieldPath = "ApiKey",
   ): Result<FApiKey, ExceptionValidation> {
-    const inst = new FApiKey(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FApiKey.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FApiKey(raw, fieldPath));
   }
 
   static createOrThrow(raw: TApiKey, fieldPath = "ApiKey"): FApiKey {
@@ -55,16 +68,7 @@ export class FApiKey extends TypeField<TApiKey> {
     value: TApiKey,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    const baseValidation = super.validate(value, fieldPath);
-    if (isFailure(baseValidation)) return baseValidation;
-
-    if (!validate(value)) {
-      return err(
-        ExceptionValidation.create(fieldPath, "ApiKey deve ser UUID valido"),
-      );
-    }
-
-    return ok(true);
+    return FApiKey.validateRaw(value, fieldPath);
   }
 
   toSafeDisplay(): string {

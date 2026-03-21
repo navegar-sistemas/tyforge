@@ -1,6 +1,6 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 
 export const OStatusAplicacao = {
@@ -11,7 +11,7 @@ export const OStatusAplicacao = {
 export type TKeyStatusAplicacao = keyof typeof OStatusAplicacao;
 export type TStatusAplicacao = (typeof OStatusAplicacao)[TKeyStatusAplicacao];
 
-export class FStatusAplicacao extends TypeField<TStatusAplicacao> {
+export class FStatusAplicacao extends TypeField<TStatusAplicacao, string> {
   override readonly typeInference = "FStatusAplicacao";
 
   override readonly config: ITypeFieldConfig<TStatusAplicacao> = {
@@ -26,17 +26,19 @@ export class FStatusAplicacao extends TypeField<TStatusAplicacao> {
     super(value, fieldPath);
   }
 
+  static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
+    const resolved = FStatusAplicacao.resolveEnum(OStatusAplicacao, value, fieldPath);
+    if (!resolved.success) return err(resolved.error);
+    return OK_TRUE;
+  }
+
   static create(
     raw: TStatusAplicacao,
     fieldPath = "StatusAplicacao",
   ): Result<FStatusAplicacao, ExceptionValidation> {
-    const inst = new FStatusAplicacao(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FStatusAplicacao.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FStatusAplicacao(raw, fieldPath));
   }
 
   static createOrThrow(
@@ -63,25 +65,7 @@ export class FStatusAplicacao extends TypeField<TStatusAplicacao> {
     value: TStatusAplicacao,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    const validateStatusAplicacao: (value: TStatusAplicacao) => boolean = (
-      value,
-    ) => {
-      return Object.values(OStatusAplicacao).includes(value);
-    };
-    if (!validateStatusAplicacao(value)) {
-      return err(
-        ExceptionValidation.create(
-          fieldPath,
-          `Status deve ser um dos valores: ${Object.values(OStatusAplicacao).join(", ")}`,
-        ),
-      );
-    }
-
-    return ok(true);
+    return FStatusAplicacao.validateRaw(value, fieldPath);
   }
 
   isActive(): boolean {

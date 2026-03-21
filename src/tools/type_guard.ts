@@ -1,4 +1,4 @@
-import { Result, ok, err } from "@tyforge/result/result";
+import { Result, err, OK_TRUE } from "@tyforge/result/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 
 export class TypeGuard {
@@ -8,7 +8,7 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     return Object.keys(enumObj).includes(value.toString())
-      ? ok(true)
+      ? OK_TRUE
       : err(
           ExceptionValidation.create(
             fieldPath,
@@ -23,7 +23,7 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     return Object.values(enumObj).includes(value)
-      ? ok(true)
+      ? OK_TRUE
       : err(
           ExceptionValidation.create(
             fieldPath,
@@ -55,7 +55,7 @@ export class TypeGuard {
         ),
       );
     }
-    return ok(true);
+    return OK_TRUE;
   }
 
   static isEmpty(value: unknown): boolean {
@@ -121,17 +121,8 @@ export class TypeGuard {
         ExceptionValidation.create(fieldPath, "O valor deve ser uma string."),
       );
     }
-    const trimmed = value.trim();
-    const length = trimmed.length;
-    if (length < min) {
-      return err(
-        ExceptionValidation.create(
-          fieldPath,
-          `A string deve conter no mínimo ${min} caracteres úteis.`,
-        ),
-      );
-    }
-    if (length > max) {
+    const len = value.length;
+    if (len > max) {
       return err(
         ExceptionValidation.create(
           fieldPath,
@@ -139,7 +130,15 @@ export class TypeGuard {
         ),
       );
     }
-    return ok(true);
+    if (len < min) {
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          `A string deve conter no mínimo ${min} caracteres úteis.`,
+        ),
+      );
+    }
+    return OK_TRUE;
   }
 
   static isNumber(
@@ -182,7 +181,7 @@ export class TypeGuard {
         ),
       );
     }
-    return ok(true);
+    return OK_TRUE;
   }
 
   static isInteger(
@@ -226,7 +225,7 @@ export class TypeGuard {
         ),
       );
     }
-    return ok(true);
+    return OK_TRUE;
   }
 
   static isBoolean(
@@ -234,7 +233,7 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     return typeof value === "boolean"
-      ? ok(true)
+      ? OK_TRUE
       : err(
           ExceptionValidation.create(
             fieldPath,
@@ -248,7 +247,7 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     return typeof value === "object" && value !== null && !Array.isArray(value)
-      ? ok(true)
+      ? OK_TRUE
       : err(
           ExceptionValidation.create(
             fieldPath,
@@ -262,7 +261,7 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     return typeof value === "function"
-      ? ok(true)
+      ? OK_TRUE
       : err(
           ExceptionValidation.create(fieldPath, "O valor deve ser uma função."),
         );
@@ -273,7 +272,7 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     return value === null
-      ? ok(true)
+      ? OK_TRUE
       : err(ExceptionValidation.create(fieldPath, "O valor deve ser null."));
   }
 
@@ -282,7 +281,7 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     return typeof value === "undefined"
-      ? ok(true)
+      ? OK_TRUE
       : err(
           ExceptionValidation.create(fieldPath, "O valor deve ser undefined."),
         );
@@ -293,7 +292,7 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     return value instanceof Date && !isNaN(value.getTime())
-      ? ok(true)
+      ? OK_TRUE
       : err(
           ExceptionValidation.create(
             fieldPath,
@@ -307,7 +306,7 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     return value instanceof RegExp
-      ? ok(true)
+      ? OK_TRUE
       : err(
           ExceptionValidation.create(
             fieldPath,
@@ -321,7 +320,7 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     return typeof value === "symbol"
-      ? ok(true)
+      ? OK_TRUE
       : err(
           ExceptionValidation.create(fieldPath, "O valor deve ser um símbolo."),
         );
@@ -332,7 +331,7 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     return typeof value === "bigint"
-      ? ok(true)
+      ? OK_TRUE
       : err(
           ExceptionValidation.create(fieldPath, "O valor deve ser um bigint."),
         );
@@ -343,7 +342,7 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     return value instanceof Set
-      ? ok(true)
+      ? OK_TRUE
       : err(ExceptionValidation.create(fieldPath, "O valor deve ser um Set."));
   }
 
@@ -352,7 +351,7 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     return value instanceof Map
-      ? ok(true)
+      ? OK_TRUE
       : err(ExceptionValidation.create(fieldPath, "O valor deve ser um Map."));
   }
 }

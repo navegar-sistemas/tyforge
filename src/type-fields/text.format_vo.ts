@@ -2,6 +2,7 @@ import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TText = string;
 
@@ -19,17 +20,20 @@ export class FText extends TypeField<TText> {
     super(value, fieldPath);
   }
 
+  static validateRaw(
+    value: unknown,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    return TypeGuard.isString(value, fieldPath, 1, 4000);
+  }
+
   static create(
     raw: TText,
     fieldPath = "Text",
   ): Result<FText, ExceptionValidation> {
-    const inst = new FText(raw, fieldPath);
-    const validation = inst.validate(raw, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FText.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FText(raw, fieldPath));
   }
 
   static createOrThrow(raw: TText, fieldPath = "Text"): FText {
@@ -42,12 +46,7 @@ export class FText extends TypeField<TText> {
     value: TText,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    // Validação da classe pai
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    return ok(true);
+    return FText.validateRaw(value, fieldPath);
   }
 
   override toString(): string {

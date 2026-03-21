@@ -5,7 +5,19 @@ import { ITypeFieldConfig } from "./type-field.config";
 
 export { TJsonSchemaType } from "./type-field.config";
 
-export abstract class TypeField<TPrimitive> {
+// Cache de Object.values() para evitar alocação repetida
+const enumValuesCache = new WeakMap<object, unknown[]>();
+
+function getCachedEnumValues(enumObj: object): unknown[] {
+  let cached = enumValuesCache.get(enumObj);
+  if (!cached) {
+    cached = Object.values(enumObj);
+    enumValuesCache.set(enumObj, cached);
+  }
+  return cached;
+}
+
+export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
   /** Nome usado para inferência de tipo */
   abstract readonly typeInference: string;
   /** Configurações de validação e serialização */
@@ -24,7 +36,7 @@ export abstract class TypeField<TPrimitive> {
     raw: unknown,
     fieldPath: string,
   ): Result<E[keyof E], ExceptionValidation> {
-    const enumValues = Object.values(enumObj);
+    const enumValues = getCachedEnumValues(enumObj);
     if (enumValues.includes(raw as E[keyof E])) {
       return ok(raw as E[keyof E]);
     }
@@ -45,9 +57,9 @@ export abstract class TypeField<TPrimitive> {
   ): Result<true, ExceptionValidation> {
     const { jsonSchemaType } = this.config;
 
-    // Validação de enum se configurado
+    // Validação de enum se configurado (com cache)
     if ("validateEnum" in this.config && this.config.validateEnum) {
-      const enumValues = Object.values(this.config.validateEnum) as unknown[];
+      const enumValues = getCachedEnumValues(this.config.validateEnum);
       if (!enumValues.includes(value)) {
         return err(
           ExceptionValidation.create(
@@ -110,9 +122,9 @@ export abstract class TypeField<TPrimitive> {
 
   abstract getDescription(): string;
   abstract getShortDescription(): string;
-  abstract formatted(): string;
+  abstract formatted(): TFormatted;
 
-  equals(other?: TypeField<TPrimitive>): boolean {
+  equals(other?: TypeField<TPrimitive, TFormatted>): boolean {
     return (
       !!other &&
       other.constructor === this.constructor &&
@@ -138,7 +150,7 @@ export abstract class TypeField<TPrimitive> {
 
   getDocumentationAux(): {
     value: TPrimitive;
-    formatted: string;
+    formatted: TFormatted;
     description: string;
   } {
     return {

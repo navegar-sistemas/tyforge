@@ -1,11 +1,11 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 
 export type TBoolean = boolean;
 
-export class FBoolean extends TypeField<TBoolean> {
+export class FBoolean extends TypeField<TBoolean, string> {
   override readonly typeInference = "FBoolean";
 
   override readonly config: ITypeFieldConfig<TBoolean> = {
@@ -17,44 +17,35 @@ export class FBoolean extends TypeField<TBoolean> {
     super(value, fieldPath);
   }
 
+  static validateRaw(value: unknown, fieldPath: string): Result<boolean, ExceptionValidation> {
+    if (typeof value === "boolean") {
+      return ok(value);
+    }
+    if (typeof value === "string") {
+      const lowerValue = value.toLowerCase();
+      if (lowerValue === "true" || lowerValue === "1" || lowerValue === "yes") {
+        return OK_TRUE;
+      }
+      if (lowerValue === "false" || lowerValue === "0" || lowerValue === "no") {
+        return ok(false);
+      }
+    }
+    if (typeof value === "number") {
+      if (value === 1) return OK_TRUE;
+      if (value === 0) return ok(false);
+    }
+    return err(
+      ExceptionValidation.create(fieldPath, "Valor deve ser um booleano válido"),
+    );
+  }
+
   static create(
     raw: TBoolean | number | string,
     fieldPath = "Boolean",
   ): Result<FBoolean, ExceptionValidation> {
-    const parseBoolean: (value: unknown) => TBoolean = (value) => {
-      if (typeof value === "boolean") {
-        return value;
-      }
-      if (typeof value === "string") {
-        const lowerValue = value.toLowerCase();
-        if (
-          lowerValue === "true" ||
-          lowerValue === "1" ||
-          lowerValue === "yes"
-        ) {
-          return true;
-        }
-        if (
-          lowerValue === "false" ||
-          lowerValue === "0" ||
-          lowerValue === "no"
-        ) {
-          return false;
-        }
-      }
-      if (typeof value === "number") {
-        return value === 1;
-      }
-      return Boolean(value);
-    };
-    const parsedValue = parseBoolean(raw);
-    const inst = new FBoolean(parsedValue, fieldPath);
-    const validation = inst.validate(parsedValue, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FBoolean.validateRaw(raw, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FBoolean(validation.value, fieldPath));
   }
 
   static createOrThrow(
@@ -70,25 +61,9 @@ export class FBoolean extends TypeField<TBoolean> {
     value: TBoolean,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    // Validação da classe pai
-    const baseValidation = super.validate(value, fieldPath);
-
-    if (isFailure(baseValidation)) return baseValidation;
-
-    // Validações customizadas
-
-    const validateBoolean: (value: TBoolean) => boolean = (value) =>
-      typeof value === "boolean";
-    if (!validateBoolean(value)) {
-      return err(
-        ExceptionValidation.create(
-          fieldPath,
-          "Valor deve ser um booleano válido",
-        ),
-      );
-    }
-
-    return ok(true);
+    const coerced = FBoolean.validateRaw(value, fieldPath);
+    if (!coerced.success) return err(coerced.error);
+    return OK_TRUE;
   }
 
   override toString(): string {

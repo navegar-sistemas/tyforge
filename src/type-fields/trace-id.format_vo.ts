@@ -1,7 +1,8 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 import { v7 as uuidv7 } from "uuid";
 
 /**
@@ -95,22 +96,36 @@ export class FTraceId extends TypeField<TTraceId> {
     super(value, fieldPath);
   }
 
+  static validateRaw(
+    value: unknown,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    const parsed = typeof value === "string" ? value.trim() : String(value);
+
+    const base = TypeGuard.isString(parsed, fieldPath, 36, 36);
+    if (!base.success) return base;
+
+    if (!UUID_V7_PATTERN.test(parsed)) {
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "TraceId deve ser UUID v7 valido (versao 7, variante RFC 4122)",
+        ),
+      );
+    }
+
+    return OK_TRUE;
+  }
+
   static create(
     raw: TTraceId,
     fieldPath = "TraceId",
   ): Result<FTraceId, ExceptionValidation> {
-    const parseTraceId = (value: unknown): TTraceId => {
-      return typeof value === "string" ? value.trim() : String(value);
-    };
+    const parsedValue = typeof raw === "string" ? raw.trim() : String(raw);
 
-    const parsedValue = parseTraceId(raw);
-    const inst = new FTraceId(parsedValue, fieldPath);
-    const validation = inst.validate(parsedValue, fieldPath);
-
-    if (!validation.success) {
-      return err(validation.error);
-    }
-    return ok(inst);
+    const validation = FTraceId.validateRaw(parsedValue, fieldPath);
+    if (!validation.success) return err(validation.error);
+    return ok(new FTraceId(parsedValue, fieldPath));
   }
 
   static createOrThrow(raw: TTraceId, fieldPath = "TraceId"): FTraceId {
@@ -155,19 +170,7 @@ export class FTraceId extends TypeField<TTraceId> {
     value: TTraceId,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    const baseValidation = super.validate(value, fieldPath);
-    if (isFailure(baseValidation)) return baseValidation;
-
-    if (!UUID_V7_PATTERN.test(value)) {
-      return err(
-        ExceptionValidation.create(
-          fieldPath,
-          "TraceId deve ser UUID v7 valido (versao 7, variante RFC 4122)",
-        ),
-      );
-    }
-
-    return ok(true);
+    return FTraceId.validateRaw(value, fieldPath);
   }
 
   /**

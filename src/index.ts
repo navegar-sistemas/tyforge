@@ -1,6 +1,6 @@
 // ── Result Pattern ──────────────────────────────────────────────
 export type { Result, ResultPromise } from "./result/result";
-export { ok, err, isSuccess, isFailure, map, flatMap, fold, match, getOrElse, orElse, all } from "./result/result";
+export { ok, err, isSuccess, isFailure, map, flatMap, fold, match, getOrElse, orElse, all, OK_TRUE } from "./result/result";
 
 // ── Exceptions ──────────────────────────────────────────────────
 export { Exceptions } from "./exceptions/base.exceptions";
@@ -13,6 +13,7 @@ export { default as ExceptionUnexpected } from "./exceptions/unexpected";
 
 // ── Schema ──────────────────────────────────────────────────────
 export { SchemaBuilder } from "./schema/schema-build";
+export type { CompiledSchema } from "./schema/schema-build";
 export type {
   ISchemaFieldConfig,
   ISchemaInlineObject,
