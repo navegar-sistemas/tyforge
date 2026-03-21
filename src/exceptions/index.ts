@@ -11,6 +11,7 @@ export { ExceptionIntInvalid } from "./int.exception";
 export { default as ExceptionInterface } from "./interface.exception";
 export { ExceptionJson } from "./json.exception";
 export { ExceptionNotFound } from "./not-found.exception";
+export { OptimisticLockException } from "./optimistic-lock.exception";
 export { ExceptionString } from "./string.exception";
 export { ExceptionText } from "./text.exception";
 export { default as ExceptionUnexpected } from "./unexpected";

@@ -146,4 +146,4 @@ abstract class FDate extends TypeField<Date, string> {
 }
 ```
 
-O `toJson()` de domain models com campos `FDate` respeita a configuracao `{ date: 'string' | 'date' }` — quando `date: 'string'`, o valor e serializado via `toString()` no formato especifico da subclasse.
+O `toJSON()` de domain models com campos `FDate` respeita a configuracao `{ date: 'string' | 'date' }` — quando `date: 'string'`, o valor e serializado via `toString()` no formato especifico da subclasse.

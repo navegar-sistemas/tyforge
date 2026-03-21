@@ -54,7 +54,7 @@ abstract class DomainEvent<TPayload = Record<string, unknown>> {
 
   constructor(eventName: string, payload: TPayload, occurredAt?: Date);
 
-  toJson(): {
+  toJSON(): {
     id: string;
     eventName: string;
     payload: TPayload;
@@ -150,7 +150,7 @@ const pedido = Pedido.criar({
 const eventos = pedido.getDomainEvents();
 console.log(eventos.length); // 1
 console.log(eventos[0].eventName); // "PedidoCriado"
-console.log(eventos[0].toJson());
+console.log(eventos[0].toJSON());
 // {
 //   id: "uuid-v7",
 //   eventName: "PedidoCriado",

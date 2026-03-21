@@ -10,8 +10,9 @@ export const OBoolInt = {
 
 export type TKeyBoolInt = keyof typeof OBoolInt;
 export type TBoolInt = (typeof OBoolInt)[TKeyBoolInt];
+export type TBoolIntFormatted = string;
 
-export class FBoolInt extends TypeField<TBoolInt, string> {
+export class FBoolInt extends TypeField<TBoolInt, TBoolIntFormatted> {
   override readonly typeInference = "FBoolInt";
 
   override readonly config: ITypeFieldConfig<TBoolInt> = {

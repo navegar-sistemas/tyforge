@@ -5,8 +5,9 @@ import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TPassword = string;
+export type TPasswordFormatted = string;
 
-export class FPassword extends TypeField<TPassword> {
+export class FPassword extends TypeField<TPassword, TPasswordFormatted> {
   override readonly typeInference = "FPassword";
 
   override readonly config: ITypeFieldConfig<TPassword> = {
@@ -33,7 +34,8 @@ export class FPassword extends TypeField<TPassword> {
     const base = TypeGuard.isString(value, fieldPath, 8, 128);
     if (!base.success) return base;
 
-    const str = value as string;
+    if (typeof value !== "string") return base;
+    const str = value;
     if (
       str.length < 8 ||
       !FPassword.UPPERCASE_REGEX.test(str) ||

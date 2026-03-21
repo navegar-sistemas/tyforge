@@ -68,7 +68,7 @@ export abstract class Exceptions extends Error {
     return this._lazyStack;
   }
 
-  toJson(): Record<string, unknown> {
+  toJSON(): Record<string, unknown> {
     return {
       type: this.type,
       title: this.title,

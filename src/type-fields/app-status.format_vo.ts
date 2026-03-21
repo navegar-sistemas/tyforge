@@ -3,73 +3,74 @@ import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 
-export const OStatusAplicacao = {
+export const OAppStatus = {
   ACTIVE: "active",
   INACTIVE: "inactive",
 } as const;
 
-export type TKeyStatusAplicacao = keyof typeof OStatusAplicacao;
-export type TStatusAplicacao = (typeof OStatusAplicacao)[TKeyStatusAplicacao];
+export type TKeyAppStatus = keyof typeof OAppStatus;
+export type TAppStatus = (typeof OAppStatus)[TKeyAppStatus];
+export type TAppStatusFormatted = string;
 
-export class FStatusAplicacao extends TypeField<TStatusAplicacao, string> {
-  override readonly typeInference = "FStatusAplicacao";
+export class FAppStatus extends TypeField<TAppStatus, TAppStatusFormatted> {
+  override readonly typeInference = "FAppStatus";
 
-  override readonly config: ITypeFieldConfig<TStatusAplicacao> = {
+  override readonly config: ITypeFieldConfig<TAppStatus> = {
     jsonSchemaType: "string",
     minLength: 1,
     maxLength: 10,
-    validateEnum: OStatusAplicacao,
+    validateEnum: OAppStatus,
     serializeAsString: false,
   };
 
-  private constructor(value: TStatusAplicacao, fieldPath: string) {
+  private constructor(value: TAppStatus, fieldPath: string) {
     super(value, fieldPath);
   }
 
   static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
-    const resolved = FStatusAplicacao.resolveEnum(OStatusAplicacao, value, fieldPath);
+    const resolved = FAppStatus.resolveEnum(OAppStatus, value, fieldPath);
     if (!resolved.success) return err(resolved.error);
     return OK_TRUE;
   }
 
   static create(
-    raw: TStatusAplicacao,
-    fieldPath = "StatusAplicacao",
-  ): Result<FStatusAplicacao, ExceptionValidation> {
-    const validation = FStatusAplicacao.validateRaw(raw, fieldPath);
+    raw: TAppStatus,
+    fieldPath = "AppStatus",
+  ): Result<FAppStatus, ExceptionValidation> {
+    const validation = FAppStatus.validateRaw(raw, fieldPath);
     if (!validation.success) return err(validation.error);
-    return ok(new FStatusAplicacao(raw, fieldPath));
+    return ok(new FAppStatus(raw, fieldPath));
   }
 
   static createOrThrow(
-    raw: TStatusAplicacao,
-    fieldPath = "StatusAplicacao",
-  ): FStatusAplicacao {
+    raw: TAppStatus,
+    fieldPath = "AppStatus",
+  ): FAppStatus {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static fromBoolean(isActive: boolean): FStatusAplicacao {
+  static fromBoolean(isActive: boolean): FAppStatus {
     const status = isActive
-      ? OStatusAplicacao.ACTIVE
-      : OStatusAplicacao.INACTIVE;
-    return FStatusAplicacao.createOrThrow(status, "StatusAplicacao");
+      ? OAppStatus.ACTIVE
+      : OAppStatus.INACTIVE;
+    return FAppStatus.createOrThrow(status, "AppStatus");
   }
 
-  static generate(): FStatusAplicacao {
-    return FStatusAplicacao.createOrThrow(OStatusAplicacao.ACTIVE, "StatusAplicacao");
+  static generate(): FAppStatus {
+    return FAppStatus.createOrThrow(OAppStatus.ACTIVE, "AppStatus");
   }
 
   override validate(
-    value: TStatusAplicacao,
+    value: TAppStatus,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    return FStatusAplicacao.validateRaw(value, fieldPath);
+    return FAppStatus.validateRaw(value, fieldPath);
   }
 
   isActive(): boolean {
-    return this.getValue() === OStatusAplicacao.ACTIVE;
+    return this.getValue() === OAppStatus.ACTIVE;
   }
 
   override toString(): string {

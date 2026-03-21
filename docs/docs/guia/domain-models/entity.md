@@ -103,7 +103,7 @@ const usuario = Usuario.create({
 });
 
 // Serializar para JSON
-const json = usuario.toJson();
+const json = usuario.toJSON();
 // { id: "uuid-aqui", nome: "Maria Silva", email: "maria@email.com" }
 
 // Comparar por identidade

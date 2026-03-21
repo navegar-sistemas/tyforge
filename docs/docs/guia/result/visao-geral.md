@@ -184,18 +184,18 @@ Isso e especialmente importante em cenarios de validacao em massa, onde milhares
 O Result pattern permeia toda a biblioteca:
 
 - **TypeFields**: `FString.create()`, `FEmail.create()`, `FInt.create()` — todos retornam `Result<TInstance, Exceptions>`.
-- **SchemaBuilder**: `validator.create()` e `validator.assign()` retornam `Result<ISchemaInferProps<T>, Exceptions>`.
+- **SchemaBuilder**: `validator.create()` e `validator.assign()` retornam `Result<InferProps<T>, Exceptions>`.
 - **Domain Models**: `Entity.create()`, `ValueObject.create()` e `Aggregate.create()` retornam Result.
 
 ```typescript
 import { FEmail, SchemaBuilder, isSuccess } from "tyforge";
-import type { ISchemaInlineObject } from "tyforge";
+import type { Schema } from "tyforge";
 
 // TypeField retorna Result
 const emailResult = FEmail.create("usuario@email.com");
 
 // Schema retorna Result
-const schema = { email: { type: FEmail, required: true } } satisfies ISchemaInlineObject;
+const schema = { email: { type: FEmail, required: true } } satisfies Schema;
 const validator = SchemaBuilder.compile(schema);
 const schemaResult = validator.create({ email: "usuario@email.com" });
 

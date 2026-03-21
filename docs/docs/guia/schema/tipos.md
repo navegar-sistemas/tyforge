@@ -15,7 +15,7 @@ Interface que define a configuracao de um campo individual no schema:
 interface ISchemaFieldConfig {
   type: ValueObjectStatic<unknown, TypeField<unknown>>
       | EntityStatic<Entity<IEntityPropsBase, unknown>>
-      | ISchemaInlineObject;
+      | Schema;
   required?: boolean;       // padrao: true
   isArray?: boolean;        // padrao: false
   expose?: 'public' | 'private' | 'redacted';
@@ -33,13 +33,13 @@ interface ISchemaFieldConfig {
 | `label` | `string` | Rotulo legivel para o campo (ex: para documentacao de API) |
 | `description` | `string` | Descricao detalhada do campo |
 
-## ISchemaInlineObject
+## Schema
 
 Representa um objeto aninhado dentro do schema, sem o wrapper `{ type: ... }`. Cada chave contem outro campo ou sub-objeto:
 
 ```typescript
-interface ISchemaInlineObject {
-  [key: string]: ISchemaFieldConfig | ISchemaInlineObject;
+interface Schema {
+  [key: string]: ISchemaFieldConfig | Schema;
 }
 ```
 
@@ -47,24 +47,24 @@ interface ISchemaInlineObject {
 
 ```typescript
 import { FString } from 'tyforge';
-import type { ISchemaInlineObject } from 'tyforge';
+import type { Schema } from 'tyforge';
 
-// 'address' e um ISchemaInlineObject — nao possui { type: ... }
+// 'address' e um Schema — nao possui { type: ... }
 const schema = {
   name: { type: FString, required: true },     // ISchemaFieldConfig
-  address: {                                     // ISchemaInlineObject
+  address: {                                     // Schema
     street: { type: FString, required: true },
     city: { type: FString, required: true },
   },
-} satisfies ISchemaInlineObject;
+} satisfies Schema;
 ```
 
-## ISchemaInferJson
+## InferJson
 
 Infere o tipo da entrada JSON (dados brutos com primitivos) a partir do schema. Campos com `required: false` tornam-se propriedades opcionais.
 
 ```typescript
-type ISchemaInferJson<TSchema extends ISchemaInlineObject>
+type InferJson<TSchema extends Schema>
 ```
 
 ### Regras de Inferencia para JSON
@@ -82,16 +82,16 @@ type ISchemaInferJson<TSchema extends ISchemaInlineObject>
 
 ```typescript
 import { SchemaBuilder, FString, FEmail, FInt, FBoolean } from 'tyforge';
-import type { ISchemaInferJson, ISchemaInlineObject } from 'tyforge';
+import type { InferJson, Schema } from 'tyforge';
 
 const userSchema = {
   name: { type: FString, required: true },
   email: { type: FEmail, required: true },
   age: { type: FInt, required: false },
   active: { type: FBoolean, required: true },
-} satisfies ISchemaInlineObject;
+} satisfies Schema;
 
-type UserJson = ISchemaInferJson<typeof userSchema>;
+type UserJson = InferJson<typeof userSchema>;
 // Resultado:
 // {
 //   name: string;
@@ -101,12 +101,12 @@ type UserJson = ISchemaInferJson<typeof userSchema>;
 // }
 ```
 
-## ISchemaInferProps
+## InferProps
 
 Infere o tipo da saida validada (instancias de TypeField) a partir do schema. Campos com `required: false` tornam-se propriedades opcionais.
 
 ```typescript
-type ISchemaInferProps<TSchema extends ISchemaInlineObject>
+type InferProps<TSchema extends Schema>
 ```
 
 ### Regras de Inferencia para Props
@@ -123,16 +123,16 @@ type ISchemaInferProps<TSchema extends ISchemaInlineObject>
 
 ```typescript
 import { SchemaBuilder, FString, FEmail, FInt, FBoolean } from 'tyforge';
-import type { ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
+import type { InferProps, Schema } from 'tyforge';
 
 const userSchema = {
   name: { type: FString, required: true },
   email: { type: FEmail, required: true },
   age: { type: FInt, required: false },
   active: { type: FBoolean, required: true },
-} satisfies ISchemaInlineObject;
+} satisfies Schema;
 
-type UserProps = ISchemaInferProps<typeof userSchema>;
+type UserProps = InferProps<typeof userSchema>;
 // Resultado:
 // {
 //   name: FString;
@@ -144,24 +144,24 @@ type UserProps = ISchemaInferProps<typeof userSchema>;
 
 ## Inferencia com Arrays
 
-Quando `isArray: true` esta presente, tanto `ISchemaInferJson` quanto `ISchemaInferProps` produzem arrays:
+Quando `isArray: true` esta presente, tanto `InferJson` quanto `InferProps` produzem arrays:
 
 ```typescript
 import { FString, FInt } from 'tyforge';
-import type { ISchemaInferJson, ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
+import type { InferJson, InferProps, Schema } from 'tyforge';
 
 const schema = {
   tags: { type: FString, required: true, isArray: true },
   scores: { type: FInt, required: false, isArray: true },
-} satisfies ISchemaInlineObject;
+} satisfies Schema;
 
-type JsonType = ISchemaInferJson<typeof schema>;
+type JsonType = InferJson<typeof schema>;
 // {
 //   tags: string[];
 //   scores?: number[];
 // }
 
-type PropsType = ISchemaInferProps<typeof schema>;
+type PropsType = InferProps<typeof schema>;
 // {
 //   tags: FString[];
 //   scores?: FInt[];
@@ -174,7 +174,7 @@ Objetos inline (sem wrapper `{ type: ... }`) sao tratados recursivamente. O tipo
 
 ```typescript
 import { FString } from 'tyforge';
-import type { ISchemaInferJson, ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
+import type { InferJson, InferProps, Schema } from 'tyforge';
 
 const schema = {
   user: {
@@ -185,9 +185,9 @@ const schema = {
       zip: { type: FString, required: false },
     },
   },
-} satisfies ISchemaInlineObject;
+} satisfies Schema;
 
-type JsonType = ISchemaInferJson<typeof schema>;
+type JsonType = InferJson<typeof schema>;
 // {
 //   user: {
 //     name: string;
@@ -199,7 +199,7 @@ type JsonType = ISchemaInferJson<typeof schema>;
 //   };
 // }
 
-type PropsType = ISchemaInferProps<typeof schema>;
+type PropsType = InferProps<typeof schema>;
 // {
 //   user: {
 //     name: FString;
@@ -226,16 +226,16 @@ interface EntityStatic<TInstance extends Entity<IEntityPropsBase, unknown>> {
 
 ```typescript
 import { SchemaBuilder, FString, FInt, isSuccess } from 'tyforge';
-import type { ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
+import type { InferProps, Schema } from 'tyforge';
 
 // Supondo que Produto e uma Entity com create() estatico
 const pedidoSchema = {
   numero: { type: FInt, required: true },
   cliente: { type: FString, required: true },
   produto: { type: Produto, required: true },
-} satisfies ISchemaInlineObject;
+} satisfies Schema;
 
-type PedidoProps = ISchemaInferProps<typeof pedidoSchema>;
+type PedidoProps = InferProps<typeof pedidoSchema>;
 // {
 //   numero: FInt;
 //   cliente: FString;
@@ -263,7 +263,7 @@ O exemplo abaixo demonstra todas as capacidades de inferencia em um unico schema
 import {
   SchemaBuilder, FString, FEmail, FInt, FBoolean, isSuccess,
 } from 'tyforge';
-import type { ISchemaInferJson, ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
+import type { InferJson, InferProps, Schema } from 'tyforge';
 
 const cadastroSchema = {
   nome: { type: FString, required: true },
@@ -276,10 +276,10 @@ const cadastroSchema = {
     cidade: { type: FString, required: true },
     cep: { type: FString, required: false },
   },
-} satisfies ISchemaInlineObject;
+} satisfies Schema;
 
 // Tipo da entrada JSON
-type CadastroJson = ISchemaInferJson<typeof cadastroSchema>;
+type CadastroJson = InferJson<typeof cadastroSchema>;
 // {
 //   nome: string;
 //   email: string;
@@ -294,7 +294,7 @@ type CadastroJson = ISchemaInferJson<typeof cadastroSchema>;
 // }
 
 // Tipo da saida validada
-type CadastroProps = ISchemaInferProps<typeof cadastroSchema>;
+type CadastroProps = InferProps<typeof cadastroSchema>;
 // {
 //   nome: FString;
 //   email: FEmail;

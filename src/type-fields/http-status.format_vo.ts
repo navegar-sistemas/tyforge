@@ -9,8 +9,9 @@ import {
 } from "@tyforge/constants/http-status.constants";
 
 export { OHttpStatus, TKeyHttpStatus, THttpStatus };
+export type THttpStatusFormatted = string;
 
-export class FHttpStatus extends TypeField<THttpStatus, string> {
+export class FHttpStatus extends TypeField<THttpStatus, THttpStatusFormatted> {
   override readonly typeInference = "FHttpStatus";
 
   override readonly config: ITypeFieldConfig<THttpStatus> = {

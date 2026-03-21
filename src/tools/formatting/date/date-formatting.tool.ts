@@ -1,3 +1,6 @@
+import { Result, ok, err } from "@tyforge/result";
+import { ExceptionValidation } from "@tyforge/exceptions";
+
 export class ToolFormattingDateISO8601 {
   private static pad(num: number): string {
     return num.toString().padStart(2, "0");
@@ -42,9 +45,11 @@ export class ToolFormattingDateISO8601 {
    * Apenas data (YYYY-MM-DD) em UTC-3.
    * Exemplo: "2024-04-09"
    */
-  static formatDate(value: Date): string {
+  static formatDate(value: Date): Result<string, ExceptionValidation> {
     if (!(value instanceof Date) || isNaN(value.getTime())) {
-      throw new Error("Invalid Date input");
+      return err(
+        ExceptionValidation.create("formatDate", "Invalid Date input"),
+      );
     }
 
     // Adjust to UTC-3 by subtracting 3 hours (3 * 60 * 60 * 1000 milliseconds)
@@ -55,7 +60,7 @@ export class ToolFormattingDateISO8601 {
     const month = String(utcMinus3.getUTCMonth() + 1).padStart(2, "0");
     const day = String(utcMinus3.getUTCDate()).padStart(2, "0");
 
-    return `${year}-${month}-${day}`;
+    return ok(`${year}-${month}-${day}`);
   }
 
   /**

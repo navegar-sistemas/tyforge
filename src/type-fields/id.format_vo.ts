@@ -6,11 +6,12 @@ import { TypeGuard } from "@tyforge/tools/type_guard";
 import { v7 as uuidv7 } from "uuid";
 
 export type TId = string;
+export type TIdFormatted = string;
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export class FId extends TypeField<TId> {
+export class FId extends TypeField<TId, TIdFormatted> {
   override readonly typeInference = "FId";
 
   override readonly config: ITypeFieldConfig<TId> = {
@@ -27,7 +28,8 @@ export class FId extends TypeField<TId> {
   static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
     const base = TypeGuard.isString(value, fieldPath, 36, 36);
     if (!base.success) return base;
-    const trimmed = (value as string).trim();
+    if (typeof value !== "string") return base;
+    const trimmed = value.trim();
     if (!UUID_REGEX.test(trimmed)) {
       return err(ExceptionValidation.create(fieldPath, "ID deve ser um UUID válido"));
     }
@@ -37,7 +39,7 @@ export class FId extends TypeField<TId> {
   static create(raw: TId, fieldPath = "Id"): Result<FId, ExceptionValidation> {
     const validation = FId.validateRaw(raw, fieldPath);
     if (!validation.success) return err(validation.error);
-    const trimmed = (raw as string).trim();
+    const trimmed = raw.trim();
     return ok(new FId(trimmed, fieldPath));
   }
 

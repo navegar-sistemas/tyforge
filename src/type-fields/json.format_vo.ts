@@ -4,8 +4,9 @@ import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 
 export type TJson = Record<string, unknown>;
+export type TJsonFormatted = string;
 
-export class FJson extends TypeField<TJson, string> {
+export class FJson extends TypeField<TJson, TJsonFormatted> {
   override readonly typeInference = "FJson";
 
   override readonly config: ITypeFieldConfig<TJson> = {
@@ -17,20 +18,24 @@ export class FJson extends TypeField<TJson, string> {
     super(value, fieldPath);
   }
 
+  private static isPlainObject(v: unknown): v is TJson {
+    return typeof v === "object" && v !== null && !Array.isArray(v);
+  }
+
   static validateRaw(value: unknown, fieldPath: string): Result<TJson, ExceptionValidation> {
     if (typeof value === "string") {
       try {
         const parsed: unknown = JSON.parse(value);
-        if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
-          return ok(parsed as TJson);
+        if (FJson.isPlainObject(parsed)) {
+          return ok(parsed);
         }
         return err(ExceptionValidation.create(fieldPath, "Deve ser um objeto JSON válido"));
       } catch {
         return err(ExceptionValidation.create(fieldPath, "Deve ser um objeto JSON válido"));
       }
     }
-    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      return ok(value as TJson);
+    if (FJson.isPlainObject(value)) {
+      return ok(value);
     }
     return err(ExceptionValidation.create(fieldPath, "Deve ser um objeto JSON válido"));
   }

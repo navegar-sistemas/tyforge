@@ -5,8 +5,9 @@ import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TInt = number;
+export type TIntFormatted = string;
 
-export class FInt extends TypeField<TInt, string> {
+export class FInt extends TypeField<TInt, TIntFormatted> {
   override readonly typeInference = "FInt";
 
   override readonly config: ITypeFieldConfig<TInt> = {

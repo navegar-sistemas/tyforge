@@ -48,8 +48,8 @@ export const getOrElse = <T, E>(
 ): T =>
   isSuccess(result)
     ? result.value
-    : typeof defaultValue === "function"
-      ? (defaultValue as () => T)()
+    : defaultValue instanceof Function
+      ? defaultValue()
       : defaultValue;
 
 export const orElse = <T, E>(

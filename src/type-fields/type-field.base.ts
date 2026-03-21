@@ -17,6 +17,13 @@ function getCachedEnumValues(enumObj: object): unknown[] {
   return cached;
 }
 
+function isEnumValue<E extends Record<string, string | number>>(
+  value: unknown,
+  enumValues: unknown[],
+): value is E[keyof E] {
+  return enumValues.includes(value);
+}
+
 export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
   /** Nome usado para inferência de tipo */
   abstract readonly typeInference: string;
@@ -37,8 +44,8 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
     fieldPath: string,
   ): Result<E[keyof E], ExceptionValidation> {
     const enumValues = getCachedEnumValues(enumObj);
-    if (enumValues.includes(raw as E[keyof E])) {
-      return ok(raw as E[keyof E]);
+    if (isEnumValue<E>(raw, enumValues)) {
+      return ok(raw);
     }
     return err(
       ExceptionValidation.create(
@@ -72,22 +79,22 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
 
     switch (jsonSchemaType) {
       case "string": {
-        const cfg = this.config as ITypeFieldConfig<string>;
+        const cfg = this.config;
         return TypeGuard.isString(
           value,
           fieldPath,
-          cfg.minLength,
-          cfg.maxLength,
+          "minLength" in cfg ? cfg.minLength : undefined,
+          "maxLength" in cfg ? cfg.maxLength : undefined,
         );
       }
       case "number": {
-        const cfg = this.config as ITypeFieldConfig<number>;
+        const cfg = this.config;
         return TypeGuard.isNumber(
           value,
           fieldPath,
-          cfg.min,
-          cfg.max,
-          cfg.decimalPrecision,
+          "min" in cfg ? cfg.min : undefined,
+          "max" in cfg ? cfg.max : undefined,
+          "decimalPrecision" in cfg ? cfg.decimalPrecision : undefined,
         );
       }
       case "boolean":
@@ -95,12 +102,12 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
       case "object":
         return TypeGuard.isObject(value, fieldPath);
       case "array": {
-        const cfg = this.config as ITypeFieldConfig<unknown[]>;
+        const cfg = this.config;
         return TypeGuard.isArray(
           value,
           fieldPath,
-          cfg.minItems ?? 0,
-          cfg.maxItems ?? Infinity,
+          "minItems" in cfg ? cfg.minItems ?? 0 : 0,
+          "maxItems" in cfg ? cfg.maxItems ?? Infinity : Infinity,
         );
       }
       case "Date":

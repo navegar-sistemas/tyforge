@@ -14,7 +14,7 @@ Type Fields complementares para booleanos, objetos JSON, status HTTP, status de 
 | `FBoolean` | `boolean` | Coercao de string/number para boolean | `boolean.format_vo.ts` |
 | `FJson` | `Record<string, unknown>` | Objeto JSON valido | `json.format_vo.ts` |
 | `FHttpStatus` | `number` (enum) | Enum `OHttpStatus` | `http-status.format_vo.ts` |
-| `FStatusAplicacao` | `string` (enum) | `"active"` ou `"inactive"` | `status-aplicacao.format_vo.ts` |
+| `FAppStatus` | `string` (enum) | `"active"` ou `"inactive"` | `status-aplicacao.format_vo.ts` |
 | `FPublicKeyPem` | `string` | Formato PEM com headers BEGIN/END | `public-key-pem.format_vo.ts` |
 
 ---
@@ -134,22 +134,22 @@ export const OHttpStatus = {
 
 ---
 
-## FStatusAplicacao
+## FAppStatus
 
 Status de uma aplicacao no sistema. Aceita apenas os valores `"active"` ou `"inactive"`.
 
 ```typescript
-import { FStatusAplicacao, OStatusAplicacao } from "tyforge";
+import { FAppStatus, OStatusAplicacao } from "tyforge";
 
-const result = FStatusAplicacao.create("active");
-// Result<FStatusAplicacao, ExceptionValidation>
+const result = FAppStatus.create("active");
+// Result<FAppStatus, ExceptionValidation>
 
 // Criar a partir de booleano
-const status = FStatusAplicacao.fromBoolean(true);
+const status = FAppStatus.fromBoolean(true);
 status.getValue(); // "active"
 
 // Gerar status ativo por padrao
-const ativo = FStatusAplicacao.generate();
+const ativo = FAppStatus.generate();
 ativo.getValue(); // "active"
 
 // Verificar se esta ativo

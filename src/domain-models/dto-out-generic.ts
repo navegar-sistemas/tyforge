@@ -69,7 +69,7 @@ export class DtoOutGeneric
     );
   }
 
-  toJson(): IpDtoOutGeneric {
+  toJSON(): IpDtoOutGeneric {
     return {
       status: this.status.getValue(),
       body: this.body,

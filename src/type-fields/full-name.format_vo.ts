@@ -4,19 +4,20 @@ import { Result, ok, err, isFailure } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
-export type TDescricao = string;
+export type TFullName = string;
+export type TFullNameFormatted = string;
 
-export class FDescricao extends TypeField<TDescricao> {
-  override readonly typeInference = "FDescricao";
+export class FFullName extends TypeField<TFullName, TFullNameFormatted> {
+  override readonly typeInference = "FFullName";
 
-  override readonly config: ITypeFieldConfig<TDescricao> = {
+  override readonly config: ITypeFieldConfig<TFullName> = {
     jsonSchemaType: "string",
-    minLength: 1,
-    maxLength: 1000,
+    minLength: 2,
+    maxLength: 140,
     serializeAsString: false,
   };
 
-  private constructor(value: TDescricao, fieldPath: string) {
+  private constructor(value: TFullName, fieldPath: string) {
     super(value, fieldPath);
   }
 
@@ -24,29 +25,32 @@ export class FDescricao extends TypeField<TDescricao> {
     value: unknown,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    return TypeGuard.isString(value, fieldPath, 1, 1000);
+    return TypeGuard.isString(value, fieldPath, 2, 140);
   }
 
   static create(
-    raw: TDescricao,
-    fieldPath = "Descricao",
-  ): Result<FDescricao, ExceptionValidation> {
-    const validation = FDescricao.validateRaw(raw, fieldPath);
+    raw: TFullName,
+    fieldPath = "FullName",
+  ): Result<FFullName, ExceptionValidation> {
+    const validation = FFullName.validateRaw(raw, fieldPath);
     if (!validation.success) return err(validation.error);
-    return ok(new FDescricao(raw, fieldPath));
+    return ok(new FFullName(raw, fieldPath));
   }
 
-  static createOrThrow(raw: TDescricao, fieldPath = "Descricao"): FDescricao {
+  static createOrThrow(
+    raw: TFullName,
+    fieldPath = "FullName",
+  ): FFullName {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
   override validate(
-    value: TDescricao,
+    value: TFullName,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    return FDescricao.validateRaw(value, fieldPath);
+    return FFullName.validateRaw(value, fieldPath);
   }
 
   override toString(): string {
@@ -58,10 +62,10 @@ export class FDescricao extends TypeField<TDescricao> {
   }
 
   override getDescription(): string {
-    return "Descrição detalhada. Deve fornecer informações suficientes para compreensão completa do objeto descrito.";
+    return "Nome completo de uma pessoa, incluindo nome e sobrenome. Deve conter pelo menos 2 caracteres e não pode exceder 100 caracteres. Utilizado para identificação pessoal.";
   }
 
   override getShortDescription(): string {
-    return "Descrição detalhada";
+    return "Nome completo da pessoa";
   }
 }

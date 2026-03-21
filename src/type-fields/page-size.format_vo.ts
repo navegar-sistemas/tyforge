@@ -5,8 +5,9 @@ import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TPageSize = number;
+export type TPageSizeFormatted = string;
 
-export class FPageSize extends TypeField<TPageSize, string> {
+export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
   override readonly typeInference = "FPageSize";
 
   override readonly config: ITypeFieldConfig<TPageSize> = {
@@ -37,7 +38,8 @@ export class FPageSize extends TypeField<TPageSize, string> {
       );
     }
 
-    if ((value as number) < 1) {
+    if (typeof value !== "number") return base;
+    if (value < 1) {
       return err(
         ExceptionValidation.create(
           fieldPath,
@@ -46,7 +48,7 @@ export class FPageSize extends TypeField<TPageSize, string> {
       );
     }
 
-    if ((value as number) > 100) {
+    if (value > 100) {
       return err(
         ExceptionValidation.create(
           fieldPath,

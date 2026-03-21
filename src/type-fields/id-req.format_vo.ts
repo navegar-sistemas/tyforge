@@ -5,8 +5,9 @@ import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TIdReq = string;
+export type TIdReqFormatted = string;
 
-export class FIdReq extends TypeField<TIdReq> {
+export class FIdReq extends TypeField<TIdReq, TIdReqFormatted> {
   override readonly typeInference = "FIdReq";
 
   override readonly config: ITypeFieldConfig<TIdReq> = {

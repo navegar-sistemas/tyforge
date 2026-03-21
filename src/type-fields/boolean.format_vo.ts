@@ -4,8 +4,9 @@ import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 
 export type TBoolean = boolean;
+export type TBooleanFormatted = string;
 
-export class FBoolean extends TypeField<TBoolean, string> {
+export class FBoolean extends TypeField<TBoolean, TBooleanFormatted> {
   override readonly typeInference = "FBoolean";
 
   override readonly config: ITypeFieldConfig<TBoolean> = {

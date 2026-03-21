@@ -14,8 +14,8 @@ Type Fields do tipo string encapsulam e validam textos com regras especificas de
 | `FString` | 1 | 255 | — | `string.format_vo.ts` |
 | `FEmail` | 5 | 200 | Regex RFC 5322 + lowercase/trim | `email.format_vo.ts` |
 | `FPassword` | 8 | 128 | Maiuscula + minuscula + digito + especial | `password.format_vo.ts` |
-| `FNomeCompleto` | 2 | 140 | — | `nome-completo.format_vo.ts` |
-| `FDescricao` | 1 | 1000 | — | `descricao.format_vo.ts` |
+| `FFullName` | 2 | 140 | — | `nome-completo.format_vo.ts` |
+| `FDescription` | 1 | 1000 | — | `descricao.format_vo.ts` |
 | `FText` | 1 | 4000 | — | `text.format_vo.ts` |
 
 ---
@@ -90,17 +90,17 @@ senha.getValue(); // "Senh@Forte1"
 
 ---
 
-## FNomeCompleto
+## FFullName
 
 Nome completo de uma pessoa, incluindo nome e sobrenome.
 
 ```typescript
-import { FNomeCompleto } from "tyforge";
+import { FFullName } from "tyforge";
 
-const result = FNomeCompleto.create("Maria Silva");
-// Result<FNomeCompleto, ExceptionValidation>
+const result = FFullName.create("Maria Silva");
+// Result<FFullName, ExceptionValidation>
 
-const nome = FNomeCompleto.createOrThrow("Maria Silva");
+const nome = FFullName.createOrThrow("Maria Silva");
 nome.getValue(); // "Maria Silva"
 ```
 
@@ -109,17 +109,17 @@ nome.getValue(); // "Maria Silva"
 
 ---
 
-## FDescricao
+## FDescription
 
 Descricao detalhada com capacidade para textos medios.
 
 ```typescript
-import { FDescricao } from "tyforge";
+import { FDescription } from "tyforge";
 
-const result = FDescricao.create("Descricao do produto com detalhes completos.");
-// Result<FDescricao, ExceptionValidation>
+const result = FDescription.create("Descricao do produto com detalhes completos.");
+// Result<FDescription, ExceptionValidation>
 
-const desc = FDescricao.createOrThrow("Descricao do produto");
+const desc = FDescription.createOrThrow("Descricao do produto");
 desc.getValue(); // "Descricao do produto"
 ```
 

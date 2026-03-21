@@ -140,8 +140,8 @@ export class FCpf extends TypeField<TCpf> {
 
 ## Proximos passos
 
-- [Strings](/guia/type-fields/string) — FString, FEmail, FPassword, FNomeCompleto, FDescricao, FText
+- [Strings](/guia/type-fields/string) — FString, FEmail, FPassword, FFullName, FDescription, FText
 - [Numericos](/guia/type-fields/numerico) — FInt, FPageNumber, FPageSize, FBoolInt
 - [Datas](/guia/type-fields/data) — FDateTimeISOZMillis, FDateTimeISOZ, FDateISODate, FDateISOCompact
 - [Identificadores](/guia/type-fields/identificador) — FId, FIdReq, FTraceId, FApiKey, FBearer, FSignature
-- [Outros](/guia/type-fields/outros) — FBoolean, FJson, FHttpStatus, FStatusAplicacao, FPublicKeyPem
+- [Outros](/guia/type-fields/outros) — FBoolean, FJson, FHttpStatus, FAppStatus, FPublicKeyPem

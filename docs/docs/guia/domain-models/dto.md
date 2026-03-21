@@ -122,7 +122,7 @@ const dto = CriarUsuarioDto.create({
 });
 
 // Serializar — TypeFields sao desembrulhados automaticamente
-const json = dto.toJson();
+const json = dto.toJSON();
 // {
 //   body: { nome: "Maria Silva", email: "maria@email.com" },
 //   params: { tenantId: "uuid-aqui" }
@@ -143,12 +143,12 @@ Dtos podem ser combinados com o `SchemaBuilder` para validar dados de entrada e 
 
 ```typescript
 import { SchemaBuilder, FString, FEmail } from 'tyforge';
-import type { ISchemaInlineObject } from 'tyforge';
+import type { Schema } from 'tyforge';
 
 const schema = {
   nome:  { type: FString, required: true },
   email: { type: FEmail, required: true },
-} satisfies ISchemaInlineObject;
+} satisfies Schema;
 
 const validator = SchemaBuilder.compile(schema);
 const result = validator.create(requestBody);

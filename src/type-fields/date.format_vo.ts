@@ -1,5 +1,4 @@
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
-import { ExceptionDate } from "@tyforge/exceptions/date.exception";
 import {
   Result,
   ok,
@@ -12,16 +11,17 @@ import { TypeField } from "./type-field.base";
 import { ITypeFieldConfig } from "./type-field.config";
 
 export type TDate = Date;
-export type TfDate = string;
+export type TDateFormatted = string;
+export type TfDate = TDateFormatted;
 
 /**
  * Base abstrata para formatos de Date.
  */
-export abstract class FDate extends TypeField<TDate, string> {
+export abstract class FDate extends TypeField<TDate, TDateFormatted> {
   /** JSON schema tipo Date */
   static readonly config: ITypeFieldConfig<TDate> = { jsonSchemaType: "Date" };
   override get config(): ITypeFieldConfig<TDate> {
-    return (this.constructor as typeof FDate).config;
+    return FDate.config;
   }
 
   protected constructor(value: TDate, fieldPath: string) {
@@ -57,7 +57,7 @@ export class FDateTimeISOZMillis extends FDate {
   static validateRaw(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
     const parsed = ToolParse.dateISO8601.parseDateTimeZuluWithMillis(value);
     if (isFailure(parsed)) {
-      return err(ExceptionValidation.create(fieldPath, (parsed.error as ExceptionDate).detail));
+      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
     }
     return ok(parsed.value);
   }
@@ -94,13 +94,16 @@ export class FDateTimeISOZMillis extends FDate {
 export class FDateISODate extends FDate {
   override readonly typeInference = "FDateISODate";
 
-  protected formatValue = (date: Date): string =>
-    ToolFormattingDateISO8601.formatDate(date);
+  protected formatValue = (date: Date): string => {
+    const result = ToolFormattingDateISO8601.formatDate(date);
+    if (!result.success) throw result.error;
+    return result.value;
+  };
 
   static validateRaw(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
     const parsed = ToolParse.dateISO8601.parseDate(value);
     if (isFailure(parsed)) {
-      return err(ExceptionValidation.create(fieldPath, (parsed.error as ExceptionDate).detail));
+      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
     }
     return ok(parsed.value);
   }
@@ -133,7 +136,7 @@ export class FDateTimeISOZ extends FDate {
   static validateRaw(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
     const parsed = ToolParse.dateISO8601.parseDateTimeUTC(value);
     if (isFailure(parsed)) {
-      return err(ExceptionValidation.create(fieldPath, (parsed.error as ExceptionDate).detail));
+      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
     }
     return ok(parsed.value);
   }
@@ -170,7 +173,7 @@ export class FDateISOCompact extends FDate {
   static validateRaw(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
     const parsed = ToolParse.dateISO8601.parseDateCompact(value);
     if (isFailure(parsed)) {
-      return err(ExceptionValidation.create(fieldPath, (parsed.error as ExceptionDate).detail));
+      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
     }
     return ok(parsed.value);
   }
@@ -203,7 +206,7 @@ export class FDateTimeISOCompact extends FDate {
   static validateRaw(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
     const parsed = ToolParse.dateISO8601.parseDateTimeCompactWithT(value);
     if (isFailure(parsed)) {
-      return err(ExceptionValidation.create(fieldPath, (parsed.error as ExceptionDate).detail));
+      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
     }
     return ok(parsed.value);
   }
@@ -236,7 +239,7 @@ export class FDateTimeISOFullCompact extends FDate {
   static validateRaw(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
     const parsed = ToolParse.dateISO8601.parseDateTimeFullCompact(value);
     if (isFailure(parsed)) {
-      return err(ExceptionValidation.create(fieldPath, (parsed.error as ExceptionDate).detail));
+      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
     }
     return ok(parsed.value);
   }

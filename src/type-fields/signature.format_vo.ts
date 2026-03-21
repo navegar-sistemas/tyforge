@@ -5,8 +5,9 @@ import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TSignature = string;
+export type TSignatureFormatted = string;
 
-export class FSignature extends TypeField<TSignature> {
+export class FSignature extends TypeField<TSignature, TSignatureFormatted> {
   override readonly typeInference = "FSignature";
 
   private static readonly BASE64_REGEX = /^[A-Za-z0-9+/]+=*$/;
@@ -29,7 +30,8 @@ export class FSignature extends TypeField<TSignature> {
     const base = TypeGuard.isString(value, fieldPath, 64, 512);
     if (!base.success) return base;
 
-    const str = value as string;
+    if (typeof value !== "string") return base;
+    const str = value;
     const cleanValue = str.replace(/\s/g, "");
     if (!FSignature.BASE64_REGEX.test(cleanValue) || cleanValue.length < 64) {
       return err(

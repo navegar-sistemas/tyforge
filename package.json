@@ -1,5 +1,5 @@
 {
-  "name": "tyforge",
+  "name": "tyforge-temp",
   "version": "0.1.3",
   "description": "Type-safe schema validation, Result pattern, and DDD building blocks for TypeScript",
   "keywords": [

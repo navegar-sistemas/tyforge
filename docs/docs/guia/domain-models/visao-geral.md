@@ -14,7 +14,7 @@ O TyForge fornece blocos de construcao para Domain-Driven Design (DDD) com supor
 <MermaidDiagram chart={`
 graph TD
   Class["Class<br/><i>_classInfo: name, version, description</i>"]
-  CDM["ClassDomainModels&lt;TProps, TPropsJson&gt;<br/><i>toJson(), toPrimitives(), deepUnwrap()</i>"]
+  CDM["ClassDomainModels&lt;TProps, TPropsJson&gt;<br/><i>toJSON(), toPrimitives(), deepUnwrap()</i>"]
   Entity["Entity&lt;TProps, TPropsJson&gt;<br/><i>id?: FId, equals por identidade</i>"]
   VO["ValueObject&lt;TProps, TPropsJson&gt;<br/><i>equals por estrutura (JSON.stringify)</i>"]
   Aggregate["Aggregate&lt;TProps, TPropsJson&gt;<br/><i>domain events</i>"]
@@ -49,16 +49,16 @@ type TClassInfo = {
 
 Classe intermediaria que adiciona os metodos de serializacao:
 
-### `toJson(config?)`
+### `toJSON(config?)`
 
-Converte todas as propriedades da instancia para seus valores primitivos. TypeFields sao automaticamente desembrulhados via `getValue()`. Objetos aninhados com `toJson()` sao recursivamente convertidos.
+Converte todas as propriedades da instancia para seus valores primitivos. TypeFields sao automaticamente desembrulhados via `getValue()`. Objetos aninhados com `toJSON()` sao recursivamente convertidos.
 
 ```typescript
-const json = entidade.toJson();
+const json = entidade.toJSON();
 // Todas as propriedades TypeField sao convertidas para primitivos
 
 // Com configuracao de data
-const jsonDateStr = entidade.toJson({ date: "string" });
+const jsonDateStr = entidade.toJSON({ date: "string" });
 // Campos FDate sao serializados como string no formato especifico
 ```
 
@@ -78,7 +78,7 @@ const primitivos = ClassDomainModels.toPrimitives<TProps, TPropsJson>(props);
 
 Metodo privado que realiza o unwrap recursivo:
 1. Arrays — cada item e processado recursivamente
-2. Objetos com `toJson()` — delegam para seu proprio `toJson()`
+2. Objetos com `toJSON()` — delegam para seu proprio `toJSON()`
 3. Objetos com `getValue()` (TypeFields) — retornam o valor primitivo
 4. Campos `FDate` com `config.date === "string"` — retornam `toString()`
 5. Campos `undefined` — sao omitidos do resultado

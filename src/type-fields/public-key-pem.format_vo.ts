@@ -5,8 +5,9 @@ import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TPublicKeyPem = string;
+export type TPublicKeyPemFormatted = string;
 
-export class FPublicKeyPem extends TypeField<TPublicKeyPem> {
+export class FPublicKeyPem extends TypeField<TPublicKeyPem, TPublicKeyPemFormatted> {
   override readonly typeInference = "FPublicKeyPem";
 
   private static readonly PEM_BEGIN = "-----BEGIN PUBLIC KEY-----";
@@ -31,7 +32,8 @@ export class FPublicKeyPem extends TypeField<TPublicKeyPem> {
     const base = TypeGuard.isString(value, fieldPath, 100, 1000);
     if (!base.success) return base;
 
-    const str = value as string;
+    if (typeof value !== "string") return base;
+    const str = value;
     if (
       !str.includes(FPublicKeyPem.PEM_BEGIN) ||
       !str.includes(FPublicKeyPem.PEM_END)

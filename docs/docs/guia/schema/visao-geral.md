@@ -17,13 +17,13 @@ O `SchemaBuilder` e o motor de validacao do TyForge. Ele recebe dados JSON bruto
 
 ```typescript
 import { SchemaBuilder, FString, FEmail, FInt, isSuccess } from 'tyforge';
-import type { ISchemaInlineObject } from 'tyforge';
+import type { Schema } from 'tyforge';
 
 const userSchema = {
   name: { type: FString, required: true },
   email: { type: FEmail, required: true },
   age: { type: FInt, required: false },
-} satisfies ISchemaInlineObject;
+} satisfies Schema;
 
 const validator = SchemaBuilder.compile(userSchema);
 const result = validator.create({ name: 'Joao', email: 'joao@email.com', age: 30 });
@@ -72,8 +72,8 @@ Para novos projetos, prefira `compile()`.
 
 O sistema de tipos do TyForge infere automaticamente dois tipos a partir do schema:
 
-- **`ISchemaInferJson<TSchema>`** — o tipo da entrada JSON (primitivos: `string`, `number`, etc.)
-- **`ISchemaInferProps<TSchema>`** — o tipo da saida validada (instancias: `FString`, `FEmail`, etc.)
+- **`InferJson<TSchema>`** — o tipo da entrada JSON (primitivos: `string`, `number`, etc.)
+- **`InferProps<TSchema>`** — o tipo da saida validada (instancias: `FString`, `FEmail`, etc.)
 
 Campos marcados com `required: false` tornam-se propriedades opcionais (`?`) em ambos os tipos.
 
@@ -96,11 +96,11 @@ O SchemaBuilder retorna `Result<Props, Exceptions>` e nunca lanca excecoes. Cada
 
 ```typescript
 import { SchemaBuilder, FEmail, isFailure } from 'tyforge';
-import type { ISchemaInlineObject } from 'tyforge';
+import type { Schema } from 'tyforge';
 
 const schema = {
   email: { type: FEmail, required: true },
-} satisfies ISchemaInlineObject;
+} satisfies Schema;
 
 const validator = SchemaBuilder.compile(schema);
 const result = validator.create({ email: 'invalido' });

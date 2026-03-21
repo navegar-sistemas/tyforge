@@ -5,8 +5,9 @@ import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TText = string;
+export type TTextFormatted = string;
 
-export class FText extends TypeField<TText> {
+export class FText extends TypeField<TText, TTextFormatted> {
   override readonly typeInference = "FText";
 
   override readonly config: ITypeFieldConfig<TText> = {

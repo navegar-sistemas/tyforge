@@ -14,10 +14,10 @@ O TyForge utiliza o sistema de tipos do TypeScript para inferir automaticamente 
 <MermaidDiagram chart={`
 sequenceDiagram
   participant J as JSON Input
-  participant I as ISchemaInferJson&lt;T&gt;
+  participant I as InferJson&lt;T&gt;
   participant C as SchemaBuilder.compile()
   participant V as Validacao
-  participant P as ISchemaInferProps&lt;T&gt;
+  participant P as InferProps&lt;T&gt;
 
   J->>I: Dados brutos tipados
   I->>C: Schema + JSON tipado
@@ -28,9 +28,9 @@ sequenceDiagram
 O fluxo funciona assim:
 
 1. O desenvolvedor define um **schema** usando TypeFields e configuracoes.
-2. `ISchemaInferJson<T>` infere o tipo dos **dados de entrada** (primitivos JSON).
+2. `InferJson<T>` infere o tipo dos **dados de entrada** (primitivos JSON).
 3. `SchemaBuilder.compile()` gera um validador otimizado.
-4. A validacao transforma os dados de entrada em `ISchemaInferProps<T>` — um objeto com **instancias de TypeField**.
+4. A validacao transforma os dados de entrada em `InferProps<T>` — um objeto com **instancias de TypeField**.
 
 ## Interfaces principais
 
@@ -63,7 +63,7 @@ interface ISchemaFieldConfig {
   type:
     | ValueObjectStatic<unknown, TypeField<unknown>>
     | EntityStatic<Entity<IEntityPropsBase, unknown>>
-    | ISchemaInlineObject;
+    | Schema;
   required?: boolean;   // default: true
   isArray?: boolean;    // default: false
   expose?: "public" | "private" | "redacted";
@@ -74,20 +74,20 @@ interface ISchemaFieldConfig {
 
 | Propriedade | Tipo | Descricao |
 |-------------|------|-----------|
-| `type` | `ValueObjectStatic \| EntityStatic \| ISchemaInlineObject` | O TypeField, Entity ou objeto inline que valida o campo |
+| `type` | `ValueObjectStatic \| EntityStatic \| Schema` | O TypeField, Entity ou objeto inline que valida o campo |
 | `required` | `boolean?` | Se `false`, o campo e opcional no JSON de entrada. Padrao: `true` |
 | `isArray` | `boolean?` | Se `true`, o valor esperado e um array de itens do `type` |
 | `expose` | `string?` | Controle de visibilidade: `"public"`, `"private"` ou `"redacted"` |
 | `label` | `string?` | Rotulo legivel para o campo (util em mensagens de erro e UI) |
 | `description` | `string?` | Descricao detalhada do campo |
 
-### ISchemaInlineObject
+### Schema
 
 Representa um objeto aninhado dentro do schema, permitindo composicao de estruturas complexas sem criar TypeFields dedicados.
 
 ```typescript
-interface ISchemaInlineObject {
-  [key: string]: ISchemaFieldConfig | ISchemaInlineObject;
+interface Schema {
+  [key: string]: ISchemaFieldConfig | Schema;
 }
 ```
 
@@ -99,7 +99,7 @@ Extrai o tipo primitivo (para JSON) a partir do `type` do campo:
 
 - Se for um `ValueObjectStatic<TP, ...>`, extrai `TP` (ex.: `FString` -> `string`, `FInt` -> `number`).
 - Se for um `EntityStatic`, retorna `unknown` (o caller deve especializar).
-- Se for um `ISchemaInlineObject`, aplica recursao via `ISchemaInferJson`.
+- Se for um `Schema`, aplica recursao via `InferJson`.
 
 ```typescript
 type InferPrimitive<T> =
@@ -107,8 +107,8 @@ type InferPrimitive<T> =
     ? TP
     : T extends EntityStatic<Entity<IEntityPropsBase, unknown>>
       ? unknown
-      : T extends ISchemaInlineObject
-        ? ISchemaInferJson<T>
+      : T extends Schema
+        ? InferJson<T>
         : never;
 ```
 
@@ -118,7 +118,7 @@ Extrai o tipo da instancia (para props) a partir do `type` do campo:
 
 - Se for um `ValueObjectStatic<..., TI>`, extrai `TI` (ex.: `FString` -> instancia de `FString`).
 - Se for um `EntityStatic<TE>`, extrai `TE` (a instancia da Entity).
-- Se for um `ISchemaInlineObject`, aplica recursao via `ISchemaInferProps`.
+- Se for um `Schema`, aplica recursao via `InferProps`.
 
 ```typescript
 type InferInstance<T> =
@@ -126,17 +126,17 @@ type InferInstance<T> =
     ? TI
     : T extends EntityStatic<infer TE>
       ? TE
-      : T extends ISchemaInlineObject
-        ? ISchemaInferProps<T>
+      : T extends Schema
+        ? InferProps<T>
         : never;
 ```
 
-### ISchemaInferJson
+### InferJson
 
 Mapeia o schema inteiro para o tipo de JSON de entrada. Campos com `required: false` se tornam opcionais (`?`). Campos com `isArray: true` se tornam arrays.
 
 ```typescript
-type ISchemaInferJson<TSchema extends ISchemaInlineObject> = {
+type InferJson<TSchema extends Schema> = {
   // campos opcionais (required: false)
   [K in keyof TSchema as TSchema[K] extends { required: false }
     ? K : never]?: /* InferPrimitive ou InferPrimitive[] */;
@@ -147,12 +147,12 @@ type ISchemaInferJson<TSchema extends ISchemaInlineObject> = {
 };
 ```
 
-### ISchemaInferProps
+### InferProps
 
-Analogo ao `ISchemaInferJson`, porem mapeia para instancias de TypeField em vez de primitivos.
+Analogo ao `InferJson`, porem mapeia para instancias de TypeField em vez de primitivos.
 
 ```typescript
-type ISchemaInferProps<TSchema extends ISchemaInlineObject> = {
+type InferProps<TSchema extends Schema> = {
   // campos opcionais
   [K in keyof TSchema as TSchema[K] extends { required: false }
     ? K : never]?: /* InferInstance ou InferInstance[] */;
@@ -169,27 +169,27 @@ O exemplo abaixo demonstra como a definicao de um schema flui pelo sistema de ti
 
 ```typescript
 import { FString, FEmail, FInt, SchemaBuilder, isSuccess } from "tyforge";
-import type { ISchemaInlineObject } from "tyforge";
+import type { Schema } from "tyforge";
 
 // 1. Definicao do schema
 const schema = {
   name:  { type: FString, required: true },
   email: { type: FEmail, required: true },
   age:   { type: FInt, required: false },
-} satisfies ISchemaInlineObject;
+} satisfies Schema;
 
 // 2. Tipos inferidos automaticamente:
 //
-// ISchemaInferJson<typeof schema>
+// InferJson<typeof schema>
 // => { name: string; email: string; age?: number }
 //
-// ISchemaInferProps<typeof schema>
+// InferProps<typeof schema>
 // => { name: FString; email: FEmail; age?: FInt }
 
 // 3. Compilacao e uso
 const validator = SchemaBuilder.compile(schema);
 
-// O TypeScript garante que 'data' corresponde a ISchemaInferJson
+// O TypeScript garante que 'data' corresponde a InferJson
 const result = validator.create({
   name: "Maria Silva",
   email: "maria@navegar.com",
@@ -197,7 +197,7 @@ const result = validator.create({
 });
 
 if (isSuccess(result)) {
-  // result.value e tipado como ISchemaInferProps
+  // result.value e tipado como InferProps
   const props = result.value;
   props.name;   // tipo: FString
   props.email;  // tipo: FEmail
@@ -211,7 +211,7 @@ Objetos inline permitem compor estruturas complexas diretamente no schema:
 
 ```typescript
 import { FId, FString } from "tyforge";
-import type { ISchemaInlineObject } from "tyforge";
+import type { Schema } from "tyforge";
 
 const orderSchema = {
   id:      { type: FId, required: true },
@@ -224,9 +224,9 @@ const orderSchema = {
     required: true,
     isArray: true,
   },
-} satisfies ISchemaInlineObject;
+} satisfies Schema;
 
-// ISchemaInferJson<typeof orderSchema>
+// InferJson<typeof orderSchema>
 // => {
 //   id: string;
 //   address: { street: string; city: string };

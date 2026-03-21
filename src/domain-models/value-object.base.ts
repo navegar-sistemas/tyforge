@@ -6,6 +6,6 @@ export abstract class ValueObject<TProps, TPropsJson> extends ClassDomainModels<
 > {
   equals(input: ClassDomainModels<TProps, TPropsJson>): boolean {
     if (!input || input.constructor !== this.constructor) return false;
-    return JSON.stringify(this.toJson()) === JSON.stringify(input.toJson());
+    return JSON.stringify(this.toJSON()) === JSON.stringify(input.toJSON());
   }
 }

@@ -6,8 +6,9 @@ import { TypeGuard } from "@tyforge/tools/type_guard";
 import { v4 as uuidv4, validate, version } from "uuid";
 
 export type TApiKey = string;
+export type TApiKeyFormatted = string;
 
-export class FApiKey extends TypeField<TApiKey> {
+export class FApiKey extends TypeField<TApiKey, TApiKeyFormatted> {
   override readonly typeInference = "FApiKey";
 
   override readonly config: ITypeFieldConfig<TApiKey> = {
@@ -28,7 +29,8 @@ export class FApiKey extends TypeField<TApiKey> {
     const base = TypeGuard.isString(value, fieldPath, 36, 36);
     if (!base.success) return base;
 
-    if (!validate(value as string)) {
+    if (typeof value !== "string") return base;
+    if (!validate(value)) {
       return err(
         ExceptionValidation.create(fieldPath, "ApiKey deve ser UUID valido"),
       );

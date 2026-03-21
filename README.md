@@ -17,12 +17,12 @@ npm install tyforge
 
 ```typescript
 import { SchemaBuilder, FString, FEmail, isSuccess, isFailure } from "tyforge";
-import type { ISchemaInlineObject } from "tyforge";
+import type { Schema } from "tyforge";
 
 const userSchema = {
   name:  { type: FString, required: true },
   email: { type: FEmail, required: true },
-} satisfies ISchemaInlineObject;
+} satisfies Schema;
 
 const validator = SchemaBuilder.compile(userSchema);
 

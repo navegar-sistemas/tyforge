@@ -5,8 +5,9 @@ import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TPageNumber = number;
+export type TPageNumberFormatted = string;
 
-export class FPageNumber extends TypeField<TPageNumber, string> {
+export class FPageNumber extends TypeField<TPageNumber, TPageNumberFormatted> {
   override readonly typeInference = "FPageNumber";
 
   override readonly config: ITypeFieldConfig<TPageNumber> = {
@@ -37,7 +38,8 @@ export class FPageNumber extends TypeField<TPageNumber, string> {
       );
     }
 
-    if ((value as number) < 1) {
+    if (typeof value !== "number") return base;
+    if (value < 1) {
       return err(
         ExceptionValidation.create(
           fieldPath,

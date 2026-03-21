@@ -85,12 +85,12 @@ if (error instanceof ExceptionValidation) {
 
 ## Serializacao
 
-O metodo `toJson()` converte a excecao para um objeto compativel com RFC 7807:
+O metodo `toJSON()` converte a excecao para um objeto compativel com RFC 7807:
 
 ```typescript
 const excecao = ExceptionValidation.create("email", "Email invalido");
 
-excecao.toJson();
+excecao.toJSON();
 // {
 //   type: "ExceptionValidation",
 //   title: "Erro de Validacao",

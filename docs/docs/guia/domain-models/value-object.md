@@ -25,7 +25,7 @@ O metodo `equals()` compara Value Objects serializando ambos para JSON e compara
 ```typescript
 equals(input: ClassDomainModels<TProps, TPropsJson>): boolean {
   if (!input || input.constructor !== this.constructor) return false;
-  return JSON.stringify(this.toJson()) === JSON.stringify(input.toJson());
+  return JSON.stringify(this.toJSON()) === JSON.stringify(input.toJSON());
 }
 ```
 
@@ -104,7 +104,7 @@ const end2 = Endereco.create({
 end1.equals(end2); // true — mesmos valores
 
 // Serializar
-const json = end1.toJson();
+const json = end1.toJSON();
 // { rua: "Rua das Flores", numero: 100, cidade: "Curitiba" }
 ```
 

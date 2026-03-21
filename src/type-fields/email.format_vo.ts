@@ -5,8 +5,9 @@ import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TEmail = string;
+export type TEmailFormatted = string;
 
-export class FEmail extends TypeField<TEmail, string> {
+export class FEmail extends TypeField<TEmail, TEmailFormatted> {
   private static readonly EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   override readonly typeInference = "FEmail";
 
@@ -24,7 +25,8 @@ export class FEmail extends TypeField<TEmail, string> {
   static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
     const base = TypeGuard.isString(value, fieldPath, 5, 200);
     if (!base.success) return base;
-    if (!FEmail.EMAIL_REGEX.test(value as string)) {
+    if (typeof value !== "string") return base;
+    if (!FEmail.EMAIL_REGEX.test(value)) {
       return err(ExceptionValidation.create(fieldPath, "Email deve ter formato válido"));
     }
     return OK_TRUE;

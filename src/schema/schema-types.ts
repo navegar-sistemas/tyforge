@@ -27,11 +27,11 @@ export interface EntityStatic<
  * Se `isArray === true`, o valor de entrada deve ser um array,
  * e a inferência resultará num array de primitivos/VOs/Entidades.
  */
-export interface ISchemaFieldConfig {
+export interface FieldConfig {
   type:
     | ValueObjectStatic<unknown, TypeField<unknown>>
     | EntityStatic<Entity<IEntityPropsBase, unknown>>
-    | ISchemaInlineObject;
+    | Schema;
   required?: boolean;
   isArray?: boolean;
   expose?: "public" | "private" | "redacted";
@@ -42,8 +42,8 @@ export interface ISchemaFieldConfig {
 /**
  * Representa um objeto inline de schema, com campos aninhados.
  */
-export interface ISchemaInlineObject {
-  [key: string]: ISchemaAllowedEntry;
+export interface Schema {
+  [key: string]: SchemaEntry;
 }
 
 /**
@@ -51,7 +51,7 @@ export interface ISchemaInlineObject {
  * - um field config (com ou sem isArray)
  * - um objeto inline (aninhado)
  */
-export type ISchemaAllowedEntry = ISchemaFieldConfig | ISchemaInlineObject;
+export type SchemaEntry = FieldConfig | Schema | [FieldConfig];
 
 /**
  * EXTRAÇÃO DO PRIMITIVO A PARTIR DO TYPE (para JSON):
@@ -64,8 +64,8 @@ type InferPrimitive<T> =
     ? TP
     : T extends EntityStatic<Entity<IEntityPropsBase, unknown>>
       ? unknown
-      : T extends ISchemaInlineObject
-        ? ISchemaInferJson<T>
+      : T extends Schema
+        ? InferJson<T>
         : never;
 
 /**
@@ -73,27 +73,27 @@ type InferPrimitive<T> =
  * - para cada campo, se `isArray` então InferPrimitive[]; senão InferPrimitive
  * - campos `required: false` viram opcionais (`?`)
  */
-export type ISchemaInferJson<TSchema extends ISchemaInlineObject> = {
+export type InferJson<TSchema extends Schema> = {
   // campos opcionais
   [K in keyof TSchema as TSchema[K] extends { required: false }
     ? K
-    : never]?: TSchema[K] extends ISchemaFieldConfig
+    : never]?: TSchema[K] extends FieldConfig
     ? TSchema[K] extends { isArray: true }
       ? InferPrimitive<TSchema[K]["type"]>[]
       : InferPrimitive<TSchema[K]["type"]>
-    : TSchema[K] extends ISchemaInlineObject
-      ? ISchemaInferJson<TSchema[K]>
+    : TSchema[K] extends Schema
+      ? InferJson<TSchema[K]>
       : never;
 } & {
   // campos obrigatórios
   [K in keyof TSchema as TSchema[K] extends { required: false }
     ? never
-    : K]: TSchema[K] extends ISchemaFieldConfig
+    : K]: TSchema[K] extends FieldConfig
     ? TSchema[K] extends { isArray: true }
       ? InferPrimitive<TSchema[K]["type"]>[]
       : InferPrimitive<TSchema[K]["type"]>
-    : TSchema[K] extends ISchemaInlineObject
-      ? ISchemaInferJson<TSchema[K]>
+    : TSchema[K] extends Schema
+      ? InferJson<TSchema[K]>
       : never;
 };
 
@@ -107,34 +107,45 @@ type InferInstance<T> =
     ? TI
     : T extends EntityStatic<infer TE>
       ? TE
-      : T extends ISchemaInlineObject
-        ? ISchemaInferProps<T>
+      : T extends Schema
+        ? InferProps<T>
         : never;
 
 /**
  * MONTA O TIPO FINAL DE PROPS:
- * - análogo ao ISchemaInferJson, mas usa InferInstance
+ * - análogo ao InferJson, mas usa InferInstance
  */
-export type ISchemaInferProps<TSchema extends ISchemaInlineObject> = {
+export type InferProps<TSchema extends Schema> = {
   // opcionais
   [K in keyof TSchema as TSchema[K] extends { required: false }
     ? K
-    : never]?: TSchema[K] extends ISchemaFieldConfig
+    : never]?: TSchema[K] extends FieldConfig
     ? TSchema[K] extends { isArray: true }
       ? InferInstance<TSchema[K]["type"]>[]
       : InferInstance<TSchema[K]["type"]>
-    : TSchema[K] extends ISchemaInlineObject
-      ? ISchemaInferProps<TSchema[K]>
+    : TSchema[K] extends Schema
+      ? InferProps<TSchema[K]>
       : never;
 } & {
   // obrigatórios
   [K in keyof TSchema as TSchema[K] extends { required: false }
     ? never
-    : K]: TSchema[K] extends ISchemaFieldConfig
+    : K]: TSchema[K] extends FieldConfig
     ? TSchema[K] extends { isArray: true }
       ? InferInstance<TSchema[K]["type"]>[]
       : InferInstance<TSchema[K]["type"]>
-    : TSchema[K] extends ISchemaInlineObject
-      ? ISchemaInferProps<TSchema[K]>
+    : TSchema[K] extends Schema
+      ? InferProps<TSchema[K]>
       : never;
 };
+
+/** @deprecated Use InferProps */
+export type ISchemaInferProps<T extends Schema> = InferProps<T>;
+/** @deprecated Use InferJson */
+export type ISchemaInferJson<T extends Schema> = InferJson<T>;
+/** @deprecated Use Schema */
+export type ISchemaInlineObject = Schema;
+/** @deprecated Use SchemaEntry */
+export type ISchemaAllowedEntry = SchemaEntry;
+/** @deprecated Use FieldConfig */
+export type ISchemaFieldConfig = FieldConfig;

@@ -72,6 +72,7 @@ import { v7 as uuidv7 } from "uuid";
  */
 
 export type TTraceId = string;
+export type TTraceIdFormatted = string;
 
 interface IParsedTraceId {
   timestamp: Date;
@@ -82,7 +83,7 @@ interface IParsedTraceId {
 const UUID_V7_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-export class FTraceId extends TypeField<TTraceId> {
+export class FTraceId extends TypeField<TTraceId, TTraceIdFormatted> {
   override readonly typeInference = "FTraceId";
 
   override readonly config: ITypeFieldConfig<TTraceId> = {

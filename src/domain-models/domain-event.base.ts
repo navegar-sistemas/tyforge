@@ -17,7 +17,7 @@ export abstract class DomainEvent<TPayload = Record<string, unknown>> {
     this.occurredAt = occurredAt ?? new Date();
   }
 
-  toJson() {
+  toJSON() {
     return {
       id: this.id,
       eventName: this.eventName,

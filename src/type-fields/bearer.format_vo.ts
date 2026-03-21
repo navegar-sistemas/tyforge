@@ -5,8 +5,9 @@ import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TBearer = string;
+export type TBearerFormatted = string;
 
-export class FBearer extends TypeField<TBearer> {
+export class FBearer extends TypeField<TBearer, TBearerFormatted> {
   override readonly typeInference = "FBearer";
 
   private static readonly BEARER_PREFIX = "Bearer ";
@@ -29,7 +30,8 @@ export class FBearer extends TypeField<TBearer> {
     const base = TypeGuard.isString(value, fieldPath, 100, 5000);
     if (!base.success) return base;
 
-    const str = value as string;
+    if (typeof value !== "string") return base;
+    const str = value;
     if (!str.startsWith(FBearer.BEARER_PREFIX) || str.length <= 7) {
       return err(
         ExceptionValidation.create(
