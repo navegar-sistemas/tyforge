@@ -47,6 +47,9 @@ interface ISchemaInlineObject {
 **Exemplo:**
 
 ```typescript
+import { FString } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
+
 // 'address' e um ISchemaInlineObject — nao possui { type: ... }
 const schema = {
   name: { type: FString, required: true },     // ISchemaFieldConfig
@@ -54,7 +57,7 @@ const schema = {
     street: { type: FString, required: true },
     city: { type: FString, required: true },
   },
-};
+} satisfies ISchemaInlineObject;
 ```
 
 ## ISchemaInferJson
@@ -80,14 +83,14 @@ type ISchemaInferJson<TSchema extends ISchemaInlineObject>
 
 ```typescript
 import { SchemaBuilder, FString, FEmail, FInt, FBoolean } from 'tyforge';
-import type { ISchemaInferJson } from 'tyforge';
+import type { ISchemaInferJson, ISchemaInlineObject } from 'tyforge';
 
 const userSchema = {
   name: { type: FString, required: true },
   email: { type: FEmail, required: true },
   age: { type: FInt, required: false },
   active: { type: FBoolean, required: true },
-};
+} satisfies ISchemaInlineObject;
 
 type UserJson = ISchemaInferJson<typeof userSchema>;
 // Resultado:
@@ -121,14 +124,14 @@ type ISchemaInferProps<TSchema extends ISchemaInlineObject>
 
 ```typescript
 import { SchemaBuilder, FString, FEmail, FInt, FBoolean } from 'tyforge';
-import type { ISchemaInferProps } from 'tyforge';
+import type { ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
 
 const userSchema = {
   name: { type: FString, required: true },
   email: { type: FEmail, required: true },
   age: { type: FInt, required: false },
   active: { type: FBoolean, required: true },
-};
+} satisfies ISchemaInlineObject;
 
 type UserProps = ISchemaInferProps<typeof userSchema>;
 // Resultado:
@@ -145,10 +148,13 @@ type UserProps = ISchemaInferProps<typeof userSchema>;
 Quando `isArray: true` esta presente, tanto `ISchemaInferJson` quanto `ISchemaInferProps` produzem arrays:
 
 ```typescript
+import { FString, FInt } from 'tyforge';
+import type { ISchemaInferJson, ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
+
 const schema = {
   tags: { type: FString, required: true, isArray: true },
   scores: { type: FInt, required: false, isArray: true },
-};
+} satisfies ISchemaInlineObject;
 
 type JsonType = ISchemaInferJson<typeof schema>;
 // {
@@ -168,6 +174,9 @@ type PropsType = ISchemaInferProps<typeof schema>;
 Objetos inline (sem wrapper `{ type: ... }`) sao tratados recursivamente. O tipo inferido reflete a estrutura aninhada:
 
 ```typescript
+import { FString } from 'tyforge';
+import type { ISchemaInferJson, ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
+
 const schema = {
   user: {
     name: { type: FString, required: true },
@@ -177,7 +186,7 @@ const schema = {
       zip: { type: FString, required: false },
     },
   },
-};
+} satisfies ISchemaInlineObject;
 
 type JsonType = ISchemaInferJson<typeof schema>;
 // {
@@ -218,14 +227,14 @@ interface EntityStatic<TInstance extends Entity<IEntityPropsBase, unknown>> {
 
 ```typescript
 import { SchemaBuilder, FString, FInt, isSuccess } from 'tyforge';
-import type { ISchemaInferProps } from 'tyforge';
+import type { ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
 
 // Supondo que Produto e uma Entity com create() estatico
 const pedidoSchema = {
   numero: { type: FInt, required: true },
   cliente: { type: FString, required: true },
   produto: { type: Produto, required: true },
-};
+} satisfies ISchemaInlineObject;
 
 type PedidoProps = ISchemaInferProps<typeof pedidoSchema>;
 // {
@@ -255,7 +264,7 @@ O exemplo abaixo demonstra todas as capacidades de inferencia em um unico schema
 import {
   SchemaBuilder, FString, FEmail, FInt, FBoolean, isSuccess,
 } from 'tyforge';
-import type { ISchemaInferJson, ISchemaInferProps } from 'tyforge';
+import type { ISchemaInferJson, ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
 
 const cadastroSchema = {
   nome: { type: FString, required: true },
@@ -268,7 +277,7 @@ const cadastroSchema = {
     cidade: { type: FString, required: true },
     cep: { type: FString, required: false },
   },
-};
+} satisfies ISchemaInlineObject;
 
 // Tipo da entrada JSON
 type CadastroJson = ISchemaInferJson<typeof cadastroSchema>;

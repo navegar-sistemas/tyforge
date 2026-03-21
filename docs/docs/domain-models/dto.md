@@ -143,10 +143,13 @@ dto1.equals(dto2); // true se todos os campos forem identicos
 Dtos podem ser combinados com o `SchemaBuilder` para validar dados de entrada e construir o Dto de forma segura:
 
 ```typescript
+import { SchemaBuilder, FString, FEmail } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
+
 const schema = {
   nome:  { type: FString, required: true },
   email: { type: FEmail, required: true },
-};
+} satisfies ISchemaInlineObject;
 
 const validator = SchemaBuilder.compile(schema);
 const result = validator.create(requestBody);

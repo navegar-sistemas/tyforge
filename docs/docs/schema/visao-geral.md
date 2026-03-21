@@ -18,12 +18,13 @@ O `SchemaBuilder` e o motor de validacao do TyForge. Ele recebe dados JSON bruto
 
 ```typescript
 import { SchemaBuilder, FString, FEmail, FInt, isSuccess } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
 
 const userSchema = {
   name: { type: FString, required: true },
   email: { type: FEmail, required: true },
   age: { type: FInt, required: false },
-};
+} satisfies ISchemaInlineObject;
 
 const validator = SchemaBuilder.compile(userSchema);
 const result = validator.create({ name: 'Joao', email: 'joao@email.com', age: 30 });
@@ -96,10 +97,11 @@ O SchemaBuilder retorna `Result<Props, Exceptions>` e nunca lanca excecoes. Cada
 
 ```typescript
 import { SchemaBuilder, FEmail, isFailure } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
 
 const schema = {
   email: { type: FEmail, required: true },
-};
+} satisfies ISchemaInlineObject;
 
 const validator = SchemaBuilder.compile(schema);
 const result = validator.create({ email: 'invalido' });

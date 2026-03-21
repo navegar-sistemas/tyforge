@@ -170,13 +170,14 @@ O exemplo abaixo demonstra como a definicao de um schema flui pelo sistema de ti
 
 ```typescript
 import { FString, FEmail, FInt, SchemaBuilder, isSuccess } from "tyforge";
+import type { ISchemaInlineObject } from "tyforge";
 
 // 1. Definicao do schema
 const schema = {
   name:  { type: FString, required: true },
   email: { type: FEmail, required: true },
   age:   { type: FInt, required: false },
-};
+} satisfies ISchemaInlineObject;
 
 // 2. Tipos inferidos automaticamente:
 //
@@ -210,6 +211,9 @@ if (isSuccess(result)) {
 Objetos inline permitem compor estruturas complexas diretamente no schema:
 
 ```typescript
+import { FId, FString } from "tyforge";
+import type { ISchemaInlineObject } from "tyforge";
+
 const orderSchema = {
   id:      { type: FId, required: true },
   address: {
@@ -221,7 +225,7 @@ const orderSchema = {
     required: true,
     isArray: true,
   },
-};
+} satisfies ISchemaInlineObject;
 
 // ISchemaInferJson<typeof orderSchema>
 // => {

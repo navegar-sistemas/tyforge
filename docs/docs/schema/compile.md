@@ -33,12 +33,13 @@ Use este modo ao **atualizar entidades existentes** com dados parciais.
 
 ```typescript
 import { SchemaBuilder, FString, FEmail, FId, isSuccess } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
 
 const userSchema = {
   id: { type: FId, required: true },
   name: { type: FString, required: true },
   email: { type: FEmail, required: true },
-};
+} satisfies ISchemaInlineObject;
 
 const validator = SchemaBuilder.compile(userSchema);
 
@@ -90,13 +91,14 @@ Ambos os metodos retornam `Result<ISchemaInferProps<TSchema>, Exceptions>`. O er
 
 ```typescript
 import { SchemaBuilder, FString, FEmail, isFailure } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
 
 const schema = {
   user: {
     name: { type: FString, required: true },
     email: { type: FEmail, required: true },
   },
-};
+} satisfies ISchemaInlineObject;
 
 const validator = SchemaBuilder.compile(schema);
 const result = validator.create({ user: { name: 'Ana', email: 'invalido' } });
@@ -134,6 +136,9 @@ const resultado = SchemaBuilder.build(userSchema, dados, 'user', 'create');
 O SchemaBuilder suporta objetos aninhados de forma transparente. Basta definir um objeto inline no schema — sem necessidade do wrapper `{ type: ... }`:
 
 ```typescript
+import { SchemaBuilder, FString } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
+
 const schema = {
   user: {
     name: { type: FString, required: true },
@@ -142,7 +147,7 @@ const schema = {
       city: { type: FString, required: true },
     },
   },
-};
+} satisfies ISchemaInlineObject;
 
 const validator = SchemaBuilder.compile(schema);
 const result = validator.create({
@@ -165,19 +170,25 @@ Ha duas sintaxes para definir campos do tipo array:
 ### Sintaxe com `isArray`
 
 ```typescript
+import { FString, FInt } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
+
 const schema = {
   tags: { type: FString, required: true, isArray: true },
   scores: { type: FInt, required: false, isArray: true },
-};
+} satisfies ISchemaInlineObject;
 ```
 
 ### Sintaxe com colchetes
 
 ```typescript
+import { FString, FInt } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
+
 const schema = {
   tags: [{ type: FString, required: true }],
   scores: [{ type: FInt, required: false }],
-};
+} satisfies ISchemaInlineObject;
 ```
 
 Ambas produzem o mesmo resultado. Na entrada JSON, o campo deve ser um array. Cada item do array e validado individualmente, e o erro inclui o indice:
@@ -194,6 +205,9 @@ const result = validator.create({ tags: ['node', '', 'tyforge'], scores: [10, 20
 Tambem e possivel definir arrays de objetos complexos:
 
 ```typescript
+import { SchemaBuilder, FString, FInt } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
+
 const schema = {
   itens: {
     type: {
@@ -203,7 +217,7 @@ const schema = {
     required: true,
     isArray: true,
   },
-};
+} satisfies ISchemaInlineObject;
 
 const validator = SchemaBuilder.compile(schema);
 const result = validator.create({
