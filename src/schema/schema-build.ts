@@ -30,15 +30,16 @@ function assertResultType<T>(result: Result<unknown, Exceptions>): asserts resul
   void result;
 }
 
+function assertRecord(data: unknown): asserts data is Record<string, unknown> {
+  void data;
+}
+
 function validateObject(data: unknown, path: string): Result<Record<string, unknown>, Exceptions> {
   if (!data || typeof data !== "object" || Array.isArray(data)) {
     return err(ExceptionValidation.create(path || "root", "Dados obrigatórios ausentes."));
   }
-  const record: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(data)) {
-    record[k] = v;
-  }
-  return ok(record);
+  assertRecord(data);
+  return ok(data);
 }
 
 // ── Compiled Schema ─────────────────────────────────────────────
@@ -95,25 +96,25 @@ function compileFields(schema: Record<string, unknown>, basePath: string): Compi
           nestedValidator: null,
         });
       } else if (!!t && typeof t === "object") {
-        const nested = Object.fromEntries(Object.entries(t));
+        assertRecord(t);
         fields.push({
           key, path,
           required: entry.required !== false,
           kind: isArray ? FieldKind.ArrayNestedSchema : FieldKind.NestedSchema,
           creatable: null,
           hasAssign: false,
-          nestedValidator: { fields: compileFields(nested, isArray ? "" : path), run: createRunner(nested) },
+          nestedValidator: { fields: compileFields(t, isArray ? "" : path), run: createRunner(t) },
         });
       }
     } else if (!!entry && typeof entry === "object" && !Array.isArray(entry)) {
-      const nested = Object.fromEntries(Object.entries(entry));
+      assertRecord(entry);
       fields.push({
         key, path,
         required: true,
         kind: FieldKind.NestedSchema,
         creatable: null,
         hasAssign: false,
-        nestedValidator: { fields: compileFields(nested, path), run: createRunner(nested) },
+        nestedValidator: { fields: compileFields(entry, path), run: createRunner(entry) },
       });
     }
   }
