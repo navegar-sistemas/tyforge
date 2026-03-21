@@ -9,8 +9,8 @@ export class ExceptionDb extends Exceptions {
   static recordNotFound(): ExceptionDb {
     return new ExceptionDb({
       type: "database/record-not-found",
-      title: "Record Not Found",
-      detail: `entity not found`,
+      title: "Registro não encontrado",
+      detail: "O registro solicitado não foi encontrado no banco de dados.",
       status: OHttpStatus.NOT_FOUND,
       instance: "",
       uri: "",
@@ -21,8 +21,8 @@ export class ExceptionDb extends Exceptions {
   static duplicateEntry(): ExceptionDb {
     return new ExceptionDb({
       type: "database/duplicate-entry",
-      title: "Duplicate Entry",
-      detail: `entity already exists`,
+      title: "Registro duplicado",
+      detail: "Já existe um registro com os mesmos dados.",
       status: OHttpStatus.CONFLICT,
       instance: "",
       uri: "",
@@ -33,8 +33,8 @@ export class ExceptionDb extends Exceptions {
   static invalidData(): ExceptionDb {
     return new ExceptionDb({
       type: "database/invalid-data",
-      title: "Invalid Data",
-      detail: "Invalid data format",
+      title: "Dados inválidos",
+      detail: "Os dados fornecidos estão em formato inválido para persistência.",
       status: OHttpStatus.UNPROCESSABLE_ENTITY,
       instance: "",
       uri: "",
@@ -45,8 +45,8 @@ export class ExceptionDb extends Exceptions {
   static unexpectedError(): ExceptionDb {
     return new ExceptionDb({
       type: "database/unexpected-error",
-      title: "Database Error",
-      detail: `Database error`,
+      title: "Erro de banco de dados",
+      detail: "Ocorreu um erro inesperado no banco de dados.",
       status: OHttpStatus.INTERNAL_SERVER_ERROR,
       instance: "",
       uri: "",
@@ -57,8 +57,8 @@ export class ExceptionDb extends Exceptions {
   static connectionError(): ExceptionDb {
     return new ExceptionDb({
       type: "database/connection-error",
-      title: "Connection Error",
-      detail: "Database connection error",
+      title: "Erro de conexão",
+      detail: "Não foi possível conectar ao banco de dados.",
       status: OHttpStatus.SERVICE_UNAVAILABLE,
       instance: "",
       uri: "",
@@ -69,8 +69,8 @@ export class ExceptionDb extends Exceptions {
   static transactionError(): ExceptionDb {
     return new ExceptionDb({
       type: "database/transaction-error",
-      title: "Transaction Error",
-      detail: "Transaction failed",
+      title: "Erro de transação",
+      detail: "A transação do banco de dados falhou.",
       status: OHttpStatus.INTERNAL_SERVER_ERROR,
       instance: "",
       uri: "",
@@ -81,8 +81,8 @@ export class ExceptionDb extends Exceptions {
   static queryError(): ExceptionDb {
     return new ExceptionDb({
       type: "database/query-error",
-      title: "Query Error",
-      detail: `Query error in operation`,
+      title: "Erro de consulta",
+      detail: "Ocorreu um erro durante a execução da consulta.",
       status: OHttpStatus.INTERNAL_SERVER_ERROR,
       instance: "",
       uri: "",

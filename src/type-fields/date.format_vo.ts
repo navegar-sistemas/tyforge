@@ -105,6 +105,12 @@ export class FDateISODate extends FDate {
     const validation = inst.validate(parsed.value, fieldPath);
     return isFailure(validation) ? err(validation.error) : ok(inst);
   }
+
+  static createOrThrow(raw: string | Date, fieldPath = "FDateISODate"): FDateISODate {
+    const result = this.create(raw, fieldPath);
+    if (isFailure(result)) throw result.error;
+    return result.value;
+  }
 }
 
 // ============================================================================
@@ -127,6 +133,12 @@ export class FDateTimeISOZ extends FDate {
     const inst = new FDateTimeISOZ(parsed.value, fieldPath);
     const validation = inst.validate(parsed.value, fieldPath);
     return isFailure(validation) ? err(validation.error) : ok(inst);
+  }
+
+  static createOrThrow(raw: string | Date, fieldPath = "FDateTimeISOZ"): FDateTimeISOZ {
+    const result = this.create(raw, fieldPath);
+    if (isFailure(result)) throw result.error;
+    return result.value;
   }
 
   static generateDateString(date: Date = new Date()): string {
@@ -155,6 +167,12 @@ export class FDateISOCompact extends FDate {
     const validation = inst.validate(parsed.value, fieldPath);
     return isFailure(validation) ? err(validation.error) : ok(inst);
   }
+
+  static createOrThrow(raw: string | Date, fieldPath = "FDateISOCompact"): FDateISOCompact {
+    const result = this.create(raw, fieldPath);
+    if (isFailure(result)) throw result.error;
+    return result.value;
+  }
 }
 
 // ============================================================================
@@ -178,6 +196,12 @@ export class FDateTimeISOCompact extends FDate {
     const validation = inst.validate(parsed.value, fieldPath);
     return isFailure(validation) ? err(validation.error) : ok(inst);
   }
+
+  static createOrThrow(raw: string | Date, fieldPath = "FDateTimeISOCompact"): FDateTimeISOCompact {
+    const result = this.create(raw, fieldPath);
+    if (isFailure(result)) throw result.error;
+    return result.value;
+  }
 }
 
 // ============================================================================
@@ -200,5 +224,11 @@ export class FDateTimeISOFullCompact extends FDate {
     const inst = new FDateTimeISOFullCompact(parsed.value, fieldPath);
     const validation = inst.validate(parsed.value, fieldPath);
     return isFailure(validation) ? err(validation.error) : ok(inst);
+  }
+
+  static createOrThrow(raw: string | Date, fieldPath = "FDateTimeISOFullCompact"): FDateTimeISOFullCompact {
+    const result = this.create(raw, fieldPath);
+    if (isFailure(result)) throw result.error;
+    return result.value;
   }
 }

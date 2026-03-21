@@ -129,7 +129,7 @@ export class ExceptionAuth extends Exceptions {
   static requestExpired(): ExceptionAuth {
     return new ExceptionAuth({
       type: "auth/request-expired",
-      title: "Requisicao Expirada",
+      title: "Requisição Expirada",
       detail: "A requisição está fora da janela temporal permitida",
       status: OHttpStatus.UNAUTHORIZED,
       instance: "",
