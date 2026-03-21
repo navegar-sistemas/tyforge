@@ -49,8 +49,8 @@ if (isFailure(result)) {
 
 ## Documentacao
 
-Documentacao completa em [navegarsistemas.github.io/tyforge](https://navegarsistemas.github.io/tyforge/).
+Documentacao completa em [tyforge.navegarsistemas.com.br](https://tyforge.navegarsistemas.com.br).
 
 ## Licenca
 
-MIT - [Navegar Sistemas](https://www.navegarsistemas.com.br)
+MIT - [Navegar Sistemas](https://navegarsistemas.com.br/)

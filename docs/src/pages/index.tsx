@@ -21,7 +21,7 @@ function HomepageHeader() {
           <Link className={styles.btnPrimary} to="/guia/introducao">
             Ver Documentacao
           </Link>
-          <Link className={styles.btnOutline} to="https://github.com/navegarsistemas/tyforge">
+          <Link className={styles.btnOutline} to="https://github.com/navegar-sistemas/tyforge">
             GitHub
           </Link>
         </div>

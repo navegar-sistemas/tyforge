@@ -8,14 +8,14 @@ import MermaidDiagram from '@site/src/components/MermaidDiagram';
 
 # TyForge — Type-safe Validation Library
 
-**TyForge** e uma biblioteca TypeScript para validacao de schemas com seguranca de tipos, Result pattern e blocos de construcao para Domain-Driven Design, desenvolvida pela [Navegar Sistemas](https://github.com/navegarsistemas).
+**TyForge** e uma biblioteca TypeScript para validacao de schemas com seguranca de tipos, Result pattern e blocos de construcao para Domain-Driven Design, desenvolvida pela [Navegar Sistemas](https://github.com/navegar-sistemas).
 
 Toda operacao de validacao retorna um `Result<T, E>` em vez de lancar excecoes, garantindo tratamento de erros explicito e composicional em todo o fluxo da aplicacao.
 
 ## Instalacao
 
 ```bash
-npm install tyforge
+npm install @navegar-sistemas/tyforge
 ```
 
 ## Inicio rapido

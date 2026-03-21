@@ -7,8 +7,8 @@ const config = {
   title: "TyForge - Documentacao Tecnica",
   tagline: "Type-safe schema validation, Result pattern e DDD building blocks para TypeScript",
   favicon: "img/favicon.ico",
-  url: "https://navegarsistemas.github.io",
-  baseUrl: "/tyforge/",
+  url: "https://tyforge.navegarsistemas.com.br",
+  baseUrl: "/",
   organizationName: "Navegar Sistemas",
   projectName: "tyforge",
   onBrokenLinks: "warn",
@@ -72,7 +72,7 @@ const config = {
           position: "left",
         },
         {
-          href: "https://github.com/navegarsistemas/tyforge",
+          href: "https://github.com/navegar-sistemas/tyforge",
           label: "GitHub",
           position: "right",
         },
@@ -82,8 +82,8 @@ const config = {
           position: "right",
         },
         {
-          href: "https://www.navegarsistemas.com.br",
-          label: "Site Oficial",
+          href: "https://navegarsistemas.com.br/opensource/tyforge/",
+          label: "Navegar Sistemas",
           position: "right",
         },
       ],
@@ -103,7 +103,7 @@ const config = {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/navegarsistemas/tyforge",
+              href: "https://github.com/navegar-sistemas/tyforge",
             },
             {
               label: "npm",
@@ -116,7 +116,11 @@ const config = {
           items: [
             {
               label: "Navegar Sistemas",
-              href: "https://www.navegarsistemas.com.br",
+              href: "https://navegarsistemas.com.br/",
+            },
+            {
+              label: "Projeto",
+              href: "https://navegarsistemas.com.br/opensource/tyforge/",
             },
             {
               label: "Contato",
