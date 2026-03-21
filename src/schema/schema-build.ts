@@ -5,7 +5,7 @@ import {
   InferProps,
 } from "./schema-types";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
-import { err, isFailure, ok, Result } from "@tyforge/result";
+import { err, ok, Result } from "@tyforge/result";
 
 // ── Type Guards (zero casts) ────────────────────────────────────
 
@@ -32,14 +32,6 @@ function assertResultType<T>(result: Result<unknown, Exceptions>): asserts resul
 
 function assertRecord(data: unknown): asserts data is Record<string, unknown> {
   void data;
-}
-
-function validateObject(data: unknown, path: string): Result<Record<string, unknown>, Exceptions> {
-  if (!data || typeof data !== "object" || Array.isArray(data)) {
-    return err(ExceptionValidation.create(path || "root", "Dados obrigatórios ausentes."));
-  }
-  assertRecord(data);
-  return ok(data);
 }
 
 // ── Compiled Schema ─────────────────────────────────────────────
@@ -128,90 +120,90 @@ function createRunner(schema: Record<string, unknown>) {
   return function run(data: unknown, basePath: string, mode: "create" | "assign"): Result<Record<string, unknown>, Exceptions> {
     if (!compiled) compiled = compileFields(schema, basePath);
 
-    const validated = validateObject(data, basePath);
-    if (isFailure(validated)) return validated;
-    const dataRecord = validated.value;
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
+      return err(ExceptionValidation.create(basePath || "root", "Dados obrigatórios ausentes."));
+    }
+    assertRecord(data);
 
     const props: Record<string, unknown> = {};
+    const useAssign = mode === "assign";
 
     for (let i = 0; i < compiled.length; i++) {
-      const field = compiled[i];
-      const value = dataRecord[field.key];
+      const { key, path: fieldPath, required, kind, creatable, nestedValidator } = compiled[i];
+      const value = data[key];
 
-      switch (field.kind) {
+      switch (kind) {
         case FieldKind.Creatable: {
           if (value === undefined || value === null) {
-            if (field.required) return err(requiredError(field.path));
+            if (required) return err(requiredError(fieldPath));
             continue;
           }
-          if (!field.creatable) continue;
-          const res = mode === "create" || !field.hasAssign || !field.creatable.assign
-            ? field.creatable.create(value, field.path)
-            : field.creatable.assign(value);
-          if (isFailure(res)) return res;
-          props[field.key] = res.value;
+          if (!creatable) continue;
+          const res = useAssign && creatable.assign
+            ? creatable.assign(value)
+            : creatable.create(value, fieldPath);
+          if (!res.success) return res;
+          props[key] = res.value;
           break;
         }
 
         case FieldKind.ArrayCreatable: {
           if (value === undefined || value === null) {
-            if (field.required) return err(requiredError(field.path));
+            if (required) return err(requiredError(fieldPath));
             continue;
           }
           if (!Array.isArray(value)) {
-            return err(ExceptionValidation.create(field.path, "Esperado array."));
+            return err(ExceptionValidation.create(fieldPath, "Esperado array."));
           }
-          if (!field.creatable) continue;
+          if (!creatable) continue;
           const arr: unknown[] = [];
           for (let j = 0; j < value.length; j++) {
             const item = value[j];
-            const idxPath = `${field.path}[${j}]`;
-            if (field.required && (item === undefined || item === null)) {
-              return err(requiredError(idxPath));
+            if (required && (item === undefined || item === null)) {
+              return err(requiredError(`${fieldPath}[${j}]`));
             }
-            const res = mode === "create" || !field.hasAssign || !field.creatable.assign
-              ? field.creatable.create(item, idxPath)
-              : field.creatable.assign(item);
-            if (isFailure(res)) return res;
+            const res = useAssign && creatable.assign
+              ? creatable.assign(item)
+              : creatable.create(item, `${fieldPath}[${j}]`);
+            if (!res.success) return res;
             arr.push(res.value);
           }
-          props[field.key] = arr;
+          props[key] = arr;
           break;
         }
 
         case FieldKind.NestedSchema: {
           if (value === undefined || value === null) {
-            if (field.required) return err(requiredError(field.path));
+            if (required) return err(requiredError(fieldPath));
             continue;
           }
-          if (!field.nestedValidator) continue;
-          const nested = field.nestedValidator.run(value, field.path, mode);
-          if (isFailure(nested)) return nested;
-          props[field.key] = nested.value;
+          if (!nestedValidator) continue;
+          const nested = nestedValidator.run(value, fieldPath, mode);
+          if (!nested.success) return nested;
+          props[key] = nested.value;
           break;
         }
 
         case FieldKind.ArrayNestedSchema: {
           if (value === undefined || value === null) {
-            if (field.required) return err(requiredError(field.path));
+            if (required) return err(requiredError(fieldPath));
             continue;
           }
           if (!Array.isArray(value)) {
-            return err(ExceptionValidation.create(field.path, "Esperado array."));
+            return err(ExceptionValidation.create(fieldPath, "Esperado array."));
           }
-          if (!field.nestedValidator) continue;
+          if (!nestedValidator) continue;
           const arr: unknown[] = [];
           for (let j = 0; j < value.length; j++) {
             const item = value[j];
-            const idxPath = `${field.path}[${j}]`;
-            if (field.required && (item === undefined || item === null)) {
-              return err(requiredError(idxPath));
+            if (required && (item === undefined || item === null)) {
+              return err(requiredError(`${fieldPath}[${j}]`));
             }
-            const nested = field.nestedValidator.run(item, idxPath, mode);
-            if (isFailure(nested)) return nested;
+            const nested = nestedValidator.run(item, `${fieldPath}[${j}]`, mode);
+            if (!nested.success) return nested;
             arr.push(nested.value);
           }
-          props[field.key] = arr;
+          props[key] = arr;
           break;
         }
       }

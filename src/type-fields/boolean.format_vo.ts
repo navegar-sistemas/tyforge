@@ -1,6 +1,6 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE, OK_FALSE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 
 export type TBoolean = boolean;
@@ -28,12 +28,12 @@ export class FBoolean extends TypeField<TBoolean, TBooleanFormatted> {
         return OK_TRUE;
       }
       if (lowerValue === "false" || lowerValue === "0" || lowerValue === "no") {
-        return ok(false);
+        return OK_FALSE;
       }
     }
     if (typeof value === "number") {
       if (value === 1) return OK_TRUE;
-      if (value === 0) return ok(false);
+      if (value === 0) return OK_FALSE;
     }
     return err(
       ExceptionValidation.create(fieldPath, "Valor deve ser um booleano válido"),

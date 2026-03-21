@@ -6,15 +6,24 @@ import { z } from "zod";
 
 const ITERATIONS = 200_000;
 const WARMUP = 10_000;
+const RUNS = 3;
 
 function bench(fn: () => void): { opsPerSec: number; avgUs: number } {
   for (let i = 0; i < WARMUP; i++) fn();
-  const start = performance.now();
-  for (let i = 0; i < ITERATIONS; i++) fn();
-  const ms = performance.now() - start;
+
+  const results: number[] = [];
+  for (let r = 0; r < RUNS; r++) {
+    const start = performance.now();
+    for (let i = 0; i < ITERATIONS; i++) fn();
+    results.push(performance.now() - start);
+  }
+
+  results.sort((a, b) => a - b);
+  const median = results[Math.floor(RUNS / 2)];
+
   return {
-    opsPerSec: Math.round((ITERATIONS / ms) * 1000),
-    avgUs: Math.round((ms / ITERATIONS) * 1000 * 100) / 100,
+    opsPerSec: Math.round((ITERATIONS / median) * 1000),
+    avgUs: Math.round((median / ITERATIONS) * 1000 * 100) / 100,
   };
 }
 
@@ -55,7 +64,7 @@ function makeNestedData(depth: number): Record<string, unknown> {
 
 // ── Schemas ─────────────────────────────────────────────────────
 
-// 1. Flat object (8 fields)
+// Flat object (8 fields + nested + array)
 const flatTyforge = {
   id: { type: FId }, name: { type: FString }, email: { type: FEmail },
   age: { type: FInt }, isActive: { type: FBoolean }, createdAt: { type: FDateTimeISOZMillis },
@@ -78,36 +87,39 @@ const flatData = {
   tags: ["admin", "premium", "verified"],
 };
 
-const flatInvalid = {
-  id: "bad", name: "", email: "bad", age: -5, isActive: "yes",
-  createdAt: "bad", address: { street: "", city: 123, zipCode: null },
-  tags: [123, null, ""],
+// Invalid data — erro no PRIMEIRO campo (favorece early-return)
+const flatInvalidFirst = {
+  id: "bad", name: "Maria", email: "maria@ex.com", age: 28, isActive: true,
+  createdAt: new Date().toISOString(),
+  address: { street: "Rua X", city: "SP", zipCode: "00000" },
+  tags: ["ok"],
 };
 
-// 2. Large array (100 items)
+// Invalid data — erro no ÚLTIMO campo (justo, ambos processam tudo)
+const flatInvalidLast = {
+  id: "019d0863-5d45-7246-b6d0-de5098bfd12e", name: "Maria Silva",
+  email: "maria@exemplo.com", age: 28, isActive: true,
+  createdAt: new Date().toISOString(),
+  address: { street: "Rua das Flores, 123", city: "São Paulo", zipCode: "01234-567" },
+  tags: ["admin", "", "verified"],
+};
+
+// Array schemas
 const arrayTyforge = { items: [{ type: FString }] } satisfies Schema;
 const arrayZod = z.object({ items: z.array(zodStr) });
-const arrayData = { items: Array.from({ length: 100 }, (_, i) => `item-${i}`) };
+const arrayData100 = { items: Array.from({ length: 100 }, (_, i) => `item-${i}`) };
+const arrayData1000 = { items: Array.from({ length: 1000 }, (_, i) => `item-${i}`) };
 
-// 3. Large array (1000 items)
-const bigArrayData = { items: Array.from({ length: 1000 }, (_, i) => `item-${i}`) };
-
-// 4. Nested 5 levels
+// Nested schemas
 const nested5Tyforge = makeNestedTyforge(5);
 const nested5Zod = makeNestedZod(5);
 const nested5Data = makeNestedData(5);
 
-// 5. Nested 10 levels
 const nested10Tyforge = makeNestedTyforge(10);
 const nested10Zod = makeNestedZod(10);
 const nested10Data = makeNestedData(10);
 
-// 6. Nested 15 levels
-const nested15Tyforge = makeNestedTyforge(15);
-const nested15Zod = makeNestedZod(15);
-const nested15Data = makeNestedData(15);
-
-// 7. Wide object (20 fields)
+// Wide objects (20 and 50 fields)
 const wideFields: Record<string, { type: typeof FString }> = {};
 const wideZodShape: Record<string, z.ZodString> = {};
 const wideData: Record<string, string> = {};
@@ -119,7 +131,6 @@ for (let i = 0; i < 20; i++) {
 const wideTyforge = wideFields as Schema;
 const wideZod = z.object(wideZodShape);
 
-// 8. Wide object (50 fields)
 const wide50Fields: Record<string, { type: typeof FString }> = {};
 const wide50ZodShape: Record<string, z.ZodString> = {};
 const wide50Data: Record<string, string> = {};
@@ -131,90 +142,104 @@ for (let i = 0; i < 50; i++) {
 const wide50Tyforge = wide50Fields as Schema;
 const wide50Zod = z.object(wide50ZodShape);
 
-// ── Compile all TyForge schemas ─────────────────────────────────
+// ── Compile schemas ─────────────────────────────────────────────
 
 const compiledFlat = SchemaBuilder.compile(flatTyforge);
 const compiledArray = SchemaBuilder.compile(arrayTyforge);
 const compiledNested5 = SchemaBuilder.compile(nested5Tyforge);
 const compiledNested10 = SchemaBuilder.compile(nested10Tyforge);
-const compiledNested15 = SchemaBuilder.compile(nested15Tyforge);
 const compiledWide = SchemaBuilder.compile(wideTyforge);
 const compiledWide50 = SchemaBuilder.compile(wide50Tyforge);
 
 // ── Run ─────────────────────────────────────────────────────────
 
-console.log(`\n🔥 TyForge vs Zod — ${ITERATIONS.toLocaleString()} iterações, ${WARMUP.toLocaleString()} warmup\n`);
+console.log(`\n🔥 TyForge vs Zod — ${ITERATIONS.toLocaleString()} iterações × ${RUNS} rodadas (mediana), ${WARMUP.toLocaleString()} warmup`);
+console.log(`\n   Nota: TyForge retorna TypeField instances (getValue, formatted, equals, toJSON).`);
+console.log(`         Zod retorna valores primitivos. Trade-offs diferentes.\n`);
 console.log("━".repeat(70));
 
 // 1. Flat valid
-console.log("\n📊 1. Objeto flat (8 campos + nested address + array tags) — VÁLIDO");
-compare("compile vs zod",
-  bench(() => compiledFlat.create(flatData as InferJson<typeof flatTyforge>, "u")),
+console.log("\n📊 1. Objeto flat (8 campos + nested + array) — VÁLIDO");
+compare("compile vs safeParse",
+  bench(() => compiledFlat.create(flatData as InferJson<typeof flatTyforge>)),
   bench(() => flatZod.safeParse(flatData)),
 );
 
-// 2. Flat invalid
-console.log("📊 2. Objeto flat — INVÁLIDO");
-compare("compile vs zod",
-  bench(() => compiledFlat.create(flatInvalid as unknown as InferJson<typeof flatTyforge>, "u")),
-  bench(() => flatZod.safeParse(flatInvalid)),
+// 2. Flat invalid — erro no primeiro campo (favorece early-return)
+console.log("📊 2. Erro no PRIMEIRO campo (early-return)");
+console.log("   ⚠ TyForge para no 1º erro, Zod coleta todos — cenário favorece TyForge");
+compare("compile vs safeParse",
+  bench(() => compiledFlat.create(flatInvalidFirst as unknown as InferJson<typeof flatTyforge>)),
+  bench(() => flatZod.safeParse(flatInvalidFirst)),
 );
 
-// 3. Array 100 items
-console.log("📊 3. Array com 100 strings");
-compare("compile vs zod",
-  bench(() => compiledArray.create(arrayData as InferJson<typeof arrayTyforge>, "a")),
-  bench(() => arrayZod.safeParse(arrayData)),
+// 3. Flat invalid — erro no último campo (justo)
+console.log("📊 3. Erro no ÚLTIMO campo (ambos processam tudo)");
+compare("compile vs safeParse",
+  bench(() => compiledFlat.create(flatInvalidLast as unknown as InferJson<typeof flatTyforge>)),
+  bench(() => flatZod.safeParse(flatInvalidLast)),
 );
 
-// 4. Array 1000 items
-console.log("📊 4. Array com 1000 strings");
-compare("compile vs zod",
-  bench(() => compiledArray.create(bigArrayData as InferJson<typeof arrayTyforge>, "a")),
-  bench(() => arrayZod.safeParse(bigArrayData)),
+// 4. Array 100 items
+console.log("📊 4. Array com 100 strings");
+compare("compile vs safeParse",
+  bench(() => compiledArray.create(arrayData100 as InferJson<typeof arrayTyforge>)),
+  bench(() => arrayZod.safeParse(arrayData100)),
 );
 
-// 5. Nested 5
-console.log("📊 5. Objeto aninhado — 5 níveis");
-compare("compile vs zod",
-  bench(() => compiledNested5.create(nested5Data as InferJson<typeof nested5Tyforge>, "n")),
+// 5. Array 1000 items
+console.log("📊 5. Array com 1000 strings");
+compare("compile vs safeParse",
+  bench(() => compiledArray.create(arrayData1000 as InferJson<typeof arrayTyforge>)),
+  bench(() => arrayZod.safeParse(arrayData1000)),
+);
+
+// 6. Nested 5
+console.log("📊 6. Objeto aninhado — 5 níveis");
+compare("compile vs safeParse",
+  bench(() => compiledNested5.create(nested5Data as InferJson<typeof nested5Tyforge>)),
   bench(() => nested5Zod.safeParse(nested5Data)),
 );
 
-// 6. Nested 10
-console.log("📊 6. Objeto aninhado — 10 níveis");
-compare("compile vs zod",
-  bench(() => compiledNested10.create(nested10Data as InferJson<typeof nested10Tyforge>, "n")),
+// 7. Nested 10
+console.log("📊 7. Objeto aninhado — 10 níveis");
+compare("compile vs safeParse",
+  bench(() => compiledNested10.create(nested10Data as InferJson<typeof nested10Tyforge>)),
   bench(() => nested10Zod.safeParse(nested10Data)),
-);
-
-// 7. Nested 15
-console.log("📊 7. Objeto aninhado — 15 níveis");
-compare("compile vs zod",
-  bench(() => compiledNested15.create(nested15Data as InferJson<typeof nested15Tyforge>, "n")),
-  bench(() => nested15Zod.safeParse(nested15Data)),
 );
 
 // 8. Wide 20 fields
 console.log("📊 8. Objeto largo — 20 campos string");
-compare("compile vs zod",
-  bench(() => compiledWide.create(wideData as InferJson<typeof wideTyforge>, "w")),
+compare("compile vs safeParse",
+  bench(() => compiledWide.create(wideData as InferJson<typeof wideTyforge>)),
   bench(() => wideZod.safeParse(wideData)),
 );
 
 // 9. Wide 50 fields
 console.log("📊 9. Objeto largo — 50 campos string");
-compare("compile vs zod",
-  bench(() => compiledWide50.create(wide50Data as InferJson<typeof wide50Tyforge>, "w")),
+compare("compile vs safeParse",
+  bench(() => compiledWide50.create(wide50Data as InferJson<typeof wide50Tyforge>)),
   bench(() => wide50Zod.safeParse(wide50Data)),
 );
 
 // 10. Campo simples
 const zodEmailPre = z.string().min(5).max(200).email();
-console.log("📊 10. Campo simples — FEmail vs z.string().email()");
-compare("field vs zod",
+console.log("📊 10. Campo simples — FEmail.create vs z.string().email()");
+compare("field vs safeParse",
   bench(() => FEmail.create("test@example.com")),
   bench(() => zodEmailPre.safeParse("test@example.com")),
+);
+
+// 11. Tempo de compilação
+console.log("📊 11. Tempo de compilação do schema flat");
+compare("compile vs z.object",
+  bench(() => SchemaBuilder.compile(flatTyforge)),
+  bench(() => z.object({
+    id: zodId, name: zodStr, email: zodEmail, age: zodInt, isActive: zodBool,
+    createdAt: zodDate,
+    address: z.object({ street: zodStr, city: zodStr, zipCode: zodStr }),
+    tags: z.array(zodStr),
+  })),
 );
 
 console.log("━".repeat(70));

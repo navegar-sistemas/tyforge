@@ -1,6 +1,6 @@
 // ── Result Pattern ──────────────────────────────────────────────
 export type { Result, ResultPromise } from "./result/result";
-export { ok, err, isSuccess, isFailure, map, flatMap, fold, match, getOrElse, orElse, all, toPromise, OK_TRUE } from "./result/result";
+export { ok, err, isSuccess, isFailure, map, flatMap, fold, match, getOrElse, orElse, all, toPromise, OK_TRUE, OK_FALSE } from "./result/result";
 
 // ── Exceptions ──────────────────────────────────────────────────
 export { Exceptions } from "./exceptions/base.exceptions";
