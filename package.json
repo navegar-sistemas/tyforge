@@ -9,13 +9,24 @@
     "ddd",
     "result-pattern",
     "type-fields",
-    "domain-driven-design"
+    "domain-driven-design",
+    "value-objects",
+    "entity",
+    "aggregate",
+    "type-safe",
+    "clean-architecture",
+    "exceptions",
+    "rfc7807"
   ],
   "author": "Navegar Sistemas",
   "license": "MIT",
+  "homepage": "https://navegarsistemas.com.br/opensource/tyforge/",
   "repository": {
     "type": "git",
     "url": "https://github.com/navegar-sistemas/tyforge"
+  },
+  "bugs": {
+    "url": "https://github.com/navegar-sistemas/tyforge/issues"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

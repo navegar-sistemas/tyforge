@@ -1,5 +1,10 @@
 # TyForge
 
+[![npm version](https://img.shields.io/npm/v/@navegar-sistemas/tyforge)](https://www.npmjs.com/package/@navegar-sistemas/tyforge)
+[![license](https://img.shields.io/npm/l/@navegar-sistemas/tyforge)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-green)](https://nodejs.org/)
+
 Validacao de schemas type-safe, Result pattern e building blocks DDD para TypeScript.
 
 ## Instalacao
