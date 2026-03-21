@@ -38,14 +38,17 @@
   "scripts": {
     "build": "tsc && tsc-alias",
     "prepublishOnly": "npm run build",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test src/**/*.test.ts"
   },
   "dependencies": {
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
     "@types/uuid": "^10.0.0",
     "tsc-alias": "^1.8.16",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.3",
     "zod": "^4.3.6"
   },

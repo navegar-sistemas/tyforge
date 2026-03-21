@@ -19,7 +19,7 @@ function hasType(entry: unknown): entry is { type: unknown; required?: boolean; 
 }
 
 function isCreatable(t: unknown): t is Creatable {
-  return !!t && typeof t === "object" && "create" in t && typeof t.create === "function";
+  return !!t && (typeof t === "object" || typeof t === "function") && "create" in t && typeof t.create === "function";
 }
 
 function hasAssign(t: Creatable): boolean {
@@ -143,9 +143,10 @@ function createRunner(schema: Record<string, unknown>) {
             if (field.required) return err(requiredError(field.path));
             continue;
           }
-          const res = mode === "create" || !field.hasAssign
-            ? field.creatable!.create(value, field.path)
-            : field.creatable!.assign!(value);
+          if (!field.creatable) continue;
+          const res = mode === "create" || !field.hasAssign || !field.creatable.assign
+            ? field.creatable.create(value, field.path)
+            : field.creatable.assign(value);
           if (isFailure(res)) return res;
           props[field.key] = res.value;
           break;
@@ -159,6 +160,7 @@ function createRunner(schema: Record<string, unknown>) {
           if (!Array.isArray(value)) {
             return err(ExceptionValidation.create(field.path, "Esperado array."));
           }
+          if (!field.creatable) continue;
           const arr: unknown[] = [];
           for (let j = 0; j < value.length; j++) {
             const item = value[j];
@@ -166,9 +168,9 @@ function createRunner(schema: Record<string, unknown>) {
             if (field.required && (item === undefined || item === null)) {
               return err(requiredError(idxPath));
             }
-            const res = mode === "create" || !field.hasAssign
-              ? field.creatable!.create(item, idxPath)
-              : field.creatable!.assign!(item);
+            const res = mode === "create" || !field.hasAssign || !field.creatable.assign
+              ? field.creatable.create(item, idxPath)
+              : field.creatable.assign(item);
             if (isFailure(res)) return res;
             arr.push(res.value);
           }
@@ -181,7 +183,8 @@ function createRunner(schema: Record<string, unknown>) {
             if (field.required) return err(requiredError(field.path));
             continue;
           }
-          const nested = field.nestedValidator!.run(value, field.path, mode);
+          if (!field.nestedValidator) continue;
+          const nested = field.nestedValidator.run(value, field.path, mode);
           if (isFailure(nested)) return nested;
           props[field.key] = nested.value;
           break;
@@ -195,6 +198,7 @@ function createRunner(schema: Record<string, unknown>) {
           if (!Array.isArray(value)) {
             return err(ExceptionValidation.create(field.path, "Esperado array."));
           }
+          if (!field.nestedValidator) continue;
           const arr: unknown[] = [];
           for (let j = 0; j < value.length; j++) {
             const item = value[j];
@@ -202,7 +206,7 @@ function createRunner(schema: Record<string, unknown>) {
             if (field.required && (item === undefined || item === null)) {
               return err(requiredError(idxPath));
             }
-            const nested = field.nestedValidator!.run(item, idxPath, mode);
+            const nested = field.nestedValidator.run(item, idxPath, mode);
             if (isFailure(nested)) return nested;
             arr.push(nested.value);
           }
@@ -243,13 +247,4 @@ export class SchemaBuilder {
     };
   }
 
-  static build<TSchema extends Schema>(
-    schema: TSchema,
-    data: InferJson<TSchema>,
-    path = "",
-    mode: "create" | "assign",
-  ): Result<InferProps<TSchema>, Exceptions> {
-    const compiled = SchemaBuilder.compile(schema);
-    return mode === "create" ? compiled.create(data, path) : compiled.assign(data, path);
-  }
 }

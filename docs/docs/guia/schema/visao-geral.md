@@ -58,16 +58,6 @@ O metodo `compile()` pre-analisa o schema uma unica vez e retorna um validador o
 
 Consulte [Compilacao e Modos](/guia/schema/compile) para detalhes completos sobre `create` vs `assign`.
 
-### `build()` — Compatibilidade
-
-```typescript
-const resultado = SchemaBuilder.build(schema, dados, 'user', 'create');
-```
-
-O metodo `build()` e a API original, mantida por retrocompatibilidade. Ele analisa o schema a cada chamada, sem pre-compilacao. Aceita o parametro `mode` diretamente como argumento (`"create"` ou `"assign"`).
-
-Para novos projetos, prefira `compile()`.
-
 ## Inferencia de Tipos
 
 O sistema de tipos do TyForge infere automaticamente dois tipos a partir do schema:

@@ -110,26 +110,6 @@ if (isFailure(result)) {
 
 Para campos ausentes obrigatorios, o erro e `"Campo obrigatorio ausente."` com o path do campo. Para arrays, o path inclui o indice (ex: `tags[2]`).
 
-## SchemaBuilder.build() — Retrocompatibilidade
-
-O metodo `build()` oferece a mesma funcionalidade sem pre-compilacao:
-
-```typescript
-static build<TSchema>(
-  schema: TSchema,
-  data: InferJson<TSchema>,
-  path?: string,
-  mode: 'create' | 'assign',
-): Result<InferProps<TSchema>, Exceptions>
-```
-
-A diferenca e que `build()` analisa o schema a cada chamada. Para schemas usados uma unica vez, a diferenca de performance e insignificante. Para schemas reutilizados (ex: em endpoints de API), prefira `compile()`.
-
-```typescript
-// Equivalente ao compile().create(), porem sem pre-compilacao
-const resultado = SchemaBuilder.build(userSchema, dados, 'user', 'create');
-```
-
 ## Objetos Aninhados
 
 O SchemaBuilder suporta objetos aninhados de forma transparente. Basta definir um objeto inline no schema — sem necessidade do wrapper `{ type: ... }`:
