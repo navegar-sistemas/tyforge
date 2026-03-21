@@ -108,7 +108,7 @@ src/
 | `result/` | Tipo `Result<T, E>` e funcoes utilitarias (`ok`, `err`, `isSuccess`, `isFailure`, `map`, `flatMap`, `fold`, `match`, `getOrElse`, `orElse`, `all`, `toPromise`) |
 | `exceptions/` | 18 tipos de excecao baseados em RFC 7807 (`ExceptionValidation`, `ExceptionBusiness`, `ExceptionNotFound`, `ExceptionDb`, `ExceptionAuth`, `ExceptionUnexpected` e outros) |
 | `type-fields/` | Classe base `TypeField<TPrimitive>` e implementacoes concretas como `FString`, `FEmail`, `FId`, `FInt`, `FBoolean`, `FDate*`, `FPassword`, etc. |
-| `schema/` | `SchemaBuilder` com metodos `compile()` e `build()`, tipos de inferencia `InferJson` e `InferProps` |
+| `schema/` | `SchemaBuilder` com metodo `compile()`, tipos de inferencia `InferJson` e `InferProps` |
 | `domain-models/` | Classes base `Entity`, `ValueObject`, `Aggregate` (com domain events), `Dto` e `DomainEvent` |
 | `tools/` | Utilitarios: `TypeGuard` (verificacoes de tipo), `ToolParse` (parsing seguro), `ToolFormattingDateISO8601` (formatacao de datas) |
 | `constants/` | Constantes HTTP: `OHttpStatus` (objeto com status codes) e `THttpStatus` (tipo) |
