@@ -1,0 +1,45 @@
+# ── Base (producao) ───────────────────────────────────────────────
+# Dev: docker compose up (auto-merge com override.yml)
+# Prod: docker compose -f docker-compose.yml up (ignora override)
+
+services:
+  docs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tyforge-docs
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - '${DOCS_BIND:-127.0.0.1}:4200:4200'
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4200"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 256M
+          pids: 100
+        reservations:
+          cpus: "0.25"
+          memory: 64M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+    tmpfs:
+      - /tmp:size=32M
+    networks:
+      - tyforge-network
+
+networks:
+  tyforge-network:
+    name: tyforge-network
+    driver: bridge

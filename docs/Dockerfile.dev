@@ -1,0 +1,10 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund --loglevel error
+
+EXPOSE 4200
+
+CMD ["npx", "docusaurus", "start", "--host", "0.0.0.0", "--port", "4200", "--poll", "1000"]

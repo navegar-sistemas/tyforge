@@ -1,0 +1,9 @@
+node_modules
+build
+.git
+.docusaurus
+.cache-loader
+.claude
+.DS_Store
+*.md.bak
+Dockerfile*

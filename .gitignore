@@ -7,3 +7,11 @@ dist
 # Claude
 CLAUDE.md
 .claude/
+
+# Docker
+docker-compose.override.yml
+
+# Docs
+docs/node_modules
+docs/.docusaurus
+docs/build

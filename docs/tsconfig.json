@@ -1,0 +1,14 @@
+{
+  // This file is not used in compilation. It is here just for a nice editor experience.
+  "extends": "@docusaurus/tsconfig",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "lib": ["dom", "es2015"],
+    "moduleResolution": "node"
+  },
+  "include": ["src/**/*"],
+  "exclude": [".docusaurus", "build", "node_modules"]
+}

@@ -1,0 +1,462 @@
+/**
+ * Identidade Visual — NAVEGAR Sistemas
+ * Cores: Laranja #FD6800 (primaria), Roxo #8B5CF6 (secundaria)
+ * Fundo escuro: #0A0A0A | Tipografia: Inter + JetBrains Mono
+ */
+
+/* Fontes do manual de identidade */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ========================================
+   Light Mode
+   ======================================== */
+:root {
+  /* Laranja Tecnico — cor primaria de acao */
+  --ifm-color-primary: #FD6800;
+  --ifm-color-primary-dark: #E55D00;
+  --ifm-color-primary-darker: #CC5200;
+  --ifm-color-primary-darkest: #B34700;
+  --ifm-color-primary-light: #FD8033;
+  --ifm-color-primary-lighter: #FE9966;
+  --ifm-color-primary-lightest: #FEB399;
+
+  /* Roxo Profundo — cor secundaria */
+  --ifm-color-secondary: #8B5CF6;
+  --ifm-color-secondary-dark: #7C3AED;
+  --ifm-color-secondary-darker: #6D28D9;
+  --ifm-color-secondary-darkest: #5B21B6;
+  --ifm-color-secondary-light: #A78BFA;
+  --ifm-color-secondary-lighter: #C4B5FD;
+  --ifm-color-secondary-lightest: #DDD6FE;
+
+  /* Fundos e superficies */
+  --ifm-background-color: #ffffff;
+  --ifm-background-surface-color: #f8fafc;
+  --ifm-color-emphasis-100: #f1f5f9;
+  --ifm-color-emphasis-200: #e2e8f0;
+  --ifm-color-emphasis-300: #cbd5e1;
+  --ifm-color-emphasis-600: #475569;
+  --ifm-color-emphasis-700: #334155;
+  --ifm-color-emphasis-800: #1e293b;
+  --ifm-color-emphasis-900: #0f172a;
+
+  /* Tipografia */
+  --ifm-font-family-base:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ifm-font-family-monospace:
+    'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
+  --ifm-code-font-size: 95%;
+
+  /* Destaque de codigo */
+  --docusaurus-highlighted-code-line-bg: rgba(253, 104, 0, 0.1);
+
+  /* Bordas e sombras */
+  --ifm-border-color: #e2e8f0;
+  --ifm-global-shadow-lw: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --ifm-global-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --ifm-global-shadow-tl: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   Dark Mode — padrao da marca NAVEGAR
+   ======================================== */
+[data-theme='dark'] {
+  --ifm-color-primary: #FD8033;
+  --ifm-color-primary-dark: #FD6800;
+  --ifm-color-primary-darker: #E55D00;
+  --ifm-color-primary-darkest: #CC5200;
+  --ifm-color-primary-light: #FE9966;
+  --ifm-color-primary-lighter: #FEB399;
+  --ifm-color-primary-lightest: #FECDB2;
+
+  --ifm-color-secondary: #A78BFA;
+  --ifm-color-secondary-dark: #8B5CF6;
+  --ifm-color-secondary-darker: #7C3AED;
+  --ifm-color-secondary-darkest: #6D28D9;
+  --ifm-color-secondary-light: #C4B5FD;
+  --ifm-color-secondary-lighter: #DDD6FE;
+  --ifm-color-secondary-lightest: #EDE9FE;
+
+  /* Fundos escuros do manual */
+  --ifm-background-color: #0A0A0A;
+  --ifm-background-surface-color: #111111;
+  --ifm-color-emphasis-100: #181818;
+  --ifm-color-emphasis-200: #1a1a1a;
+  --ifm-color-emphasis-300: #333333;
+  --ifm-color-emphasis-600: #9CA3AF;
+  --ifm-color-emphasis-700: #cbd5e1;
+  --ifm-color-emphasis-800: #e2e8f0;
+  --ifm-color-emphasis-900: #f1f5f9;
+
+  --docusaurus-highlighted-code-line-bg: rgba(253, 104, 0, 0.15);
+  --ifm-border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ========================================
+   Navbar — Glassmorphism
+   ======================================== */
+.navbar {
+  box-shadow: var(--ifm-global-shadow-lw);
+  border-bottom: 1px solid var(--ifm-border-color);
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(1.2);
+}
+
+[data-theme='dark'] .navbar {
+  background-color: rgba(17, 17, 17, 0.85);
+}
+
+.navbar__title {
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+  font-size: 1.25rem;
+}
+
+.navbar__brand {
+  font-weight: 700;
+}
+
+.navbar__logo {
+  height: 36px;
+  width: auto;
+}
+
+/* ========================================
+   Footer
+   ======================================== */
+.footer {
+  background-color: #080808;
+  color: var(--ifm-color-emphasis-100);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='light'] .footer {
+  background-color: #0f172a;
+}
+
+.footer__title {
+  color: var(--ifm-color-primary-light);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.footer__link-item {
+  color: #9CA3AF;
+  transition: color 200ms ease;
+  font-size: 0.95rem;
+}
+
+.footer__link-item:hover {
+  color: var(--ifm-color-primary-light);
+  text-decoration: none;
+}
+
+.footer__copyright {
+  color: #6B7280;
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 1rem;
+  margin-top: 2rem;
+}
+
+/* ========================================
+   Botoes — Pill Shape (manual)
+   ======================================== */
+.button {
+  border-radius: 9999px;
+  font-weight: 500;
+  transition: all 200ms ease;
+  font-family: var(--ifm-font-family-base);
+}
+
+.button--primary {
+  background-color: #FD6800;
+  border-color: #FD6800;
+  color: #ffffff;
+}
+
+.button--primary:hover {
+  background-color: #E55D00;
+  border-color: #E55D00;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 0 40px rgba(253, 104, 0, 0.15);
+}
+
+.button--secondary {
+  background-color: #8B5CF6;
+  border-color: #8B5CF6;
+  color: #ffffff;
+}
+
+.button--secondary:hover {
+  background-color: #7C3AED;
+  border-color: #7C3AED;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+}
+
+/* ========================================
+   Cards
+   ======================================== */
+.card {
+  border: 1px solid var(--ifm-border-color);
+  border-radius: 24px;
+  box-shadow: var(--ifm-global-shadow-lw);
+  transition: all 200ms ease;
+  background-color: var(--ifm-background-surface-color);
+}
+
+[data-theme='dark'] .card {
+  background-color: #181818;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.card:hover {
+  box-shadow: var(--ifm-global-shadow-md);
+  transform: translateY(-2px);
+}
+
+[data-theme='dark'] .card:hover {
+  background-color: #1a1a1a;
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+/* ========================================
+   Sidebar
+   ======================================== */
+.theme-doc-sidebar-container {
+  border-right: 1px solid var(--ifm-border-color);
+  background-color: var(--ifm-background-surface-color);
+}
+
+[data-theme='dark'] .theme-doc-sidebar-container {
+  background-color: #0A0A0A;
+}
+
+.theme-doc-sidebar-item-category-level-1
+  > .theme-doc-sidebar-item-category-level-1__button {
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-900);
+  font-size: 1rem;
+}
+
+.theme-doc-sidebar-item-link-level-1 {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.theme-doc-sidebar-item-link-level-1:hover {
+  background-color: var(--ifm-color-emphasis-100);
+}
+
+/* Item ativo do menu lateral */
+.menu__link--active,
+.theme-doc-sidebar-item-link--active {
+  background-color: rgba(253, 104, 0, 0.1) !important;
+  color: var(--ifm-color-primary) !important;
+  font-weight: 700;
+  border-radius: 8px;
+}
+
+[data-theme='dark'] .menu__link--active,
+[data-theme='dark'] .theme-doc-sidebar-item-link--active {
+  background-color: rgba(253, 104, 0, 0.15) !important;
+  color: var(--ifm-color-primary-light) !important;
+}
+
+/* ========================================
+   Tabelas
+   ======================================== */
+table {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--ifm-global-shadow-lw);
+  border-collapse: collapse;
+  width: 100%;
+}
+
+thead {
+  background-color: var(--ifm-color-primary);
+}
+
+[data-theme='dark'] thead {
+  background-color: #181818;
+}
+
+thead th {
+  padding: 1rem;
+  font-weight: 600;
+  text-align: left;
+  color: #ffffff;
+}
+
+[data-theme='light'] thead th {
+  color: #ffffff;
+}
+
+tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--ifm-border-color);
+}
+
+tbody tr:hover {
+  background-color: var(--ifm-color-emphasis-100);
+}
+
+/* ========================================
+   Codigo
+   ======================================== */
+code {
+  background-color: var(--ifm-color-emphasis-100);
+  border: 1px solid var(--ifm-border-color);
+  border-radius: 4px;
+  color: #8B5CF6;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.9em;
+  padding: 0.2em 0.4em;
+}
+
+[data-theme='dark'] code {
+  color: #A78BFA;
+}
+
+pre {
+  border-radius: 8px;
+  border: 1px solid var(--ifm-border-color);
+  background-color: var(--ifm-background-surface-color);
+  box-shadow: var(--ifm-global-shadow-lw);
+}
+
+pre code {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* ========================================
+   Alertas
+   ======================================== */
+.alert {
+  border-radius: 8px;
+  border-left: 4px solid;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-weight: 500;
+}
+
+.alert--info {
+  border-left-color: #8B5CF6;
+  background-color: rgba(139, 92, 246, 0.08);
+  color: var(--ifm-color-secondary-dark);
+}
+
+[data-theme='dark'] .alert--info {
+  color: var(--ifm-color-secondary-light);
+}
+
+.alert--success {
+  border-left-color: #22C55E;
+  background-color: rgba(34, 197, 94, 0.08);
+  color: #16A34A;
+}
+
+.alert--warning {
+  border-left-color: #FD6800;
+  background-color: rgba(253, 104, 0, 0.08);
+  color: #E55D00;
+}
+
+.alert--danger {
+  border-left-color: #EF4444;
+  background-color: rgba(239, 68, 68, 0.08);
+  color: #DC2626;
+}
+
+/* ========================================
+   Tipografia
+   ======================================== */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--ifm-color-emphasis-900);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: var(--ifm-color-primary);
+  border-bottom: 2px solid var(--ifm-color-primary-light);
+  padding-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+  color: var(--ifm-color-emphasis-900);
+}
+
+h3 {
+  font-size: 1.5rem;
+  color: var(--ifm-color-emphasis-800);
+}
+
+/* ========================================
+   Links
+   ======================================== */
+a {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+a:hover {
+  color: var(--ifm-color-primary-dark);
+  text-decoration: underline;
+}
+
+/* ========================================
+   Conteudo principal
+   ======================================== */
+.theme-doc-markdown {
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+.theme-doc-markdown p {
+  margin-bottom: 1rem;
+}
+
+.theme-doc-markdown ul,
+.theme-doc-markdown ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.theme-doc-markdown li {
+  margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   Responsividade
+   ======================================== */
+@media (max-width: 768px) {
+  .navbar__title {
+    font-size: 1.1rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+}

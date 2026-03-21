@@ -1,0 +1,148 @@
+---
+title: Type Fields
+sidebar_position: 1
+slug: /type-fields/visao-geral
+---
+
+# Type Fields
+
+**Type Fields** sao Value Objects validados que encapsulam valores primitivos com regras de validacao embutidas. Cada TypeField garante, no momento da criacao, que o valor armazenado respeita suas restricoes — eliminando a necessidade de validacoes manuais dispersas pelo codigo.
+
+## Classe base: `TypeField<TPrimitive, TFormatted>`
+
+Todos os Type Fields estendem a classe abstrata `TypeField<TPrimitive, TFormatted>`:
+
+```typescript
+abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
+  abstract readonly typeInference: string;
+  abstract readonly config: ITypeFieldConfig<TPrimitive>;
+
+  protected constructor(value: TPrimitive, fieldPath: string);
+
+  // Metodos de instancia
+  getValue(): TPrimitive;
+  formatted(): TFormatted;
+  equals(other?: TypeField<TPrimitive, TFormatted>): boolean;
+  toString(): string;
+  toInt(): Result<number, ExceptionValidation>;
+  isEmpty(): boolean;
+  toJSON(): TPrimitive | string;
+  getDescription(): string;
+  getShortDescription(): string;
+  getDocumentationAux(): { value: TPrimitive; formatted: TFormatted; description: string };
+}
+```
+
+### Metodos estaticos (implementados por cada subclasse)
+
+Toda subclasse concreta implementa dois factory methods:
+
+```typescript
+// Retorna Result — caminho seguro (hot path)
+static create(value: TPrimitive, fieldPath?: string): Result<Instance, ExceptionValidation>;
+
+// Lanca excecao se falhar — conveniencia para try/catch
+static createOrThrow(value: TPrimitive, fieldPath?: string): Instance;
+```
+
+O metodo `create()` retorna um `Result<T, ExceptionValidation>`, permitindo tratamento explicito de erros. O metodo `createOrThrow()` lanca a excecao diretamente, sendo util em contextos onde try/catch e preferido.
+
+## `ITypeFieldConfig` — Configuracao de validacao
+
+A configuracao e um tipo discriminado por `jsonSchemaType`. Cada tipo primitivo possui campos especificos:
+
+| `jsonSchemaType` | Campos adicionais | Descricao |
+|------------------|-------------------|-----------|
+| `"string"` | `minLength`, `maxLength` | Comprimento minimo e maximo da string |
+| `"number"` | `min`, `max`, `decimalPrecision` | Faixa numerica e casas decimais |
+| `"boolean"` | — | Verificacao de tipo booleano |
+| `"object"` | — | Verificacao de tipo objeto |
+| `"array"` | `minItems?`, `maxItems?` | Limites de itens no array |
+| `"Date"` | — | Verificacao de tipo Date |
+
+Todos os configs possuem o campo opcional `serializeAsString` e `validateEnum` (para tipos com enum).
+
+### Validacao por enum
+
+O metodo estatico protegido `resolveEnum()` valida valores contra um objeto enum com cache via `WeakMap`:
+
+```typescript
+protected static resolveEnum<E extends Record<string, string | number>>(
+  enumObj: E,
+  raw: unknown,
+  fieldPath: string,
+): Result<E[keyof E], ExceptionValidation>;
+```
+
+## Convencao de nomenclatura
+
+| Convencao | Exemplo |
+|-----------|---------|
+| Prefixo `F` no nome da classe | `FString`, `FEmail`, `FId` |
+| Prefixo `T` no tipo primitivo | `TString`, `TEmail`, `TId` |
+| Arquivo com sufixo `.format_vo.ts` | `email.format_vo.ts` |
+
+## Exemplo: criando um TypeField customizado
+
+```typescript
+import { TypeField } from "tyforge";
+import { ITypeFieldConfig } from "tyforge";
+import { Result, ok, err, isFailure } from "tyforge";
+import { ExceptionValidation } from "tyforge";
+
+export type TCpf = string;
+
+export class FCpf extends TypeField<TCpf> {
+  override readonly typeInference = "FCpf";
+
+  override readonly config: ITypeFieldConfig<TCpf> = {
+    jsonSchemaType: "string",
+    minLength: 11,
+    maxLength: 14,
+    serializeAsString: false,
+  };
+
+  private constructor(value: TCpf, fieldPath: string) {
+    super(value, fieldPath);
+  }
+
+  static create(
+    raw: TCpf,
+    fieldPath = "Cpf",
+  ): Result<FCpf, ExceptionValidation> {
+    // Validacao customizada aqui
+    const digits = raw.replace(/\D/g, "");
+    if (digits.length !== 11) {
+      return err(ExceptionValidation.create(fieldPath, "CPF deve ter 11 digitos"));
+    }
+    return ok(new FCpf(digits, fieldPath));
+  }
+
+  static createOrThrow(raw: TCpf, fieldPath = "Cpf"): FCpf {
+    const result = this.create(raw, fieldPath);
+    if (isFailure(result)) throw result.error;
+    return result.value;
+  }
+
+  override formatted(): string {
+    const v = this.getValue();
+    return `${v.slice(0, 3)}.${v.slice(3, 6)}.${v.slice(6, 9)}-${v.slice(9)}`;
+  }
+
+  override getDescription(): string {
+    return "Cadastro de Pessoa Fisica (CPF)";
+  }
+
+  override getShortDescription(): string {
+    return "CPF";
+  }
+}
+```
+
+## Proximos passos
+
+- [Strings](/type-fields/string) — FString, FEmail, FPassword, FNomeCompleto, FDescricao, FText
+- [Numericos](/type-fields/numerico) — FInt, FPageNumber, FPageSize, FBoolInt
+- [Datas](/type-fields/data) — FDateTimeISOZMillis, FDateTimeISOZ, FDateISODate, FDateISOCompact
+- [Identificadores](/type-fields/identificador) — FId, FIdReq, FTraceId, FApiKey, FBearer, FSignature
+- [Outros](/type-fields/outros) — FBoolean, FJson, FHttpStatus, FStatusAplicacao, FPublicKeyPem

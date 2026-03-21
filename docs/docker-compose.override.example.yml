@@ -1,0 +1,30 @@
+# ── Override para desenvolvimento ─────────────────────────────────
+# Carregado automaticamente pelo `docker compose up` (sem flag extra)
+# Para rodar SOMENTE producao: docker compose -f docker-compose.yml up
+
+services:
+  docs:
+    build:
+      dockerfile: Dockerfile.dev
+    container_name: tyforge-docs-dev
+    read_only: false
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./docs:/app/docs
+      - ./src:/app/src
+      - ./static:/app/static
+      - ./docusaurus.config.js:/app/docusaurus.config.js
+      - ./sidebars.ts:/app/sidebars.ts
+    healthcheck:
+      disable: true
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+          pids: 200
+        reservations:
+          cpus: "0.25"
+          memory: 256M
