@@ -1,26 +1,9 @@
 export default {
-  docs: [
+  guia: [
     {
       type: "doc",
       id: "introducao",
       label: "Introducao",
-    },
-    {
-      type: "category",
-      label: "Arquitetura",
-      collapsed: false,
-      items: [
-        {
-          type: "doc",
-          id: "arquitetura/visao-geral",
-          label: "Visao Geral",
-        },
-        {
-          type: "doc",
-          id: "arquitetura/type-system",
-          label: "Sistema de Tipos",
-        },
-      ],
     },
     {
       type: "category",

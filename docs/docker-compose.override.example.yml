@@ -12,11 +12,7 @@ services:
     environment:
       NODE_ENV: development
     volumes:
-      - ./docs:/app/docs
-      - ./src:/app/src
-      - ./static:/app/static
-      - ./docusaurus.config.js:/app/docusaurus.config.js
-      - ./sidebars.ts:/app/sidebars.ts
+      - .:/app
     healthcheck:
       disable: true
     deploy:

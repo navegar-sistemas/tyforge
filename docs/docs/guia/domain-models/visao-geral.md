@@ -1,7 +1,6 @@
 ---
 title: Domain Models
 sidebar_position: 1
-slug: /domain-models/visao-geral
 ---
 
 import MermaidDiagram from '@site/src/components/MermaidDiagram';
@@ -87,7 +86,7 @@ Metodo privado que realiza o unwrap recursivo:
 
 ## Proximos passos
 
-- [Entity](/domain-models/entity) — identidade e comparacao por ID
-- [Value Object](/domain-models/value-object) — comparacao estrutural
-- [Aggregate](/domain-models/aggregate) — domain events
-- [Dto](/domain-models/dto) — Data Transfer Objects com TypeFields
+- [Entity](/guia/domain-models/entity) — identidade e comparacao por ID
+- [Value Object](/guia/domain-models/value-object) — comparacao estrutural
+- [Aggregate](/guia/domain-models/aggregate) — domain events
+- [Dto](/guia/domain-models/dto) — Data Transfer Objects com TypeFields

@@ -1,7 +1,6 @@
 ---
 title: Tipos de Excecao
 sidebar_position: 2
-slug: /exceptions/tipos
 ---
 
 # Tipos de Excecao

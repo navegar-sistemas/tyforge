@@ -1,7 +1,6 @@
 ---
 title: Result Pattern
 sidebar_position: 1
-slug: /result/visao-geral
 ---
 
 # Result Pattern
@@ -207,4 +206,4 @@ if (isSuccess(schemaResult)) { /* ... */ }
 
 ## Proximos passos
 
-- [API completa do Result](/result/api)
+- [API completa do Result](/guia/result/api)

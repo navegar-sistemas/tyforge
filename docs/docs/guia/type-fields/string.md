@@ -1,7 +1,6 @@
 ---
 title: Strings
 sidebar_position: 2
-slug: /type-fields/string
 ---
 
 # Type Fields — Strings

@@ -25,14 +25,28 @@ const config = {
       "classic",
       {
         docs: {
+          id: "guia",
+          path: "docs/guia",
+          routeBasePath: "guia",
           sidebarPath: require.resolve("./sidebars.ts"),
           editUrl: undefined,
-          routeBasePath: "/",
         },
         blog: false,
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
+      },
+    ],
+  ],
+  plugins: [
+    [
+      "@docusaurus/plugin-content-docs",
+      {
+        id: "contribuindo",
+        path: "docs/contribuindo",
+        routeBasePath: "contribuindo",
+        sidebarPath: require.resolve("./sidebarsContribuindo.ts"),
+        editUrl: undefined,
       },
     ],
   ],
@@ -47,6 +61,16 @@ const config = {
         src: "img/logo.png",
       },
       items: [
+        {
+          to: "/guia/introducao",
+          label: "Guia",
+          position: "left",
+        },
+        {
+          to: "/contribuindo/arquitetura",
+          label: "Contribuindo",
+          position: "left",
+        },
         {
           href: "https://github.com/navegarsistemas/tyforge",
           label: "GitHub",
@@ -69,7 +93,10 @@ const config = {
       links: [
         {
           title: "Documentacao",
-          items: [{ label: "Inicio", to: "/" }],
+          items: [
+            { label: "Guia", to: "/guia/introducao" },
+            { label: "Contribuindo", to: "/contribuindo/arquitetura" },
+          ],
         },
         {
           title: "Links",

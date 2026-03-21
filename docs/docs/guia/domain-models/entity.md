@@ -1,7 +1,6 @@
 ---
 title: Entity
 sidebar_position: 2
-slug: /domain-models/entity
 ---
 
 # Entity
@@ -119,4 +118,4 @@ usuario.equals(mesmoUsuario); // true — mesmo ID
 
 ## Heranca
 
-`Entity` e a classe base para `Aggregate`, que adiciona suporte a domain events. Veja [Aggregate](/domain-models/aggregate) para mais detalhes.
+`Entity` e a classe base para `Aggregate`, que adiciona suporte a domain events. Veja [Aggregate](/guia/domain-models/aggregate) para mais detalhes.

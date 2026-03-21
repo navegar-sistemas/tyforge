@@ -1,7 +1,6 @@
 ---
 title: Inferencia de Tipos
 sidebar_position: 3
-slug: /schema/tipos
 ---
 
 # Inferencia de Tipos

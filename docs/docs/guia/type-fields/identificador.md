@@ -1,7 +1,6 @@
 ---
 title: Identificadores
 sidebar_position: 5
-slug: /type-fields/identificador
 ---
 
 # Type Fields — Identificadores

@@ -1,7 +1,6 @@
 ---
 title: Value Object
 sidebar_position: 3
-slug: /domain-models/value-object
 ---
 
 # Value Object
@@ -111,4 +110,4 @@ const json = end1.toJson();
 
 ## Heranca
 
-`ValueObject` e a classe base para `Dto`, que adiciona campos especificos para transporte HTTP. Veja [Dto](/domain-models/dto) para mais detalhes.
+`ValueObject` e a classe base para `Dto`, que adiciona campos especificos para transporte HTTP. Veja [Dto](/guia/domain-models/dto) para mais detalhes.

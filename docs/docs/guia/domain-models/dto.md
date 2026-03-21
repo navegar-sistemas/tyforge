@@ -1,7 +1,6 @@
 ---
 title: Dto
 sidebar_position: 5
-slug: /domain-models/dto
 ---
 
 # Dto

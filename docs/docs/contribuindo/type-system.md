@@ -1,7 +1,6 @@
 ---
 title: Sistema de Tipos
 sidebar_position: 2
-slug: /arquitetura/type-system
 ---
 
 import MermaidDiagram from '@site/src/components/MermaidDiagram';

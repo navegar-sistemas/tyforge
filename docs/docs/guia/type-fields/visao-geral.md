@@ -1,7 +1,6 @@
 ---
 title: Type Fields
 sidebar_position: 1
-slug: /type-fields/visao-geral
 ---
 
 # Type Fields
@@ -141,8 +140,8 @@ export class FCpf extends TypeField<TCpf> {
 
 ## Proximos passos
 
-- [Strings](/type-fields/string) — FString, FEmail, FPassword, FNomeCompleto, FDescricao, FText
-- [Numericos](/type-fields/numerico) — FInt, FPageNumber, FPageSize, FBoolInt
-- [Datas](/type-fields/data) — FDateTimeISOZMillis, FDateTimeISOZ, FDateISODate, FDateISOCompact
-- [Identificadores](/type-fields/identificador) — FId, FIdReq, FTraceId, FApiKey, FBearer, FSignature
-- [Outros](/type-fields/outros) — FBoolean, FJson, FHttpStatus, FStatusAplicacao, FPublicKeyPem
+- [Strings](/guia/type-fields/string) — FString, FEmail, FPassword, FNomeCompleto, FDescricao, FText
+- [Numericos](/guia/type-fields/numerico) — FInt, FPageNumber, FPageSize, FBoolInt
+- [Datas](/guia/type-fields/data) — FDateTimeISOZMillis, FDateTimeISOZ, FDateISODate, FDateISOCompact
+- [Identificadores](/guia/type-fields/identificador) — FId, FIdReq, FTraceId, FApiKey, FBearer, FSignature
+- [Outros](/guia/type-fields/outros) — FBoolean, FJson, FHttpStatus, FStatusAplicacao, FPublicKeyPem

@@ -1,7 +1,6 @@
 ---
 title: Aggregate
 sidebar_position: 4
-slug: /domain-models/aggregate
 ---
 
 # Aggregate

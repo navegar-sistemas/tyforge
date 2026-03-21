@@ -1,7 +1,6 @@
 ---
 title: API Completa
 sidebar_position: 2
-slug: /result/api
 ---
 
 # API Completa do Result

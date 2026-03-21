@@ -2,7 +2,6 @@
 id: introducao
 title: Introducao
 sidebar_position: 1
-slug: /introducao
 ---
 
 import MermaidDiagram from '@site/src/components/MermaidDiagram';
@@ -99,9 +98,9 @@ O modulo **Result** e a base de toda a biblioteca — todos os demais modulos re
 
 ## Proximos passos
 
-- [Visao Geral da Arquitetura](/arquitetura/visao-geral)
-- [Result Pattern](/result/visao-geral)
-- [Schema Builder](/schema/visao-geral)
-- [Type Fields](/type-fields/visao-geral)
-- [Domain Models](/domain-models/visao-geral)
-- [Exceptions](/exceptions/visao-geral)
+- [Visao Geral da Arquitetura](/contribuindo/arquitetura)
+- [Result Pattern](/guia/result/visao-geral)
+- [Schema Builder](/guia/schema/visao-geral)
+- [Type Fields](/guia/type-fields/visao-geral)
+- [Domain Models](/guia/domain-models/visao-geral)
+- [Exceptions](/guia/exceptions/visao-geral)

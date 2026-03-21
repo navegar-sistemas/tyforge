@@ -18,7 +18,7 @@ function HomepageHeader() {
         </p>
         <code className={styles.heroInstall}>npm install @navegar-sistemas/tyforge</code>
         <div className={styles.heroButtons}>
-          <Link className={styles.btnPrimary} to="/introducao">
+          <Link className={styles.btnPrimary} to="/guia/introducao">
             Ver Documentacao
           </Link>
           <Link className={styles.btnOutline} to="https://github.com/navegarsistemas/tyforge">

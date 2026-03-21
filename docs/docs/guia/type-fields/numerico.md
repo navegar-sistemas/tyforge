@@ -1,7 +1,6 @@
 ---
 title: Numericos
 sidebar_position: 3
-slug: /type-fields/numerico
 ---
 
 # Type Fields — Numericos

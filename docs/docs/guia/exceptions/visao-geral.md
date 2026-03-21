@@ -1,7 +1,6 @@
 ---
 title: Exceptions
 sidebar_position: 1
-slug: /exceptions/visao-geral
 ---
 
 # Exceptions
@@ -108,4 +107,4 @@ excecao.toJson();
 
 ## Proximos passos
 
-- [Tipos de Excecao](/exceptions/tipos) — catalogo completo com factory methods
+- [Tipos de Excecao](/guia/exceptions/tipos) — catalogo completo com factory methods

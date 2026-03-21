@@ -1,7 +1,6 @@
 ---
 title: Schema Builder
 sidebar_position: 1
-slug: /schema/visao-geral
 ---
 
 # Schema Builder
@@ -57,7 +56,7 @@ const resultadoParcial = validator.assign(dados);
 
 O metodo `compile()` pre-analisa o schema uma unica vez e retorna um validador otimizado (`CompiledSchema`). Os campos sao convertidos em uma estrutura interna (`CompiledField[]`) que elimina verificacoes repetidas em cada chamada. **Use esta API para schemas reutilizados muitas vezes** — o custo de compilacao e pago uma vez e as validacoes subsequentes sao mais rapidas.
 
-Consulte [Compilacao e Modos](/schema/compile) para detalhes completos sobre `create` vs `assign`.
+Consulte [Compilacao e Modos](/guia/schema/compile) para detalhes completos sobre `create` vs `assign`.
 
 ### `build()` — Compatibilidade
 
@@ -78,7 +77,7 @@ O sistema de tipos do TyForge infere automaticamente dois tipos a partir do sche
 
 Campos marcados com `required: false` tornam-se propriedades opcionais (`?`) em ambos os tipos.
 
-Consulte [Inferencia de Tipos](/schema/tipos) para a referencia completa dos tipos utilitarios.
+Consulte [Inferencia de Tipos](/guia/schema/tipos) para a referencia completa dos tipos utilitarios.
 
 ## Recursos Suportados
 

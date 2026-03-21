@@ -1,7 +1,6 @@
 ---
 title: Compilacao e Modos
 sidebar_position: 2
-slug: /schema/compile
 ---
 
 # Compilacao e Modos

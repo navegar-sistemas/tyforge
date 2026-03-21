@@ -1,7 +1,6 @@
 ---
-title: Visao Geral da Arquitetura
+title: Arquitetura
 sidebar_position: 1
-slug: /arquitetura/visao-geral
 ---
 
 import MermaidDiagram from '@site/src/components/MermaidDiagram';

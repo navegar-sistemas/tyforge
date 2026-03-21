@@ -1,7 +1,6 @@
 ---
 title: Outros
 sidebar_position: 6
-slug: /type-fields/outros
 ---
 
 # Type Fields — Outros

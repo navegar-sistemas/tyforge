@@ -1,7 +1,6 @@
 ---
 title: Datas
 sidebar_position: 4
-slug: /type-fields/data
 ---
 
 # Type Fields — Datas
