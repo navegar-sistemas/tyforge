@@ -9,15 +9,12 @@ RUN npm ci --omit=dev --no-audit --no-fund --loglevel error
 COPY . .
 RUN npm run build
 
-# Stage 2: Serve
-FROM node:18-alpine
+# Stage 2: Serve (Nginx Alpine)
+FROM nginx:stable-alpine
 
-WORKDIR /app
-
-RUN npm install -g serve
-
-COPY --from=build /app/build ./build
+COPY --from=build /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 4200
 
-CMD ["sh", "-c", "echo '[TyForge Docs] v1.0.0' && serve -s build -l 4200"]
+CMD ["nginx", "-g", "daemon off;"]
