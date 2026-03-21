@@ -50,8 +50,10 @@ export { FStatusAplicacao } from "./type-fields/status-aplicacao.format_vo";
 // ── Domain Models ───────────────────────────────────────────────
 export { Aggregate } from "./domain-models/agreggate.base";
 export { Entity } from "./domain-models/entity.base";
+export type { IEntityPropsBase } from "./domain-models/entity.base";
 export { ValueObject } from "./domain-models/value-object.base";
 export { Dto } from "./domain-models/dto.base";
+export type { TDtoPropsBase, TDtoPropsJson } from "./domain-models/dto.base";
 export { DomainEvent } from "./domain-models/domain-event.base";
 
 // ── Tools ───────────────────────────────────────────────────────
