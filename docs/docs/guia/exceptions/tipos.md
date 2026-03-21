@@ -25,7 +25,7 @@ O TyForge fornece seis classes de excecao especializadas, cada uma com factory m
 Erros de validacao de dados de entrada. Status HTTP 400 (Bad Request).
 
 ```typescript
-import { ExceptionValidation } from "@navegar-sistemas/tyforge";
+import { ExceptionValidation } from "tyforge";
 
 const erro = ExceptionValidation.create("email", "Email deve ter formato valido");
 // ExceptionValidation {
@@ -53,7 +53,7 @@ Esta e a excecao mais utilizada no TyForge — todos os TypeFields retornam `Exc
 Violacoes de regras de negocio. O status HTTP varia conforme o tipo de violacao.
 
 ```typescript
-import { ExceptionBusiness } from "@navegar-sistemas/tyforge";
+import { ExceptionBusiness } from "tyforge";
 
 // Regra de negocio invalida
 const regra = ExceptionBusiness.invalidBusinessRule("Saldo deve ser positivo");
@@ -88,7 +88,7 @@ const naoEncontrado = ExceptionBusiness.notFound("Conta");
 Recurso nao encontrado. Status HTTP 404.
 
 ```typescript
-import { ExceptionNotFound } from "@navegar-sistemas/tyforge";
+import { ExceptionNotFound } from "tyforge";
 
 const generico = ExceptionNotFound.generic();
 // detail: "O recurso solicitado nao foi encontrado."
@@ -115,7 +115,7 @@ const externo = ExceptionNotFound.externalService();
 Erros de autenticacao e autorizacao. O status HTTP varia conforme o cenario.
 
 ```typescript
-import { ExceptionAuth } from "@navegar-sistemas/tyforge";
+import { ExceptionAuth } from "tyforge";
 
 const credenciais = ExceptionAuth.invalidCredentials();
 // status: 401, code: "AUTH_INVALID_CREDENTIALS"
@@ -166,7 +166,7 @@ Metodos como `mfaLockout()` e `rateLimited()` aceitam `retryAfterSeconds` em `ad
 Erros de banco de dados. O status HTTP varia conforme o tipo de erro.
 
 ```typescript
-import { ExceptionDb } from "@navegar-sistemas/tyforge";
+import { ExceptionDb } from "tyforge";
 
 const naoEncontrado = ExceptionDb.recordNotFound();
 // status: 404, code: "DB_RECORD_NOT_FOUND"
@@ -198,7 +198,7 @@ const fk = ExceptionDb.foreignKeyConstraintViolation("cliente_id");
 Erros inesperados e nao tratados. Status HTTP 500 (Internal Server Error).
 
 ```typescript
-import ExceptionUnexpected from "@navegar-sistemas/tyforge";
+import ExceptionUnexpected from "tyforge";
 
 const erro = ExceptionUnexpected.create({
   message: "Conexao recusada pelo servidor remoto",
@@ -237,8 +237,8 @@ interface ExceptionLog {
 As excecoes sao tipicamente encapsuladas em `Result` via o helper `err()`:
 
 ```typescript
-import { err, ok, Result } from "@navegar-sistemas/tyforge";
-import { ExceptionBusiness } from "@navegar-sistemas/tyforge";
+import { err, ok, Result } from "tyforge";
+import { ExceptionBusiness } from "tyforge";
 
 function sacar(valor: number, saldo: number): Result<number, ExceptionBusiness> {
   if (valor > saldo) {

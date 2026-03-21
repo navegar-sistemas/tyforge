@@ -25,7 +25,7 @@ Type Fields do tipo string encapsulam e validam textos com regras especificas de
 Texto generico sem formatacao especifica. Aceita qualquer string entre 1 e 255 caracteres.
 
 ```typescript
-import { FString } from "@navegar-sistemas/tyforge";
+import { FString } from "tyforge";
 
 const result = FString.create("Meu texto");
 // Result<FString, ExceptionValidation>
@@ -51,7 +51,7 @@ texto.getValue(); // "Meu texto"
 Endereco de email valido seguindo o padrao RFC 5322. O metodo `formatted()` retorna o valor em lowercase com trim.
 
 ```typescript
-import { FEmail } from "@navegar-sistemas/tyforge";
+import { FEmail } from "tyforge";
 
 const result = FEmail.create("Usuario@Email.COM");
 // Result<FEmail, ExceptionValidation>
@@ -72,7 +72,7 @@ email.formatted(); // "usuario@email.com" (lowercase + trim)
 Senha segura para autenticacao de usuarios. Exige complexidade minima para proteger contra ataques de forca bruta.
 
 ```typescript
-import { FPassword } from "@navegar-sistemas/tyforge";
+import { FPassword } from "tyforge";
 
 const result = FPassword.create("Senh@Forte1");
 // Result<FPassword, ExceptionValidation>
@@ -95,7 +95,7 @@ senha.getValue(); // "Senh@Forte1"
 Nome completo de uma pessoa, incluindo nome e sobrenome.
 
 ```typescript
-import { FNomeCompleto } from "@navegar-sistemas/tyforge";
+import { FNomeCompleto } from "tyforge";
 
 const result = FNomeCompleto.create("Maria Silva");
 // Result<FNomeCompleto, ExceptionValidation>
@@ -114,7 +114,7 @@ nome.getValue(); // "Maria Silva"
 Descricao detalhada com capacidade para textos medios.
 
 ```typescript
-import { FDescricao } from "@navegar-sistemas/tyforge";
+import { FDescricao } from "tyforge";
 
 const result = FDescricao.create("Descricao do produto com detalhes completos.");
 // Result<FDescricao, ExceptionValidation>
@@ -133,7 +133,7 @@ desc.getValue(); // "Descricao do produto"
 Texto longo sem formatacao especifica. Ideal para campos de observacao, comentarios e conteudo extenso.
 
 ```typescript
-import { FText } from "@navegar-sistemas/tyforge";
+import { FText } from "tyforge";
 
 const result = FText.create("Texto longo com multiplos paragrafos...");
 // Result<FText, ExceptionValidation>

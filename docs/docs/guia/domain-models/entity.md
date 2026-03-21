@@ -56,7 +56,7 @@ public equals(other: this): boolean {
 ## Exemplo
 
 ```typescript
-import { Entity, IEntityPropsBase, FId, FString, FEmail } from "@navegar-sistemas/tyforge";
+import { Entity, IEntityPropsBase, FId, FString, FEmail } from "tyforge";
 
 // 1. Defina os tipos
 interface IUsuarioProps extends IEntityPropsBase {

@@ -15,7 +15,7 @@ Toda operacao de validacao retorna um `Result<T, E>` em vez de lancar excecoes, 
 ## Instalacao
 
 ```bash
-npm install @navegar-sistemas/tyforge
+npm install tyforge
 ```
 
 ## Inicio rapido
@@ -27,8 +27,8 @@ import {
   SchemaBuilder,
   isSuccess,
   isFailure,
-} from "@navegar-sistemas/tyforge";
-import type { ISchemaInlineObject } from "@navegar-sistemas/tyforge";
+} from "tyforge";
+import type { ISchemaInlineObject } from "tyforge";
 
 // 1. Defina o schema com TypeFields
 const userSchema = {

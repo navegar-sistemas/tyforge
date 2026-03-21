@@ -49,7 +49,7 @@ equals(input: ClassDomainModels<TProps, TPropsJson>): boolean {
 ## Exemplo
 
 ```typescript
-import { ValueObject, FString, FInt } from "@navegar-sistemas/tyforge";
+import { ValueObject, FString, FInt } from "tyforge";
 
 // 1. Defina os tipos
 interface IEnderecoProps {

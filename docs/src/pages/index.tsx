@@ -16,7 +16,7 @@ function HomepageHeader() {
         <p className={styles.heroSubtitle}>
           Validacao de schemas type-safe, Result pattern e building blocks DDD para TypeScript.
         </p>
-        <code className={styles.heroInstall}>npm install @navegar-sistemas/tyforge</code>
+        <code className={styles.heroInstall}>npm install tyforge</code>
         <div className={styles.heroButtons}>
           <Link className={styles.btnPrimary} to="/guia/introducao">
             Ver Documentacao

@@ -23,7 +23,7 @@ Type Fields numericos encapsulam e validam valores inteiros com regras de faixa,
 Numero inteiro generico sem casas decimais. Cobre a faixa completa de inteiros de 32 bits.
 
 ```typescript
-import { FInt } from "@navegar-sistemas/tyforge";
+import { FInt } from "tyforge";
 
 const result = FInt.create(42);
 // Result<FInt, ExceptionValidation>
@@ -55,7 +55,7 @@ numero.toString(); // "42"
 Numero de pagina para paginacao. Garante que a pagina seja sempre >= 1.
 
 ```typescript
-import { FPageNumber } from "@navegar-sistemas/tyforge";
+import { FPageNumber } from "tyforge";
 
 const result = FPageNumber.create(1);
 // Result<FPageNumber, ExceptionValidation>
@@ -75,7 +75,7 @@ pagina.getValue(); // 3
 Tamanho da pagina para paginacao. Limita a quantidade de itens por pagina entre 1 e 100.
 
 ```typescript
-import { FPageSize } from "@navegar-sistemas/tyforge";
+import { FPageSize } from "tyforge";
 
 const result = FPageSize.create(20);
 // Result<FPageSize, ExceptionValidation>
@@ -95,7 +95,7 @@ tamanho.getValue(); // 50
 Valor booleano codificado como inteiro. Utiliza o enum `OBoolInt` para validacao.
 
 ```typescript
-import { FBoolInt, OBoolInt } from "@navegar-sistemas/tyforge";
+import { FBoolInt, OBoolInt } from "tyforge";
 
 const result = FBoolInt.create(OBoolInt.VALIDO);
 // Result<FBoolInt, ExceptionValidation>

@@ -31,8 +31,8 @@ Use este modo ao **atualizar entidades existentes** com dados parciais.
 ## Exemplo Comparativo
 
 ```typescript
-import { SchemaBuilder, FString, FEmail, FId, isSuccess } from '@navegar-sistemas/tyforge';
-import type { ISchemaInlineObject } from '@navegar-sistemas/tyforge';
+import { SchemaBuilder, FString, FEmail, FId, isSuccess } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
 
 const userSchema = {
   id: { type: FId, required: true },
@@ -89,8 +89,8 @@ Essa pre-analise elimina verificacoes de tipo (`typeof creatable.create === 'fun
 Ambos os metodos retornam `Result<ISchemaInferProps<TSchema>, Exceptions>`. O erro inclui o **field path** completo, permitindo localizar exatamente qual campo falhou:
 
 ```typescript
-import { SchemaBuilder, FString, FEmail, isFailure } from '@navegar-sistemas/tyforge';
-import type { ISchemaInlineObject } from '@navegar-sistemas/tyforge';
+import { SchemaBuilder, FString, FEmail, isFailure } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
 
 const schema = {
   user: {
@@ -135,8 +135,8 @@ const resultado = SchemaBuilder.build(userSchema, dados, 'user', 'create');
 O SchemaBuilder suporta objetos aninhados de forma transparente. Basta definir um objeto inline no schema — sem necessidade do wrapper `{ type: ... }`:
 
 ```typescript
-import { SchemaBuilder, FString } from '@navegar-sistemas/tyforge';
-import type { ISchemaInlineObject } from '@navegar-sistemas/tyforge';
+import { SchemaBuilder, FString } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
 
 const schema = {
   user: {
@@ -169,8 +169,8 @@ Ha duas sintaxes para definir campos do tipo array:
 ### Sintaxe com `isArray`
 
 ```typescript
-import { FString, FInt } from '@navegar-sistemas/tyforge';
-import type { ISchemaInlineObject } from '@navegar-sistemas/tyforge';
+import { FString, FInt } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
 
 const schema = {
   tags: { type: FString, required: true, isArray: true },
@@ -181,8 +181,8 @@ const schema = {
 ### Sintaxe com colchetes
 
 ```typescript
-import { FString, FInt } from '@navegar-sistemas/tyforge';
-import type { ISchemaInlineObject } from '@navegar-sistemas/tyforge';
+import { FString, FInt } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
 
 const schema = {
   tags: [{ type: FString, required: true }],
@@ -204,8 +204,8 @@ const result = validator.create({ tags: ['node', '', 'tyforge'], scores: [10, 20
 Tambem e possivel definir arrays de objetos complexos:
 
 ```typescript
-import { SchemaBuilder, FString, FInt } from '@navegar-sistemas/tyforge';
-import type { ISchemaInlineObject } from '@navegar-sistemas/tyforge';
+import { SchemaBuilder, FString, FInt } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
 
 const schema = {
   itens: {

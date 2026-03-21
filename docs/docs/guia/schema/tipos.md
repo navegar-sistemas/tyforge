@@ -46,8 +46,8 @@ interface ISchemaInlineObject {
 **Exemplo:**
 
 ```typescript
-import { FString } from '@navegar-sistemas/tyforge';
-import type { ISchemaInlineObject } from '@navegar-sistemas/tyforge';
+import { FString } from 'tyforge';
+import type { ISchemaInlineObject } from 'tyforge';
 
 // 'address' e um ISchemaInlineObject — nao possui { type: ... }
 const schema = {
@@ -81,8 +81,8 @@ type ISchemaInferJson<TSchema extends ISchemaInlineObject>
 **Exemplo:**
 
 ```typescript
-import { SchemaBuilder, FString, FEmail, FInt, FBoolean } from '@navegar-sistemas/tyforge';
-import type { ISchemaInferJson, ISchemaInlineObject } from '@navegar-sistemas/tyforge';
+import { SchemaBuilder, FString, FEmail, FInt, FBoolean } from 'tyforge';
+import type { ISchemaInferJson, ISchemaInlineObject } from 'tyforge';
 
 const userSchema = {
   name: { type: FString, required: true },
@@ -122,8 +122,8 @@ type ISchemaInferProps<TSchema extends ISchemaInlineObject>
 **Exemplo:**
 
 ```typescript
-import { SchemaBuilder, FString, FEmail, FInt, FBoolean } from '@navegar-sistemas/tyforge';
-import type { ISchemaInferProps, ISchemaInlineObject } from '@navegar-sistemas/tyforge';
+import { SchemaBuilder, FString, FEmail, FInt, FBoolean } from 'tyforge';
+import type { ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
 
 const userSchema = {
   name: { type: FString, required: true },
@@ -147,8 +147,8 @@ type UserProps = ISchemaInferProps<typeof userSchema>;
 Quando `isArray: true` esta presente, tanto `ISchemaInferJson` quanto `ISchemaInferProps` produzem arrays:
 
 ```typescript
-import { FString, FInt } from '@navegar-sistemas/tyforge';
-import type { ISchemaInferJson, ISchemaInferProps, ISchemaInlineObject } from '@navegar-sistemas/tyforge';
+import { FString, FInt } from 'tyforge';
+import type { ISchemaInferJson, ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
 
 const schema = {
   tags: { type: FString, required: true, isArray: true },
@@ -173,8 +173,8 @@ type PropsType = ISchemaInferProps<typeof schema>;
 Objetos inline (sem wrapper `{ type: ... }`) sao tratados recursivamente. O tipo inferido reflete a estrutura aninhada:
 
 ```typescript
-import { FString } from '@navegar-sistemas/tyforge';
-import type { ISchemaInferJson, ISchemaInferProps, ISchemaInlineObject } from '@navegar-sistemas/tyforge';
+import { FString } from 'tyforge';
+import type { ISchemaInferJson, ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
 
 const schema = {
   user: {
@@ -225,8 +225,8 @@ interface EntityStatic<TInstance extends Entity<IEntityPropsBase, unknown>> {
 **Exemplo com entidade:**
 
 ```typescript
-import { SchemaBuilder, FString, FInt, isSuccess } from '@navegar-sistemas/tyforge';
-import type { ISchemaInferProps, ISchemaInlineObject } from '@navegar-sistemas/tyforge';
+import { SchemaBuilder, FString, FInt, isSuccess } from 'tyforge';
+import type { ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
 
 // Supondo que Produto e uma Entity com create() estatico
 const pedidoSchema = {
@@ -262,8 +262,8 @@ O exemplo abaixo demonstra todas as capacidades de inferencia em um unico schema
 ```typescript
 import {
   SchemaBuilder, FString, FEmail, FInt, FBoolean, isSuccess,
-} from '@navegar-sistemas/tyforge';
-import type { ISchemaInferJson, ISchemaInferProps, ISchemaInlineObject } from '@navegar-sistemas/tyforge';
+} from 'tyforge';
+import type { ISchemaInferJson, ISchemaInferProps, ISchemaInlineObject } from 'tyforge';
 
 const cadastroSchema = {
   nome: { type: FString, required: true },

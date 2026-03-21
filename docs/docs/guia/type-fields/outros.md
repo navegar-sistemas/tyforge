@@ -24,7 +24,7 @@ Type Fields complementares para booleanos, objetos JSON, status HTTP, status de 
 Valor booleano com coercao inteligente. Aceita `boolean`, `string` (`"true"`, `"false"`, `"1"`, `"0"`, `"yes"`, `"no"`) e `number` (`1`, `0`).
 
 ```typescript
-import { FBoolean } from "@navegar-sistemas/tyforge";
+import { FBoolean } from "tyforge";
 
 const result = FBoolean.create(true);
 // Result<FBoolean, ExceptionValidation>
@@ -51,7 +51,7 @@ fromNumber.getValue(); // false
 Objeto JSON generico (`Record<string, unknown>`). Aceita tanto objetos quanto strings JSON validas (que sao parseadas automaticamente).
 
 ```typescript
-import { FJson } from "@navegar-sistemas/tyforge";
+import { FJson } from "tyforge";
 
 // A partir de objeto
 const result = FJson.create({ nome: "Maria", idade: 30 });
@@ -91,7 +91,7 @@ json.formatted();     // JSON formatado com indentacao (2 espacos)
 Codigo de status HTTP conforme especificacao RFC 7231. Validado contra o enum `OHttpStatus`.
 
 ```typescript
-import { FHttpStatus, OHttpStatus } from "@navegar-sistemas/tyforge";
+import { FHttpStatus, OHttpStatus } from "tyforge";
 
 const result = FHttpStatus.create(OHttpStatus.OK);
 // Result<FHttpStatus, ExceptionValidation>
@@ -139,7 +139,7 @@ export const OHttpStatus = {
 Status de uma aplicacao no sistema. Aceita apenas os valores `"active"` ou `"inactive"`.
 
 ```typescript
-import { FStatusAplicacao, OStatusAplicacao } from "@navegar-sistemas/tyforge";
+import { FStatusAplicacao, OStatusAplicacao } from "tyforge";
 
 const result = FStatusAplicacao.create("active");
 // Result<FStatusAplicacao, ExceptionValidation>
@@ -179,7 +179,7 @@ export const OStatusAplicacao = {
 Chave publica no formato PEM (Privacy-Enhanced Mail) para autenticacao assimetrica. Valida a presenca dos delimitadores e o conteudo base64.
 
 ```typescript
-import { FPublicKeyPem } from "@navegar-sistemas/tyforge";
+import { FPublicKeyPem } from "tyforge";
 
 const pem = `-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA...

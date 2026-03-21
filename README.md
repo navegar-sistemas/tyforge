@@ -1,7 +1,7 @@
 # TyForge
 
-[![npm version](https://img.shields.io/npm/v/@navegar-sistemas/tyforge)](https://www.npmjs.com/package/@navegar-sistemas/tyforge)
-[![license](https://img.shields.io/npm/l/@navegar-sistemas/tyforge)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/tyforge)](https://www.npmjs.com/package/tyforge)
+[![license](https://img.shields.io/npm/l/tyforge)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-green)](https://nodejs.org/)
 
@@ -10,14 +10,14 @@ Validacao de schemas type-safe, Result pattern e building blocks DDD para TypeSc
 ## Instalacao
 
 ```bash
-npm install @navegar-sistemas/tyforge
+npm install tyforge
 ```
 
 ## Quick Start
 
 ```typescript
-import { SchemaBuilder, FString, FEmail, isSuccess, isFailure } from "@navegar-sistemas/tyforge";
-import type { ISchemaInlineObject } from "@navegar-sistemas/tyforge";
+import { SchemaBuilder, FString, FEmail, isSuccess, isFailure } from "tyforge";
+import type { ISchemaInlineObject } from "tyforge";
 
 const userSchema = {
   name:  { type: FString, required: true },
