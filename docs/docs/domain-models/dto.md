@@ -66,7 +66,7 @@ Todos os campos sao opcionais. A interface aceita propriedades adicionais via in
 ## Exemplo
 
 ```typescript
-import { Dto, TDtoPropsBase, TDtoPropsJson, FHttpStatus, FString, FId } from "tyforge";
+import { Dto, TDtoPropsBase, TDtoPropsJson, FHttpStatus, FString, FId } from "@navegar-sistemas/tyforge";
 
 // 1. Defina os tipos
 interface ICriarUsuarioDtoProps extends TDtoPropsBase {
@@ -143,8 +143,8 @@ dto1.equals(dto2); // true se todos os campos forem identicos
 Dtos podem ser combinados com o `SchemaBuilder` para validar dados de entrada e construir o Dto de forma segura:
 
 ```typescript
-import { SchemaBuilder, FString, FEmail } from 'tyforge';
-import type { ISchemaInlineObject } from 'tyforge';
+import { SchemaBuilder, FString, FEmail } from '@navegar-sistemas/tyforge';
+import type { ISchemaInlineObject } from '@navegar-sistemas/tyforge';
 
 const schema = {
   nome:  { type: FString, required: true },

@@ -169,8 +169,8 @@ type ISchemaInferProps<TSchema extends ISchemaInlineObject> = {
 O exemplo abaixo demonstra como a definicao de um schema flui pelo sistema de tipos:
 
 ```typescript
-import { FString, FEmail, FInt, SchemaBuilder, isSuccess } from "tyforge";
-import type { ISchemaInlineObject } from "tyforge";
+import { FString, FEmail, FInt, SchemaBuilder, isSuccess } from "@navegar-sistemas/tyforge";
+import type { ISchemaInlineObject } from "@navegar-sistemas/tyforge";
 
 // 1. Definicao do schema
 const schema = {
@@ -211,8 +211,8 @@ if (isSuccess(result)) {
 Objetos inline permitem compor estruturas complexas diretamente no schema:
 
 ```typescript
-import { FId, FString } from "tyforge";
-import type { ISchemaInlineObject } from "tyforge";
+import { FId, FString } from "@navegar-sistemas/tyforge";
+import type { ISchemaInlineObject } from "@navegar-sistemas/tyforge";
 
 const orderSchema = {
   id:      { type: FId, required: true },

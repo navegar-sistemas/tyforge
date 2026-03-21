@@ -77,7 +77,7 @@ abstract class DomainEvent<TPayload = Record<string, unknown>> {
 ## Exemplo completo
 
 ```typescript
-import { Aggregate, IEntityPropsBase, DomainEvent, FId, FString, FInt } from "tyforge";
+import { Aggregate, IEntityPropsBase, DomainEvent, FId, FString, FInt } from "@navegar-sistemas/tyforge";
 
 // 1. Defina o evento de dominio
 class PedidoCriadoEvent extends DomainEvent<{

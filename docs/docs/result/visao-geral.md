@@ -44,7 +44,7 @@ O parametro de erro `E` tem default `string`, mas no TyForge e tipicamente `Exce
 ### Criando Results
 
 ```typescript
-import { ok, err, isSuccess, isFailure } from "tyforge";
+import { ok, err, isSuccess, isFailure } from "@navegar-sistemas/tyforge";
 
 // Sucesso
 const sucesso = ok(42);
@@ -58,7 +58,7 @@ const falha = err("valor invalido");
 ### Verificando o resultado
 
 ```typescript
-import { FEmail, isSuccess, isFailure } from "tyforge";
+import { FEmail, isSuccess, isFailure } from "@navegar-sistemas/tyforge";
 
 const result = FEmail.create("usuario@email.com");
 
@@ -82,7 +82,7 @@ As funcoes `isSuccess` e `isFailure` sao **type guards** — apos a verificacao,
 Transforma o valor de sucesso sem afetar falhas:
 
 ```typescript
-import { ok, err, map } from "tyforge";
+import { ok, err, map } from "@navegar-sistemas/tyforge";
 
 map(ok(10), (n) => n * 2);     // => ok(20)
 map(err("falha"), (n) => n * 2); // => err("falha")
@@ -93,7 +93,7 @@ map(err("falha"), (n) => n * 2); // => err("falha")
 Encadeia operacoes que retornam Result, evitando Result aninhados:
 
 ```typescript
-import { ok, flatMap } from "tyforge";
+import { ok, flatMap } from "@navegar-sistemas/tyforge";
 
 const validarPositivo = (n: number) =>
   n > 0 ? ok(n) : err("deve ser positivo");
@@ -107,7 +107,7 @@ flatMap(ok(-1), validarPositivo); // => err("deve ser positivo")
 Reduz um Result a um unico valor, tratando ambos os casos:
 
 ```typescript
-import { fold } from "tyforge";
+import { fold } from "@navegar-sistemas/tyforge";
 
 const mensagem = fold(
   result,
@@ -121,7 +121,7 @@ const mensagem = fold(
 Similar ao `fold`, mas recebe um objeto com handlers nomeados:
 
 ```typescript
-import { match } from "tyforge";
+import { match } from "@navegar-sistemas/tyforge";
 
 const mensagem = match(result, {
   success: (value) => `Sucesso: ${value}`,
@@ -134,7 +134,7 @@ const mensagem = match(result, {
 Extrai o valor de sucesso ou retorna um valor padrao:
 
 ```typescript
-import { ok, err, getOrElse } from "tyforge";
+import { ok, err, getOrElse } from "@navegar-sistemas/tyforge";
 
 getOrElse(ok(42), 0);       // => 42
 getOrElse(err("falha"), 0); // => 0
@@ -148,7 +148,7 @@ getOrElse(err("falha"), () => calcularPadrao());
 Retorna o Result original se for sucesso, ou uma alternativa se for falha:
 
 ```typescript
-import { ok, err, orElse } from "tyforge";
+import { ok, err, orElse } from "@navegar-sistemas/tyforge";
 
 orElse(ok(42), ok(0));       // => ok(42)
 orElse(err("falha"), ok(0)); // => ok(0)
@@ -159,7 +159,7 @@ orElse(err("falha"), ok(0)); // => ok(0)
 Combina um array de Results em um unico Result com array de valores. Falha no primeiro erro encontrado:
 
 ```typescript
-import { ok, err, all } from "tyforge";
+import { ok, err, all } from "@navegar-sistemas/tyforge";
 
 all([ok(1), ok(2), ok(3)]); // => ok([1, 2, 3])
 all([ok(1), err("x"), ok(3)]); // => err("x")
@@ -189,8 +189,8 @@ O Result pattern permeia toda a biblioteca:
 - **Domain Models**: `Entity.create()`, `ValueObject.create()` e `Aggregate.create()` retornam Result.
 
 ```typescript
-import { FEmail, SchemaBuilder, isSuccess } from "tyforge";
-import type { ISchemaInlineObject } from "tyforge";
+import { FEmail, SchemaBuilder, isSuccess } from "@navegar-sistemas/tyforge";
+import type { ISchemaInlineObject } from "@navegar-sistemas/tyforge";
 
 // TypeField retorna Result
 const emailResult = FEmail.create("usuario@email.com");

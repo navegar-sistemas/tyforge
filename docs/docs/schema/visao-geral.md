@@ -17,8 +17,8 @@ O `SchemaBuilder` e o motor de validacao do TyForge. Ele recebe dados JSON bruto
 ## Exemplo Basico
 
 ```typescript
-import { SchemaBuilder, FString, FEmail, FInt, isSuccess } from 'tyforge';
-import type { ISchemaInlineObject } from 'tyforge';
+import { SchemaBuilder, FString, FEmail, FInt, isSuccess } from '@navegar-sistemas/tyforge';
+import type { ISchemaInlineObject } from '@navegar-sistemas/tyforge';
 
 const userSchema = {
   name: { type: FString, required: true },
@@ -96,8 +96,8 @@ Consulte [Inferencia de Tipos](/schema/tipos) para a referencia completa dos tip
 O SchemaBuilder retorna `Result<Props, Exceptions>` e nunca lanca excecoes. Cada erro de validacao inclui o **field path** completo para localizacao precisa:
 
 ```typescript
-import { SchemaBuilder, FEmail, isFailure } from 'tyforge';
-import type { ISchemaInlineObject } from 'tyforge';
+import { SchemaBuilder, FEmail, isFailure } from '@navegar-sistemas/tyforge';
+import type { ISchemaInlineObject } from '@navegar-sistemas/tyforge';
 
 const schema = {
   email: { type: FEmail, required: true },

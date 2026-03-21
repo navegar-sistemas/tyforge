@@ -53,7 +53,7 @@ const config = {
           position: "right",
         },
         {
-          href: "https://www.npmjs.com/package/tyforge",
+          href: "https://www.npmjs.com/package/@navegar-sistemas/tyforge",
           label: "npm",
           position: "right",
         },
@@ -80,7 +80,7 @@ const config = {
             },
             {
               label: "npm",
-              href: "https://www.npmjs.com/package/tyforge",
+              href: "https://www.npmjs.com/package/@navegar-sistemas/tyforge",
             },
           ],
         },

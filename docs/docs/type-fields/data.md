@@ -28,7 +28,7 @@ Todos os campos de data aceitam tanto `string` quanto `Date` no metodo `create()
 Formato ISO 8601 completo com fuso Zulu e milissegundos. E o formato mais preciso disponivel.
 
 ```typescript
-import { FDateTimeISOZMillis } from "tyforge";
+import { FDateTimeISOZMillis } from "@navegar-sistemas/tyforge";
 
 // A partir de string
 const result = FDateTimeISOZMillis.create("2024-01-15T10:30:00.000Z");
@@ -58,7 +58,7 @@ const str = FDateTimeISOZMillis.generateToString();
 Formato ISO 8601 UTC sem milissegundos.
 
 ```typescript
-import { FDateTimeISOZ } from "tyforge";
+import { FDateTimeISOZ } from "@navegar-sistemas/tyforge";
 
 const result = FDateTimeISOZ.create("2024-01-15T10:30:00Z");
 // Result<FDateTimeISOZ, ExceptionValidation>
@@ -77,7 +77,7 @@ data.toString(); // "2024-01-15T10:30:00Z"
 Formato ISO 8601 somente data (sem componente de hora).
 
 ```typescript
-import { FDateISODate } from "tyforge";
+import { FDateISODate } from "@navegar-sistemas/tyforge";
 
 const result = FDateISODate.create("2024-01-15");
 // Result<FDateISODate, ExceptionValidation>
@@ -93,7 +93,7 @@ data.toString(); // "2024-01-15"
 Formato ISO 8601 compacto sem separadores.
 
 ```typescript
-import { FDateISOCompact } from "tyforge";
+import { FDateISOCompact } from "@navegar-sistemas/tyforge";
 
 const result = FDateISOCompact.create("20240115");
 // Result<FDateISOCompact, ExceptionValidation>
@@ -109,7 +109,7 @@ data.toString(); // "20240115"
 Formato ISO 8601 compacto com separador `T` e hora.
 
 ```typescript
-import { FDateTimeISOCompact } from "tyforge";
+import { FDateTimeISOCompact } from "@navegar-sistemas/tyforge";
 
 const result = FDateTimeISOCompact.create("20240115T10:30:00");
 // Result<FDateTimeISOCompact, ExceptionValidation>
@@ -122,7 +122,7 @@ const result = FDateTimeISOCompact.create("20240115T10:30:00");
 Formato ISO 8601 totalmente compacto, sem nenhum separador.
 
 ```typescript
-import { FDateTimeISOFullCompact } from "tyforge";
+import { FDateTimeISOFullCompact } from "@navegar-sistemas/tyforge";
 
 const result = FDateTimeISOFullCompact.create("20240115103000");
 // Result<FDateTimeISOFullCompact, ExceptionValidation>

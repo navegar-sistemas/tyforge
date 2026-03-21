@@ -26,7 +26,7 @@ Type Fields de identificacao encapsulam UUIDs, tokens de autenticacao e assinatu
 Identificador unico universal (UUID). Utilizado como chave primaria de entidades e agregados. Gera UUIDs v7 (ordenados temporalmente) via metodo `generate()`.
 
 ```typescript
-import { FId } from "tyforge";
+import { FId } from "@navegar-sistemas/tyforge";
 
 // Criar a partir de string UUID existente
 const result = FId.create("0193a5e7-8b3c-7d4e-9f1a-2b3c4d5e6f7a");
@@ -54,7 +54,7 @@ const uuidStr = FId.generateId();
 Identificador de requisicao. Aceita qualquer string de 1 a 36 caracteres, sem restricao de formato UUID. Utilizado para rastrear requisicoes externas e garantir idempotencia.
 
 ```typescript
-import { FIdReq } from "tyforge";
+import { FIdReq } from "@navegar-sistemas/tyforge";
 
 const result = FIdReq.create("req-abc-123");
 // Result<FIdReq, ExceptionValidation>
@@ -71,7 +71,7 @@ id.formatted(); // "meu-id-externo" (com trim)
 Identificador de rastreamento distribuido no formato UUID v7 (RFC 9562). Contém timestamp embutido para ordenacao temporal. Ideal para correlacionar logs e metricas entre microservicos.
 
 ```typescript
-import { FTraceId } from "tyforge";
+import { FTraceId } from "@navegar-sistemas/tyforge";
 
 // Gerar novo trace ID (no API Gateway)
 const traceId = FTraceId.generate();
@@ -110,7 +110,7 @@ const valido = FTraceId.isValid("0193a5e7-8b3c-7d4e-9f1a-2b3c4d5e6f7a");
 Chave de API no formato UUID v4 para autenticacao de aplicacoes cliente.
 
 ```typescript
-import { FApiKey } from "tyforge";
+import { FApiKey } from "@navegar-sistemas/tyforge";
 
 // Gerar nova API key
 const apiKey = FApiKey.generate();
@@ -139,7 +139,7 @@ FApiKey.isValid("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"); // true
 Token de acesso Bearer para autenticacao em APIs. Deve comecar com o prefixo `"Bearer "` e ter entre 100 e 5000 caracteres.
 
 ```typescript
-import { FBearer } from "tyforge";
+import { FBearer } from "@navegar-sistemas/tyforge";
 
 const token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
 const result = FBearer.create(token);
@@ -161,7 +161,7 @@ bearer.formatted(); // Garante prefixo "Bearer "
 Assinatura digital no formato base64. Utilizada para verificacao de autenticidade e integridade de dados.
 
 ```typescript
-import { FSignature } from "tyforge";
+import { FSignature } from "@navegar-sistemas/tyforge";
 
 const sig = "dGVzdGUgZGUgYXNzaW5hdHVyYSBkaWdpdGFsIGJhc2U2NC4uLg==...";
 const result = FSignature.create(sig);

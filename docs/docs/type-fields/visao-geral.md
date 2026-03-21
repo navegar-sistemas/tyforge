@@ -85,10 +85,10 @@ protected static resolveEnum<E extends Record<string, string | number>>(
 ## Exemplo: criando um TypeField customizado
 
 ```typescript
-import { TypeField } from "tyforge";
-import { ITypeFieldConfig } from "tyforge";
-import { Result, ok, err, isFailure } from "tyforge";
-import { ExceptionValidation } from "tyforge";
+import { TypeField } from "@navegar-sistemas/tyforge";
+import { ITypeFieldConfig } from "@navegar-sistemas/tyforge";
+import { Result, ok, err, isFailure } from "@navegar-sistemas/tyforge";
+import { ExceptionValidation } from "@navegar-sistemas/tyforge";
 
 export type TCpf = string;
 

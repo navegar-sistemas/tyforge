@@ -28,8 +28,8 @@ import {
   SchemaBuilder,
   isSuccess,
   isFailure,
-} from "tyforge";
-import type { ISchemaInlineObject } from "tyforge";
+} from "@navegar-sistemas/tyforge";
+import type { ISchemaInlineObject } from "@navegar-sistemas/tyforge";
 
 // 1. Defina o schema com TypeFields
 const userSchema = {

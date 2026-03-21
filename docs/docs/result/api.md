@@ -32,7 +32,7 @@ function ok<T>(value: T): Result<T, never>
 **Exemplo:**
 
 ```typescript
-import { ok } from 'tyforge';
+import { ok } from '@navegar-sistemas/tyforge';
 
 const resultado = ok(42);
 // resultado: { success: true, value: 42 }
@@ -54,7 +54,7 @@ function err<E>(error: E): Result<never, E>
 **Exemplo:**
 
 ```typescript
-import { err } from 'tyforge';
+import { err } from '@navegar-sistemas/tyforge';
 
 const falha = err('Campo obrigatorio ausente');
 // falha: { success: false, error: 'Campo obrigatorio ausente' }
@@ -76,7 +76,7 @@ const OK_TRUE: Result<true, never>
 **Exemplo:**
 
 ```typescript
-import { OK_TRUE } from 'tyforge';
+import { OK_TRUE } from '@navegar-sistemas/tyforge';
 
 function validarAtivo(ativo: boolean): Result<true, string> {
   if (!ativo) return err('Usuario inativo');
@@ -99,7 +99,7 @@ function isSuccess<T, E>(result: Result<T, E>): result is Success<T>
 **Exemplo:**
 
 ```typescript
-import { ok, err, isSuccess } from 'tyforge';
+import { ok, err, isSuccess } from '@navegar-sistemas/tyforge';
 
 const resultado = ok('Joao');
 
@@ -121,7 +121,7 @@ function isFailure<T, E>(result: Result<T, E>): result is Failure<E>
 **Exemplo:**
 
 ```typescript
-import { err, isFailure } from 'tyforge';
+import { err, isFailure } from '@navegar-sistemas/tyforge';
 
 const resultado = err('Dados invalidos');
 
@@ -145,7 +145,7 @@ function map<T, U, E>(result: Result<T, E>, fn: (value: T) => U): Result<U, E>
 **Exemplo:**
 
 ```typescript
-import { ok, err, map } from 'tyforge';
+import { ok, err, map } from '@navegar-sistemas/tyforge';
 
 const numero = ok(5);
 const dobro = map(numero, (n) => n * 2);
@@ -172,7 +172,7 @@ function flatMap<T, U, E>(
 **Exemplo:**
 
 ```typescript
-import { ok, err, flatMap } from 'tyforge';
+import { ok, err, flatMap } from '@navegar-sistemas/tyforge';
 
 function parsearIdade(valor: string): Result<number, string> {
   const num = Number(valor);
@@ -209,7 +209,7 @@ function fold<T, E, R>(
 **Exemplo:**
 
 ```typescript
-import { ok, err, fold } from 'tyforge';
+import { ok, err, fold } from '@navegar-sistemas/tyforge';
 
 const resultado = ok('Maria');
 
@@ -245,7 +245,7 @@ function match<T, E, R>(
 **Exemplo:**
 
 ```typescript
-import { ok, err, match } from 'tyforge';
+import { ok, err, match } from '@navegar-sistemas/tyforge';
 
 const resultado = ok(42);
 
@@ -281,7 +281,7 @@ function getOrElse<T, E>(
 **Exemplo:**
 
 ```typescript
-import { ok, err, getOrElse } from 'tyforge';
+import { ok, err, getOrElse } from '@navegar-sistemas/tyforge';
 
 const resultado = ok('Joao');
 const nome = getOrElse(resultado, 'Anonimo');
@@ -311,7 +311,7 @@ function orElse<T, E>(
 **Exemplo:**
 
 ```typescript
-import { ok, err, orElse } from 'tyforge';
+import { ok, err, orElse } from '@navegar-sistemas/tyforge';
 
 const primario = err('falha no cache');
 const secundario = ok('dados do banco');
@@ -339,7 +339,7 @@ function all<T, E>(results: Result<T, E>[]): Result<T[], E>
 **Exemplo:**
 
 ```typescript
-import { ok, err, all, isSuccess } from 'tyforge';
+import { ok, err, all, isSuccess } from '@navegar-sistemas/tyforge';
 
 const resultados = [ok(1), ok(2), ok(3)];
 const combinado = all(resultados);
@@ -376,7 +376,7 @@ function toPromise<T, E>(result: Result<T, E>): Promise<T>
 **Exemplo:**
 
 ```typescript
-import { ok, err, toPromise } from 'tyforge';
+import { ok, err, toPromise } from '@navegar-sistemas/tyforge';
 
 // Sucesso → resolve
 const promessa = toPromise(ok(42));
