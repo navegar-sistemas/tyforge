@@ -1,6 +1,6 @@
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import {
-  Schema,
+  ISchema,
   InferJson,
   InferProps,
 } from "./schema-types";
@@ -215,15 +215,15 @@ function createRunner(schema: Record<string, unknown>) {
 
 // ── Public API ───────────────────────────────────────────────────
 
-export interface CompiledSchema<TSchema extends Schema> {
+export interface ICompiledSchema<TSchema extends ISchema> {
   create(data: InferJson<TSchema>, path?: string): Result<InferProps<TSchema>, Exceptions>;
   assign(data: InferJson<TSchema>, path?: string): Result<InferProps<TSchema>, Exceptions>;
 }
 
 export class SchemaBuilder {
-  static compile<TSchema extends Schema>(
+  static compile<TSchema extends ISchema>(
     schema: TSchema,
-  ): CompiledSchema<TSchema> {
+  ): ICompiledSchema<TSchema> {
     const runner = createRunner(schema);
 
     return {

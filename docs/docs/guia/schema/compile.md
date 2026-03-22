@@ -5,12 +5,12 @@ sidebar_position: 2
 
 # Compilacao e Modos
 
-O metodo `SchemaBuilder.compile()` e a forma recomendada de usar o SchemaBuilder. Ele pre-analisa o schema uma unica vez e retorna um objeto `CompiledSchema<T>` com dois metodos de validacao.
+O metodo `SchemaBuilder.compile()` e a forma recomendada de usar o SchemaBuilder. Ele pre-analisa o schema uma unica vez e retorna um objeto `ICompiledSchema<T>` com dois metodos de validacao.
 
-## CompiledSchema
+## ICompiledSchema
 
 ```typescript
-interface CompiledSchema<TSchema> {
+interface ICompiledSchema<TSchema> {
   create(data: InferJson<TSchema>, path?: string): Result<InferProps<TSchema>, Exceptions>;
   assign(data: InferJson<TSchema>, path?: string): Result<InferProps<TSchema>, Exceptions>;
 }
@@ -32,13 +32,13 @@ Use este modo ao **atualizar entidades existentes** com dados parciais.
 
 ```typescript
 import { SchemaBuilder, FString, FEmail, FId, isSuccess } from 'tyforge';
-import type { Schema } from 'tyforge';
+import type { ISchema } from 'tyforge';
 
 const userSchema = {
   id: { type: FId, required: true },
   name: { type: FString, required: true },
   email: { type: FEmail, required: true },
-} satisfies Schema;
+} satisfies ISchema;
 
 const validator = SchemaBuilder.compile(userSchema);
 
@@ -90,14 +90,14 @@ Ambos os metodos retornam `Result<InferProps<TSchema>, Exceptions>`. O erro incl
 
 ```typescript
 import { SchemaBuilder, FString, FEmail, isFailure } from 'tyforge';
-import type { Schema } from 'tyforge';
+import type { ISchema } from 'tyforge';
 
 const schema = {
   user: {
     name: { type: FString, required: true },
     email: { type: FEmail, required: true },
   },
-} satisfies Schema;
+} satisfies ISchema;
 
 const validator = SchemaBuilder.compile(schema);
 const result = validator.create({ user: { name: 'Ana', email: 'invalido' } });
@@ -116,7 +116,7 @@ O SchemaBuilder suporta objetos aninhados de forma transparente. Basta definir u
 
 ```typescript
 import { SchemaBuilder, FString } from 'tyforge';
-import type { Schema } from 'tyforge';
+import type { ISchema } from 'tyforge';
 
 const schema = {
   user: {
@@ -126,7 +126,7 @@ const schema = {
       city: { type: FString, required: true },
     },
   },
-} satisfies Schema;
+} satisfies ISchema;
 
 const validator = SchemaBuilder.compile(schema);
 const result = validator.create({
@@ -150,24 +150,24 @@ Ha duas sintaxes para definir campos do tipo array:
 
 ```typescript
 import { FString, FInt } from 'tyforge';
-import type { Schema } from 'tyforge';
+import type { ISchema } from 'tyforge';
 
 const schema = {
   tags: { type: FString, required: true, isArray: true },
   scores: { type: FInt, required: false, isArray: true },
-} satisfies Schema;
+} satisfies ISchema;
 ```
 
 ### Sintaxe com colchetes
 
 ```typescript
 import { FString, FInt } from 'tyforge';
-import type { Schema } from 'tyforge';
+import type { ISchema } from 'tyforge';
 
 const schema = {
   tags: [{ type: FString, required: true }],
   scores: [{ type: FInt, required: false }],
-} satisfies Schema;
+} satisfies ISchema;
 ```
 
 Ambas produzem o mesmo resultado. Na entrada JSON, o campo deve ser um array. Cada item do array e validado individualmente, e o erro inclui o indice:
@@ -185,7 +185,7 @@ Tambem e possivel definir arrays de objetos complexos:
 
 ```typescript
 import { SchemaBuilder, FString, FInt } from 'tyforge';
-import type { Schema } from 'tyforge';
+import type { ISchema } from 'tyforge';
 
 const schema = {
   itens: {
@@ -196,7 +196,7 @@ const schema = {
     required: true,
     isArray: true,
   },
-} satisfies Schema;
+} satisfies ISchema;
 
 const validator = SchemaBuilder.compile(schema);
 const result = validator.create({

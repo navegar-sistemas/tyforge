@@ -1,6 +1,6 @@
-export type { Command } from "./command";
-export type { Query } from "./query";
-export type { CommandHandler } from "./command-handler";
-export type { QueryHandler } from "./query-handler";
-export type { CommandBus } from "./command-bus";
-export type { QueryBus } from "./query-bus";
+export type { ICommand } from "./command";
+export type { IQuery } from "./query";
+export type { ICommandHandler } from "./command-handler";
+export type { IQueryHandler } from "./query-handler";
+export type { ICommandBus } from "./command-bus";
+export type { IQueryBus } from "./query-bus";

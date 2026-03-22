@@ -1,3 +1,3 @@
-export interface Query {
+export interface IQuery {
   readonly _brand: "Query";
 }

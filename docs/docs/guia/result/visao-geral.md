@@ -189,13 +189,13 @@ O Result pattern permeia toda a biblioteca:
 
 ```typescript
 import { FEmail, SchemaBuilder, isSuccess } from "tyforge";
-import type { Schema } from "tyforge";
+import type { ISchema } from "tyforge";
 
 // TypeField retorna Result
 const emailResult = FEmail.create("usuario@email.com");
 
 // Schema retorna Result
-const schema = { email: { type: FEmail, required: true } } satisfies Schema;
+const schema = { email: { type: FEmail, required: true } } satisfies ISchema;
 const validator = SchemaBuilder.compile(schema);
 const schemaResult = validator.create({ email: "usuario@email.com" });
 

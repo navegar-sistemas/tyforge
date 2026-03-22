@@ -10,7 +10,7 @@ export abstract class DomainEvent<TPayload = Record<string, unknown>> {
   readonly version: string = "1.0.0";
   abstract readonly queueName: TQueueName;
 
-  constructor(eventName: string, payload: TPayload, occurredAt?: Date) {
+  protected constructor(eventName: string, payload: TPayload, occurredAt?: Date) {
     this.id = uuidv7();
     this.eventName = eventName;
     this.payload = payload;

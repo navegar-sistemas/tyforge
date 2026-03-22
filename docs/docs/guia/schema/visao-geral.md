@@ -17,13 +17,13 @@ O `SchemaBuilder` e o motor de validacao do TyForge. Ele recebe dados JSON bruto
 
 ```typescript
 import { SchemaBuilder, FString, FEmail, FInt, isSuccess } from 'tyforge';
-import type { Schema } from 'tyforge';
+import type { ISchema } from 'tyforge';
 
 const userSchema = {
   name: { type: FString, required: true },
   email: { type: FEmail, required: true },
   age: { type: FInt, required: false },
-} satisfies Schema;
+} satisfies ISchema;
 
 const validator = SchemaBuilder.compile(userSchema);
 const result = validator.create({ name: 'Joao', email: 'joao@email.com', age: 30 });
@@ -54,7 +54,7 @@ const resultado = validator.create(dados);
 const resultadoParcial = validator.assign(dados);
 ```
 
-O metodo `compile()` pre-analisa o schema uma unica vez e retorna um validador otimizado (`CompiledSchema`). Os campos sao convertidos em uma estrutura interna (`CompiledField[]`) que elimina verificacoes repetidas em cada chamada. **Use esta API para schemas reutilizados muitas vezes** — o custo de compilacao e pago uma vez e as validacoes subsequentes sao mais rapidas.
+O metodo `compile()` pre-analisa o schema uma unica vez e retorna um validador otimizado (`ICompiledSchema`). Os campos sao convertidos em uma estrutura interna (`CompiledField[]`) que elimina verificacoes repetidas em cada chamada. **Use esta API para schemas reutilizados muitas vezes** — o custo de compilacao e pago uma vez e as validacoes subsequentes sao mais rapidas.
 
 Consulte [Compilacao e Modos](/guia/schema/compile) para detalhes completos sobre `create` vs `assign`.
 
@@ -86,11 +86,11 @@ O SchemaBuilder retorna `Result<Props, Exceptions>` e nunca lanca excecoes. Cada
 
 ```typescript
 import { SchemaBuilder, FEmail, isFailure } from 'tyforge';
-import type { Schema } from 'tyforge';
+import type { ISchema } from 'tyforge';
 
 const schema = {
   email: { type: FEmail, required: true },
-} satisfies Schema;
+} satisfies ISchema;
 
 const validator = SchemaBuilder.compile(schema);
 const result = validator.create({ email: 'invalido' });

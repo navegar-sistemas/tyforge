@@ -1,6 +1,6 @@
-import { AuditEntry } from "./audit-entry";
+import { IAuditEntry } from "./audit-entry";
 
-export interface AuditFilter {
+export interface IAuditFilter {
   action?: string;
   actor?: string;
   resource?: string;
@@ -8,7 +8,7 @@ export interface AuditFilter {
   to?: Date;
 }
 
-export interface AuditLog {
-  log(entry: AuditEntry): Promise<void>;
-  query(filter: AuditFilter): Promise<AuditEntry[]>;
+export interface IAuditLog {
+  log(entry: IAuditEntry): Promise<void>;
+  query(filter: IAuditFilter): Promise<IAuditEntry[]>;
 }

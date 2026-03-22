@@ -1,7 +1,7 @@
 import { Exceptions } from "./base.exceptions";
-import { THttpStatus } from "@tyforge/type-fields";
+import { THttpStatus } from "@tyforge/constants/http-status.constants";
 
-export default class ExceptionGeneric extends Exceptions {
+export class ExceptionGeneric extends Exceptions {
   readonly typeInference = "ExceptionGeneric" as const;
   readonly data: Record<string, unknown>;
 

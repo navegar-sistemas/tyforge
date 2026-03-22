@@ -1,3 +1,3 @@
-export interface DomainService {
+export interface IDomainService {
   readonly _brand: "DomainService";
 }

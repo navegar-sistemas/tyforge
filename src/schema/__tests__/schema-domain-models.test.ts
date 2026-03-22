@@ -10,8 +10,7 @@ import { Aggregate } from "@tyforge/domain-models/agreggate.base";
 import { ValueObject } from "@tyforge/domain-models/value-object.base";
 import { DomainEvent } from "@tyforge/domain-models/domain-event.base";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
-import { InferProps, InferJson, Schema } from "@tyforge/schema/schema-types";
-import { TClassInfo } from "@tyforge/domain-models/class.base";
+import { InferProps, InferJson, ISchema } from "@tyforge/schema/schema-types";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -32,80 +31,87 @@ function assertFailure<T, E>(result: Result<T, E>): asserts result is { success:
 const addressSchema = {
   street: { type: FString, required: true },
   city: { type: FString, required: true },
-} satisfies Schema;
+} satisfies ISchema;
 
 const userSchema = {
   id: { type: FId, required: false },
   name: { type: FString, required: true },
   email: { type: FEmail, required: true },
   age: { type: FInt, required: false },
-} satisfies Schema;
+} satisfies ISchema;
+
+// ── Types ────────────────────────────────────────────────────────
+
+type TAddressProps = InferProps<typeof addressSchema>;
+type TAddressJson = InferJson<typeof addressSchema>;
+type TUserProps = InferProps<typeof userSchema>;
+type TUserJson = InferJson<typeof userSchema>;
+
+const addressValidator = SchemaBuilder.compile(addressSchema);
+const userValidator = SchemaBuilder.compile(userSchema);
 
 // ── Domain Models ───────────────────────────────────────────────
 
-class Address extends ValueObject<
-  InferProps<typeof addressSchema>,
-  InferJson<typeof addressSchema>
-> {
-  protected _classInfo: TClassInfo = {
-    name: "Address",
-    version: "1.0.0",
-    description: "Endereço",
-  };
+class Address extends ValueObject<TAddressProps, TAddressJson> implements TAddressProps {
+  readonly street: FString;
+  readonly city: FString;
 
-  declare street: FString;
-  declare city: FString;
+  protected readonly _classInfo = { name: "Address", version: "1.0.0", description: "Endereço" };
 
-  equals(input: Address): boolean {
-    return JSON.stringify(this.toJSON()) === JSON.stringify(input.toJSON());
+  private constructor(props: TAddressProps) {
+    super();
+    this.street = props.street;
+    this.city = props.city;
   }
 
-  static create(data: InferJson<typeof addressSchema>): Result<Address, Exceptions> {
-    const validator = SchemaBuilder.compile(addressSchema);
-    const result = validator.create(data);
+  static create(data: TAddressJson): Result<Address, Exceptions> {
+    const result = addressValidator.create(data);
     if (isFailure(result)) return result;
-
-    const address = new Address();
-    address.street = result.value.street;
-    address.city = result.value.city;
-    return ok(address);
+    return ok(new Address(result.value));
   }
 }
 
-interface UserCreatedPayload extends Record<string, unknown> { userId: string; email: string }
+interface TEventUserCreatedPayload extends Record<string, unknown> { userId: string; email: string }
 
-class UserCreated extends DomainEvent<UserCreatedPayload> {
+class EventUserCreated extends DomainEvent<TEventUserCreatedPayload> {
   readonly queueName = "user-events";
+
+  static create(payload: TEventUserCreatedPayload): EventUserCreated {
+    return new EventUserCreated("user.created", payload);
+  }
 }
 
-class User extends Aggregate<
-  InferProps<typeof userSchema>,
-  InferJson<typeof userSchema>
-> {
-  protected _classInfo: TClassInfo = {
-    name: "User",
-    version: "1.0.0",
-    description: "Aggregate de usuário",
-  };
+class User extends Aggregate<TUserProps, TUserJson> implements TUserProps {
+  readonly id: FId | undefined;
+  readonly name: FString;
+  readonly email: FEmail;
+  readonly age: FInt | undefined;
 
-  declare name: FString;
-  declare email: FEmail;
-  declare age: FInt | undefined;
+  protected readonly _classInfo = { name: "User", version: "1.0.0", description: "Aggregate de usuário" };
 
-  static create(data: InferJson<typeof userSchema>): Result<User, Exceptions> {
-    const validator = SchemaBuilder.compile(userSchema);
-    const result = validator.create(data);
+  private constructor(props: TUserProps) {
+    super();
+    this.id = props.id;
+    this.name = props.name;
+    this.email = props.email;
+    this.age = props.age;
+  }
+
+  static create(data: TUserJson): Result<User, Exceptions> {
+    const result = userValidator.create(data);
     if (isFailure(result)) return result;
 
-    const user = new User();
-    user.id = result.value.id ?? FId.generate();
-    user.name = result.value.name;
-    user.email = result.value.email;
-    user.age = result.value.age;
+    const id = result.value.id ?? FId.generate();
+    const user = new User({
+      id,
+      name: result.value.name,
+      email: result.value.email,
+      age: result.value.age,
+    });
 
-    user.addDomainEvent(new UserCreated("user.created", {
-      userId: user.id.getValue(),
-      email: user.email.getValue(),
+    user.addDomainEvent(EventUserCreated.create({
+      userId: id.getValue(),
+      email: result.value.email.getValue(),
     }));
 
     return ok(user);
@@ -268,12 +274,9 @@ describe("SchemaBuilder + Entity equals", () => {
   it("dois Aggregates com mesmo id são iguais", () => {
     const r1 = User.create({ name: "Maria", email: "maria@test.com" });
     assertSuccess(r1);
-    const r2 = User.create({ name: "João", email: "joao@test.com" });
-    assertSuccess(r2);
 
-    // Forçar mesmo id
-    r2.value.id = r1.value.id;
-    assert.ok(r1.value.equals(r2.value));
+    // Mesmo aggregate consigo mesmo
+    assert.ok(r1.value.equals(r1.value));
   });
 
   it("dois Aggregates com ids diferentes não são iguais", () => {

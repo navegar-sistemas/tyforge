@@ -1,6 +1,6 @@
 import { THttpStatus } from "@tyforge/type-fields";
 
-export interface ExceptionDetails {
+export interface IExceptionDetails {
   type: string;
   title: string;
   detail: string;
@@ -42,7 +42,7 @@ export abstract class Exceptions extends Error {
     code,
     additionalFields,
     retriable = true,
-  }: ExceptionDetails) {
+  }: IExceptionDetails) {
     super(detail);
     this.name = this.constructor.name;
     this.type = type;

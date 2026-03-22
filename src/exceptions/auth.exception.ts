@@ -1,8 +1,8 @@
-import { Exceptions, ExceptionDetails } from "./base.exceptions";
+import { Exceptions, IExceptionDetails } from "./base.exceptions";
 import { OHttpStatus } from "@tyforge/constants/http-status.constants";
 
 export class ExceptionAuth extends Exceptions {
-  private constructor(details: ExceptionDetails) {
+  private constructor(details: IExceptionDetails) {
     super(details);
   }
 

@@ -1,3 +1,3 @@
-export interface CorrelationContext {
+export interface ICorrelationContext {
   correlationId: string;
 }

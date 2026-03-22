@@ -1,7 +1,7 @@
 import { OHttpStatus } from "@tyforge/constants/http-status.constants";
 import { Exceptions } from "./base.exceptions";
 
-export default class ExceptionImplementation extends Exceptions {
+export class ExceptionImplementation extends Exceptions {
   static readonly status = OHttpStatus.INTERNAL_SERVER_ERROR;
   override readonly typeInference = "ExceptionImplementation" as const;
   readonly log?: Record<string, unknown>;

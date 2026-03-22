@@ -1,30 +1,30 @@
-import { DtoOut } from "./dto-out.base";
+import { DtoResponse } from "./dto-out.base";
 import { Exceptions } from "@tyforge/exceptions";
 import { err, isFailure, ok, Result } from "@tyforge/tools";
 import { FHttpStatus, THttpStatus } from "@tyforge/type-fields";
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { FString } from "@tyforge/type-fields/string.format_vo";
 
-// Interface genérica que satisfaz TDtoOutPropsBase
-export interface IcDtoOutGeneric {
+// Interface genérica que satisfaz TDtoResponsePropsBase
+export interface IcDtoResponseGeneric {
   status: FHttpStatus;
   body?: unknown;
   headers?: Record<string, TypeField<unknown>>;
 }
 
 // Interface para JSON
-export interface IpDtoOutGeneric {
+export interface IpDtoResponseGeneric {
   status: THttpStatus;
   body?: unknown;
   headers?: Record<string, unknown>;
 }
 
-export class DtoOutGeneric
-  extends DtoOut<IcDtoOutGeneric, IpDtoOutGeneric>
-  implements IcDtoOutGeneric
+export class DtoResponseGeneric
+  extends DtoResponse<IcDtoResponseGeneric, IpDtoResponseGeneric>
+  implements IcDtoResponseGeneric
 {
   protected _classInfo = {
-    name: "DtoOutGeneric",
+    name: "DtoResponseGeneric",
     version: "1.0.0",
     description: "Generic DTO for fallback responses",
   };
@@ -33,7 +33,7 @@ export class DtoOutGeneric
   readonly headers?: Record<string, TypeField<unknown>>;
   readonly body?: unknown;
 
-  constructor(props: IcDtoOutGeneric) {
+  constructor(props: IcDtoResponseGeneric) {
     super();
     this.status = props.status;
     this.headers = props.headers;
@@ -44,7 +44,7 @@ export class DtoOutGeneric
     status: THttpStatus;
     body?: unknown;
     headers?: Record<string, unknown>;
-  }): Result<DtoOutGeneric, Exceptions> {
+  }): Result<DtoResponseGeneric, Exceptions> {
     const statusResult = FHttpStatus.create(inputs.status);
     if (isFailure(statusResult)) {
       return err(statusResult.error);
@@ -61,7 +61,7 @@ export class DtoOutGeneric
     }
 
     return ok(
-      new DtoOutGeneric({
+      new DtoResponseGeneric({
         status: statusResult.value,
         body: inputs.body,
         headers,
@@ -69,7 +69,7 @@ export class DtoOutGeneric
     );
   }
 
-  toJSON(): IpDtoOutGeneric {
+  toJSON(): IpDtoResponseGeneric {
     return {
       status: this.status.getValue(),
       body: this.body,

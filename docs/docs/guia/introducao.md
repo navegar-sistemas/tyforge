@@ -28,13 +28,13 @@ import {
   isSuccess,
   isFailure,
 } from "tyforge";
-import type { Schema } from "tyforge";
+import type { ISchema } from "tyforge";
 
 // 1. Defina o schema com TypeFields
 const userSchema = {
   name:  { type: FString, required: true },
   email: { type: FEmail, required: true },
-} satisfies Schema;
+} satisfies ISchema;
 
 // 2. Compile o schema (uma vez)
 const validator = SchemaBuilder.compile(userSchema);

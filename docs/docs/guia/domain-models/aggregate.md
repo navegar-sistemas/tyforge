@@ -79,15 +79,17 @@ abstract class DomainEvent<TPayload = Record<string, unknown>> {
 import { Aggregate, IEntityPropsBase, DomainEvent, FId, FString, FInt } from "tyforge";
 
 // 1. Defina o evento de dominio
-class PedidoCriadoEvent extends DomainEvent<{
+interface TEventPedidoCriadoPayload extends Record<string, unknown> {
   pedidoId: string;
   clienteNome: string;
   total: number;
-}> {
+}
+
+class EventPedidoCriado extends DomainEvent<TEventPedidoCriadoPayload> {
   readonly queueName = "pedidos.criado";
 
-  constructor(pedidoId: string, clienteNome: string, total: number) {
-    super("PedidoCriado", { pedidoId, clienteNome, total });
+  static create(payload: TEventPedidoCriadoPayload): EventPedidoCriado {
+    return new EventPedidoCriado("pedido.criado", payload);
   }
 }
 
@@ -127,13 +129,11 @@ class Pedido extends Aggregate<IPedidoProps, IPedidoJson> {
     const pedido = new Pedido(props);
 
     // Emitir evento de dominio
-    pedido.addDomainEvent(
-      new PedidoCriadoEvent(
-        pedido.id?.getValue() ?? "",
-        pedido.cliente.getValue(),
-        pedido.total.getValue(),
-      ),
-    );
+    pedido.addDomainEvent(EventPedidoCriado.create({
+      pedidoId: pedido.id?.getValue() ?? "",
+      clienteNome: pedido.cliente.getValue(),
+      total: pedido.total.getValue(),
+    }));
 
     return pedido;
   }
@@ -168,7 +168,7 @@ pedido.getDomainEvents().length; // 0
 ## Fluxo tipico de domain events
 
 1. O Aggregate executa uma operacao de negocio
-2. Dentro da operacao, chama `this.addDomainEvent(new MeuEvento(...))`
+2. Dentro da operacao, chama `this.addDomainEvent(EventMeuEvento.create(...))`
 3. O repositorio (ou unit of work) persiste o agregado
 4. Apos persistencia bem-sucedida, publica os eventos via `getDomainEvents()`
 5. Chama `clearDomainEvents()` para limpar a fila

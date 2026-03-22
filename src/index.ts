@@ -4,27 +4,34 @@ export { ok, err, isSuccess, isFailure, map, flatMap, fold, match, getOrElse, or
 
 // ── Exceptions ──────────────────────────────────────────────────
 export { Exceptions } from "./exceptions/base.exceptions";
+export type { IExceptionDetails } from "./exceptions/base.exceptions";
 export { ExceptionValidation } from "./exceptions/validation.exception";
 export { ExceptionBusiness } from "./exceptions/business.exception";
 export { ExceptionNotFound } from "./exceptions/not-found.exception";
 export { ExceptionDb } from "./exceptions/db.exception";
 export { ExceptionAuth } from "./exceptions/auth.exception";
-export { default as ExceptionUnexpected } from "./exceptions/unexpected";
+export { ExceptionUnexpected } from "./exceptions/unexpected";
+export { ExceptionGeneric } from "./exceptions/generic.exception";
+export { ExceptionImplementation } from "./exceptions/implementation.exception";
+export { ExceptionInterface } from "./exceptions/interface.exception";
+export { ExceptionOptimisticLock } from "./exceptions/optimistic-lock.exception";
+export { ExceptionBooleanInvalid } from "./exceptions/boolean.exception";
+export { ExceptionDate } from "./exceptions/date.exception";
+export { ExceptionId } from "./exceptions/id.exception";
+export { ExceptionIntInvalid } from "./exceptions/int.exception";
+export { ExceptionJson } from "./exceptions/json.exception";
+export { ExceptionString } from "./exceptions/string.exception";
+export { ExceptionText } from "./exceptions/text.exception";
 
 // ── Schema ──────────────────────────────────────────────────────
 export { SchemaBuilder } from "./schema/schema-build";
-export type { CompiledSchema } from "./schema/schema-build";
+export type { ICompiledSchema } from "./schema/schema-build";
 export type {
-  FieldConfig,
-  Schema,
+  IFieldConfig,
+  ISchema,
   SchemaEntry,
   InferProps,
   InferJson,
-  // Backward-compatible re-exports
-  ISchemaFieldConfig,
-  ISchemaInlineObject,
-  ISchemaInferProps,
-  ISchemaInferJson,
 } from "./schema/schema-types";
 
 // ── Type Fields ─────────────────────────────────────────────────
@@ -51,64 +58,62 @@ export { FTraceId } from "./type-fields/trace-id.format_vo";
 export { FPublicKeyPem } from "./type-fields/public-key-pem.format_vo";
 export { FHttpStatus } from "./type-fields/http-status.format_vo";
 export { FBoolInt } from "./type-fields/bool-int.format_vo";
-export { FAppStatus } from "./type-fields/app-status.format_vo";
+export { FAppStatus, OAppStatus } from "./type-fields/app-status.format_vo";
 
 // ── Domain Models ───────────────────────────────────────────────
+export type { TClassInfo } from "./domain-models/class.base";
 export { Aggregate } from "./domain-models/agreggate.base";
 export { Entity } from "./domain-models/entity.base";
 export type { IEntityPropsBase } from "./domain-models/entity.base";
 export { ValueObject } from "./domain-models/value-object.base";
 export { Dto } from "./domain-models/dto.base";
 export type { TDtoPropsBase, TDtoPropsJson } from "./domain-models/dto.base";
+export { DtoResponse } from "./domain-models/dto-out.base";
+export type { TDtoResponsePropsBase, TDtoResponsePropsJson } from "./domain-models/dto-out.base";
 export { DomainEvent } from "./domain-models/domain-event.base";
-export type { IBaseRepository, IRepositoryOptions } from "./domain-models/base-repository.interface";
+export type { IRepositoryBase, IRepositoryBaseOptions } from "./domain-models/base-repository.interface";
 export { DomainEventDispatcher } from "./domain-models/domain-event-dispatcher";
 
 // ── Domain ─────────────────────────────────────────────────────
 export { Specification } from "./domain/specification";
-export type { Policy } from "./domain/policy";
-export type { Factory } from "./domain/factory";
-export type { ReadRepository } from "./domain/read-repository";
-export type { DomainService } from "./domain/domain-service";
-export type { SoftDeletable } from "./domain/soft-deletable";
-export type { Versioned } from "./domain/versioned";
+export type { IPolicy } from "./domain/policy";
+export type { IFactory } from "./domain/factory";
+export type { IRepositoryRead } from "./domain/read-repository";
+export type { IDomainService } from "./domain/domain-service";
+export type { ISoftDeletable } from "./domain/soft-deletable";
+export type { IVersioned } from "./domain/versioned";
 
 // ── Application ────────────────────────────────────────────────
 export { UseCase } from "./application/use-case";
-export type { Mapper } from "./application/mapper";
-export type { Command, Query, CommandHandler, QueryHandler, CommandBus, QueryBus } from "./application/cqrs";
+export type { IMapper } from "./application/mapper";
+export type { ICommand, IQuery, ICommandHandler, IQueryHandler, ICommandBus, IQueryBus } from "./application/cqrs";
 export { IntegrationEvent } from "./application/integration-event";
 export { Saga } from "./application/saga";
-export type { SagaStep } from "./application/saga";
-export type { EventHandler } from "./application/event-handler";
-export type { EventBus } from "./application/event-bus";
+export type { ISagaStep } from "./application/saga";
+export type { IEventHandler } from "./application/event-handler";
+export type { IEventBus } from "./application/event-bus";
 export type { InputDto } from "./application/input-dto";
-export type { OutputDto } from "./application/output-dto";
-export type { Port } from "./application/port";
-export type { PipelineBehavior } from "./application/pipeline-behavior";
+export type { IPort } from "./application/port";
+export type { IPipelineBehavior } from "./application/pipeline-behavior";
 
 // ── Infrastructure ─────────────────────────────────────────────
-export type { UnitOfWork } from "./infrastructure/unit-of-work";
-export { BaseOrmMapper } from "./infrastructure/base-orm-mapper";
-export type { Outbox } from "./infrastructure/outbox";
-export type { OutboxEntry } from "./infrastructure/outbox-entry";
+export type { IUnitOfWork } from "./infrastructure/unit-of-work";
+export type { IOutbox } from "./infrastructure/outbox";
+export type { IOutboxEntry } from "./infrastructure/outbox-entry";
 export type { IdempotencyKey } from "./infrastructure/idempotency-key";
-export type { RetryPolicy, RetryPolicyConfig } from "./infrastructure/retry-policy";
-export type { CircuitBreaker, CircuitBreakerConfig, CircuitBreakerState } from "./infrastructure/circuit-breaker";
-export type { AuditLog, AuditFilter } from "./infrastructure/audit-log";
-export type { AuditEntry } from "./infrastructure/audit-entry";
-export type { CorrelationContext } from "./infrastructure/correlation-context";
+export type { IRetryPolicy, IRetryPolicyConfig } from "./infrastructure/retry-policy";
+export type { ICircuitBreaker, ICircuitBreakerConfig, CircuitBreakerState } from "./infrastructure/circuit-breaker";
+export type { IAuditLog, IAuditFilter } from "./infrastructure/audit-log";
+export type { IAuditEntry } from "./infrastructure/audit-entry";
+export type { ICorrelationContext } from "./infrastructure/correlation-context";
 
 // ── Common ─────────────────────────────────────────────────────
 export { Paginated } from "./common/paginated";
-export type { PaginationParams } from "./common/pagination-params";
+export type { IPaginationParams } from "./common/pagination-params";
 export { DefaultDateTimeProvider } from "./common/date-time-provider";
-export type { DateTimeProvider } from "./common/date-time-provider";
-export type { Logger } from "./common/logger";
+export type { IDateTimeProvider } from "./common/date-time-provider";
+export type { ILogger } from "./common/logger";
 export { Optional } from "./common/optional";
-
-// ── Exceptions (extras) ────────────────────────────────────────
-export { OptimisticLockException } from "./exceptions/optimistic-lock.exception";
 
 // ── Tools ───────────────────────────────────────────────────────
 export { TypeGuard } from "./tools/type_guard";

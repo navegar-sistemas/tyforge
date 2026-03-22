@@ -1,9 +1,9 @@
-export interface RetryPolicyConfig {
+export interface IRetryPolicyConfig {
   maxRetries: number;
   delay: number;
   backoffStrategy: "linear" | "exponential";
 }
 
-export interface RetryPolicy {
+export interface IRetryPolicy {
   execute<T>(fn: () => Promise<T>): Promise<T>;
 }

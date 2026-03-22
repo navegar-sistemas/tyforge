@@ -1,7 +1,7 @@
 import { Exceptions } from "./base.exceptions";
 import { OHttpStatus } from "@tyforge/constants/http-status.constants";
 
-export class OptimisticLockException extends Exceptions {
+export class ExceptionOptimisticLock extends Exceptions {
   private constructor(detail: string) {
     super({
       type: "concurrency/optimistic-lock",
@@ -15,10 +15,10 @@ export class OptimisticLockException extends Exceptions {
     });
   }
 
-  static create(entity: string, id?: string): OptimisticLockException {
+  static create(entity: string, id?: string): ExceptionOptimisticLock {
     const detail = id
       ? `A entidade ${entity} (${id}) foi modificada por outro processo`
       : `A entidade ${entity} foi modificada por outro processo`;
-    return new OptimisticLockException(detail);
+    return new ExceptionOptimisticLock(detail);
   }
 }

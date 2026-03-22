@@ -1,5 +1,5 @@
-import { Query } from "./query";
+import { IQuery } from "./query";
 
-export interface QueryHandler<TQuery extends Query, TResult> {
+export interface IQueryHandler<TQuery extends IQuery, TResult> {
   handle(query: TQuery): Promise<TResult>;
 }

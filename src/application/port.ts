@@ -1,3 +1,3 @@
-export interface Port {
+export interface IPort {
   readonly _brand: "Port";
 }

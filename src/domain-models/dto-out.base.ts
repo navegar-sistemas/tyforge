@@ -2,7 +2,7 @@ import { FHttpStatus, THttpStatus } from "@tyforge/type-fields";
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ValueObject } from "./value-object.base";
 
-export interface TDtoOutPropsBase {
+export interface TDtoResponsePropsBase {
   status: FHttpStatus;
   body?: unknown;
   headers?: Record<string, TypeField<unknown>>;
@@ -10,7 +10,7 @@ export interface TDtoOutPropsBase {
   params?: Record<string, TypeField<unknown>>;
 }
 
-export interface TDtoOutPropsJson {
+export interface TDtoResponsePropsJson {
   status: THttpStatus;
   body?: unknown;
   headers?: Record<string, unknown>;
@@ -18,7 +18,7 @@ export interface TDtoOutPropsJson {
   params?: Record<string, unknown>;
 }
 
-export abstract class DtoOut<TProps, TPropsJson> extends ValueObject<
+export abstract class DtoResponse<TProps, TPropsJson> extends ValueObject<
   TProps,
   TPropsJson
 > {

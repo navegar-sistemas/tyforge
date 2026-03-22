@@ -1,4 +1,4 @@
-import { THttpStatus } from "@tyforge/type-fields";
+import { OHttpStatus } from "@tyforge/constants/http-status.constants";
 import { Exceptions } from "./base.exceptions";
 
 interface ExceptionLog {
@@ -7,16 +7,14 @@ interface ExceptionLog {
   context?: Record<string, unknown>;
 }
 
-export default class ExceptionUnexpected extends Exceptions {
-  static readonly status: THttpStatus = 500; // INTERNAL_SERVER_ERROR
-  override readonly typeInference = "ExceptionUnexpected" as const;
+export class ExceptionUnexpected extends Exceptions {
   readonly log?: ExceptionLog;
 
   private constructor(log?: ExceptionLog, detail?: string) {
     super({
       type: "ExceptionUnexpected",
       title: "Ocorreu um erro inesperado.",
-      status: ExceptionUnexpected.status,
+      status: OHttpStatus.INTERNAL_SERVER_ERROR,
       detail: detail || "Um erro inesperado ocorreu durante a operação.",
       instance: "",
       uri: "",

@@ -1,4 +1,4 @@
-import ExceptionUnexpected from "@tyforge/exceptions/unexpected";
+import { ExceptionUnexpected } from "@tyforge/exceptions/unexpected";
 
 export type Result<T, E = string> = Success<T> | Failure<E>;
 export type ResultPromise<T, E> = Promise<Result<T, E>>;

@@ -1,5 +1,5 @@
-import { Query } from "./query";
+import { IQuery } from "./query";
 
-export interface QueryBus {
-  dispatch<TResult>(query: Query): Promise<TResult>;
+export interface IQueryBus {
+  dispatch<TResult>(query: IQuery): Promise<TResult>;
 }

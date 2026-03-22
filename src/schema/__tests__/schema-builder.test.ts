@@ -7,7 +7,7 @@ import { FEmail } from "@tyforge/type-fields/email.format_vo";
 import { FInt } from "@tyforge/type-fields/int.format_vo";
 import { FBoolean } from "@tyforge/type-fields/boolean.format_vo";
 import { FId } from "@tyforge/type-fields/id.format_vo";
-import type { Schema } from "@tyforge/schema/schema-types";
+import type { ISchema } from "@tyforge/schema/schema-types";
 import { assertType } from "@tyforge/common/assert-type";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 
@@ -28,7 +28,7 @@ function assertFailure<T, E>(result: Result<T, E>): asserts result is { success:
 }
 
 /** Testa cenários com dados intencionalmente inválidos para validação runtime */
-function createWithUntypedData<T extends Schema>(schema: T, data: unknown): Result<Record<string, unknown>, Exceptions> {
+function createWithUntypedData<T extends ISchema>(schema: T, data: unknown): Result<Record<string, unknown>, Exceptions> {
   const validator = SchemaBuilder.compile(schema);
   assertType<Parameters<typeof validator.create>[0]>(data);
   const result = validator.create(data);
@@ -41,7 +41,7 @@ function createWithUntypedData<T extends Schema>(schema: T, data: unknown): Resu
 
 describe("SchemaBuilder — campos simples válidos", () => {
   it("valida FString", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ name: "Maria" });
     assertSuccess(result);
@@ -49,7 +49,7 @@ describe("SchemaBuilder — campos simples válidos", () => {
   });
 
   it("valida FEmail", () => {
-    const schema = { email: { type: FEmail } } satisfies Schema;
+    const schema = { email: { type: FEmail } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ email: "maria@test.com" });
     assertSuccess(result);
@@ -57,7 +57,7 @@ describe("SchemaBuilder — campos simples válidos", () => {
   });
 
   it("valida FInt", () => {
-    const schema = { age: { type: FInt } } satisfies Schema;
+    const schema = { age: { type: FInt } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ age: 28 });
     assertSuccess(result);
@@ -65,7 +65,7 @@ describe("SchemaBuilder — campos simples válidos", () => {
   });
 
   it("valida FBoolean", () => {
-    const schema = { active: { type: FBoolean } } satisfies Schema;
+    const schema = { active: { type: FBoolean } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ active: true });
     assertSuccess(result);
@@ -73,7 +73,7 @@ describe("SchemaBuilder — campos simples válidos", () => {
   });
 
   it("valida FId", () => {
-    const schema = { id: { type: FId } } satisfies Schema;
+    const schema = { id: { type: FId } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ id: validUUID });
     assertSuccess(result);
@@ -81,7 +81,7 @@ describe("SchemaBuilder — campos simples válidos", () => {
   });
 
   it("valida FBoolean com false", () => {
-    const schema = { active: { type: FBoolean } } satisfies Schema;
+    const schema = { active: { type: FBoolean } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ active: false });
     assertSuccess(result);
@@ -89,7 +89,7 @@ describe("SchemaBuilder — campos simples válidos", () => {
   });
 
   it("FBoolean aceita coerção de string e número", () => {
-    const schema = { active: { type: FBoolean } } satisfies Schema;
+    const schema = { active: { type: FBoolean } } satisfies ISchema;
     // FBoolean coerces "true", "1", 1, "false", "0", 0
     const r1 = createWithUntypedData(schema, { active: "true" });
     const r2 = createWithUntypedData(schema, { active: 1 });
@@ -102,7 +102,7 @@ describe("SchemaBuilder — campos simples válidos", () => {
   });
 
   it("FInt aceita zero", () => {
-    const schema = { count: { type: FInt } } satisfies Schema;
+    const schema = { count: { type: FInt } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ count: 0 });
     assertSuccess(result);
@@ -110,7 +110,7 @@ describe("SchemaBuilder — campos simples válidos", () => {
   });
 
   it("FInt aceita números negativos", () => {
-    const schema = { count: { type: FInt } } satisfies Schema;
+    const schema = { count: { type: FInt } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ count: -100 });
     assertSuccess(result);
@@ -118,7 +118,7 @@ describe("SchemaBuilder — campos simples válidos", () => {
   });
 
   it("campos extras no input são ignorados", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const result = createWithUntypedData(schema, { name: "Maria", extra: "ignored", another: 123 });
     assertSuccess(result);
     assert.ok("name" in result.value);
@@ -129,14 +129,14 @@ describe("SchemaBuilder — campos simples válidos", () => {
 
 describe("SchemaBuilder — required / optional", () => {
   it("campo required ausente retorna erro", () => {
-    const schema = { name: { type: FString, required: true } } satisfies Schema;
+    const schema = { name: { type: FString, required: true } } satisfies ISchema;
     const result = createWithUntypedData(schema, {});
     assertFailure(result);
     assert.equal(result.error.field, "name");
   });
 
   it("campo required: false ausente é aceito", () => {
-    const schema = { name: { type: FString, required: false } } satisfies Schema;
+    const schema = { name: { type: FString, required: false } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({});
     assertSuccess(result);
@@ -144,13 +144,13 @@ describe("SchemaBuilder — required / optional", () => {
   });
 
   it("campo required com valor null retorna erro", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const result = createWithUntypedData(schema, { name: null });
     assertFailure(result);
   });
 
   it("campo required por padrão (sem especificar required)", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const result = createWithUntypedData(schema, {});
     assertFailure(result);
   });
@@ -159,7 +159,7 @@ describe("SchemaBuilder — required / optional", () => {
     const schema = {
       name: { type: FString, required: false },
       age: { type: FInt, required: false },
-    } satisfies Schema;
+    } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({});
     assertSuccess(result);
@@ -172,35 +172,35 @@ describe("SchemaBuilder — required / optional", () => {
 
 describe("SchemaBuilder — validação de formato", () => {
   it("email sem @ falha", () => {
-    const schema = { email: { type: FEmail } } satisfies Schema;
+    const schema = { email: { type: FEmail } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ email: "invalido" });
     assertFailure(result);
   });
 
   it("string vazia falha em FString (minLength: 1)", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ name: "" });
     assertFailure(result);
   });
 
   it("número com decimal falha em FInt", () => {
-    const schema = { count: { type: FInt } } satisfies Schema;
+    const schema = { count: { type: FInt } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ count: 3.14 });
     assertFailure(result);
   });
 
   it("UUID inválido falha em FId", () => {
-    const schema = { id: { type: FId } } satisfies Schema;
+    const schema = { id: { type: FId } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ id: "not-a-uuid" });
     assertFailure(result);
   });
 
   it("erro de validação tem status 400", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ name: "" });
     assertFailure(result);
@@ -208,7 +208,7 @@ describe("SchemaBuilder — validação de formato", () => {
   });
 
   it("erro de validação tem detail descritivo", () => {
-    const schema = { email: { type: FEmail } } satisfies Schema;
+    const schema = { email: { type: FEmail } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ email: "bad" });
     assertFailure(result);
@@ -216,25 +216,25 @@ describe("SchemaBuilder — validação de formato", () => {
   });
 
   it("FString rejeita número como input", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const result = createWithUntypedData(schema, { name: 123 });
     assertFailure(result);
   });
 
   it("FInt rejeita string como input", () => {
-    const schema = { count: { type: FInt } } satisfies Schema;
+    const schema = { count: { type: FInt } } satisfies ISchema;
     const result = createWithUntypedData(schema, { count: "abc" });
     assertFailure(result);
   });
 
   it("FBoolean rejeita string inválida", () => {
-    const schema = { active: { type: FBoolean } } satisfies Schema;
+    const schema = { active: { type: FBoolean } } satisfies ISchema;
     const result = createWithUntypedData(schema, { active: "maybe" });
     assertFailure(result);
   });
 
   it("FString com apenas espaços falha (minLength conta caracteres úteis)", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ name: "   " });
     // FString has minLength:1, spaces count as characters, so this may pass
@@ -254,7 +254,7 @@ describe("SchemaBuilder — nested objects", () => {
         name: { type: FString },
         email: { type: FEmail },
       },
-    } satisfies Schema;
+    } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ user: { name: "Ana", email: "ana@test.com" } });
     assertSuccess(result);
@@ -269,7 +269,7 @@ describe("SchemaBuilder — nested objects", () => {
           },
         },
       },
-    } satisfies Schema;
+    } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ level1: { level2: { level3: { value: "deep" } } } });
     assertSuccess(result);
@@ -282,7 +282,7 @@ describe("SchemaBuilder — nested objects", () => {
           street: { type: FString },
         },
       },
-    } satisfies Schema;
+    } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ user: { address: { street: "" } } });
     assertFailure(result);
@@ -294,7 +294,7 @@ describe("SchemaBuilder — nested objects", () => {
       user: {
         name: { type: FString },
       },
-    } satisfies Schema;
+    } satisfies ISchema;
     const result = createWithUntypedData(schema, {});
     assertFailure(result);
   });
@@ -304,7 +304,7 @@ describe("SchemaBuilder — nested objects", () => {
 
 describe("SchemaBuilder — arrays", () => {
   it("array com isArray: true válido", () => {
-    const schema = { tags: { type: FString, isArray: true } } satisfies Schema;
+    const schema = { tags: { type: FString, isArray: true } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ tags: ["node", "typescript"] });
     assertSuccess(result);
@@ -312,7 +312,7 @@ describe("SchemaBuilder — arrays", () => {
   });
 
   it("array syntax [{ type }] válido", () => {
-    const schema = { tags: [{ type: FString }] } satisfies Schema;
+    const schema = { tags: [{ type: FString }] } satisfies ISchema;
     const result = createWithUntypedData(schema, { tags: ["a", "b", "c"] });
     assertSuccess(result);
     assert.ok("tags" in result.value);
@@ -324,7 +324,7 @@ describe("SchemaBuilder — arrays", () => {
   });
 
   it("array vazio é aceito", () => {
-    const schema = { tags: { type: FString, isArray: true } } satisfies Schema;
+    const schema = { tags: { type: FString, isArray: true } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const emptyTags: string[] = [];
     const result = validator.create({ tags: emptyTags });
@@ -333,7 +333,7 @@ describe("SchemaBuilder — arrays", () => {
   });
 
   it("item inválido no array retorna erro com path indexado", () => {
-    const schema = { tags: { type: FString, isArray: true } } satisfies Schema;
+    const schema = { tags: { type: FString, isArray: true } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ tags: ["valid", "", "also-valid"] });
     assertFailure(result);
@@ -341,7 +341,7 @@ describe("SchemaBuilder — arrays", () => {
   });
 
   it("valor simples onde espera array retorna erro", () => {
-    const schema = { tags: { type: FString, isArray: true } } satisfies Schema;
+    const schema = { tags: { type: FString, isArray: true } } satisfies ISchema;
     const result = createWithUntypedData(schema, { tags: "not-an-array" });
     assertFailure(result);
   });
@@ -351,7 +351,7 @@ describe("SchemaBuilder — arrays", () => {
 
 describe("SchemaBuilder — compile reutilizável", () => {
   it("múltiplas chamadas create() funcionam", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
 
     const r1 = validator.create({ name: "Ana" });
@@ -366,7 +366,7 @@ describe("SchemaBuilder — compile reutilizável", () => {
   });
 
   it("create() e assign() são independentes", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
 
     const r1 = validator.create({ name: "Test" });
@@ -392,7 +392,7 @@ describe("SchemaBuilder — schema complexo", () => {
         street: { type: FString },
         city: { type: FString },
       },
-    } satisfies Schema;
+    } satisfies ISchema;
 
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({
@@ -417,7 +417,7 @@ describe("SchemaBuilder — schema complexo", () => {
     const schema = {
       name: { type: FString },
       email: { type: FEmail },
-    } satisfies Schema;
+    } satisfies ISchema;
 
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ name: "", email: "invalido" });
@@ -431,25 +431,25 @@ describe("SchemaBuilder — schema complexo", () => {
 
 describe("SchemaBuilder — dados inválidos", () => {
   it("null como data retorna erro", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const result = createWithUntypedData(schema, null);
     assertFailure(result);
   });
 
   it("undefined como data retorna erro", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const result = createWithUntypedData(schema, undefined);
     assertFailure(result);
   });
 
   it("número como data retorna erro", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const result = createWithUntypedData(schema, 42);
     assertFailure(result);
   });
 
   it("string como data retorna erro", () => {
-    const schema = { name: { type: FString } } satisfies Schema;
+    const schema = { name: { type: FString } } satisfies ISchema;
     const result = createWithUntypedData(schema, "invalid");
     assertFailure(result);
   });

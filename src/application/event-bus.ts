@@ -1,7 +1,7 @@
 import { DomainEvent } from "@tyforge/domain-models/domain-event.base";
-import { EventHandler } from "./event-handler";
+import { IEventHandler } from "./event-handler";
 
-export interface EventBus {
+export interface IEventBus {
   publish(event: DomainEvent): Promise<void>;
-  subscribe<T extends DomainEvent>(eventType: string, handler: EventHandler<T>): void;
+  subscribe<T extends DomainEvent>(eventType: string, handler: IEventHandler<T>): void;
 }

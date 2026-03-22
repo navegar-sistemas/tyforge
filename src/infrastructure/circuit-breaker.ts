@@ -1,11 +1,11 @@
 export type CircuitBreakerState = "closed" | "open" | "half-open";
 
-export interface CircuitBreakerConfig {
+export interface ICircuitBreakerConfig {
   failureThreshold: number;
   resetTimeout: number;
 }
 
-export interface CircuitBreaker {
+export interface ICircuitBreaker {
   execute<T>(fn: () => Promise<T>): Promise<T>;
   getState(): CircuitBreakerState;
 }

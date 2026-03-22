@@ -1,3 +1,3 @@
-export interface OutputDto {
+export interface IOutputDto {
   readonly _brand: "OutputDto";
 }

@@ -1,3 +1,3 @@
-export interface Versioned {
+export interface IVersioned {
   version: number;
 }

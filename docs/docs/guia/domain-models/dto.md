@@ -143,12 +143,12 @@ Dtos podem ser combinados com o `SchemaBuilder` para validar dados de entrada e 
 
 ```typescript
 import { SchemaBuilder, FString, FEmail } from 'tyforge';
-import type { Schema } from 'tyforge';
+import type { ISchema } from 'tyforge';
 
 const schema = {
   nome:  { type: FString, required: true },
   email: { type: FEmail, required: true },
-} satisfies Schema;
+} satisfies ISchema;
 
 const validator = SchemaBuilder.compile(schema);
 const result = validator.create(requestBody);

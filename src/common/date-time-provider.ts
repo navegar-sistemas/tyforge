@@ -1,8 +1,8 @@
-export interface DateTimeProvider {
+export interface IDateTimeProvider {
   now(): Date;
 }
 
-export class DefaultDateTimeProvider implements DateTimeProvider {
+export class DefaultDateTimeProvider implements IDateTimeProvider {
   now(): Date {
     return new Date();
   }

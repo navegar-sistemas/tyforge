@@ -1,4 +1,4 @@
-export interface OutboxEntry {
+export interface IOutboxEntry {
   id: string;
   eventName: string;
   payload: Record<string, unknown>;

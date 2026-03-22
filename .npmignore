@@ -5,3 +5,5 @@ tsconfig.json
 CLAUDE.md
 .claude/
 docs/
+benchmark.ts
+todo/

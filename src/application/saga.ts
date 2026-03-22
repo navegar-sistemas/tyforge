@@ -11,7 +11,7 @@ export abstract class Saga {
   }
 }
 
-export interface SagaStep<TInput, TOutput> {
+export interface ISagaStep<TInput, TOutput> {
   execute(input: TInput): Promise<TOutput>;
   compensate(input: TInput): Promise<void>;
 }

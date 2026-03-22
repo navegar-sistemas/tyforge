@@ -9,7 +9,7 @@ import { FBoolean } from "@tyforge/type-fields/boolean.format_vo";
 import { FId } from "@tyforge/type-fields/id.format_vo";
 import { Aggregate } from "@tyforge/domain-models/agreggate.base";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
-import { InferProps, InferJson, Schema } from "@tyforge/schema/schema-types";
+import { InferProps, InferJson, ISchema } from "@tyforge/schema/schema-types";
 import { TClassInfo } from "@tyforge/domain-models/class.base";
 import { assertType } from "@tyforge/common/assert-type";
 
@@ -27,7 +27,7 @@ function assertFailure<T, E>(result: Result<T, E>): asserts result is { success:
   }
 }
 
-function createWithUntypedData<T extends Schema>(schema: T, data: unknown): Result<Record<string, unknown>, Exceptions> {
+function createWithUntypedData<T extends ISchema>(schema: T, data: unknown): Result<Record<string, unknown>, Exceptions> {
   const validator = SchemaBuilder.compile(schema);
   assertType<Parameters<typeof validator.create>[0]>(data);
   const result = validator.create(data);
@@ -120,7 +120,7 @@ const orderSchema = {
       value: { type: FInt },
     }, isArray: true },
   },
-} satisfies Schema;
+} satisfies ISchema;
 
 const validUUID1 = "019d0863-5d45-7246-b6d0-de5098bfd12e";
 const validUUID2 = "019d0863-5d45-7246-b6d0-de5098bfd13f";

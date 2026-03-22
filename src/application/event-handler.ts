@@ -1,5 +1,5 @@
 import { DomainEvent } from "@tyforge/domain-models/domain-event.base";
 
-export interface EventHandler<T extends DomainEvent> {
+export interface IEventHandler<T extends DomainEvent> {
   handle(event: T): Promise<void>;
 }
