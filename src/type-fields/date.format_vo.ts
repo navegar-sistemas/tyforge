@@ -4,6 +4,7 @@ import {
   ok,
   err,
   isFailure,
+  OK_TRUE,
 } from "@tyforge/result/result";
 import { ToolFormattingDateISO8601 } from "@tyforge/tools/formatting/date/date-formatting.tool";
 import { ToolParse } from "@tyforge/tools/parse/parse.tool";
@@ -48,8 +49,30 @@ export abstract class FDate extends TypeField<TDate, TDateFormatted> {
 // ============================================================================
 // ISO8601 Zulu com milissegundos: YYYY-MM-DDTHH:mm:ss.sssZ
 // ============================================================================
+const DATE_CONFIG_SERIALIZE: ITypeFieldConfig<TDate> = {
+  jsonSchemaType: "Date",
+  serializeAsString: false,
+};
+
 export class FDateTimeISOZMillis extends FDate {
   override readonly typeInference = "FDateTimeISOZMillis";
+
+  override get config(): ITypeFieldConfig<TDate> {
+    return DATE_CONFIG_SERIALIZE;
+  }
+
+  private constructor(value: TDate, fieldPath: string) {
+    super(value, fieldPath);
+  }
+
+  protected override validate(
+    value: TDate,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    const result = FDateTimeISOZMillis.validateRaw(value, fieldPath);
+    if (!result.success) return err(result.error);
+    return OK_TRUE;
+  }
 
   protected formatValue = (date: Date): string =>
     ToolFormattingDateISO8601.formatDateTimeZuluWithMillis(date);
@@ -71,8 +94,8 @@ export class FDateTimeISOZMillis extends FDate {
     return ok(new FDateTimeISOZMillis(validation.value, fieldPath));
   }
 
-  static createOrThrow(date: Date): FDateTimeISOZMillis {
-    const result = this.create(date);
+  static createOrThrow(date: Date, fieldPath = "FDateTimeISOZMillis"): FDateTimeISOZMillis {
+    const result = this.create(date, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
@@ -93,6 +116,23 @@ export class FDateTimeISOZMillis extends FDate {
 // ============================================================================
 export class FDateISODate extends FDate {
   override readonly typeInference = "FDateISODate";
+
+  override get config(): ITypeFieldConfig<TDate> {
+    return DATE_CONFIG_SERIALIZE;
+  }
+
+  private constructor(value: TDate, fieldPath: string) {
+    super(value, fieldPath);
+  }
+
+  protected override validate(
+    value: TDate,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    const result = FDateISODate.validateRaw(value, fieldPath);
+    if (!result.success) return err(result.error);
+    return OK_TRUE;
+  }
 
   protected formatValue = (date: Date): string => {
     const result = ToolFormattingDateISO8601.formatDate(date);
@@ -129,6 +169,23 @@ export class FDateISODate extends FDate {
 // ============================================================================
 export class FDateTimeISOZ extends FDate {
   override readonly typeInference = "FDateTimeISOZ";
+
+  override get config(): ITypeFieldConfig<TDate> {
+    return DATE_CONFIG_SERIALIZE;
+  }
+
+  private constructor(value: TDate, fieldPath: string) {
+    super(value, fieldPath);
+  }
+
+  protected override validate(
+    value: TDate,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    const result = FDateTimeISOZ.validateRaw(value, fieldPath);
+    if (!result.success) return err(result.error);
+    return OK_TRUE;
+  }
 
   protected formatValue = (date: Date): string =>
     ToolFormattingDateISO8601.formatDateTimeUTC(date);
@@ -167,6 +224,23 @@ export class FDateTimeISOZ extends FDate {
 export class FDateISOCompact extends FDate {
   override readonly typeInference = "FDateISOCompact";
 
+  override get config(): ITypeFieldConfig<TDate> {
+    return DATE_CONFIG_SERIALIZE;
+  }
+
+  private constructor(value: TDate, fieldPath: string) {
+    super(value, fieldPath);
+  }
+
+  protected override validate(
+    value: TDate,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    const result = FDateISOCompact.validateRaw(value, fieldPath);
+    if (!result.success) return err(result.error);
+    return OK_TRUE;
+  }
+
   protected formatValue = (date: Date): string =>
     ToolFormattingDateISO8601.formatDateCompact(date);
 
@@ -200,6 +274,23 @@ export class FDateISOCompact extends FDate {
 export class FDateTimeISOCompact extends FDate {
   override readonly typeInference = "FDateTimeISOCompact";
 
+  override get config(): ITypeFieldConfig<TDate> {
+    return DATE_CONFIG_SERIALIZE;
+  }
+
+  private constructor(value: TDate, fieldPath: string) {
+    super(value, fieldPath);
+  }
+
+  protected override validate(
+    value: TDate,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    const result = FDateTimeISOCompact.validateRaw(value, fieldPath);
+    if (!result.success) return err(result.error);
+    return OK_TRUE;
+  }
+
   protected formatValue = (date: Date): string =>
     ToolFormattingDateISO8601.formatDateTimeCompactWithT(date);
 
@@ -232,6 +323,23 @@ export class FDateTimeISOCompact extends FDate {
 // ============================================================================
 export class FDateTimeISOFullCompact extends FDate {
   override readonly typeInference = "FDateTimeISOFullCompact";
+
+  override get config(): ITypeFieldConfig<TDate> {
+    return DATE_CONFIG_SERIALIZE;
+  }
+
+  private constructor(value: TDate, fieldPath: string) {
+    super(value, fieldPath);
+  }
+
+  protected override validate(
+    value: TDate,
+    fieldPath: string,
+  ): Result<true, ExceptionValidation> {
+    const result = FDateTimeISOFullCompact.validateRaw(value, fieldPath);
+    if (!result.success) return err(result.error);
+    return OK_TRUE;
+  }
 
   protected formatValue = (date: Date): string =>
     ToolFormattingDateISO8601.formatDateTimeCompact(date);

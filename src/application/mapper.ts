@@ -1,5 +1,5 @@
 import type { IEntityPropsBase } from "@tyforge/domain-models/entity.base";
-import type { Aggregate } from "@tyforge/domain-models/agreggate.base";
+import type { Aggregate } from "@tyforge/domain-models/aggregate.base";
 import type { Dto, TDtoPropsBase, TDtoPropsJson } from "@tyforge/domain-models/dto.base";
 import type { DtoResponse } from "@tyforge/domain-models/dto-response.base";
 

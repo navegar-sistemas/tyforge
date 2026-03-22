@@ -4,8 +4,8 @@ import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 
 export const OBoolInt = {
-  INVALIDO: 0,
-  VALIDO: 1,
+  INVALID: 0,
+  VALID: 1,
 } as const;
 
 export type TKeyBoolInt = keyof typeof OBoolInt;

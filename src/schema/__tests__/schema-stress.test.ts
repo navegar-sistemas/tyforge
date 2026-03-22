@@ -7,7 +7,7 @@ import { FEmail } from "@tyforge/type-fields/email.format_vo";
 import { FInt } from "@tyforge/type-fields/int.format_vo";
 import { FBoolean } from "@tyforge/type-fields/boolean.format_vo";
 import { FId } from "@tyforge/type-fields/id.format_vo";
-import { Aggregate } from "@tyforge/domain-models/agreggate.base";
+import { Aggregate } from "@tyforge/domain-models/aggregate.base";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 import { InferProps, InferJson, ISchema } from "@tyforge/schema/schema-types";
 import { TClassInfo } from "@tyforge/domain-models/class.base";
@@ -248,8 +248,7 @@ class Order extends Aggregate<
     if (isFailure(result)) return result;
 
     const order = new Order();
-    order.id = result.value.id ?? FId.generate();
-    Object.assign(order, result.value);
+    Object.assign(order, result.value, { id: result.value.id ?? FId.generate() });
     return ok(order);
   }
 }

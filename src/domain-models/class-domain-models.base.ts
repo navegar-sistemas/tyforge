@@ -2,11 +2,13 @@ import { FDate } from "@tyforge/type-fields/date.format_vo";
 import { Class } from "./class.base";
 
 function assertType<T>(value: unknown): asserts value is T {
-  void value;
+  if (value !== null && typeof value !== "object" && typeof value !== "string" && typeof value !== "number" && typeof value !== "boolean") {
+    throw new TypeError(`assertType: unexpected type ${typeof value}`);
+  }
 }
 
 export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
-  constructor() {
+  protected constructor() {
     super();
   }
 

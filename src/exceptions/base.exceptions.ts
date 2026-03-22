@@ -31,7 +31,7 @@ export abstract class Exceptions extends Error {
   public readonly additionalFields?: Record<string, unknown>;
   public readonly retriable: boolean;
 
-  constructor({
+  protected constructor({
     type,
     title,
     detail,

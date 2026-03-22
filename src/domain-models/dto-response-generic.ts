@@ -1,6 +1,6 @@
 import { DtoResponse } from "./dto-response.base";
 import { Exceptions } from "@tyforge/exceptions";
-import { err, isFailure, ok, Result } from "@tyforge/result/result";
+import { isFailure, ok, Result } from "@tyforge/result/result";
 import { FHttpStatus, THttpStatus } from "@tyforge/type-fields";
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { FString } from "@tyforge/type-fields/string.format_vo";
@@ -47,7 +47,7 @@ export class DtoResponseGeneric
   }): Result<DtoResponseGeneric, Exceptions> {
     const statusResult = FHttpStatus.create(inputs.status);
     if (isFailure(statusResult)) {
-      return err(statusResult.error);
+      return statusResult;
     }
 
     let headers: Record<string, TypeField<unknown>> | undefined;

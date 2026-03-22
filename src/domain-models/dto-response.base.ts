@@ -22,7 +22,7 @@ export abstract class DtoResponse<TProps, TPropsJson> extends ValueObject<
   TProps,
   TPropsJson
 > {
-  public constructor() {
+  protected constructor() {
     super();
   }
 }

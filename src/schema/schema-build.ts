@@ -27,11 +27,15 @@ function hasAssign(t: Creatable): boolean {
 }
 
 function assertResultType<T>(result: Result<unknown, Exceptions>): asserts result is Result<T, Exceptions> {
-  void result;
+  if (!("success" in result)) {
+    throw new TypeError("Expected a Result object");
+  }
 }
 
 function assertRecord(data: unknown): asserts data is Record<string, unknown> {
-  void data;
+  if (typeof data !== "object" || data === null || Array.isArray(data)) {
+    throw new TypeError("Expected a plain object");
+  }
 }
 
 // ── Compiled Schema ─────────────────────────────────────────────

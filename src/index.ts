@@ -36,33 +36,57 @@ export type {
 
 // ── Type Fields ─────────────────────────────────────────────────
 export { TypeField } from "./type-fields/type-field.base";
+export type { TJsonSchemaType } from "./type-fields/type-field.base";
 export type { ITypeFieldConfig } from "./type-fields/type-field.config";
 export { FId } from "./type-fields/id.format_vo";
+export type { TId, TIdFormatted } from "./type-fields/id.format_vo";
 export { FIdReq } from "./type-fields/id-req.format_vo";
+export type { TIdReq, TIdReqFormatted } from "./type-fields/id-req.format_vo";
 export { FString } from "./type-fields/string.format_vo";
+export type { TString, TStringFormatted } from "./type-fields/string.format_vo";
 export { FText } from "./type-fields/text.format_vo";
+export type { TText, TTextFormatted } from "./type-fields/text.format_vo";
 export { FEmail } from "./type-fields/email.format_vo";
+export type { TEmail, TEmailFormatted } from "./type-fields/email.format_vo";
 export { FPassword } from "./type-fields/password.format_vo";
+export type { TPassword, TPasswordFormatted } from "./type-fields/password.format_vo";
 export { FBoolean } from "./type-fields/boolean.format_vo";
+export type { TBoolean, TBooleanFormatted } from "./type-fields/boolean.format_vo";
 export { FInt } from "./type-fields/int.format_vo";
+export type { TInt, TIntFormatted } from "./type-fields/int.format_vo";
 export { FJson } from "./type-fields/json.format_vo";
-export { FDateTimeISOZMillis, FDateTimeISOZ, FDateISODate, FDateISOCompact, FDateTimeISOCompact, FDateTimeISOFullCompact } from "./type-fields/date.format_vo";
+export type { TJson, TJsonFormatted } from "./type-fields/json.format_vo";
+export { FDate, FDateTimeISOZMillis, FDateTimeISOZ, FDateISODate, FDateISOCompact, FDateTimeISOCompact, FDateTimeISOFullCompact } from "./type-fields/date.format_vo";
+export type { TDate, TDateFormatted, TfDate } from "./type-fields/date.format_vo";
 export { FPageNumber } from "./type-fields/page-number.format_vo";
+export type { TPageNumber, TPageNumberFormatted } from "./type-fields/page-number.format_vo";
 export { FPageSize } from "./type-fields/page-size.format_vo";
+export type { TPageSize, TPageSizeFormatted } from "./type-fields/page-size.format_vo";
 export { FFullName } from "./type-fields/full-name.format_vo";
+export type { TFullName, TFullNameFormatted } from "./type-fields/full-name.format_vo";
 export { FDescription } from "./type-fields/description.format_vo";
+export type { TDescription, TDescriptionFormatted } from "./type-fields/description.format_vo";
 export { FApiKey } from "./type-fields/api-key.format_vo";
+export type { TApiKey, TApiKeyFormatted } from "./type-fields/api-key.format_vo";
 export { FBearer } from "./type-fields/bearer.format_vo";
+export type { TBearer, TBearerFormatted } from "./type-fields/bearer.format_vo";
 export { FSignature } from "./type-fields/signature.format_vo";
+export type { TSignature, TSignatureFormatted } from "./type-fields/signature.format_vo";
 export { FTraceId } from "./type-fields/trace-id.format_vo";
+export type { TTraceId, TTraceIdFormatted } from "./type-fields/trace-id.format_vo";
 export { FPublicKeyPem } from "./type-fields/public-key-pem.format_vo";
-export { FHttpStatus } from "./type-fields/http-status.format_vo";
-export { FBoolInt } from "./type-fields/bool-int.format_vo";
+export type { TPublicKeyPem, TPublicKeyPemFormatted } from "./type-fields/public-key-pem.format_vo";
+export { FHttpStatus, OHttpStatus } from "./type-fields/http-status.format_vo";
+export type { THttpStatus, THttpStatusFormatted, TKeyHttpStatus } from "./type-fields/http-status.format_vo";
+export { FBoolInt, OBoolInt } from "./type-fields/bool-int.format_vo";
+export type { TBoolInt, TBoolIntFormatted, TKeyBoolInt } from "./type-fields/bool-int.format_vo";
 export { FAppStatus, OAppStatus } from "./type-fields/app-status.format_vo";
+export type { TAppStatus, TAppStatusFormatted, TKeyAppStatus } from "./type-fields/app-status.format_vo";
 
 // ── Domain Models ───────────────────────────────────────────────
 export type { TClassInfo } from "./domain-models/class.base";
-export { Aggregate } from "./domain-models/agreggate.base";
+export { ClassDomainModels } from "./domain-models/class-domain-models.base";
+export { Aggregate } from "./domain-models/aggregate.base";
 export { Entity } from "./domain-models/entity.base";
 export type { IEntityPropsBase } from "./domain-models/entity.base";
 export { ValueObject } from "./domain-models/value-object.base";
@@ -70,9 +94,13 @@ export { Dto } from "./domain-models/dto.base";
 export type { TDtoPropsBase, TDtoPropsJson } from "./domain-models/dto.base";
 export { DtoResponse } from "./domain-models/dto-response.base";
 export type { TDtoResponsePropsBase, TDtoResponsePropsJson } from "./domain-models/dto-response.base";
+export { DtoResponseGeneric } from "./domain-models/dto-response-generic";
+export type { IDtoResponseGeneric, IDtoResponseGenericJson } from "./domain-models/dto-response-generic";
 export { DomainEvent } from "./domain-models/domain-event.base";
+export type { TQueueName } from "./domain-models/domain-event.base";
 export type { IRepositoryBase, IRepositoryBaseOptions } from "./domain-models/base-repository.interface";
 export { DomainEventDispatcher } from "./domain-models/domain-event-dispatcher";
+export type { DomainEventHandler } from "./domain-models/domain-event-dispatcher";
 
 // ── Domain ─────────────────────────────────────────────────────
 export { Specification } from "./domain/specification";
@@ -120,5 +148,3 @@ export { TypeGuard } from "./tools/type_guard";
 export { ToolParse } from "./tools/parse/parse.tool";
 export { ToolFormattingDateISO8601 } from "./tools/formatting/date/date-formatting.tool";
 
-// ── Constants ───────────────────────────────────────────────────
-export { OHttpStatus, type THttpStatus } from "./constants/http-status.constants";

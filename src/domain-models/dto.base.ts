@@ -24,7 +24,7 @@ export abstract class Dto<
   TProps extends TDtoPropsBase,
   TPropsJson extends TDtoPropsJson,
 > extends ValueObject<TProps, TPropsJson> {
-  public constructor() {
+  protected constructor() {
     super();
   }
 }

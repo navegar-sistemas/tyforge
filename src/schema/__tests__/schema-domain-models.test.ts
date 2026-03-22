@@ -6,7 +6,7 @@ import { FString } from "@tyforge/type-fields/string.format_vo";
 import { FEmail } from "@tyforge/type-fields/email.format_vo";
 import { FInt } from "@tyforge/type-fields/int.format_vo";
 import { FId } from "@tyforge/type-fields/id.format_vo";
-import { Aggregate } from "@tyforge/domain-models/agreggate.base";
+import { Aggregate } from "@tyforge/domain-models/aggregate.base";
 import { ValueObject } from "@tyforge/domain-models/value-object.base";
 import { DomainEvent } from "@tyforge/domain-models/domain-event.base";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
