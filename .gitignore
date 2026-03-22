@@ -4,6 +4,9 @@ dist
 .env
 .env.*
 
+# Benchmark
+benchmark/
+
 # Claude
 CLAUDE.md
 .claude/

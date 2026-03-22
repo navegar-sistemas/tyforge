@@ -1,3 +1,3 @@
-export interface IdempotencyKey {
+export interface IIdempotencyKey {
   key: string;
 }

@@ -1,6 +1,8 @@
 import { Result, ok, err } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions";
 
+const UTC_MINUS_3_OFFSET_MS = 3 * 60 * 60 * 1000;
+
 export class ToolFormattingDateISO8601 {
   private static pad(num: number): string {
     return num.toString().padStart(2, "0");
@@ -14,7 +16,7 @@ export class ToolFormattingDateISO8601 {
   private static toUTCMinus3(date: Date): Date {
     // Para datas que vêm de parseDateCompact (que já estão em UTC),
     // apenas subtraímos 3 horas para converter para UTC-3
-    return new Date(date.getTime() - 3 * 60 * 60 * 1000);
+    return new Date(date.getTime() - UTC_MINUS_3_OFFSET_MS);
   }
 
   /**
@@ -52,8 +54,8 @@ export class ToolFormattingDateISO8601 {
       );
     }
 
-    // Adjust to UTC-3 by subtracting 3 hours (3 * 60 * 60 * 1000 milliseconds)
-    const utcMinus3 = new Date(value.getTime() - 3 * 60 * 60 * 1000);
+    // Adjust to UTC-3 by subtracting 3 hours
+    const utcMinus3 = new Date(value.getTime() - UTC_MINUS_3_OFFSET_MS);
 
     // Extract year, month, day in UTC
     const year = utcMinus3.getUTCFullYear();

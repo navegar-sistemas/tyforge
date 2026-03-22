@@ -1,16 +1,16 @@
 import { OHttpStatus } from "@tyforge/constants/http-status.constants";
 import { Exceptions } from "./base.exceptions";
 
-interface ExceptionLog {
+interface IExceptionLog {
   message?: string;
   stack?: string;
   context?: Record<string, unknown>;
 }
 
 export class ExceptionUnexpected extends Exceptions {
-  readonly log?: ExceptionLog;
+  readonly log?: IExceptionLog;
 
-  private constructor(log?: ExceptionLog, detail?: string) {
+  private constructor(log?: IExceptionLog, detail?: string) {
     super({
       type: "ExceptionUnexpected",
       title: "Ocorreu um erro inesperado.",
@@ -23,10 +23,10 @@ export class ExceptionUnexpected extends Exceptions {
     });
     this.log = log;
   }
-  static create(log?: ExceptionLog): ExceptionUnexpected {
+  static create(log?: IExceptionLog): ExceptionUnexpected {
     return new ExceptionUnexpected(log);
   }
-  static externalService(log?: ExceptionLog): ExceptionUnexpected {
+  static externalService(log?: IExceptionLog): ExceptionUnexpected {
     return new ExceptionUnexpected(log, "Erro ao acessar serviço externo");
   }
 }

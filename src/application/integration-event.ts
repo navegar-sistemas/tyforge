@@ -1,7 +1,15 @@
 import { v7 as uuidv7 } from "uuid";
-import { assertType } from "@tyforge/common/assert-type";
 
-export abstract class IntegrationEvent<TPayload, TPropsJson = TPayload> {
+export interface IIntegrationEventJson<TPayload> {
+  id: string;
+  eventName: string;
+  source: string;
+  version: string;
+  payload: TPayload;
+  occurredAt: string;
+}
+
+export abstract class IntegrationEvent<TPayload> {
   readonly id: string;
   readonly occurredAt: Date;
   abstract readonly eventName: string;
@@ -15,8 +23,8 @@ export abstract class IntegrationEvent<TPayload, TPropsJson = TPayload> {
     this.occurredAt = occurredAt ?? new Date();
   }
 
-  toJSON(): TPropsJson {
-    const json = {
+  toJSON(): IIntegrationEventJson<TPayload> {
+    return {
       id: this.id,
       eventName: this.eventName,
       source: this.source,
@@ -24,7 +32,5 @@ export abstract class IntegrationEvent<TPayload, TPropsJson = TPayload> {
       payload: this.payload,
       occurredAt: this.occurredAt.toISOString(),
     };
-    assertType<TPropsJson>(json);
-    return json;
   }
 }

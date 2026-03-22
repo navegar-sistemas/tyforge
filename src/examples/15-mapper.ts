@@ -51,7 +51,7 @@ export class DtoUserResponse extends DtoResponse<TDtoUserResponseFullProps, TDto
 // IMapper — Domain ↔ Persistência ↔ Request ↔ Response
 // ═══════════════════════════════════════════════════════════════════
 
-class MapperUser implements IMapper<User, TUserJson, DtoCreateUser, DtoUserResponse> {
+class MapperUser implements IMapper<User, TUserJson, DtoCreateUser, DtoUserResponse, TDtoCreateUserJson, User> {
   toDomain(raw: TUserJson): User {
     const result = User.assign(raw);
     if (isFailure(result)) throw result.error;
@@ -62,24 +62,21 @@ class MapperUser implements IMapper<User, TUserJson, DtoCreateUser, DtoUserRespo
     return domain.toJSON();
   }
 
-  toRequest(raw: unknown): DtoCreateUser {
-    const result = DtoCreateUser.create(raw as TDtoCreateUserJson);
+  toRequest(raw: TDtoCreateUserJson): DtoCreateUser {
+    const result = DtoCreateUser.create(raw);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  toResponse(input: unknown): DtoUserResponse {
-    if (input instanceof User) {
-      const result = DtoUserResponse.create({
-        id: input.id?.getValue() ?? "",
-        fullName: input.name.getValue(),
-        email: input.email.getValue(),
-        isAdult: input.age.getValue() >= 18,
-      });
-      if (isFailure(result)) throw result.error;
-      return result.value;
-    }
-    throw new Error("Input inválido para toResponse");
+  toResponse(input: User): DtoUserResponse {
+    const result = DtoUserResponse.create({
+      id: input.id?.getValue() ?? "",
+      fullName: input.name.getValue(),
+      email: input.email.getValue(),
+      isAdult: input.age.getValue() >= 18,
+    });
+    if (isFailure(result)) throw result.error;
+    return result.value;
   }
 }
 

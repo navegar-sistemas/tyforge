@@ -1,6 +1,6 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure } from "@tyforge/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
@@ -25,7 +25,9 @@ export class FFullName extends TypeField<TFullName, TFullNameFormatted> {
     value: unknown,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    return TypeGuard.isString(value, fieldPath, 2, 140);
+    const base = TypeGuard.isString(value, fieldPath, 2, 140);
+    if (!base.success) return base;
+    return OK_TRUE;
   }
 
   static create(

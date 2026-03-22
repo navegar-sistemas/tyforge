@@ -8,7 +8,6 @@ import { FInt } from "@tyforge/type-fields/int.format_vo";
 import { FBoolean } from "@tyforge/type-fields/boolean.format_vo";
 import { FId } from "@tyforge/type-fields/id.format_vo";
 import type { ISchema } from "@tyforge/schema/schema-types";
-import { assertType } from "@tyforge/common/assert-type";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 
 // ── Helpers ─────────────────────────────────────────────────────
@@ -30,10 +29,8 @@ function assertFailure<T, E>(result: Result<T, E>): asserts result is { success:
 /** Testa cenários com dados intencionalmente inválidos para validação runtime */
 function createWithUntypedData<T extends ISchema>(schema: T, data: unknown): Result<Record<string, unknown>, Exceptions> {
   const validator = SchemaBuilder.compile(schema);
-  assertType<Parameters<typeof validator.create>[0]>(data);
-  const result = validator.create(data);
-  assertType<Result<Record<string, unknown>, Exceptions>>(result);
-  return result;
+  const result = validator.create(data as Parameters<typeof validator.create>[0]);
+  return result as Result<Record<string, unknown>, Exceptions>;
 }
 
 

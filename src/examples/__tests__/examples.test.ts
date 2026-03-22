@@ -724,7 +724,8 @@ describe("14 — Repository + Paginação", () => {
     assertSuccess(user);
     const saved = await repo.save(user.value);
     assertSuccess(saved);
-    const found = await repo.findById(user.value.id!);
+    assert.ok(user.value.id);
+    const found = await repo.findById(user.value.id);
     assertSuccess(found);
     assert.ok(found.value);
     assert.equal(found.value.name.getValue(), "Maria");
@@ -771,9 +772,10 @@ describe("14 — Repository + Paginação", () => {
     const u = TestUser.create("Del", "del@test.com");
     assertSuccess(u);
     await repo.save(u.value);
-    const del = await repo.delete(u.value.id!);
+    assert.ok(u.value.id);
+    const del = await repo.delete(u.value.id);
     assertSuccess(del);
-    const notFound = await repo.findById(u.value.id!);
+    const notFound = await repo.findById(u.value.id);
     assertSuccess(notFound);
     assert.equal(notFound.value, null);
   });

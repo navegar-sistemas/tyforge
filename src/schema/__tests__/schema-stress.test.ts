@@ -11,7 +11,6 @@ import { Aggregate } from "@tyforge/domain-models/agreggate.base";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 import { InferProps, InferJson, ISchema } from "@tyforge/schema/schema-types";
 import { TClassInfo } from "@tyforge/domain-models/class.base";
-import { assertType } from "@tyforge/common/assert-type";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -29,10 +28,8 @@ function assertFailure<T, E>(result: Result<T, E>): asserts result is { success:
 
 function createWithUntypedData<T extends ISchema>(schema: T, data: unknown): Result<Record<string, unknown>, Exceptions> {
   const validator = SchemaBuilder.compile(schema);
-  assertType<Parameters<typeof validator.create>[0]>(data);
-  const result = validator.create(data);
-  assertType<Result<Record<string, unknown>, Exceptions>>(result);
-  return result;
+  const result = validator.create(data as Parameters<typeof validator.create>[0]);
+  return result as Result<Record<string, unknown>, Exceptions>;
 }
 
 // ── Schema: 15+ níveis de aninhamento ───────────────────────────
@@ -385,11 +382,8 @@ describe("SchemaBuilder — Stress test (15+ níveis)", () => {
     const data2 = makeValidOrderData();
     data2.customer.name = "João";
 
-    assertType<Parameters<typeof validator.create>[0]>(data1);
-    assertType<Parameters<typeof validator.create>[0]>(data2);
-
-    const r1 = validator.create(data1);
-    const r2 = validator.create(data2);
+    const r1 = validator.create(data1 as Parameters<typeof validator.create>[0]);
+    const r2 = validator.create(data2 as Parameters<typeof validator.create>[0]);
     assertSuccess(r1);
     assertSuccess(r2);
   });

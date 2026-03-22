@@ -1,4 +1,5 @@
 import { Exceptions } from "./base.exceptions";
+import { OHttpStatus } from "@tyforge/constants/http-status.constants";
 
 export class ExceptionValidation extends Exceptions {
   override readonly typeInference = "ExceptionValidation" as const;
@@ -8,7 +9,7 @@ export class ExceptionValidation extends Exceptions {
       type: "ExceptionValidation",
       title: "Erro de Validação",
       detail,
-      status: 400, // BAD_REQUEST
+      status: OHttpStatus.BAD_REQUEST,
       instance: "",
       uri: "",
       field,

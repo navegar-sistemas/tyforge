@@ -14,5 +14,5 @@ export { ExceptionNotFound } from "./not-found.exception";
 export { ExceptionOptimisticLock } from "./optimistic-lock.exception";
 export { ExceptionString } from "./string.exception";
 export { ExceptionText } from "./text.exception";
-export { ExceptionUnexpected } from "./unexpected";
+export { ExceptionUnexpected } from "./unexpected.exception";
 export { ExceptionValidation } from "./validation.exception";

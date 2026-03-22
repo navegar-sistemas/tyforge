@@ -1,29 +1,29 @@
-import { DtoResponse } from "./dto-out.base";
+import { DtoResponse } from "./dto-response.base";
 import { Exceptions } from "@tyforge/exceptions";
-import { err, isFailure, ok, Result } from "@tyforge/tools";
+import { err, isFailure, ok, Result } from "@tyforge/result/result";
 import { FHttpStatus, THttpStatus } from "@tyforge/type-fields";
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { FString } from "@tyforge/type-fields/string.format_vo";
 
 // Interface genérica que satisfaz TDtoResponsePropsBase
-export interface IcDtoResponseGeneric {
+export interface IDtoResponseGeneric {
   status: FHttpStatus;
   body?: unknown;
   headers?: Record<string, TypeField<unknown>>;
 }
 
 // Interface para JSON
-export interface IpDtoResponseGeneric {
+export interface IDtoResponseGenericJson {
   status: THttpStatus;
   body?: unknown;
   headers?: Record<string, unknown>;
 }
 
 export class DtoResponseGeneric
-  extends DtoResponse<IcDtoResponseGeneric, IpDtoResponseGeneric>
-  implements IcDtoResponseGeneric
+  extends DtoResponse<IDtoResponseGeneric, IDtoResponseGenericJson>
+  implements IDtoResponseGeneric
 {
-  protected _classInfo = {
+  protected readonly _classInfo = {
     name: "DtoResponseGeneric",
     version: "1.0.0",
     description: "Generic DTO for fallback responses",
@@ -33,7 +33,7 @@ export class DtoResponseGeneric
   readonly headers?: Record<string, TypeField<unknown>>;
   readonly body?: unknown;
 
-  constructor(props: IcDtoResponseGeneric) {
+  private constructor(props: IDtoResponseGeneric) {
     super();
     this.status = props.status;
     this.headers = props.headers;
@@ -69,7 +69,7 @@ export class DtoResponseGeneric
     );
   }
 
-  toJSON(): IpDtoResponseGeneric {
+  toJSON(): IDtoResponseGenericJson {
     return {
       status: this.status.getValue(),
       body: this.body,

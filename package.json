@@ -1,6 +1,6 @@
 {
   "name": "tyforge-temp",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Type-safe schema validation, Result pattern, and DDD building blocks for TypeScript",
   "keywords": [
     "typescript",
@@ -49,8 +49,7 @@
     "@types/uuid": "^10.0.0",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.21.0",
-    "typescript": "^5.7.3",
-    "zod": "^4.3.6"
+    "typescript": "^5.7.3"
   },
   "engines": {
     "node": ">=24"

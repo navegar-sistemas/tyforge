@@ -9,7 +9,7 @@ export abstract class Entity<
   TProps extends IEntityPropsBase,
   TPropsJson = unknown,
 > extends ClassDomainModels<TProps, TPropsJson> {
-  declare id?: FId;
+  id?: FId;
 
   protected constructor() {
     super();

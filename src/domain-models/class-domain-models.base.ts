@@ -1,6 +1,9 @@
 import { FDate } from "@tyforge/type-fields/date.format_vo";
-import { assertType } from "@tyforge/common/assert-type";
 import { Class } from "./class.base";
+
+function assertType<T>(value: unknown): asserts value is T {
+  void value;
+}
 
 export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
   constructor() {

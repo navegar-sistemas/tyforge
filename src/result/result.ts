@@ -1,13 +1,13 @@
-import { ExceptionUnexpected } from "@tyforge/exceptions/unexpected";
+import { ExceptionUnexpected } from "@tyforge/exceptions/unexpected.exception";
 
-export type Result<T, E = string> = Success<T> | Failure<E>;
+export type Result<T, E = string> = ISuccess<T> | IFailure<E>;
 export type ResultPromise<T, E> = Promise<Result<T, E>>;
-interface Success<T> {
+interface ISuccess<T> {
   success: true;
   value: T;
 }
 
-interface Failure<E> {
+interface IFailure<E> {
   success: false;
   error: E;
 }
@@ -22,9 +22,9 @@ export const err = <E>(error: E): Result<never, E> => ({
   error,
 });
 
-export const isSuccess = <T, E>(result: Result<T, E>): result is Success<T> =>
+export const isSuccess = <T, E>(result: Result<T, E>): result is ISuccess<T> =>
   result.success;
-export const isFailure = <T, E>(result: Result<T, E>): result is Failure<E> =>
+export const isFailure = <T, E>(result: Result<T, E>): result is IFailure<E> =>
   !result.success;
 
 export const map = <T, U, E>(

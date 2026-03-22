@@ -1,4 +1,4 @@
-import { Result } from "@tyforge/tools";
+import { Result } from "@tyforge/result/result";
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { Entity, IEntityPropsBase } from "@tyforge/domain-models/entity.base";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
@@ -6,7 +6,7 @@ import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 /**
  * Interface para tipos TypeField com método estático `create`
  */
-export interface ValueObjectStatic<
+export interface IValueObjectStatic<
   TPrimitive,
   TInstance extends TypeField<TPrimitive>,
 > {
@@ -16,7 +16,7 @@ export interface ValueObjectStatic<
 /**
  * Interface para entidades que implementam o método `create`
  */
-export interface EntityStatic<
+export interface IEntityStatic<
   TInstance extends Entity<IEntityPropsBase, unknown>,
 > {
   create(value: unknown, fieldPath?: string): Result<TInstance, Exceptions>;
@@ -29,8 +29,8 @@ export interface EntityStatic<
  */
 export interface IFieldConfig {
   type:
-    | ValueObjectStatic<unknown, TypeField<unknown>>
-    | EntityStatic<Entity<IEntityPropsBase, unknown>>
+    | IValueObjectStatic<unknown, TypeField<unknown>>
+    | IEntityStatic<Entity<IEntityPropsBase, unknown>>
     | ISchema;
   required?: boolean;
   isArray?: boolean;
@@ -60,9 +60,9 @@ export type SchemaEntry = IFieldConfig | ISchema | [IFieldConfig];
  * - se for objeto inline, usa recursão
  */
 type InferPrimitive<T> =
-  T extends ValueObjectStatic<infer TP, TypeField<infer TP>>
+  T extends IValueObjectStatic<infer TP, TypeField<infer TP>>
     ? TP
-    : T extends EntityStatic<Entity<IEntityPropsBase, unknown>>
+    : T extends IEntityStatic<Entity<IEntityPropsBase, unknown>>
       ? unknown
       : T extends ISchema
         ? InferJson<T>
@@ -103,9 +103,9 @@ export type EnsureExtends<T extends U, U> = T;
  * EXTRAÇÃO DA INSTÂNCIA (VO ou Entity) PARA PROPS:
  */
 type InferInstance<T> =
-  T extends ValueObjectStatic<unknown, infer TI>
+  T extends IValueObjectStatic<unknown, infer TI>
     ? TI
-    : T extends EntityStatic<infer TE>
+    : T extends IEntityStatic<infer TE>
       ? TE
       : T extends ISchema
         ? InferProps<T>
