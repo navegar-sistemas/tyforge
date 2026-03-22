@@ -1,6 +1,6 @@
 {
-  "name": "@tyforge/base",
-  "version": "0.1.7",
+  "name": "tyforge",
+  "version": "0.1.8",
   "description": "Type-safe schema validation, Result pattern, and DDD building blocks for TypeScript",
   "keywords": [
     "typescript",
