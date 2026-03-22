@@ -1,12 +1,12 @@
 import { FId } from "@tyforge/type-fields/id.format_vo";
 import { ClassDomainModels } from "./class-domain-models.base";
 
-export interface IEntityPropsBase {
+export interface IEntityProps {
   id?: FId;
 }
 
 export abstract class Entity<
-  TProps extends IEntityPropsBase,
+  TProps extends IEntityProps,
   TPropsJson = unknown,
 > extends ClassDomainModels<TProps, TPropsJson> {
   readonly id?: FId;

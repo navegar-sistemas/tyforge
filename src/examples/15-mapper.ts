@@ -1,82 +1,80 @@
 import {
-  isFailure, ok,
-  DtoResponse, SchemaBuilder, FString, FEmail, FBoolean,
-  Result, Exceptions,
+  isFailure, isSuccess, ok, all,
+  DtoRes, SchemaBuilder, FString, FEmail, FBoolean,
+  Result, Exceptions, Paginated,
 } from "@tyforge/index";
-import type { IMapper, ISchema, InferProps, InferJson, TDtoResponsePropsBase, TDtoResponsePropsJson } from "@tyforge/index";
+import type { IMapper, ISchema, InferProps, InferJson, TDtoResProps, TDtoResPropsJson } from "@tyforge/index";
 import { User } from "./12-aggregates";
 import type { TUserJson } from "./12-aggregates";
-import { DtoCreateUser } from "./11-dto";
-import type { TDtoCreateUserJson } from "./11-dto";
 
-console.log("=== Mapper + DtoResponse ===\n");
+console.log("=== Mapper ===\n");
 
 // ═══════════════════════════════════════════════════════════════════
-// DtoResponse — DTO de saída (response da API)
+// IMapper — Domain ↔ Persistência (responsabilidade única)
 // ═══════════════════════════════════════════════════════════════════
 
-const userResponseSchema = {
+class MapperUser implements IMapper<User, TUserJson> {
+  toDomain(raw: TUserJson): Result<User, Exceptions> {
+    return User.assign(raw);
+  }
+
+  toDomainMany(raw: TUserJson[]): Result<User[], Exceptions> {
+    return all(raw.map(r => this.toDomain(r)));
+  }
+
+  toPersistence(domain: User): Result<TUserJson, Exceptions> {
+    return ok(domain.toJSON());
+  }
+
+  toPersistenceMany(domains: User[]): Result<TUserJson[], Exceptions> {
+    return all(domains.map(d => this.toPersistence(d)));
+  }
+
+  toDomainPaginated(raw: Paginated<TUserJson>): Result<Paginated<User>, Exceptions> {
+    const result = this.toDomainMany(raw.items);
+    if (isFailure(result)) return result;
+    return ok(new Paginated(result.value, raw.total, raw.page, raw.pageSize));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DtoRes — montado pelo controller/use case, não pelo mapper
+// ═══════════════════════════════════════════════════════════════════
+
+const userProfileSchema = {
   id: { type: FString },
   fullName: { type: FString },
   email: { type: FEmail },
   isAdult: { type: FBoolean },
 } satisfies ISchema;
 
-type TDtoUserResponseProps = InferProps<typeof userResponseSchema>;
-type TDtoUserResponseJson = InferJson<typeof userResponseSchema>;
+type TDtoResUserProfileProps = InferProps<typeof userProfileSchema>;
+type TDtoResUserProfileJson = InferJson<typeof userProfileSchema>;
 
-const userResponseValidator = SchemaBuilder.compile(userResponseSchema);
+const userProfileValidator = SchemaBuilder.compile(userProfileSchema);
 
-interface TDtoUserResponseFullProps extends TDtoResponsePropsBase { body: TDtoUserResponseProps }
-interface TDtoUserResponseFullJson extends TDtoResponsePropsJson { body: TDtoUserResponseJson }
+interface TDtoResUserProfileFullProps extends TDtoResProps { body: TDtoResUserProfileProps }
+interface TDtoResUserProfileFullJson extends TDtoResPropsJson { body: TDtoResUserProfileJson }
 
-export class DtoUserResponse extends DtoResponse<TDtoUserResponseFullProps, TDtoUserResponseFullJson> {
-  readonly body: TDtoUserResponseProps;
+export class DtoResUserProfile extends DtoRes<TDtoResUserProfileFullProps, TDtoResUserProfileFullJson> {
+  readonly body: TDtoResUserProfileProps;
 
-  protected readonly _classInfo = { name: "DtoUserResponse", version: "1.0.0", description: "DTO de resposta de usuário" };
+  protected readonly _classInfo = { name: "DtoResUserProfile", version: "1.0.0", description: "Response de perfil de usuário" };
 
-  private constructor(body: TDtoUserResponseProps) {
+  private constructor(body: TDtoResUserProfileProps) {
     super();
     this.body = body;
   }
 
-  static create(data: TDtoUserResponseJson): Result<DtoUserResponse, Exceptions> {
-    const result = userResponseValidator.create(data);
-    if (isFailure(result)) return result;
-    return ok(new DtoUserResponse(result.value));
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// IMapper — Domain ↔ Persistência ↔ Request ↔ Response
-// ═══════════════════════════════════════════════════════════════════
-
-class MapperUser implements IMapper<User, TUserJson, DtoCreateUser, DtoUserResponse, TDtoCreateUserJson, User> {
-  toDomain(raw: TUserJson): User {
-    const result = User.assign(raw);
-    if (isFailure(result)) throw result.error;
-    return result.value;
-  }
-
-  toPersistence(domain: User): TUserJson {
-    return domain.toJSON();
-  }
-
-  toRequest(raw: TDtoCreateUserJson): DtoCreateUser {
-    const result = DtoCreateUser.create(raw);
-    if (isFailure(result)) throw result.error;
-    return result.value;
-  }
-
-  toResponse(input: User): DtoUserResponse {
-    const result = DtoUserResponse.create({
-      id: input.id?.getValue() ?? "",
-      fullName: input.name.getValue(),
-      email: input.email.getValue(),
-      isAdult: input.age.getValue() >= 18,
+  static fromDomain(domain: User): Result<DtoResUserProfile, Exceptions> {
+    const result = userProfileValidator.create({
+      id: domain.id?.getValue() ?? "",
+      fullName: domain.name.getValue(),
+      email: domain.email.getValue(),
+      isAdult: domain.age.getValue() >= 18,
     });
-    if (isFailure(result)) throw result.error;
-    return result.value;
+    if (isFailure(result)) return result;
+    return ok(new DtoResUserProfile(result.value));
   }
 }
 
@@ -86,11 +84,7 @@ class MapperUser implements IMapper<User, TUserJson, DtoCreateUser, DtoUserRespo
 
 const mapper = new MapperUser();
 
-// 1. Request → Dto (valida input)
-const dto = mapper.toRequest({ name: "Maria Silva", email: "maria@test.com", age: 28 });
-console.log("Request → Dto:", dto.toJSON());
-
-// 2. JSON do banco → Domain
+// 1. Persistência → Domain
 const dbRow: TUserJson = {
   id: "019d0863-5d45-7246-b6d0-de5098bfd12e",
   name: "Maria Silva",
@@ -99,15 +93,25 @@ const dbRow: TUserJson = {
   status: "active",
 };
 
-const user = mapper.toDomain(dbRow);
+const userResult = mapper.toDomain(dbRow);
+if (isFailure(userResult)) throw userResult.error;
+const user = userResult.value;
 console.log("Persistência → Domain:", user.toJSON());
 
-// 3. Domain → DtoResponse (response)
-const response = mapper.toResponse(user);
-console.log("Domain → DtoResponse:", response.toJSON());
+// 2. Domain → Persistência
+const persistenceResult = mapper.toPersistence(user);
+if (isSuccess(persistenceResult)) console.log("Domain → Persistência:", persistenceResult.value);
 
-// 4. Domain → Persistência
-const persistence = mapper.toPersistence(user);
-console.log("Domain → Persistência:", persistence);
+// 3. Domain → DtoRes (controller monta, não o mapper)
+const profileResult = DtoResUserProfile.fromDomain(user);
+if (isSuccess(profileResult)) console.log("Domain → DtoRes:", profileResult.value.toJSON());
+
+// 4. Batch — múltiplos registros do banco
+const dbRows: TUserJson[] = [
+  { id: "019d0863-5d45-7246-b6d0-de5098bfd12e", name: "Maria", email: "maria@test.com", age: 28, status: "active" },
+  { id: "019d0863-5d45-7246-b6d0-de5098bfd13f", name: "João", email: "joao@test.com", age: 30, status: "active" },
+];
+const usersResult = mapper.toDomainMany(dbRows);
+if (isSuccess(usersResult)) console.log("Batch:", usersResult.value.length, "usuários");
 
 console.log("\n✅ Exemplo 15 concluído");

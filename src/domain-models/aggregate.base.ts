@@ -1,8 +1,8 @@
-import { Entity, IEntityPropsBase } from "./entity.base";
+import { Entity, IEntityProps } from "./entity.base";
 import { DomainEvent } from "./domain-event.base";
 
 export abstract class Aggregate<
-  TProps extends IEntityPropsBase,
+  TProps extends IEntityProps,
   TPropsJson = unknown,
 > extends Entity<TProps, TPropsJson> {
   private _domainEvents: DomainEvent[] = [];

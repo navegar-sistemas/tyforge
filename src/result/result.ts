@@ -86,3 +86,14 @@ export const all = <T, E>(results: Result<T, E>[]): Result<T[], E> => {
   }
   return ok(values);
 };
+
+export const allSettled = <T, E>(results: Result<T, E>[]): Result<T[], E[]> => {
+  const values: T[] = [];
+  const errors: E[] = [];
+  for (const r of results) {
+    if (isSuccess(r)) values.push(r.value);
+    else errors.push(r.error);
+  }
+  if (errors.length > 0) return err(errors);
+  return ok(values);
+};

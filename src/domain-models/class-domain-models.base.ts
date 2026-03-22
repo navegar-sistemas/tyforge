@@ -7,6 +7,9 @@ function assertType<T>(value: unknown): asserts value is T {
   }
 }
 
+// Cache de property names por prototype para evitar recomputação em toJSON()
+const propertyNamesCache = new WeakMap<object, string[]>();
+
 export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
   protected constructor() {
     super();
@@ -21,12 +24,19 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
   private static deepUnwrap(
     input: unknown,
     config?: { date: `string` | `date` },
+    visited?: WeakSet<object>,
   ): unknown {
     if (Array.isArray(input)) {
-      return input.map((item) => ClassDomainModels.deepUnwrap(item, config));
+      return input.map((item) => ClassDomainModels.deepUnwrap(item, config, visited));
     }
 
     if (input && typeof input === "object") {
+      // Guarda contra referência circular
+      if (visited) {
+        if (visited.has(input)) return undefined;
+        visited.add(input);
+      }
+
       // se for um ValueObject ou DTO com toJSON
       if ("toJSON" in input && typeof input.toJSON === "function") {
         return input.toJSON(config);
@@ -45,7 +55,7 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
       for (const [key, value] of Object.entries(input)) {
         // pula campos undefined
         if (value === undefined) continue;
-        result[key] = ClassDomainModels.deepUnwrap(value, config);
+        result[key] = ClassDomainModels.deepUnwrap(value, config, visited);
       }
       return result;
     }
@@ -58,7 +68,7 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
    * Reutiliza a lógica de deepUnwrap do toJSON
    */
   static toPrimitives<TInput, TOutput>(input: TInput): TOutput {
-    const result = ClassDomainModels.deepUnwrap(input);
+    const result = ClassDomainModels.deepUnwrap(input, undefined, new WeakSet());
     assertType<TOutput>(result);
     return result;
   }
@@ -67,12 +77,17 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
     config = config || { date: `string` };
 
     const fields: Record<string, unknown> = {};
-    const ownPropertyNames = Object.getOwnPropertyNames(this);
-    const prototypePropertyNames = Object.getOwnPropertyNames(Object.getPrototypeOf(this));
+    const proto = Object.getPrototypeOf(this);
 
-    const allPropertyNames = [
-      ...new Set([...ownPropertyNames, ...prototypePropertyNames]),
-    ];
+    let allPropertyNames = propertyNamesCache.get(proto);
+    if (!allPropertyNames) {
+      const ownPropertyNames = Object.getOwnPropertyNames(this);
+      const prototypePropertyNames = Object.getOwnPropertyNames(proto);
+      allPropertyNames = [
+        ...new Set([...ownPropertyNames, ...prototypePropertyNames]),
+      ];
+      propertyNamesCache.set(proto, allPropertyNames);
+    }
 
     for (const propertyName of allPropertyNames) {
       if (propertyName === "constructor") continue;
@@ -85,7 +100,8 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
       }
     }
 
-    const result = ClassDomainModels.deepUnwrap(fields, config);
+    const visited = new WeakSet<object>();
+    const result = ClassDomainModels.deepUnwrap(fields, config, visited);
     assertType<TPropsJson>(result);
     return result;
   }

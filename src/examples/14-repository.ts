@@ -41,7 +41,7 @@ class RepositoryUser implements IRepositoryBase<User> {
     return ok(new Paginated(users, total, page, pageSize));
   }
 
-  async save(entity: User): ResultPromise<User, Exceptions> {
+  async create(entity: User): ResultPromise<User, Exceptions> {
     const json = entity.toJSON();
     if (!json.id) return err(ExceptionBusiness.invalidBusinessRule("entidade sem id"));
     if (this.storage.has(json.id)) return err(ExceptionBusiness.duplicateEntry("id"));
@@ -56,10 +56,54 @@ class RepositoryUser implements IRepositoryBase<User> {
     return ok(entity);
   }
 
+  async updateMany(entities: User[]): ResultPromise<User[], Exceptions> {
+    const updated: User[] = [];
+    for (const entity of entities) {
+      const result = await this.update(entity);
+      if (isFailure(result)) return result;
+      updated.push(result.value);
+    }
+    return ok(updated);
+  }
+
   async delete(id: FId): ResultPromise<void, Exceptions> {
     if (!this.storage.has(id.getValue())) return err(ExceptionBusiness.notFound("User"));
     this.storage.delete(id.getValue());
     return ok(undefined);
+  }
+
+  async count(): ResultPromise<number, Exceptions> {
+    return ok(this.storage.size);
+  }
+
+  async createMany(entities: User[]): ResultPromise<User[], Exceptions> {
+    const saved: User[] = [];
+    for (const entity of entities) {
+      const result = await this.create(entity);
+      if (isFailure(result)) return result;
+      saved.push(result.value);
+    }
+    return ok(saved);
+  }
+
+  async deleteMany(ids: FId[]): ResultPromise<void, Exceptions> {
+    for (const id of ids) {
+      const result = await this.delete(id);
+      if (isFailure(result)) return result;
+    }
+    return ok(undefined);
+  }
+
+  async exists(id: FId): ResultPromise<boolean, Exceptions> {
+    return ok(this.storage.has(id.getValue()));
+  }
+
+  async existsMany(ids: FId[]): ResultPromise<Map<string, boolean>, Exceptions> {
+    const result = new Map<string, boolean>();
+    for (const id of ids) {
+      result.set(id.getValue(), this.storage.has(id.getValue()));
+    }
+    return ok(result);
   }
 }
 
@@ -80,10 +124,10 @@ async function main() {
     });
     if (isSuccess(userResult)) {
       userResult.value.clearDomainEvents();
-      await repo.save(userResult.value);
+      await repo.create(userResult.value);
     }
   }
-  console.log("5 usuários salvos\n");
+  console.log("5 usuários criados\n");
 
   // 2. findAll sem paginação — retorna todos
   const all = await repo.findAll();
@@ -141,7 +185,7 @@ async function main() {
 
   // 8. Erro — duplicata
   if (isSuccess(all) && all.value.items.length > 0) {
-    const duplicateResult = await repo.save(all.value.items[0]);
+    const duplicateResult = await repo.create(all.value.items[0]);
     if (isFailure(duplicateResult)) console.log("\nErro duplicata:", duplicateResult.error.detail);
   }
 

@@ -1,6 +1,6 @@
 // ── Result Pattern ──────────────────────────────────────────────
 export type { Result, ResultPromise } from "./result/result";
-export { ok, err, isSuccess, isFailure, map, flatMap, fold, match, getOrElse, orElse, all, toPromise, OK_TRUE, OK_FALSE } from "./result/result";
+export { ok, err, isSuccess, isFailure, map, flatMap, fold, match, getOrElse, orElse, all, allSettled, toPromise, OK_TRUE, OK_FALSE } from "./result/result";
 
 // ── Exceptions ──────────────────────────────────────────────────
 export { Exceptions } from "./exceptions/base.exceptions";
@@ -25,7 +25,7 @@ export { ExceptionText } from "./exceptions/text.exception";
 
 // ── Schema ──────────────────────────────────────────────────────
 export { SchemaBuilder } from "./schema/schema-build";
-export type { ICompiledSchema } from "./schema/schema-build";
+export type { ICompiledSchema, IBatchCreateError } from "./schema/schema-build";
 export type {
   IFieldConfig,
   ISchema,
@@ -33,6 +33,7 @@ export type {
   InferProps,
   InferJson,
 } from "./schema/schema-types";
+export { composeSchema } from "./schema/schema-compose";
 
 // ── Type Fields ─────────────────────────────────────────────────
 export { TypeField } from "./type-fields/type-field.base";
@@ -84,23 +85,22 @@ export { FAppStatus, OAppStatus } from "./type-fields/app-status.format_vo";
 export type { TAppStatus, TAppStatusFormatted, TKeyAppStatus } from "./type-fields/app-status.format_vo";
 
 // ── Domain Models ───────────────────────────────────────────────
-export type { TClassInfo } from "./domain-models/class.base";
+export type { TClassInfo, TClassMetadata } from "./domain-models/class.base";
 export { ClassDomainModels } from "./domain-models/class-domain-models.base";
 export { Aggregate } from "./domain-models/aggregate.base";
 export { Entity } from "./domain-models/entity.base";
-export type { IEntityPropsBase } from "./domain-models/entity.base";
+export type { IEntityProps } from "./domain-models/entity.base";
 export { ValueObject } from "./domain-models/value-object.base";
 export { Dto } from "./domain-models/dto.base";
-export type { TDtoPropsBase, TDtoPropsJson } from "./domain-models/dto.base";
-export { DtoResponse } from "./domain-models/dto-response.base";
-export type { TDtoResponsePropsBase, TDtoResponsePropsJson } from "./domain-models/dto-response.base";
-export { DtoResponseGeneric } from "./domain-models/dto-response-generic";
-export type { IDtoResponseGeneric, IDtoResponseGenericJson } from "./domain-models/dto-response-generic";
+export { DtoReq } from "./domain-models/dto-req.base";
+export type { TDtoReqProps, TDtoReqPropsJson } from "./domain-models/dto-req.base";
+export { DtoRes } from "./domain-models/dto-res.base";
+export type { TDtoResProps, TDtoResPropsJson } from "./domain-models/dto-res.base";
 export { DomainEvent } from "./domain-models/domain-event.base";
 export type { TQueueName } from "./domain-models/domain-event.base";
-export type { IRepositoryBase, IRepositoryBaseOptions } from "./domain-models/base-repository.interface";
+export type { IRepositoryBase, IRepositoryOptions } from "./domain-models/base-repository.interface";
 export { DomainEventDispatcher } from "./domain-models/domain-event-dispatcher";
-export type { DomainEventHandler } from "./domain-models/domain-event-dispatcher";
+export type { DomainEventHandler, IDispatchOptions, IDispatchResult } from "./domain-models/domain-event-dispatcher";
 
 // ── Domain ─────────────────────────────────────────────────────
 export { Specification } from "./domain/specification";
@@ -116,8 +116,8 @@ export { UseCase } from "./application/use-case";
 export type { IMapper } from "./application/mapper";
 export type { ICommand, IQuery, ICommandHandler, IQueryHandler, ICommandBus, IQueryBus } from "./application/cqrs";
 export { IntegrationEvent } from "./application/integration-event";
-export { Saga } from "./application/saga";
-export type { ISagaStep } from "./application/saga";
+export { Saga, SagaContext } from "./application/saga";
+export type { ISagaStep, ISagaContext } from "./application/saga";
 export type { IEventHandler } from "./application/event-handler";
 export type { IEventBus } from "./application/event-bus";
 export type { IInputDto } from "./application/input-dto";

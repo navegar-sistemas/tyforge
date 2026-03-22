@@ -99,7 +99,7 @@ function compileFields(schema: Record<string, unknown>, basePath: string): Compi
           kind: isArray ? FieldKind.ArrayNestedSchema : FieldKind.NestedSchema,
           creatable: null,
           hasAssign: false,
-          nestedValidator: { fields: compileFields(t, isArray ? "" : path), run: createRunner(t) },
+          nestedValidator: { fields: compileFields(t, path), run: createRunner(t) },
         });
       }
     } else if (!!entry && typeof entry === "object" && !Array.isArray(entry)) {
@@ -219,9 +219,15 @@ function createRunner(schema: Record<string, unknown>) {
 
 // ── Public API ───────────────────────────────────────────────────
 
+export interface IBatchCreateError {
+  index: number;
+  error: Exceptions;
+}
+
 export interface ICompiledSchema<TSchema extends ISchema> {
   create(data: InferJson<TSchema>, path?: string): Result<InferProps<TSchema>, Exceptions>;
   assign(data: InferJson<TSchema>, path?: string): Result<InferProps<TSchema>, Exceptions>;
+  batchCreate(items: unknown[]): { ok: InferProps<TSchema>[]; errors: IBatchCreateError[] };
 }
 
 export class SchemaBuilder {
@@ -240,6 +246,20 @@ export class SchemaBuilder {
         const result = runner(data, path, "assign");
         assertResultType<InferProps<TSchema>>(result);
         return result;
+      },
+      batchCreate(items: unknown[]): { ok: InferProps<TSchema>[]; errors: IBatchCreateError[] } {
+        const successes: InferProps<TSchema>[] = [];
+        const failures: IBatchCreateError[] = [];
+        for (let i = 0; i < items.length; i++) {
+          const result = runner(items[i], "", "create");
+          assertResultType<InferProps<TSchema>>(result);
+          if (result.success) {
+            successes.push(result.value);
+          } else {
+            failures.push({ index: i, error: result.error });
+          }
+        }
+        return { ok: successes, errors: failures };
       },
     };
   }

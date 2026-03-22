@@ -1,8 +1,8 @@
 import {
-  Dto, SchemaBuilder, FString, FEmail, FInt,
+  DtoReq, SchemaBuilder, FString, FEmail, FInt,
   isSuccess, isFailure, ok, Result, Exceptions,
 } from "@tyforge/index";
-import type { ISchema, InferProps, InferJson, TDtoPropsBase, TDtoPropsJson } from "@tyforge/index";
+import type { ISchema, InferProps, InferJson, TDtoReqProps, TDtoReqPropsJson } from "@tyforge/index";
 
 // ═══════════════════════════════════════════════════════════════════
 // DTOs reutilizáveis — importados por outros exemplos
@@ -21,10 +21,10 @@ export type TDtoCreateAddressJson = InferJson<typeof createAddressDtoSchema>;
 
 const createAddressDtoValidator = SchemaBuilder.compile(createAddressDtoSchema);
 
-interface TDtoCreateAddressFullProps extends TDtoPropsBase { body: TDtoCreateAddressProps }
-interface TDtoCreateAddressFullJson extends TDtoPropsJson { body: TDtoCreateAddressJson }
+interface TDtoCreateAddressFullProps extends TDtoReqProps { body: TDtoCreateAddressProps }
+interface TDtoCreateAddressFullJson extends TDtoReqPropsJson { body: TDtoCreateAddressJson }
 
-export class DtoCreateAddress extends Dto<TDtoCreateAddressFullProps, TDtoCreateAddressFullJson> {
+export class DtoCreateAddress extends DtoReq<TDtoCreateAddressFullProps, TDtoCreateAddressFullJson> {
   protected readonly _classInfo = { name: "DtoCreateAddress", version: "1.0.0", description: "DTO de endereço" };
   readonly body: TDtoCreateAddressProps;
 
@@ -53,10 +53,10 @@ export type TDtoCreateUserJson = InferJson<typeof createUserDtoSchema>;
 
 const createUserDtoValidator = SchemaBuilder.compile(createUserDtoSchema);
 
-interface TDtoCreateUserFullProps extends TDtoPropsBase { body: TDtoCreateUserProps }
-interface TDtoCreateUserFullJson extends TDtoPropsJson { body: TDtoCreateUserJson }
+interface TDtoCreateUserFullProps extends TDtoReqProps { body: TDtoCreateUserProps }
+interface TDtoCreateUserFullJson extends TDtoReqPropsJson { body: TDtoCreateUserJson }
 
-export class DtoCreateUser extends Dto<TDtoCreateUserFullProps, TDtoCreateUserFullJson> {
+export class DtoCreateUser extends DtoReq<TDtoCreateUserFullProps, TDtoCreateUserFullJson> {
   protected readonly _classInfo = { name: "DtoCreateUser", version: "1.0.0", description: "DTO de usuário" };
   readonly body: TDtoCreateUserProps;
 
@@ -85,10 +85,10 @@ export type TDtoCreateOrderJson = InferJson<typeof createOrderDtoSchema>;
 
 const createOrderDtoValidator = SchemaBuilder.compile(createOrderDtoSchema);
 
-interface TDtoCreateOrderFullProps extends TDtoPropsBase { body: TDtoCreateOrderProps }
-interface TDtoCreateOrderFullJson extends TDtoPropsJson { body: TDtoCreateOrderJson }
+interface TDtoCreateOrderFullProps extends TDtoReqProps { body: TDtoCreateOrderProps }
+interface TDtoCreateOrderFullJson extends TDtoReqPropsJson { body: TDtoCreateOrderJson }
 
-export class DtoCreateOrder extends Dto<TDtoCreateOrderFullProps, TDtoCreateOrderFullJson> {
+export class DtoCreateOrder extends DtoReq<TDtoCreateOrderFullProps, TDtoCreateOrderFullJson> {
   protected readonly _classInfo = { name: "DtoCreateOrder", version: "1.0.0", description: "DTO de pedido" };
   readonly body: TDtoCreateOrderProps;
 

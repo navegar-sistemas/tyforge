@@ -1,6 +1,6 @@
 import { Result } from "@tyforge/result/result";
 import { TypeField } from "@tyforge/type-fields/type-field.base";
-import { Entity, IEntityPropsBase } from "@tyforge/domain-models/entity.base";
+import { Entity, IEntityProps } from "@tyforge/domain-models/entity.base";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 
 /**
@@ -17,7 +17,7 @@ export interface IValueObjectStatic<
  * Interface para entidades que implementam o método `create`
  */
 export interface IEntityStatic<
-  TInstance extends Entity<IEntityPropsBase, unknown>,
+  TInstance extends Entity<IEntityProps, unknown>,
 > {
   create(value: unknown, fieldPath?: string): Result<TInstance, Exceptions>;
 }
@@ -30,7 +30,7 @@ export interface IEntityStatic<
 export interface IFieldConfig {
   type:
     | IValueObjectStatic<unknown, TypeField<unknown>>
-    | IEntityStatic<Entity<IEntityPropsBase, unknown>>
+    | IEntityStatic<Entity<IEntityProps, unknown>>
     | ISchema;
   required?: boolean;
   isArray?: boolean;
@@ -62,7 +62,7 @@ export type SchemaEntry = IFieldConfig | ISchema | [IFieldConfig];
 type InferPrimitive<T> =
   T extends IValueObjectStatic<infer TP, TypeField<infer TP>>
     ? TP
-    : T extends IEntityStatic<Entity<IEntityPropsBase, unknown>>
+    : T extends IEntityStatic<Entity<IEntityProps, unknown>>
       ? unknown
       : T extends ISchema
         ? InferJson<T>

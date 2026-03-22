@@ -1,18 +1,16 @@
-import type { IEntityPropsBase } from "@tyforge/domain-models/entity.base";
+import type { IEntityProps } from "@tyforge/domain-models/entity.base";
 import type { Aggregate } from "@tyforge/domain-models/aggregate.base";
-import type { Dto, TDtoPropsBase, TDtoPropsJson } from "@tyforge/domain-models/dto.base";
-import type { DtoResponse } from "@tyforge/domain-models/dto-response.base";
+import type { Result } from "@tyforge/result/result";
+import type { Exceptions } from "@tyforge/exceptions/base.exceptions";
+import type { Paginated } from "@tyforge/common/paginated";
 
 export interface IMapper<
-  TAggregate extends Aggregate<IEntityPropsBase>,
+  TAggregate extends Aggregate<IEntityProps>,
   TPersistence,
-  TDtoIn extends Dto<TDtoPropsBase, TDtoPropsJson> = Dto<TDtoPropsBase, TDtoPropsJson>,
-  TDtoOut extends DtoResponse<unknown, unknown> = DtoResponse<unknown, unknown>,
-  TRequestRaw = unknown,
-  TResponseInput = TAggregate,
 > {
-  toDomain(raw: TPersistence): TAggregate;
-  toPersistence(domain: TAggregate): TPersistence;
-  toResponse(input: TResponseInput): TDtoOut;
-  toRequest(raw: TRequestRaw): TDtoIn;
+  toDomain(raw: TPersistence): Result<TAggregate, Exceptions>;
+  toDomainMany(raw: TPersistence[]): Result<TAggregate[], Exceptions>;
+  toPersistence(domain: TAggregate): Result<TPersistence, Exceptions>;
+  toPersistenceMany(domains: TAggregate[]): Result<TPersistence[], Exceptions>;
+  toDomainPaginated(raw: Paginated<TPersistence>): Result<Paginated<TAggregate>, Exceptions>;
 }

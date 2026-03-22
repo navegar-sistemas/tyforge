@@ -6,11 +6,11 @@ import {
   SchemaBuilder,
   ok, err, isSuccess, isFailure, map, flatMap, fold, match, getOrElse, orElse, all, OK_TRUE, OK_FALSE,
   Exceptions, ExceptionValidation, ExceptionBusiness, ExceptionOptimisticLock,
-  ValueObject, Entity, Aggregate, Dto, DtoResponse, DomainEvent, UseCase, Paginated,
+  ValueObject, Entity, Aggregate, DtoReq, DtoRes, DomainEvent, UseCase, Paginated,
 } from "@tyforge/index";
 import type {
   ISchema, InferProps, InferJson, Result,
-  TDtoPropsBase, TDtoPropsJson, TDtoResponsePropsBase, TDtoResponsePropsJson,
+  TDtoReqProps, TDtoReqPropsJson, TDtoResProps, TDtoResPropsJson,
   IRepositoryBase, ResultPromise, IPaginationParams,
 } from "@tyforge/index";
 
@@ -537,18 +537,18 @@ describe("09 — Exceptions", () => {
 
 describe("10 — UseCase", () => {
   const dtoSchema = { name: { type: FString }, email: { type: FEmail }, age: { type: FInt } } satisfies ISchema;
-  type TDtoProps = InferProps<typeof dtoSchema>;
-  type TDtoJson = InferJson<typeof dtoSchema>;
+  type TRegisterDtoProps = InferProps<typeof dtoSchema>;
+  type TRegisterDtoJson = InferJson<typeof dtoSchema>;
   const dtoValidator = SchemaBuilder.compile(dtoSchema);
 
-  interface TDtoFullProps extends TDtoPropsBase { body: TDtoProps }
-  interface TDtoFullJson extends TDtoPropsJson { body: TDtoJson }
+  interface TDtoFullProps extends TDtoReqProps { body: TRegisterDtoProps }
+  interface TDtoFullJson extends TDtoReqPropsJson { body: TRegisterDtoJson }
 
-  class DtoRegister extends Dto<TDtoFullProps, TDtoFullJson> {
-    readonly body: TDtoProps;
+  class DtoRegister extends DtoReq<TDtoFullProps, TDtoFullJson> {
+    readonly body: TRegisterDtoProps;
     protected readonly _classInfo = { name: "DtoRegister", version: "1.0.0", description: "DTO" };
-    private constructor(body: TDtoProps) { super(); this.body = body; }
-    static create(data: TDtoJson): Result<DtoRegister, Exceptions> {
+    private constructor(body: TRegisterDtoProps) { super(); this.body = body; }
+    static create(data: TRegisterDtoJson): Result<DtoRegister, Exceptions> {
       const r = dtoValidator.create(data);
       if (isFailure(r)) return r;
       return ok(new DtoRegister(r.value));
@@ -612,10 +612,10 @@ describe("11 — DTO", () => {
   type TJson = InferJson<typeof schema>;
   const validator = SchemaBuilder.compile(schema);
 
-  interface TFullProps extends TDtoPropsBase { body: TProps }
-  interface TFullJson extends TDtoPropsJson { body: TJson }
+  interface TFullProps extends TDtoReqProps { body: TProps }
+  interface TFullJson extends TDtoReqPropsJson { body: TJson }
 
-  class DtoAddress extends Dto<TFullProps, TFullJson> {
+  class DtoAddress extends DtoReq<TFullProps, TFullJson> {
     readonly body: TProps;
     protected readonly _classInfo = { name: "DtoAddress", version: "1.0.0", description: "DTO" };
     private constructor(body: TProps) { super(); this.body = body; }
@@ -698,12 +698,21 @@ describe("14 — Repository + Paginação", () => {
       }
       return ok(new Paginated(items, all.length, page, pageSize));
     }
-    async save(entity: TestUser): ResultPromise<TestUser, Exceptions> {
+    async create(entity: TestUser): ResultPromise<TestUser, Exceptions> {
       const json = entity.toJSON();
       if (!json.id) return err(ExceptionBusiness.invalidBusinessRule("sem id"));
       if (this.storage.has(json.id)) return err(ExceptionBusiness.duplicateEntry("id"));
       this.storage.set(json.id, json);
       return ok(entity);
+    }
+    async createMany(entities: TestUser[]): ResultPromise<TestUser[], Exceptions> {
+      const created: TestUser[] = [];
+      for (const entity of entities) {
+        const result = await this.create(entity);
+        if (isFailure(result)) return result;
+        created.push(result.value);
+      }
+      return ok(created);
     }
     async update(entity: TestUser): ResultPromise<TestUser, Exceptions> {
       const json = entity.toJSON();
@@ -711,18 +720,47 @@ describe("14 — Repository + Paginação", () => {
       this.storage.set(json.id, json);
       return ok(entity);
     }
+    async updateMany(entities: TestUser[]): ResultPromise<TestUser[], Exceptions> {
+      const updated: TestUser[] = [];
+      for (const entity of entities) {
+        const result = await this.update(entity);
+        if (isFailure(result)) return result;
+        updated.push(result.value);
+      }
+      return ok(updated);
+    }
     async delete(id: FId): ResultPromise<void, Exceptions> {
       if (!this.storage.has(id.getValue())) return err(ExceptionBusiness.notFound("User"));
       this.storage.delete(id.getValue());
       return ok(undefined);
     }
+    async deleteMany(ids: FId[]): ResultPromise<void, Exceptions> {
+      for (const id of ids) {
+        const result = await this.delete(id);
+        if (isFailure(result)) return result;
+      }
+      return ok(undefined);
+    }
+    async count(): ResultPromise<number, Exceptions> {
+      return ok(this.storage.size);
+    }
+    async exists(id: FId): ResultPromise<boolean, Exceptions> {
+      return ok(this.storage.has(id.getValue()));
+    }
+    async existsMany(ids: FId[]): ResultPromise<Map<string, boolean>, Exceptions> {
+      const result = new Map<string, boolean>();
+      for (const id of ids) {
+        result.set(id.getValue(), this.storage.has(id.getValue()));
+      }
+      return ok(result);
+    }
   }
 
-  it("save e findById", async () => {
+  it("create e findById", async () => {
     const repo = new TestRepo();
     const user = TestUser.create("Maria", "maria@test.com");
     assertSuccess(user);
-    const saved = await repo.save(user.value);
+    const saved = await repo.create(user.value);
     assertSuccess(saved);
     assert.ok(user.value.id);
     const found = await repo.findById(user.value.id);
@@ -736,7 +774,7 @@ describe("14 — Repository + Paginação", () => {
     for (let i = 0; i < 5; i++) {
       const u = TestUser.create(`User${i}`, `u${i}@test.com`);
       assertSuccess(u);
-      await repo.save(u.value);
+      await repo.create(u.value);
     }
     const all = await repo.findAll();
     assertSuccess(all);
@@ -749,7 +787,7 @@ describe("14 — Repository + Paginação", () => {
     for (let i = 0; i < 5; i++) {
       const u = TestUser.create(`User${i}`, `u${i}@test.com`);
       assertSuccess(u);
-      await repo.save(u.value);
+      await repo.create(u.value);
     }
     const page1 = await repo.findAll({ page: 1, pageSize: 2 });
     assertSuccess(page1);
@@ -758,12 +796,12 @@ describe("14 — Repository + Paginação", () => {
     assert.equal(page1.value.page, 1);
   });
 
-  it("save duplicado retorna erro", async () => {
+  it("create duplicado retorna erro", async () => {
     const repo = new TestRepo();
     const u = TestUser.create("Dup", "dup@test.com");
     assertSuccess(u);
-    await repo.save(u.value);
-    const dup = await repo.save(u.value);
+    await repo.create(u.value);
+    const dup = await repo.create(u.value);
     assertFailure(dup);
   });
 
@@ -771,7 +809,7 @@ describe("14 — Repository + Paginação", () => {
     const repo = new TestRepo();
     const u = TestUser.create("Del", "del@test.com");
     assertSuccess(u);
-    await repo.save(u.value);
+    await repo.create(u.value);
     assert.ok(u.value.id);
     const del = await repo.delete(u.value.id);
     assertSuccess(del);
@@ -783,7 +821,7 @@ describe("14 — Repository + Paginação", () => {
 
 // ── 15: Mapper ──────────────────────────────────────────────────
 
-describe("15 — Mapper + DtoResponse", () => {
+describe("15 — Mapper + DtoRes", () => {
   const userSchema = { id: { type: FId, required: false }, name: { type: FString }, email: { type: FEmail }, age: { type: FInt }, status: { type: FString } } satisfies ISchema;
   type TMProps = InferProps<typeof userSchema>;
   type TMJson = InferJson<typeof userSchema>;
@@ -809,10 +847,10 @@ describe("15 — Mapper + DtoResponse", () => {
   type TRespJson = InferJson<typeof responseSchema>;
   const respValidator = SchemaBuilder.compile(responseSchema);
 
-  interface TRespFullProps extends TDtoResponsePropsBase { body: TRespProps }
-  interface TRespFullJson extends TDtoResponsePropsJson { body: TRespJson }
+  interface TRespFullProps extends TDtoResProps { body: TRespProps }
+  interface TRespFullJson extends TDtoResPropsJson { body: TRespJson }
 
-  class DtoTestResponse extends DtoResponse<TRespFullProps, TRespFullJson> {
+  class DtoTestResponse extends DtoRes<TRespFullProps, TRespFullJson> {
     readonly body: TRespProps;
     protected readonly _classInfo = { name: "DtoResp", version: "1.0.0", description: "Response" };
     private constructor(body: TRespProps) { super(); this.body = body; }
@@ -838,7 +876,7 @@ describe("15 — Mapper + DtoResponse", () => {
     assert.equal(typeof json.id, "string");
   });
 
-  it("DtoResponse serializa corretamente", () => {
+  it("DtoRes serializa corretamente", () => {
     const resp = DtoTestResponse.create({ id: "abc", fullName: "Maria Silva", isAdult: true });
     assertSuccess(resp);
     const json = resp.value.toJSON();

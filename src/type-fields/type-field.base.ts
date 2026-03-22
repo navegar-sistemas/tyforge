@@ -17,11 +17,23 @@ function getCachedEnumValues(enumObj: object): unknown[] {
   return cached;
 }
 
+// Cache de Set para lookup O(1) em validação de enum
+const enumSetCache = new WeakMap<object, Set<unknown>>();
+
+function getCachedEnumSet(enumObj: object): Set<unknown> {
+  let cached = enumSetCache.get(enumObj);
+  if (!cached) {
+    cached = new Set(getCachedEnumValues(enumObj));
+    enumSetCache.set(enumObj, cached);
+  }
+  return cached;
+}
+
 function isEnumValue<E extends Record<string, string | number>>(
   value: unknown,
-  enumValues: unknown[],
+  enumSet: Set<unknown>,
 ): value is E[keyof E] {
-  return enumValues.includes(value);
+  return enumSet.has(value);
 }
 
 export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
@@ -43,8 +55,8 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
     raw: unknown,
     fieldPath: string,
   ): Result<E[keyof E], ExceptionValidation> {
-    const enumValues = getCachedEnumValues(enumObj);
-    if (isEnumValue<E>(raw, enumValues)) {
+    const enumSet = getCachedEnumSet(enumObj);
+    if (isEnumValue<E>(raw, enumSet)) {
       return ok(raw);
     }
     return err(
@@ -64,10 +76,11 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
   ): Result<true, ExceptionValidation> {
     const { jsonSchemaType } = this.config;
 
-    // Validação de enum se configurado (com cache)
+    // Validação de enum se configurado (com cache de Set para lookup O(1))
     if ("validateEnum" in this.config && this.config.validateEnum) {
-      const enumValues = getCachedEnumValues(this.config.validateEnum);
-      if (!enumValues.includes(value)) {
+      const enumSet = getCachedEnumSet(this.config.validateEnum);
+      if (!enumSet.has(value)) {
+        const enumValues = getCachedEnumValues(this.config.validateEnum);
         return err(
           ExceptionValidation.create(
             fieldPath,
