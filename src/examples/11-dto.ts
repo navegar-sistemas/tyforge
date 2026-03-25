@@ -5,7 +5,7 @@ import {
 import type { ISchema, InferProps, InferJson, TDtoReqProps, TDtoReqPropsJson } from "@tyforge/index";
 
 // ═══════════════════════════════════════════════════════════════════
-// DTOs reutilizáveis — importados por outros exemplos
+// Reusable DTOs — imported by other examples
 // ═══════════════════════════════════════════════════════════════════
 
 // ─── DtoCreateAddress ───
@@ -104,7 +104,7 @@ export class DtoCreateOrder extends DtoReq<TDtoCreateOrderFullProps, TDtoCreateO
   }
 }
 
-// ─── Demonstração ───
+// ─── Demo ───
 
 if (require.main === module) {
   console.log("=== DTOs ===\n");

@@ -1,7 +1,8 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
+import { Result, ok, err, isFailure } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export const OAppStatus = {
   ACTIVE: "active",
@@ -27,28 +28,34 @@ export class FAppStatus extends TypeField<TAppStatus, TAppStatusFormatted> {
     super(value, fieldPath);
   }
 
-  static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
-    const resolved = FAppStatus.resolveEnum(OAppStatus, value, fieldPath);
-    if (!resolved.success) return err(resolved.error);
-    return OK_TRUE;
-  }
-
-  static create(
-    raw: TAppStatus,
-    fieldPath = "AppStatus",
-  ): Result<FAppStatus, ExceptionValidation> {
-    const validation = FAppStatus.validateRaw(raw, fieldPath);
+  static create<T = TAppStatus>(raw: T, fieldPath = "AppStatus"): Result<FAppStatus, ExceptionValidation> {
+    const str = TypeGuard.isString(raw, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const enumResult = TypeField.resolveEnum(OAppStatus, str.value, fieldPath);
+    if (isFailure(enumResult)) return err(enumResult.error);
+    const value = TypeField.normalize(enumResult.value, TypeField.createLevel);
+    const instance = new FAppStatus(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FAppStatus(raw, fieldPath));
+    return ok(instance);
   }
 
-  static createOrThrow(
-    raw: TAppStatus,
-    fieldPath = "AppStatus",
-  ): FAppStatus {
+  static createOrThrow(raw: TAppStatus, fieldPath = "AppStatus"): FAppStatus {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
+  }
+
+  static assign<T = TAppStatus>(value: T, fieldPath = "AppStatus"): Result<FAppStatus, ExceptionValidation> {
+    const str = TypeGuard.isString(value, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const enumResult = TypeField.resolveEnum(OAppStatus, str.value, fieldPath);
+    if (isFailure(enumResult)) return err(enumResult.error);
+    const normalized = TypeField.normalize(enumResult.value, TypeField.assignLevel);
+    const instance = new FAppStatus(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   static fromBoolean(isActive: boolean): FAppStatus {
@@ -60,13 +67,6 @@ export class FAppStatus extends TypeField<TAppStatus, TAppStatusFormatted> {
 
   static generate(): FAppStatus {
     return FAppStatus.createOrThrow(OAppStatus.ACTIVE, "AppStatus");
-  }
-
-  override validate(
-    value: TAppStatus,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    return FAppStatus.validateRaw(value, fieldPath);
   }
 
   isActive(): boolean {

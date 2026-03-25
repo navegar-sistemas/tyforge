@@ -28,13 +28,11 @@ if (isSuccess(age)) {
   console.log("FInt:", age.value.getValue());
 }
 
-// FBoolean (aceita coercao)
+// FBoolean (accepts only boolean)
 const active = FBoolean.create(true);
-const fromString = FBoolean.create("true");
-const fromNumber = FBoolean.create(1);
+const inactive = FBoolean.create(false);
 if (isSuccess(active)) console.log("FBoolean (true):", active.value.getValue());
-if (isSuccess(fromString)) console.log("FBoolean ('true'):", fromString.value.getValue());
-if (isSuccess(fromNumber)) console.log("FBoolean (1):", fromNumber.value.getValue());
+if (isSuccess(inactive)) console.log("FBoolean (false):", inactive.value.getValue());
 
 // FId
 const id = FId.generate();

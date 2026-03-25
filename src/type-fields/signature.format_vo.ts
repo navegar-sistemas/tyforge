@@ -1,4 +1,4 @@
-import { TypeField } from "@tyforge/type-fields/type-field.base";
+import { TypeField, TValidationLevel } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -23,16 +23,15 @@ export class FSignature extends TypeField<TSignature, TSignatureFormatted> {
     super(value, fieldPath);
   }
 
-  static validateRaw(
-    value: unknown,
+  protected override validate(
+    value: TSignature,
     fieldPath: string,
+    validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const base = TypeGuard.isString(value, fieldPath, 64, 512);
+    const base = super.validate(value, fieldPath, validateLevel);
     if (!base.success) return base;
-
-    if (typeof value !== "string") return base;
-    const str = value;
-    const cleanValue = str.replace(/\s/g, "");
+    if (validateLevel !== "full") return OK_TRUE;
+    const cleanValue = this.getValue().replace(/\s/g, "");
     if (!FSignature.BASE64_REGEX.test(cleanValue) || cleanValue.length < 64) {
       return err(
         ExceptionValidation.create(
@@ -41,17 +40,17 @@ export class FSignature extends TypeField<TSignature, TSignatureFormatted> {
         ),
       );
     }
-
     return OK_TRUE;
   }
 
-  static create(
-    raw: TSignature,
-    fieldPath = "Signature",
-  ): Result<FSignature, ExceptionValidation> {
-    const validation = FSignature.validateRaw(raw, fieldPath);
+  static create<T = TSignature>(raw: T, fieldPath = "Signature"): Result<FSignature, ExceptionValidation> {
+    const str = TypeGuard.isString(raw, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const value = TypeField.normalize(str.value, TypeField.createLevel, false);
+    const instance = new FSignature(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FSignature(raw, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: TSignature, fieldPath = "Signature"): FSignature {
@@ -60,11 +59,14 @@ export class FSignature extends TypeField<TSignature, TSignatureFormatted> {
     return result.value;
   }
 
-  override validate(
-    value: TSignature,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    return FSignature.validateRaw(value, fieldPath);
+  static assign<T = TSignature>(value: T, fieldPath = "Signature"): Result<FSignature, ExceptionValidation> {
+    const str = TypeGuard.isString(value, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const normalized = TypeField.normalize(str.value, TypeField.assignLevel, false);
+    const instance = new FSignature(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   override toString(): string {
@@ -72,9 +74,7 @@ export class FSignature extends TypeField<TSignature, TSignatureFormatted> {
   }
 
   override formatted(): string {
-    const formatSignature: (value: TSignature) => TSignature = (value) =>
-      value.trim();
-    return formatSignature(this.getValue());
+    return this.getValue();
   }
 
   override getDescription(): string {

@@ -299,3 +299,99 @@ describe("SchemaBuilder + Schema reutilizável", () => {
     assertFailure(r3);
   });
 });
+
+// ── Expose / Redaction ────────────────────────────────────────────
+
+import { FPassword } from "@tyforge/type-fields/password.format_vo";
+
+const secureSchema = {
+  id: { type: FId, required: false },
+  name: { type: FString },
+  email: { type: FEmail, expose: "private" as const },
+  password: { type: FPassword, expose: "redacted" as const },
+} satisfies ISchema;
+
+type TSecureProps = InferProps<typeof secureSchema>;
+type TSecureJson = InferJson<typeof secureSchema>;
+
+const secureValidator = SchemaBuilder.compile(secureSchema);
+
+class SecureUser extends Aggregate<TSecureProps, TSecureJson> implements TSecureProps {
+  readonly id: FId | undefined;
+  readonly name: FString;
+  readonly email: FEmail;
+  readonly password: FPassword;
+
+  protected readonly _classInfo = { name: "SecureUser", version: "1.0.0", description: "User with expose levels" };
+  protected readonly _schema = secureSchema;
+
+  private constructor(props: TSecureProps) {
+    super();
+    this.id = props.id;
+    this.name = props.name;
+    this.email = props.email;
+    this.password = props.password;
+  }
+
+  static create(data: TSecureJson): Result<SecureUser, Exceptions> {
+    const result = secureValidator.create(data);
+    if (isFailure(result)) return result;
+    const id = result.value.id ?? FId.generate();
+    return ok(new SecureUser({ ...result.value, id }));
+  }
+}
+
+describe("toJSON with expose levels", () => {
+  it("default (public) redacts private and redacted fields", () => {
+    const result = SecureUser.create({ name: "Ana", email: "ana@test.com", password: "Str0ng!Pass" });
+    assertSuccess(result);
+    const json = result.value.toJSON();
+    assert.equal(json.name, "Ana");
+    assert.equal(json.email, "[REDACTED]");
+    assert.equal(json.password, "[REDACTED]");
+  });
+
+  it("private level shows private fields, redacts redacted", () => {
+    const result = SecureUser.create({ name: "Ana", email: "ana@test.com", password: "Str0ng!Pass" });
+    assertSuccess(result);
+    const json = result.value.toJSON(undefined, "private");
+    assert.equal(json.name, "Ana");
+    assert.equal(json.email, "ana@test.com");
+    assert.equal(json.password, "[REDACTED]");
+  });
+
+  it("redacted level shows all fields", () => {
+    const result = SecureUser.create({ name: "Ana", email: "ana@test.com", password: "Str0ng!Pass" });
+    assertSuccess(result);
+    const json = result.value.toJSON(undefined, "redacted");
+    assert.equal(json.name, "Ana");
+    assert.equal(json.email, "ana@test.com");
+    assert.equal(json.password, "Str0ng!Pass");
+  });
+
+  it("fields without expose are always visible", () => {
+    const result = SecureUser.create({ name: "Ana", email: "ana@test.com", password: "Str0ng!Pass" });
+    assertSuccess(result);
+    const json = result.value.toJSON();
+    assert.equal(json.name, "Ana");
+    assert.equal(typeof json.id, "string");
+  });
+
+  it("entity without _schema works as before (backward compat)", () => {
+    const result = User.create({ name: "Maria", email: "maria@test.com", age: 30 });
+    assertSuccess(result);
+    const json = result.value.toJSON();
+    assert.equal(json.name, "Maria");
+    assert.equal(json.email, "maria@test.com");
+    assert.equal(json.age, 30);
+  });
+
+  it("mixed expose with config date format", () => {
+    const result = SecureUser.create({ name: "Ana", email: "ana@test.com", password: "Str0ng!Pass" });
+    assertSuccess(result);
+    const json = result.value.toJSON({ date: "string" }, "public");
+    assert.equal(json.name, "Ana");
+    assert.equal(json.email, "[REDACTED]");
+    assert.equal(json.password, "[REDACTED]");
+  });
+});

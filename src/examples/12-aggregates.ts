@@ -7,7 +7,7 @@ import type { ISchema, InferProps, InferJson } from "@tyforge/index";
 import { EventUserRegistered } from "./13-events";
 
 // ═══════════════════════════════════════════════════════════════════
-// Aggregates reutilizáveis — importados por outros exemplos
+// Reusable Aggregates — imported by other examples
 // ═══════════════════════════════════════════════════════════════════
 
 // ─── User Aggregate ───

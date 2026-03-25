@@ -1,7 +1,8 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
+import { Result, ok, err, isFailure } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TJson = Record<string, unknown>;
 export type TJsonFormatted = string;
@@ -18,41 +19,26 @@ export class FJson extends TypeField<TJson, TJsonFormatted> {
     super(value, fieldPath);
   }
 
-  private static isPlainObject(v: unknown): v is TJson {
-    return typeof v === "object" && v !== null && !Array.isArray(v);
-  }
-
-  static validateRaw(value: unknown, fieldPath: string): Result<TJson, ExceptionValidation> {
-    if (typeof value === "string") {
-      try {
-        const parsed: unknown = JSON.parse(value);
-        if (FJson.isPlainObject(parsed)) {
-          return ok(parsed);
-        }
-        return err(ExceptionValidation.create(fieldPath, "Deve ser um objeto JSON válido"));
-      } catch {
-        return err(ExceptionValidation.create(fieldPath, "Deve ser um objeto JSON válido"));
-      }
-    }
-    if (FJson.isPlainObject(value)) {
-      return ok(value);
-    }
-    return err(ExceptionValidation.create(fieldPath, "Deve ser um objeto JSON válido"));
-  }
-
-  static create(
-    raw: unknown,
-    fieldPath = "Json",
-  ): Result<FJson, ExceptionValidation> {
-    const validation = FJson.validateRaw(raw, fieldPath);
+  static create<T = TJson>(raw: T, fieldPath = "Json"): Result<FJson, ExceptionValidation> {
+    if (!TypeGuard.isRecord(raw)) return err(ExceptionValidation.create(fieldPath, "Expected object"));
+    const instance = new FJson(raw, fieldPath);
+    const validation = instance.validate(raw, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FJson(validation.value, fieldPath));
+    return ok(instance);
   }
 
-  static createOrThrow(raw: unknown, fieldPath = "Json"): FJson {
+  static createOrThrow(raw: TJson, fieldPath = "Json"): FJson {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
+  }
+
+  static assign<T = TJson>(value: T, fieldPath = "Json"): Result<FJson, ExceptionValidation> {
+    if (!TypeGuard.isRecord(value)) return err(ExceptionValidation.create(fieldPath, "Expected object"));
+    const instance = new FJson(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   static createNew(
@@ -60,15 +46,6 @@ export class FJson extends TypeField<TJson, TJsonFormatted> {
     fieldPath = "Json",
   ): Result<FJson, ExceptionValidation> {
     return this.create(data, fieldPath);
-  }
-
-  override validate(
-    value: TJson,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    const parsed = FJson.validateRaw(value, fieldPath);
-    if (!parsed.success) return err(parsed.error);
-    return OK_TRUE;
   }
 
   serialize(): string {
@@ -84,7 +61,7 @@ export class FJson extends TypeField<TJson, TJsonFormatted> {
   }
 
   has(key: string): boolean {
-    return key in this._value;
+    return Object.prototype.hasOwnProperty.call(this._value, key);
   }
 
   keys(): string[] {
@@ -93,6 +70,10 @@ export class FJson extends TypeField<TJson, TJsonFormatted> {
 
   isEmpty(): boolean {
     return Object.keys(this._value).length === 0;
+  }
+
+  override toString(): string {
+    return JSON.stringify(this.getValue());
   }
 
   override getDescription(): string {

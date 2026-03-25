@@ -1,4 +1,4 @@
-import { Result, err, OK_TRUE } from "@tyforge/result/result";
+import { Result, err, ok, OK_TRUE } from "@tyforge/result/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 
 export class TypeGuard {
@@ -115,14 +115,14 @@ export class TypeGuard {
     fieldPath: string,
     min = 1,
     max = Number.MAX_SAFE_INTEGER,
-  ): Result<true, ExceptionValidation> {
+  ): Result<string, ExceptionValidation> {
     if (typeof value !== "string") {
       return err(
         ExceptionValidation.create(fieldPath, "O valor deve ser uma string."),
       );
     }
-    const len = value.length;
-    if (len > max) {
+    const trimmed = value.trim();
+    if (trimmed.length > max) {
       return err(
         ExceptionValidation.create(
           fieldPath,
@@ -130,7 +130,7 @@ export class TypeGuard {
         ),
       );
     }
-    if (len < min) {
+    if (trimmed.length < min) {
       return err(
         ExceptionValidation.create(
           fieldPath,
@@ -138,7 +138,7 @@ export class TypeGuard {
         ),
       );
     }
-    return OK_TRUE;
+    return ok(trimmed);
   }
 
   static isNumber(
@@ -256,6 +256,14 @@ export class TypeGuard {
         );
   }
 
+  static isRecord(value: unknown): value is Record<string, unknown> {
+    return TypeGuard.isObject(value, "").success;
+  }
+
+  static isCallable(value: unknown): value is Function {
+    return TypeGuard.isFunction(value, "").success;
+  }
+
   static isFunction(
     value: unknown,
     fieldPath: string,
@@ -353,5 +361,38 @@ export class TypeGuard {
     return value instanceof Map
       ? OK_TRUE
       : err(ExceptionValidation.create(fieldPath, "O valor deve ser um Map."));
+  }
+
+  static extractBoolean(value: unknown, fieldPath: string): Result<boolean, ExceptionValidation> {
+    if (typeof value !== "boolean") {
+      return err(ExceptionValidation.create(fieldPath, "O valor deve ser um booleano."));
+    }
+    return ok(value);
+  }
+
+  static extractArray(value: unknown, fieldPath: string, min = 0, max = Number.MAX_SAFE_INTEGER): Result<unknown[], ExceptionValidation> {
+    if (!Array.isArray(value)) {
+      return err(ExceptionValidation.create(fieldPath, "O valor deve ser um array."));
+    }
+    if (value.length < min) {
+      return err(ExceptionValidation.create(fieldPath, `O array deve conter no mínimo ${min} itens.`));
+    }
+    if (value.length > max) {
+      return err(ExceptionValidation.create(fieldPath, `O array deve conter no máximo ${max} itens.`));
+    }
+    return ok(value);
+  }
+
+  static extractNumber(value: unknown, fieldPath: string, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER): Result<number, ExceptionValidation> {
+    if (typeof value !== "number" || isNaN(value)) {
+      return err(ExceptionValidation.create(fieldPath, "O valor deve ser um número válido."));
+    }
+    if (value < min) {
+      return err(ExceptionValidation.create(fieldPath, `O valor deve ser no mínimo ${min}.`));
+    }
+    if (value > max) {
+      return err(ExceptionValidation.create(fieldPath, `O valor deve ser no máximo ${max}.`));
+    }
+    return ok(value);
   }
 }

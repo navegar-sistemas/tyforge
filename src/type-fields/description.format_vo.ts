@@ -1,6 +1,6 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
+import { Result, ok, err, isFailure } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
@@ -21,22 +21,14 @@ export class FDescription extends TypeField<TDescription, TDescriptionFormatted>
     super(value, fieldPath);
   }
 
-  static validateRaw(
-    value: unknown,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    const base = TypeGuard.isString(value, fieldPath, 1, 1000);
-    if (!base.success) return base;
-    return OK_TRUE;
-  }
-
-  static create(
-    raw: TDescription,
-    fieldPath = "Description",
-  ): Result<FDescription, ExceptionValidation> {
-    const validation = FDescription.validateRaw(raw, fieldPath);
+  static create<T = TDescription>(raw: T, fieldPath = "Description"): Result<FDescription, ExceptionValidation> {
+    const str = TypeGuard.isString(raw, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const value = TypeField.normalize(str.value, TypeField.createLevel);
+    const instance = new FDescription(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FDescription(raw, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: TDescription, fieldPath = "Description"): FDescription {
@@ -45,11 +37,14 @@ export class FDescription extends TypeField<TDescription, TDescriptionFormatted>
     return result.value;
   }
 
-  override validate(
-    value: TDescription,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    return FDescription.validateRaw(value, fieldPath);
+  static assign<T = TDescription>(value: T, fieldPath = "Description"): Result<FDescription, ExceptionValidation> {
+    const str = TypeGuard.isString(value, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const normalized = TypeField.normalize(str.value, TypeField.assignLevel);
+    const instance = new FDescription(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   override toString(): string {

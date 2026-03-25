@@ -1,7 +1,8 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure, OK_TRUE, OK_FALSE } from "@tyforge/result";
+import { Result, ok, err, isFailure } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export type TBoolean = boolean;
 export type TBooleanFormatted = string;
@@ -18,53 +19,30 @@ export class FBoolean extends TypeField<TBoolean, TBooleanFormatted> {
     super(value, fieldPath);
   }
 
-  static validateRaw(value: unknown, fieldPath: string): Result<boolean, ExceptionValidation> {
-    if (typeof value === "boolean") {
-      return ok(value);
-    }
-    if (typeof value === "string") {
-      const lowerValue = value.toLowerCase();
-      if (lowerValue === "true" || lowerValue === "1" || lowerValue === "yes") {
-        return OK_TRUE;
-      }
-      if (lowerValue === "false" || lowerValue === "0" || lowerValue === "no") {
-        return OK_FALSE;
-      }
-    }
-    if (typeof value === "number") {
-      if (value === 1) return OK_TRUE;
-      if (value === 0) return OK_FALSE;
-    }
-    return err(
-      ExceptionValidation.create(fieldPath, "Valor deve ser um booleano válido"),
-    );
-  }
-
-  static create(
-    raw: TBoolean | number | string,
-    fieldPath = "Boolean",
-  ): Result<FBoolean, ExceptionValidation> {
-    const validation = FBoolean.validateRaw(raw, fieldPath);
+  static create<T = TBoolean>(raw: T, fieldPath = "Boolean"): Result<FBoolean, ExceptionValidation> {
+    const bool = TypeGuard.extractBoolean(raw, fieldPath);
+    if (isFailure(bool)) return err(bool.error);
+    const value = TypeField.normalize(bool.value, TypeField.createLevel);
+    const instance = new FBoolean(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FBoolean(validation.value, fieldPath));
+    return ok(instance);
   }
 
-  static createOrThrow(
-    raw: TBoolean | number | string,
-    fieldPath = "Boolean",
-  ): FBoolean {
+  static createOrThrow(raw: TBoolean, fieldPath = "Boolean"): FBoolean {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  override validate(
-    value: TBoolean,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    const coerced = FBoolean.validateRaw(value, fieldPath);
-    if (!coerced.success) return err(coerced.error);
-    return OK_TRUE;
+  static assign<T = TBoolean>(value: T, fieldPath = "Boolean"): Result<FBoolean, ExceptionValidation> {
+    const bool = TypeGuard.extractBoolean(value, fieldPath);
+    if (isFailure(bool)) return err(bool.error);
+    const normalized = TypeField.normalize(bool.value, TypeField.assignLevel);
+    const instance = new FBoolean(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   override toString(): string {

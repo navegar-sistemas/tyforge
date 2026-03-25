@@ -1,9 +1,12 @@
-import { err, ok, Result } from "@tyforge/result";
+import { err, ok, Result, OK_TRUE } from "@tyforge/result";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 import { ExceptionValidation } from "@tyforge/exceptions";
 import { ITypeFieldConfig } from "./type-field.config";
+import { tyforgeConfig } from "@tyforge/config/tyforge-config";
 
 export { TJsonSchemaType } from "./type-field.config";
+
+export type TValidationLevel = "full" | "type" | "none";
 
 // Cache de Object.values() para evitar alocação repetida
 const enumValuesCache = new WeakMap<object, unknown[]>();
@@ -37,15 +40,24 @@ function isEnumValue<E extends Record<string, string | number>>(
 }
 
 export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
-  /** Nome usado para inferência de tipo */
+  protected static readonly createLevel = tyforgeConfig.schema.validate.create;
+  protected static readonly assignLevel = tyforgeConfig.schema.validate.assign;
+
   abstract readonly typeInference: string;
-  /** Configurações de validação e serialização */
   abstract readonly config: ITypeFieldConfig<TPrimitive>;
 
   protected constructor(
     protected readonly _value: TPrimitive,
     protected readonly fieldPath: string,
   ) {}
+
+  protected static normalize<T extends string>(raw: T, validateLevel?: TValidationLevel, trim?: boolean): T;
+  protected static normalize<T>(raw: T, validateLevel?: TValidationLevel, trim?: boolean): T;
+  protected static normalize(raw: unknown, validateLevel: TValidationLevel = "full", trim = true): unknown {
+    if (validateLevel === "none") return raw;
+    if (trim && typeof raw === "string") return raw.trim();
+    return raw;
+  }
 
   /**
    * Resolve um valor de enum, validando por chave e/ou valor conforme config
@@ -68,16 +80,24 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
   }
 
   /**
-   * Valida o valor contra o schema configurado
+   * Validates the value against the configured schema.
+   * @param validateLevel Controls validation depth:
+   *   - "full": type + range/length + enum (default)
+   *   - "type": type check only (no range/length, no enum)
+   *   - "none": skip all validation
    */
   protected validate(
     value: TPrimitive,
     fieldPath: string,
+    validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const { jsonSchemaType } = this.config;
+    if (validateLevel === "none") return OK_TRUE;
 
-    // Validação de enum se configurado (com cache de Set para lookup O(1))
-    if ("validateEnum" in this.config && this.config.validateEnum) {
+    const { jsonSchemaType } = this.config;
+    const skipRange = validateLevel === "type";
+
+    // Enum validation only runs in "full" mode
+    if (!skipRange && "validateEnum" in this.config && this.config.validateEnum) {
       const enumSet = getCachedEnumSet(this.config.validateEnum);
       if (!enumSet.has(value)) {
         const enumValues = getCachedEnumValues(this.config.validateEnum);
@@ -93,21 +113,23 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
     switch (jsonSchemaType) {
       case "string": {
         const cfg = this.config;
-        return TypeGuard.isString(
+        const strResult = TypeGuard.isString(
           value,
           fieldPath,
-          "minLength" in cfg ? cfg.minLength : undefined,
-          "maxLength" in cfg ? cfg.maxLength : undefined,
+          skipRange ? 0 : ("minLength" in cfg ? cfg.minLength : undefined),
+          skipRange ? undefined : ("maxLength" in cfg ? cfg.maxLength : undefined),
         );
+        if (!strResult.success) return err(strResult.error);
+        return OK_TRUE;
       }
       case "number": {
         const cfg = this.config;
         return TypeGuard.isNumber(
           value,
           fieldPath,
-          "min" in cfg ? cfg.min : undefined,
-          "max" in cfg ? cfg.max : undefined,
-          "decimalPrecision" in cfg ? cfg.decimalPrecision : undefined,
+          skipRange ? undefined : ("min" in cfg ? cfg.min : undefined),
+          skipRange ? undefined : ("max" in cfg ? cfg.max : undefined),
+          skipRange ? undefined : ("decimalPrecision" in cfg ? cfg.decimalPrecision : undefined),
         );
       }
       case "boolean":
@@ -119,8 +141,8 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
         return TypeGuard.isArray(
           value,
           fieldPath,
-          "minItems" in cfg ? cfg.minItems ?? 0 : 0,
-          "maxItems" in cfg ? cfg.maxItems ?? Infinity : Infinity,
+          skipRange ? 0 : ("minItems" in cfg ? cfg.minItems ?? 0 : 0),
+          skipRange ? undefined : ("maxItems" in cfg ? cfg.maxItems ?? Infinity : Infinity),
         );
       }
       case "Date":

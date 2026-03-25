@@ -1,7 +1,8 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
+import { Result, ok, err, isFailure } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
+import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export const OBoolInt = {
   INVALID: 0,
@@ -28,19 +29,16 @@ export class FBoolInt extends TypeField<TBoolInt, TBoolIntFormatted> {
     super(value, fieldPath);
   }
 
-  static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
-    const resolved = FBoolInt.resolveEnum(OBoolInt, value, fieldPath);
-    if (!resolved.success) return err(resolved.error);
-    return OK_TRUE;
-  }
-
-  static create(
-    raw: TBoolInt,
-    fieldPath = "BoolInt",
-  ): Result<FBoolInt, ExceptionValidation> {
-    const validation = FBoolInt.validateRaw(raw, fieldPath);
+  static create<T = TBoolInt>(raw: T, fieldPath = "BoolInt"): Result<FBoolInt, ExceptionValidation> {
+    const num = TypeGuard.extractNumber(raw, fieldPath);
+    if (isFailure(num)) return err(num.error);
+    const enumResult = TypeField.resolveEnum(OBoolInt, num.value, fieldPath);
+    if (isFailure(enumResult)) return err(enumResult.error);
+    const value = TypeField.normalize(enumResult.value, TypeField.createLevel);
+    const instance = new FBoolInt(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FBoolInt(raw, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: TBoolInt, fieldPath = "BoolInt"): FBoolInt {
@@ -49,11 +47,16 @@ export class FBoolInt extends TypeField<TBoolInt, TBoolIntFormatted> {
     return result.value;
   }
 
-  override validate(
-    value: TBoolInt,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    return FBoolInt.validateRaw(value, fieldPath);
+  static assign<T = TBoolInt>(value: T, fieldPath = "BoolInt"): Result<FBoolInt, ExceptionValidation> {
+    const num = TypeGuard.extractNumber(value, fieldPath);
+    if (isFailure(num)) return err(num.error);
+    const enumResult = TypeField.resolveEnum(OBoolInt, num.value, fieldPath);
+    if (isFailure(enumResult)) return err(enumResult.error);
+    const normalized = TypeField.normalize(enumResult.value, TypeField.assignLevel);
+    const instance = new FBoolInt(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   override toString(): string {

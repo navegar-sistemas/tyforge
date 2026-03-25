@@ -7,20 +7,24 @@ sidebar_position: 3
 
 O sistema de tipos do TyForge infere automaticamente os tipos de entrada (JSON) e saida (Props) a partir da definicao do schema. Isso elimina a necessidade de declarar interfaces manualmente e garante que a validacao esta alinhada com os tipos do TypeScript.
 
-## ISchemaFieldConfig
+## IFieldConfig
 
 Interface que define a configuracao de um campo individual no schema:
 
 ```typescript
-interface ISchemaFieldConfig {
-  type: ValueObjectStatic<unknown, TypeField<unknown>>
-      | EntityStatic<Entity<IEntityPropsBase, unknown>>
+interface IFieldConfig {
+  type: IValueObjectStatic<unknown, TypeField<unknown>>
+      | IEntityStatic<Entity<IEntityProps, unknown>>
       | ISchema;
   required?: boolean;       // padrao: true
   isArray?: boolean;        // padrao: false
-  expose?: 'public' | 'private' | 'redacted';
+  expose?: TExposeLevel;
   label?: string;
   description?: string;
+  validate?: {
+    create?: TValidationLevel;
+    assign?: TValidationLevel;
+  };
 }
 ```
 
@@ -29,9 +33,52 @@ interface ISchemaFieldConfig {
 | `type` | TypeField, Entity ou objeto inline | O tipo do campo — define como ele sera validado |
 | `required` | `boolean` | Se o campo e obrigatorio. Padrao: `true` |
 | `isArray` | `boolean` | Se o campo aceita um array de valores. Padrao: `false` |
-| `expose` | `string` | Nivel de exposicao do campo para serializacao |
+| `expose` | `TExposeLevel` | Nivel de exposicao do campo para serializacao (veja abaixo) |
 | `label` | `string` | Rotulo legivel para o campo (ex: para documentacao de API) |
 | `description` | `string` | Descricao detalhada do campo |
+| `validate` | `object` | Sobrescrita do nivel de validacao por campo (opcoes: `create` e `assign`) |
+
+### TExposeLevel
+
+Tipo que define os niveis de exposicao de campos na serializacao:
+
+```typescript
+const OExposeLevel = { PUBLIC: "public", PRIVATE: "private", REDACTED: "redacted" } as const;
+type TExposeLevel = typeof OExposeLevel[keyof typeof OExposeLevel];
+// "public" | "private" | "redacted"
+```
+
+O `OExposeLevel` e um objeto `as const` que segue a convencao de prefixo `O` para enums do TyForge.
+
+### getVisibilityLevel
+
+Funcao utilitaria que converte um `TExposeLevel` para um valor numerico, usada internamente pelo `toJSON()` para decidir quais campos incluir:
+
+```typescript
+function getVisibilityLevel(expose: TExposeLevel | undefined): number
+```
+
+| Nivel | Valor numerico |
+|-------|---------------|
+| `"public"` | 1 |
+| `"private"` | 2 |
+| `"redacted"` | 3 |
+
+Um campo e incluido no JSON se seu `getVisibilityLevel(campo.expose)` for **menor ou igual** ao `getVisibilityLevel(exposeLevel)` solicitado no `toJSON()`. Campos que excedem o nivel solicitado sao substituidos por `"[REDACTED]"`.
+
+### Propriedade validate por campo
+
+A propriedade `validate` permite sobrescrever o nivel de validacao global para um campo especifico:
+
+```typescript
+const schema = {
+  name: { type: FString },                                      // usa nivel global
+  email: { type: FEmail, validate: { create: "full" } },        // sempre full no create
+  legacyField: { type: FString, validate: { assign: "none" } }, // sem validacao no assign
+} satisfies ISchema;
+```
+
+Os niveis possiveis sao `"full"`, `"type"` e `"none"`, conforme documentado na [configuracao global](/guia/config/configuracao-global).
 
 ## ISchema
 

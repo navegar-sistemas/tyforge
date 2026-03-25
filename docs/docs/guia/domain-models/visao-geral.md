@@ -84,6 +84,77 @@ Metodo privado que realiza o unwrap recursivo:
 5. Campos `undefined` — sao omitidos do resultado
 6. Outros valores — retornados sem modificacao
 
+## Exposicao e redacao de campos
+
+O `toJSON()` suporta controle de visibilidade por campo via a propriedade `expose` do schema. Isso permite omitir ou redactar campos sensiveis na serializacao, sem necessidade de logica manual.
+
+### Configuracao no schema
+
+Cada campo do schema aceita a propriedade `expose` com tres niveis:
+
+```typescript
+import { FString, FEmail } from "tyforge";
+import type { ISchema } from "tyforge";
+
+const userSchema = {
+  name: { type: FString, expose: "public" },
+  email: { type: FEmail, expose: "private" },
+  passwordHash: { type: FString, expose: "redacted" },
+} satisfies ISchema;
+```
+
+### Niveis de visibilidade
+
+| Nivel | Valor numerico | Descricao |
+|-------|---------------|-----------|
+| `"public"` | 1 | Visivel em todas as serializacoes |
+| `"private"` | 2 | Visivel apenas quando solicitado explicitamente |
+| `"redacted"` | 3 | Substituido por `"[REDACTED]"` na maioria dos contextos |
+
+A hierarquia segue a ordem: `public` < `private` < `redacted`. Um campo so e incluido no JSON se seu nivel de visibilidade for **menor ou igual** ao nivel solicitado.
+
+### Uso do `toJSON` com exposeLevel
+
+O metodo `toJSON` aceita um segundo parametro opcional `exposeLevel`:
+
+```typescript
+// Serializacao publica — campos private e redacted ficam como "[REDACTED]"
+const publicJson = entity.toJSON({ date: "string" }, "public");
+
+// Serializacao privada — campos redacted ficam como "[REDACTED]"
+const privateJson = entity.toJSON({ date: "string" }, "private");
+
+// Serializacao completa — todos os campos visiveis
+const fullJson = entity.toJSON({ date: "string" }, "redacted");
+```
+
+Se `exposeLevel` nao for informado, o padrao e `"public"`.
+
+### Campo `_schema`
+
+Para que a redacao funcione, o domain model deve definir o campo protegido `_schema` apontando para o schema utilizado:
+
+```typescript
+class User extends Aggregate<TUserProps, TUserJson> {
+  protected readonly _schema = userSchema;
+  // ...
+}
+```
+
+Se `_schema` nao estiver definido, o `toJSON()` inclui todos os campos sem redacao.
+
+### Funcao `getVisibilityLevel`
+
+A funcao utilitaria `getVisibilityLevel` converte um `TExposeLevel` para seu valor numerico:
+
+```typescript
+import { getVisibilityLevel } from "tyforge";
+
+getVisibilityLevel("public");   // 1
+getVisibilityLevel("private");  // 2
+getVisibilityLevel("redacted"); // 3
+```
+
 ## Proximos passos
 
 - [Entity](/guia/domain-models/entity) — identidade e comparacao por ID

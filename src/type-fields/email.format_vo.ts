@@ -1,4 +1,4 @@
-import { TypeField } from "@tyforge/type-fields/type-field.base";
+import { TypeField, TValidationLevel } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -8,7 +8,8 @@ export type TEmail = string;
 export type TEmailFormatted = string;
 
 export class FEmail extends TypeField<TEmail, TEmailFormatted> {
-  private static readonly EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // HTML5 spec email regex
+  private static readonly EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   override readonly typeInference = "FEmail";
 
   override readonly config: ITypeFieldConfig<TEmail> = {
@@ -22,23 +23,28 @@ export class FEmail extends TypeField<TEmail, TEmailFormatted> {
     super(value, fieldPath);
   }
 
-  static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
-    const base = TypeGuard.isString(value, fieldPath, 5, 200);
+  protected override validate(
+    value: TEmail,
+    fieldPath: string,
+    validateLevel: TValidationLevel = "full",
+  ): Result<true, ExceptionValidation> {
+    const base = super.validate(value, fieldPath, validateLevel);
     if (!base.success) return base;
-    if (typeof value !== "string") return base;
-    if (!FEmail.EMAIL_REGEX.test(value)) {
+    if (validateLevel !== "full") return OK_TRUE;
+    if (!FEmail.EMAIL_REGEX.test(this.getValue())) {
       return err(ExceptionValidation.create(fieldPath, "Email deve ter formato válido"));
     }
     return OK_TRUE;
   }
 
-  static create(
-    raw: TEmail,
-    fieldPath = "Email",
-  ): Result<FEmail, ExceptionValidation> {
-    const validation = FEmail.validateRaw(raw, fieldPath);
+  static create<T = TEmail>(raw: T, fieldPath = "Email"): Result<FEmail, ExceptionValidation> {
+    const str = TypeGuard.isString(raw, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const value = TypeField.normalize(str.value, TypeField.createLevel);
+    const instance = new FEmail(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FEmail(raw, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: TEmail, fieldPath = "Email"): FEmail {
@@ -47,11 +53,14 @@ export class FEmail extends TypeField<TEmail, TEmailFormatted> {
     return result.value;
   }
 
-  override validate(
-    value: TEmail,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    return FEmail.validateRaw(value, fieldPath);
+  static assign<T = TEmail>(value: T, fieldPath = "Email"): Result<FEmail, ExceptionValidation> {
+    const str = TypeGuard.isString(value, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const normalized = TypeField.normalize(str.value, TypeField.assignLevel);
+    const instance = new FEmail(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   override toString(): string {
@@ -59,7 +68,7 @@ export class FEmail extends TypeField<TEmail, TEmailFormatted> {
   }
 
   override formatted(): string {
-    return this.getValue().toLowerCase().trim();
+    return this.getValue().toLowerCase();
   }
 
   override getDescription(): string {

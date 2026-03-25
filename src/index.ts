@@ -25,19 +25,21 @@ export { ExceptionText } from "./exceptions/text.exception";
 
 // ── Schema ──────────────────────────────────────────────────────
 export { SchemaBuilder } from "./schema/schema-build";
-export type { ICompiledSchema, IBatchCreateError } from "./schema/schema-build";
+export type { ICompiledSchema, IBatchCreateError, IBatchCreateOptions } from "./schema/schema-build";
 export type {
   IFieldConfig,
   ISchema,
   SchemaEntry,
   InferProps,
   InferJson,
+  TExposeLevel,
 } from "./schema/schema-types";
+export { OExposeLevel, getVisibilityLevel } from "./schema/schema-types";
 export { composeSchema } from "./schema/schema-compose";
 
 // ── Type Fields ─────────────────────────────────────────────────
 export { TypeField } from "./type-fields/type-field.base";
-export type { TJsonSchemaType } from "./type-fields/type-field.base";
+export type { TJsonSchemaType, TValidationLevel } from "./type-fields/type-field.base";
 export type { ITypeFieldConfig } from "./type-fields/type-field.config";
 export { FId } from "./type-fields/id.format_vo";
 export type { TId, TIdFormatted } from "./type-fields/id.format_vo";

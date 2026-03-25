@@ -1,5 +1,11 @@
 import { FDate } from "@tyforge/type-fields/date.format_vo";
 import { Class } from "./class.base";
+import type { ISchema, IFieldConfig, TExposeLevel, SchemaEntry } from "@tyforge/schema/schema-types";
+import { getVisibilityLevel } from "@tyforge/schema/schema-types";
+
+function isFieldConfig(entry: SchemaEntry): entry is IFieldConfig {
+  return !Array.isArray(entry) && "type" in entry;
+}
 
 function assertType<T>(value: unknown): asserts value is T {
   if (value !== null && typeof value !== "object" && typeof value !== "string" && typeof value !== "number" && typeof value !== "boolean") {
@@ -7,10 +13,12 @@ function assertType<T>(value: unknown): asserts value is T {
   }
 }
 
-// Cache de property names por prototype para evitar recomputação em toJSON()
+// Property names cache per prototype to avoid recomputation in toJSON()
 const propertyNamesCache = new WeakMap<object, string[]>();
 
 export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
+  protected readonly _schema?: ISchema;
+
   protected constructor() {
     super();
   }
@@ -18,8 +26,8 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
   abstract equals(input: ClassDomainModels<TProps, TPropsJson>): boolean;
 
   /**
-   * Função utilitária para converter objetos com Value Objects para primitivos
-   * Reutilizada por toJSON e toPrimitives
+   * Utility function to convert objects with Value Objects to primitives.
+   * Reused by toJSON and toPrimitives.
    */
   private static deepUnwrap(
     input: unknown,
@@ -31,18 +39,18 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
     }
 
     if (input && typeof input === "object") {
-      // Guarda contra referência circular
+      // Circular reference guard
       if (visited) {
         if (visited.has(input)) return undefined;
         visited.add(input);
       }
 
-      // se for um ValueObject ou DTO com toJSON
+      // If it's a ValueObject or DTO with toJSON
       if ("toJSON" in input && typeof input.toJSON === "function") {
         return input.toJSON(config);
       }
 
-      // se for um TypeField
+      // If it's a TypeField
       if ("getValue" in input && typeof input.getValue === "function") {
         if (input instanceof FDate && config?.date === `string`) {
           return input.toString();
@@ -53,7 +61,7 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
 
       const result: Record<string, unknown> = {};
       for (const [key, value] of Object.entries(input)) {
-        // pula campos undefined
+        // Skip undefined fields
         if (value === undefined) continue;
         result[key] = ClassDomainModels.deepUnwrap(value, config, visited);
       }
@@ -64,8 +72,8 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
   }
 
   /**
-   * Converte objetos com Value Objects para tipos primitivos
-   * Reutiliza a lógica de deepUnwrap do toJSON
+   * Converts objects with Value Objects to primitive types.
+   * Reuses the deepUnwrap logic from toJSON.
    */
   static toPrimitives<TInput, TOutput>(input: TInput): TOutput {
     const result = ClassDomainModels.deepUnwrap(input, undefined, new WeakSet());
@@ -73,7 +81,7 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
     return result;
   }
 
-  public toJSON(config?: { date: `string` | `date` }): TPropsJson {
+  public toJSON(config?: { date: `string` | `date` }, exposeLevel?: TExposeLevel): TPropsJson {
     config = config || { date: `string` };
 
     const fields: Record<string, unknown> = {};
@@ -89,6 +97,8 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
       propertyNamesCache.set(proto, allPropertyNames);
     }
 
+    const requestedLevel = getVisibilityLevel(exposeLevel ?? "public");
+
     for (const propertyName of allPropertyNames) {
       if (propertyName === "constructor") continue;
       if (propertyName.startsWith("_")) continue;
@@ -96,6 +106,16 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
       const value: unknown = Reflect.get(this, propertyName);
 
       if (typeof value !== "function" && value !== undefined) {
+        if (this._schema && propertyName in this._schema) {
+          const entry = this._schema[propertyName];
+          if (isFieldConfig(entry) && entry.expose) {
+            const fieldLevel = getVisibilityLevel(entry.expose);
+            if (fieldLevel > requestedLevel) {
+              fields[propertyName] = "[REDACTED]";
+              continue;
+            }
+          }
+        }
         fields[propertyName] = value;
       }
     }

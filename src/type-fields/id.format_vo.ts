@@ -1,4 +1,4 @@
-import { TypeField } from "@tyforge/type-fields/type-field.base";
+import { TypeField, TValidationLevel } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -25,28 +25,44 @@ export class FId extends TypeField<TId, TIdFormatted> {
     super(value, fieldPath);
   }
 
-  static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
-    const base = TypeGuard.isString(value, fieldPath, 36, 36);
+  protected override validate(
+    value: TId,
+    fieldPath: string,
+    validateLevel: TValidationLevel = "full",
+  ): Result<true, ExceptionValidation> {
+    const base = super.validate(value, fieldPath, validateLevel);
     if (!base.success) return base;
-    if (typeof value !== "string") return base;
-    const trimmed = value.trim();
-    if (!UUID_REGEX.test(trimmed)) {
+    if (validateLevel !== "full") return OK_TRUE;
+    if (!UUID_REGEX.test(this.getValue())) {
       return err(ExceptionValidation.create(fieldPath, "ID deve ser um UUID válido"));
     }
     return OK_TRUE;
   }
 
-  static create(raw: TId, fieldPath = "Id"): Result<FId, ExceptionValidation> {
-    const validation = FId.validateRaw(raw, fieldPath);
+  static create<T = TId>(raw: T, fieldPath = "Id"): Result<FId, ExceptionValidation> {
+    const str = TypeGuard.isString(raw, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const value = TypeField.normalize(str.value, TypeField.createLevel);
+    const instance = new FId(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    const trimmed = raw.trim();
-    return ok(new FId(trimmed, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: TId, fieldPath = "Id"): FId {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
+  }
+
+  static assign<T = TId>(value: T, fieldPath = "Id"): Result<FId, ExceptionValidation> {
+    const str = TypeGuard.isString(value, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const normalized = TypeField.normalize(str.value, TypeField.assignLevel);
+    const instance = new FId(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   static generate(): FId {
@@ -56,13 +72,6 @@ export class FId extends TypeField<TId, TIdFormatted> {
 
   static generateId(): string {
     return uuidv7();
-  }
-
-  override validate(
-    value: TId,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    return FId.validateRaw(value, fieldPath);
   }
 
   override toString(): string {

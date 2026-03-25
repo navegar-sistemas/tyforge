@@ -1,16 +1,27 @@
 import { Result } from "@tyforge/result/result";
-import { TypeField } from "@tyforge/type-fields/type-field.base";
+import { TypeField, type TValidationLevel } from "@tyforge/type-fields/type-field.base";
 import { Entity, IEntityProps } from "@tyforge/domain-models/entity.base";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 
+export type { TValidationLevel } from "@tyforge/type-fields/type-field.base";
+
+export const OExposeLevel = { PUBLIC: "public", PRIVATE: "private", REDACTED: "redacted" } as const;
+export type TExposeLevel = typeof OExposeLevel[keyof typeof OExposeLevel];
+
+export function getVisibilityLevel(expose: TExposeLevel | undefined): number {
+  const levels: Record<TExposeLevel, number> = { public: 1, private: 2, redacted: 3 };
+  return levels[expose ?? "public"];
+}
+
 /**
- * Interface para tipos TypeField com método estático `create`
+ * Interface for TypeField types with static `create` method.
+ * The generic `<T = TPrimitive>` on create allows accepting `unknown` when called explicitly.
  */
 export interface IValueObjectStatic<
   TPrimitive,
   TInstance extends TypeField<TPrimitive>,
 > {
-  create(value: TPrimitive, fieldPath?: string): Result<TInstance, Exceptions>;
+  create<T = TPrimitive>(value: T, fieldPath?: string): Result<TInstance, Exceptions>;
 }
 
 /**
@@ -34,9 +45,13 @@ export interface IFieldConfig {
     | ISchema;
   required?: boolean;
   isArray?: boolean;
-  expose?: "public" | "private" | "redacted";
+  expose?: TExposeLevel;
   label?: string;
   description?: string;
+  validate?: {
+    create?: TValidationLevel;
+    assign?: TValidationLevel;
+  };
 }
 
 /**
@@ -62,8 +77,8 @@ export type SchemaEntry = IFieldConfig | ISchema | [IFieldConfig];
 type InferPrimitive<T> =
   T extends IValueObjectStatic<infer TP, TypeField<infer TP>>
     ? TP
-    : T extends IEntityStatic<Entity<IEntityProps, unknown>>
-      ? unknown
+    : T extends IEntityStatic<Entity<IEntityProps, infer TJson>>
+      ? TJson
       : T extends ISchema
         ? InferJson<T>
         : never;
@@ -96,8 +111,6 @@ export type InferJson<TSchema extends ISchema> = {
       ? InferJson<TSchema[K]>
       : never;
 };
-
-export type EnsureExtends<T extends U, U> = T;
 
 /**
  * EXTRAÇÃO DA INSTÂNCIA (VO ou Entity) PARA PROPS:
@@ -139,13 +152,3 @@ export type InferProps<TSchema extends ISchema> = {
       : never;
 };
 
-/** @deprecated Use InferProps */
-export type ISchemaInferProps<T extends ISchema> = InferProps<T>;
-/** @deprecated Use InferJson */
-export type ISchemaInferJson<T extends ISchema> = InferJson<T>;
-/** @deprecated Use ISchema */
-export type ISchemaInlineObject = ISchema;
-/** @deprecated Use SchemaEntry */
-export type ISchemaAllowedEntry = SchemaEntry;
-/** @deprecated Use IFieldConfig */
-export type ISchemaFieldConfig = IFieldConfig;

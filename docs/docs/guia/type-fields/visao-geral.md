@@ -34,17 +34,48 @@ abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
 
 ### Metodos estaticos (implementados por cada subclasse)
 
-Toda subclasse concreta implementa dois factory methods:
+Toda subclasse concreta implementa dois factory methods com generics:
 
 ```typescript
 // Retorna Result — caminho seguro (hot path)
-static create(value: TPrimitive, fieldPath?: string): Result<Instance, ExceptionValidation>;
+static create<T = TPrimitive>(value: T, fieldPath?: string): Result<Instance, ExceptionValidation>;
 
 // Lanca excecao se falhar — conveniencia para try/catch
 static createOrThrow(value: TPrimitive, fieldPath?: string): Instance;
 ```
 
+O generic `<T = TPrimitive>` no metodo `create` permite aceitar `unknown` quando chamado explicitamente pelo `SchemaBuilder`, mantendo type safety quando usado diretamente.
+
 O metodo `create()` retorna um `Result<T, ExceptionValidation>`, permitindo tratamento explicito de erros. O metodo `createOrThrow()` lanca a excecao diretamente, sendo util em contextos onde try/catch e preferido.
+
+### Niveis de validacao (createLevel / assignLevel)
+
+A classe base `TypeField` expoe duas propriedades estaticas protegidas que controlam a profundidade da validacao:
+
+```typescript
+protected static readonly createLevel = tyforgeConfig.schema.validate.create;
+protected static readonly assignLevel = tyforgeConfig.schema.validate.assign;
+```
+
+Esses niveis sao definidos pela [configuracao global](/guia/config/configuracao-global) (`tyforge.config.json`) e afetam como os TypeFields validam valores em cada modo:
+
+| Nivel | Descricao |
+|-------|-----------|
+| `"full"` | Validacao completa: tipo + faixa/comprimento + enum |
+| `"type"` | Apenas verificacao de tipo (sem faixa, comprimento ou enum) |
+| `"none"` | Nenhuma validacao — valor aceito sem verificacao |
+
+### Metodo normalize
+
+Antes da validacao, o valor bruto passa pelo metodo `normalize`:
+
+```typescript
+protected static normalize(raw: unknown, validateLevel?: TValidationLevel, trim?: boolean): unknown
+```
+
+O `normalize` aplica `trim()` em strings por padrao. Quando `validateLevel` e `"none"`, retorna o valor sem modificacao.
+
+TypeFields sensiveis (como `FPassword`, `FBearer`, `FSignature`) usam `trim = false` para preservar espacos significativos no valor original.
 
 ## `ITypeFieldConfig` — Configuracao de validacao
 

@@ -1,4 +1,4 @@
-import { TypeField } from "@tyforge/type-fields/type-field.base";
+import { TypeField, TValidationLevel } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -22,36 +22,46 @@ export class FApiKey extends TypeField<TApiKey, TApiKeyFormatted> {
     super(value, fieldPath);
   }
 
-  static validateRaw(
-    value: unknown,
+  protected override validate(
+    value: TApiKey,
     fieldPath: string,
+    validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const base = TypeGuard.isString(value, fieldPath, 36, 36);
+    const base = super.validate(value, fieldPath, validateLevel);
     if (!base.success) return base;
-
-    if (typeof value !== "string") return base;
-    if (!validate(value)) {
+    if (validateLevel !== "full") return OK_TRUE;
+    if (!validate(this.getValue())) {
       return err(
         ExceptionValidation.create(fieldPath, "ApiKey deve ser UUID valido"),
       );
     }
-
     return OK_TRUE;
   }
 
-  static create(
-    raw: TApiKey,
-    fieldPath = "ApiKey",
-  ): Result<FApiKey, ExceptionValidation> {
-    const validation = FApiKey.validateRaw(raw, fieldPath);
+  static create<T = TApiKey>(raw: T, fieldPath = "ApiKey"): Result<FApiKey, ExceptionValidation> {
+    const str = TypeGuard.isString(raw, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const value = TypeField.normalize(str.value, TypeField.createLevel);
+    const instance = new FApiKey(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FApiKey(raw, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: TApiKey, fieldPath = "ApiKey"): FApiKey {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
+  }
+
+  static assign<T = TApiKey>(value: T, fieldPath = "ApiKey"): Result<FApiKey, ExceptionValidation> {
+    const str = TypeGuard.isString(value, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const normalized = TypeField.normalize(str.value, TypeField.assignLevel);
+    const instance = new FApiKey(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   static generate(): FApiKey {
@@ -64,13 +74,6 @@ export class FApiKey extends TypeField<TApiKey, TApiKeyFormatted> {
 
   static isValid(value: string): boolean {
     return validate(value) && version(value) === 4;
-  }
-
-  override validate(
-    value: TApiKey,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    return FApiKey.validateRaw(value, fieldPath);
   }
 
   toSafeDisplay(): string {

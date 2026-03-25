@@ -85,17 +85,17 @@ describe("SchemaBuilder — campos simples válidos", () => {
     assert.equal(result.value.active.getValue(), false);
   });
 
-  it("FBoolean aceita coerção de string e número", () => {
+  it("FBoolean rejects non-boolean types (no coercion)", () => {
     const schema = { active: { type: FBoolean } } satisfies ISchema;
-    // FBoolean coerces "true", "1", 1, "false", "0", 0
+    // FBoolean accepts ONLY boolean -- no string/number coercion
     const r1 = createWithUntypedData(schema, { active: "true" });
     const r2 = createWithUntypedData(schema, { active: 1 });
     const r3 = createWithUntypedData(schema, { active: "false" });
     const r4 = createWithUntypedData(schema, { active: 0 });
-    assertSuccess(r1);
-    assertSuccess(r2);
-    assertSuccess(r3);
-    assertSuccess(r4);
+    assertFailure(r1);
+    assertFailure(r2);
+    assertFailure(r3);
+    assertFailure(r4);
   });
 
   it("FInt aceita zero", () => {
@@ -224,21 +224,17 @@ describe("SchemaBuilder — validação de formato", () => {
     assertFailure(result);
   });
 
-  it("FBoolean rejeita string inválida", () => {
+  it("FBoolean rejects any string (no coercion)", () => {
     const schema = { active: { type: FBoolean } } satisfies ISchema;
     const result = createWithUntypedData(schema, { active: "maybe" });
     assertFailure(result);
   });
 
-  it("FString com apenas espaços falha (minLength conta caracteres úteis)", () => {
+  it("FString with only spaces fails (normalize trims before validation)", () => {
     const schema = { name: { type: FString } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ name: "   " });
-    // FString has minLength:1, spaces count as characters, so this may pass
-    // If it passes, that's expected behavior — verify either way
-    if (isSuccess(result)) {
-      assert.equal(result.value.name.getValue(), "   ");
-    }
+    assertFailure(result);
   });
 });
 

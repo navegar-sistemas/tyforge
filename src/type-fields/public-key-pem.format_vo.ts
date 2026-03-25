@@ -1,4 +1,4 @@
-import { TypeField } from "@tyforge/type-fields/type-field.base";
+import { TypeField, TValidationLevel } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -25,21 +25,26 @@ export class FPublicKeyPem extends TypeField<TPublicKeyPem, TPublicKeyPemFormatt
     super(value, fieldPath);
   }
 
-  static validateRaw(
-    value: unknown,
+  protected override validate(
+    value: TPublicKeyPem,
     fieldPath: string,
+    validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const base = TypeGuard.isString(value, fieldPath, 100, 1000);
+    const base = super.validate(value, fieldPath, validateLevel);
     if (!base.success) return base;
+    if (validateLevel !== "full") return OK_TRUE;
 
-    if (typeof value !== "string") return base;
-    const str = value;
-    if (
-      !str.includes(FPublicKeyPem.PEM_BEGIN) ||
-      !str.includes(FPublicKeyPem.PEM_END)
-    ) {
+    const str = this.getValue();
+
+    // Validate BEGIN marker is at the start and END marker is at the end
+    if (!str.startsWith(FPublicKeyPem.PEM_BEGIN)) {
       return err(
-        ExceptionValidation.create(fieldPath, "Chave pública PEM inválida"),
+        ExceptionValidation.create(fieldPath, "Invalid PEM: BEGIN marker must be at the start"),
+      );
+    }
+    if (!str.endsWith(FPublicKeyPem.PEM_END)) {
+      return err(
+        ExceptionValidation.create(fieldPath, "Invalid PEM: END marker must be at the end"),
       );
     }
 
@@ -50,36 +55,44 @@ export class FPublicKeyPem extends TypeField<TPublicKeyPem, TPublicKeyPemFormatt
 
     if (!FPublicKeyPem.BASE64_REGEX.test(base64) || base64.length < 100) {
       return err(
-        ExceptionValidation.create(fieldPath, "Chave pública PEM inválida"),
+        ExceptionValidation.create(fieldPath, "Invalid PEM: base64 content is malformed"),
+      );
+    }
+
+    // Validate base64 padding -- length must be a multiple of 4
+    if (base64.length % 4 !== 0) {
+      return err(
+        ExceptionValidation.create(fieldPath, "Invalid PEM: base64 padding is incorrect"),
       );
     }
 
     return OK_TRUE;
   }
 
-  static create(
-    raw: TPublicKeyPem,
-    fieldPath = "PublicKeyPem",
-  ): Result<FPublicKeyPem, ExceptionValidation> {
-    const validation = FPublicKeyPem.validateRaw(raw, fieldPath);
+  static create<T = TPublicKeyPem>(raw: T, fieldPath = "PublicKeyPem"): Result<FPublicKeyPem, ExceptionValidation> {
+    const str = TypeGuard.isString(raw, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const value = TypeField.normalize(str.value, TypeField.createLevel, false);
+    const instance = new FPublicKeyPem(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FPublicKeyPem(raw, fieldPath));
+    return ok(instance);
   }
 
-  static createOrThrow(
-    raw: TPublicKeyPem,
-    fieldPath = "PublicKeyPem",
-  ): FPublicKeyPem {
+  static createOrThrow(raw: TPublicKeyPem, fieldPath = "PublicKeyPem"): FPublicKeyPem {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  override validate(
-    value: TPublicKeyPem,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    return FPublicKeyPem.validateRaw(value, fieldPath);
+  static assign<T = TPublicKeyPem>(value: T, fieldPath = "PublicKeyPem"): Result<FPublicKeyPem, ExceptionValidation> {
+    const str = TypeGuard.isString(value, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const normalized = TypeField.normalize(str.value, TypeField.assignLevel, false);
+    const instance = new FPublicKeyPem(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   override toString(): string {
@@ -87,10 +100,7 @@ export class FPublicKeyPem extends TypeField<TPublicKeyPem, TPublicKeyPemFormatt
   }
 
   override formatted(): string {
-    const formatPublicKeyPem: (value: TPublicKeyPem) => TPublicKeyPem = (
-      value,
-    ) => value.trim();
-    return formatPublicKeyPem(this.getValue());
+    return this.getValue();
   }
 
   override getDescription(): string {

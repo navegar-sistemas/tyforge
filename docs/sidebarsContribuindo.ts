@@ -20,5 +20,10 @@ export default {
       id: "docker",
       label: "Docker",
     },
+    {
+      type: "doc",
+      id: "lint",
+      label: "Linter",
+    },
   ],
 };

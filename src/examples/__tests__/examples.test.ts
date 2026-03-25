@@ -57,16 +57,13 @@ describe("01 — TypeFields básicos", () => {
     assert.equal(result.value.getValue(), 28);
   });
 
-  it("FBoolean aceita coerção", () => {
-    const fromBool = FBoolean.create(true);
-    const fromString = FBoolean.create("true");
-    const fromNumber = FBoolean.create(1);
-    assertSuccess(fromBool);
-    assertSuccess(fromString);
-    assertSuccess(fromNumber);
-    assert.equal(fromBool.value.getValue(), true);
-    assert.equal(fromString.value.getValue(), true);
-    assert.equal(fromNumber.value.getValue(), true);
+  it("FBoolean accepts only boolean (no coercion)", () => {
+    const fromTrue = FBoolean.create(true);
+    const fromFalse = FBoolean.create(false);
+    assertSuccess(fromTrue);
+    assertSuccess(fromFalse);
+    assert.equal(fromTrue.value.getValue(), true);
+    assert.equal(fromFalse.value.getValue(), false);
   });
 
   it("FId.generate cria UUID válido", () => {
@@ -100,8 +97,8 @@ describe("02 — TypeField Enum", () => {
     assert.equal(result.value.isActive(), true);
   });
 
-  it("FAppStatus.validateRaw rejeita valor inválido", () => {
-    const result = FAppStatus.validateRaw("deleted", "status");
+  it("FAppStatus.create<unknown> rejects invalid value", () => {
+    const result = FAppStatus.create<unknown>("deleted", "status");
     assertFailure(result);
   });
 

@@ -1,4 +1,4 @@
-import { TypeField } from "@tyforge/type-fields/type-field.base";
+import { TypeField, TValidationLevel } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -22,9 +22,14 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
     super(value, fieldPath);
   }
 
-  static validateRaw(value: unknown, fieldPath: string): Result<true, ExceptionValidation> {
-    const base = TypeGuard.isNumber(value, fieldPath, -2147483648, 2147483647, 0);
+  protected override validate(
+    value: TInt,
+    fieldPath: string,
+    validateLevel: TValidationLevel = "full",
+  ): Result<true, ExceptionValidation> {
+    const base = super.validate(value, fieldPath, validateLevel);
     if (!base.success) return base;
+    if (validateLevel !== "full") return OK_TRUE;
     if (!Number.isInteger(value)) {
       return err(
         ExceptionValidation.create(fieldPath, "Valor deve ser um número inteiro"),
@@ -33,13 +38,14 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
     return OK_TRUE;
   }
 
-  static create(
-    raw: TInt,
-    fieldPath = "Int",
-  ): Result<FInt, ExceptionValidation> {
-    const validation = FInt.validateRaw(raw, fieldPath);
+  static create<T = TInt>(raw: T, fieldPath = "Int"): Result<FInt, ExceptionValidation> {
+    const num = TypeGuard.extractNumber(raw, fieldPath);
+    if (isFailure(num)) return err(num.error);
+    const value = TypeField.normalize(num.value, TypeField.createLevel);
+    const instance = new FInt(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FInt(raw, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: TInt, fieldPath = "Int"): FInt {
@@ -48,11 +54,14 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
     return result.value;
   }
 
-  override validate(
-    value: TInt,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    return FInt.validateRaw(value, fieldPath);
+  static assign<T = TInt>(value: T, fieldPath = "Int"): Result<FInt, ExceptionValidation> {
+    const num = TypeGuard.extractNumber(value, fieldPath);
+    if (isFailure(num)) return err(num.error);
+    const normalized = TypeField.normalize(num.value, TypeField.assignLevel);
+    const instance = new FInt(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   override toString(): string {

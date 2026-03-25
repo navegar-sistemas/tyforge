@@ -38,7 +38,7 @@ export class ToolParseDateISO8601 {
     }
 
     // Regex opcional (se quiser reforçar o padrão)
-    const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
+    const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/;
     if (!regex.test(value)) {
       return err(this.createError());
     }

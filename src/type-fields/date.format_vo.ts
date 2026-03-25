@@ -8,7 +8,7 @@ import {
 } from "@tyforge/result/result";
 import { ToolFormattingDateISO8601 } from "@tyforge/tools/formatting/date/date-formatting.tool";
 import { ToolParse } from "@tyforge/tools/parse/parse.tool";
-import { TypeField } from "./type-field.base";
+import { TypeField, TValidationLevel } from "./type-field.base";
 import { ITypeFieldConfig } from "./type-field.config";
 
 export type TDate = Date;
@@ -16,10 +16,10 @@ export type TDateFormatted = string;
 export type TfDate = TDateFormatted;
 
 /**
- * Base abstrata para formatos de Date.
+ * Abstract base for Date formats.
  */
 export abstract class FDate extends TypeField<TDate, TDateFormatted> {
-  /** JSON schema tipo Date */
+  /** JSON schema type: Date */
   static readonly config: ITypeFieldConfig<TDate> = { jsonSchemaType: "Date" };
   override get config(): ITypeFieldConfig<TDate> {
     return FDate.config;
@@ -29,7 +29,7 @@ export abstract class FDate extends TypeField<TDate, TDateFormatted> {
     super(value, fieldPath);
   }
 
-  /** Deve ser implementado pelas subclasses usando ToolFormattingDateISO8601 */
+  /** Must be implemented by subclasses using ToolFormattingDateISO8601 */
   protected abstract formatValue(date: Date): string;
 
   override toString(): string {
@@ -47,7 +47,7 @@ export abstract class FDate extends TypeField<TDate, TDateFormatted> {
 }
 
 // ============================================================================
-// ISO8601 Zulu com milissegundos: YYYY-MM-DDTHH:mm:ss.sssZ
+// ISO8601 Zulu with milliseconds: YYYY-MM-DDTHH:mm:ss.sssZ
 // ============================================================================
 const DATE_CONFIG_SERIALIZE: ITypeFieldConfig<TDate> = {
   jsonSchemaType: "Date",
@@ -65,11 +65,20 @@ export class FDateTimeISOZMillis extends FDate {
     super(value, fieldPath);
   }
 
+  private static parse(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
+    const parsed = ToolParse.dateISO8601.parseDateTimeZuluWithMillis(value);
+    if (isFailure(parsed)) return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
+    return ok(parsed.value);
+  }
+
   protected override validate(
     value: TDate,
     fieldPath: string,
+    validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const result = FDateTimeISOZMillis.validateRaw(value, fieldPath);
+    if (validateLevel === "none") return OK_TRUE;
+    if (validateLevel === "type") return super.validate(value, fieldPath, validateLevel);
+    const result = FDateTimeISOZMillis.parse(value, fieldPath);
     if (!result.success) return err(result.error);
     return OK_TRUE;
   }
@@ -77,27 +86,31 @@ export class FDateTimeISOZMillis extends FDate {
   protected formatValue = (date: Date): string =>
     ToolFormattingDateISO8601.formatDateTimeZuluWithMillis(date);
 
-  static validateRaw(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
-    const parsed = ToolParse.dateISO8601.parseDateTimeZuluWithMillis(value);
-    if (isFailure(parsed)) {
-      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
-    }
-    return ok(parsed.value);
-  }
-
-  static create(
-    raw: string | Date,
+  static create<T = string | Date>(
+    raw: T,
     fieldPath = "FDateTimeISOZMillis",
   ): Result<FDateTimeISOZMillis, ExceptionValidation> {
-    const validation = FDateTimeISOZMillis.validateRaw(raw, fieldPath);
+    const parsed = FDateTimeISOZMillis.parse(raw, fieldPath);
+    if (!parsed.success) return err(parsed.error);
+    const instance = new FDateTimeISOZMillis(parsed.value, fieldPath);
+    const validation = instance.validate(parsed.value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FDateTimeISOZMillis(validation.value, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(date: Date, fieldPath = "FDateTimeISOZMillis"): FDateTimeISOZMillis {
     const result = this.create(date, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
+  }
+
+  static assign<T = TDate>(value: T, fieldPath = "FDateTimeISOZMillis"): Result<FDateTimeISOZMillis, ExceptionValidation> {
+    const parsed = FDateTimeISOZMillis.parse(value, fieldPath);
+    if (!parsed.success) return err(parsed.error);
+    const instance = new FDateTimeISOZMillis(parsed.value, fieldPath);
+    const validation = instance.validate(parsed.value, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   static generateToString(date: Date = new Date()): string {
@@ -112,7 +125,7 @@ export class FDateTimeISOZMillis extends FDate {
 }
 
 // ============================================================================
-// ISO8601 data (sem hora): YYYY-MM-DD
+// ISO8601 date (no time): YYYY-MM-DD
 // ============================================================================
 export class FDateISODate extends FDate {
   override readonly typeInference = "FDateISODate";
@@ -125,11 +138,20 @@ export class FDateISODate extends FDate {
     super(value, fieldPath);
   }
 
+  private static parse(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
+    const parsed = ToolParse.dateISO8601.parseDate(value);
+    if (isFailure(parsed)) return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
+    return ok(parsed.value);
+  }
+
   protected override validate(
     value: TDate,
     fieldPath: string,
+    validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const result = FDateISODate.validateRaw(value, fieldPath);
+    if (validateLevel === "none") return OK_TRUE;
+    if (validateLevel === "type") return super.validate(value, fieldPath, validateLevel);
+    const result = FDateISODate.parse(value, fieldPath);
     if (!result.success) return err(result.error);
     return OK_TRUE;
   }
@@ -140,21 +162,16 @@ export class FDateISODate extends FDate {
     return result.value;
   };
 
-  static validateRaw(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
-    const parsed = ToolParse.dateISO8601.parseDate(value);
-    if (isFailure(parsed)) {
-      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
-    }
-    return ok(parsed.value);
-  }
-
-  static create(
-    raw: string | Date,
+  static create<T = string | Date>(
+    raw: T,
     fieldPath = "FDateISODate",
   ): Result<FDateISODate, ExceptionValidation> {
-    const validation = FDateISODate.validateRaw(raw, fieldPath);
+    const parsed = FDateISODate.parse(raw, fieldPath);
+    if (!parsed.success) return err(parsed.error);
+    const instance = new FDateISODate(parsed.value, fieldPath);
+    const validation = instance.validate(parsed.value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FDateISODate(validation.value, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: string | Date, fieldPath = "FDateISODate"): FDateISODate {
@@ -162,10 +179,19 @@ export class FDateISODate extends FDate {
     if (isFailure(result)) throw result.error;
     return result.value;
   }
+
+  static assign<T = TDate>(value: T, fieldPath = "FDateISODate"): Result<FDateISODate, ExceptionValidation> {
+    const parsed = FDateISODate.parse(value, fieldPath);
+    if (!parsed.success) return err(parsed.error);
+    const instance = new FDateISODate(parsed.value, fieldPath);
+    const validation = instance.validate(parsed.value, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
+  }
 }
 
 // ============================================================================
-// ISO8601 sem milissegundos (UTC): YYYY-MM-DDTHH:mm:ssZ
+// ISO8601 without milliseconds (UTC): YYYY-MM-DDTHH:mm:ssZ
 // ============================================================================
 export class FDateTimeISOZ extends FDate {
   override readonly typeInference = "FDateTimeISOZ";
@@ -178,11 +204,20 @@ export class FDateTimeISOZ extends FDate {
     super(value, fieldPath);
   }
 
+  private static parse(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
+    const parsed = ToolParse.dateISO8601.parseDateTimeUTC(value);
+    if (isFailure(parsed)) return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
+    return ok(parsed.value);
+  }
+
   protected override validate(
     value: TDate,
     fieldPath: string,
+    validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const result = FDateTimeISOZ.validateRaw(value, fieldPath);
+    if (validateLevel === "none") return OK_TRUE;
+    if (validateLevel === "type") return super.validate(value, fieldPath, validateLevel);
+    const result = FDateTimeISOZ.parse(value, fieldPath);
     if (!result.success) return err(result.error);
     return OK_TRUE;
   }
@@ -190,21 +225,16 @@ export class FDateTimeISOZ extends FDate {
   protected formatValue = (date: Date): string =>
     ToolFormattingDateISO8601.formatDateTimeUTC(date);
 
-  static validateRaw(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
-    const parsed = ToolParse.dateISO8601.parseDateTimeUTC(value);
-    if (isFailure(parsed)) {
-      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
-    }
-    return ok(parsed.value);
-  }
-
-  static create(
-    raw: string | Date,
+  static create<T = string | Date>(
+    raw: T,
     fieldPath = "FDateTimeISOZ",
   ): Result<FDateTimeISOZ, ExceptionValidation> {
-    const validation = FDateTimeISOZ.validateRaw(raw, fieldPath);
+    const parsed = FDateTimeISOZ.parse(raw, fieldPath);
+    if (!parsed.success) return err(parsed.error);
+    const instance = new FDateTimeISOZ(parsed.value, fieldPath);
+    const validation = instance.validate(parsed.value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FDateTimeISOZ(validation.value, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: string | Date, fieldPath = "FDateTimeISOZ"): FDateTimeISOZ {
@@ -213,13 +243,22 @@ export class FDateTimeISOZ extends FDate {
     return result.value;
   }
 
+  static assign<T = TDate>(value: T, fieldPath = "FDateTimeISOZ"): Result<FDateTimeISOZ, ExceptionValidation> {
+    const parsed = FDateTimeISOZ.parse(value, fieldPath);
+    if (!parsed.success) return err(parsed.error);
+    const instance = new FDateTimeISOZ(parsed.value, fieldPath);
+    const validation = instance.validate(parsed.value, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
+  }
+
   static generateDateString(date: Date = new Date()): string {
     return date.toISOString().replace(/\.\d{3}Z$/, "Z");
   }
 }
 
 // ============================================================================
-// ISO8601 compacto (YYYYMMDD)
+// ISO8601 compact (YYYYMMDD)
 // ============================================================================
 export class FDateISOCompact extends FDate {
   override readonly typeInference = "FDateISOCompact";
@@ -232,11 +271,20 @@ export class FDateISOCompact extends FDate {
     super(value, fieldPath);
   }
 
+  private static parse(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
+    const parsed = ToolParse.dateISO8601.parseDateCompact(value);
+    if (isFailure(parsed)) return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
+    return ok(parsed.value);
+  }
+
   protected override validate(
     value: TDate,
     fieldPath: string,
+    validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const result = FDateISOCompact.validateRaw(value, fieldPath);
+    if (validateLevel === "none") return OK_TRUE;
+    if (validateLevel === "type") return super.validate(value, fieldPath, validateLevel);
+    const result = FDateISOCompact.parse(value, fieldPath);
     if (!result.success) return err(result.error);
     return OK_TRUE;
   }
@@ -244,21 +292,16 @@ export class FDateISOCompact extends FDate {
   protected formatValue = (date: Date): string =>
     ToolFormattingDateISO8601.formatDateCompact(date);
 
-  static validateRaw(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
-    const parsed = ToolParse.dateISO8601.parseDateCompact(value);
-    if (isFailure(parsed)) {
-      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
-    }
-    return ok(parsed.value);
-  }
-
-  static create(
-    raw: string | Date,
+  static create<T = string | Date>(
+    raw: T,
     fieldPath = "FDateISOCompact",
   ): Result<FDateISOCompact, ExceptionValidation> {
-    const validation = FDateISOCompact.validateRaw(raw, fieldPath);
+    const parsed = FDateISOCompact.parse(raw, fieldPath);
+    if (!parsed.success) return err(parsed.error);
+    const instance = new FDateISOCompact(parsed.value, fieldPath);
+    const validation = instance.validate(parsed.value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FDateISOCompact(validation.value, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: string | Date, fieldPath = "FDateISOCompact"): FDateISOCompact {
@@ -266,10 +309,19 @@ export class FDateISOCompact extends FDate {
     if (isFailure(result)) throw result.error;
     return result.value;
   }
+
+  static assign<T = TDate>(value: T, fieldPath = "FDateISOCompact"): Result<FDateISOCompact, ExceptionValidation> {
+    const parsed = FDateISOCompact.parse(value, fieldPath);
+    if (!parsed.success) return err(parsed.error);
+    const instance = new FDateISOCompact(parsed.value, fieldPath);
+    const validation = instance.validate(parsed.value, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
+  }
 }
 
 // ============================================================================
-// ISO8601 compacto com T (YYYYMMDDTHH:mm:ss)
+// ISO8601 compact with T (YYYYMMDDTHH:mm:ss)
 // ============================================================================
 export class FDateTimeISOCompact extends FDate {
   override readonly typeInference = "FDateTimeISOCompact";
@@ -282,11 +334,20 @@ export class FDateTimeISOCompact extends FDate {
     super(value, fieldPath);
   }
 
+  private static parse(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
+    const parsed = ToolParse.dateISO8601.parseDateTimeCompactWithT(value);
+    if (isFailure(parsed)) return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
+    return ok(parsed.value);
+  }
+
   protected override validate(
     value: TDate,
     fieldPath: string,
+    validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const result = FDateTimeISOCompact.validateRaw(value, fieldPath);
+    if (validateLevel === "none") return OK_TRUE;
+    if (validateLevel === "type") return super.validate(value, fieldPath, validateLevel);
+    const result = FDateTimeISOCompact.parse(value, fieldPath);
     if (!result.success) return err(result.error);
     return OK_TRUE;
   }
@@ -294,21 +355,16 @@ export class FDateTimeISOCompact extends FDate {
   protected formatValue = (date: Date): string =>
     ToolFormattingDateISO8601.formatDateTimeCompactWithT(date);
 
-  static validateRaw(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
-    const parsed = ToolParse.dateISO8601.parseDateTimeCompactWithT(value);
-    if (isFailure(parsed)) {
-      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
-    }
-    return ok(parsed.value);
-  }
-
-  static create(
-    raw: string | Date,
+  static create<T = string | Date>(
+    raw: T,
     fieldPath = "FDateTimeISOCompact",
   ): Result<FDateTimeISOCompact, ExceptionValidation> {
-    const validation = FDateTimeISOCompact.validateRaw(raw, fieldPath);
+    const parsed = FDateTimeISOCompact.parse(raw, fieldPath);
+    if (!parsed.success) return err(parsed.error);
+    const instance = new FDateTimeISOCompact(parsed.value, fieldPath);
+    const validation = instance.validate(parsed.value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FDateTimeISOCompact(validation.value, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: string | Date, fieldPath = "FDateTimeISOCompact"): FDateTimeISOCompact {
@@ -316,10 +372,19 @@ export class FDateTimeISOCompact extends FDate {
     if (isFailure(result)) throw result.error;
     return result.value;
   }
+
+  static assign<T = TDate>(value: T, fieldPath = "FDateTimeISOCompact"): Result<FDateTimeISOCompact, ExceptionValidation> {
+    const parsed = FDateTimeISOCompact.parse(value, fieldPath);
+    if (!parsed.success) return err(parsed.error);
+    const instance = new FDateTimeISOCompact(parsed.value, fieldPath);
+    const validation = instance.validate(parsed.value, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
+  }
 }
 
 // ============================================================================
-// ISO8601 full compacto (YYYYMMDDHHmmss)
+// ISO8601 full compact (YYYYMMDDHHmmss)
 // ============================================================================
 export class FDateTimeISOFullCompact extends FDate {
   override readonly typeInference = "FDateTimeISOFullCompact";
@@ -332,11 +397,20 @@ export class FDateTimeISOFullCompact extends FDate {
     super(value, fieldPath);
   }
 
+  private static parse(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
+    const parsed = ToolParse.dateISO8601.parseDateTimeFullCompact(value);
+    if (isFailure(parsed)) return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
+    return ok(parsed.value);
+  }
+
   protected override validate(
     value: TDate,
     fieldPath: string,
+    validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const result = FDateTimeISOFullCompact.validateRaw(value, fieldPath);
+    if (validateLevel === "none") return OK_TRUE;
+    if (validateLevel === "type") return super.validate(value, fieldPath, validateLevel);
+    const result = FDateTimeISOFullCompact.parse(value, fieldPath);
     if (!result.success) return err(result.error);
     return OK_TRUE;
   }
@@ -344,26 +418,30 @@ export class FDateTimeISOFullCompact extends FDate {
   protected formatValue = (date: Date): string =>
     ToolFormattingDateISO8601.formatDateTimeCompact(date);
 
-  static validateRaw(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
-    const parsed = ToolParse.dateISO8601.parseDateTimeFullCompact(value);
-    if (isFailure(parsed)) {
-      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
-    }
-    return ok(parsed.value);
-  }
-
-  static create(
-    raw: string | Date,
+  static create<T = string | Date>(
+    raw: T,
     fieldPath = "FDateTimeISOFullCompact",
   ): Result<FDateTimeISOFullCompact, ExceptionValidation> {
-    const validation = FDateTimeISOFullCompact.validateRaw(raw, fieldPath);
+    const parsed = FDateTimeISOFullCompact.parse(raw, fieldPath);
+    if (!parsed.success) return err(parsed.error);
+    const instance = new FDateTimeISOFullCompact(parsed.value, fieldPath);
+    const validation = instance.validate(parsed.value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FDateTimeISOFullCompact(validation.value, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: string | Date, fieldPath = "FDateTimeISOFullCompact"): FDateTimeISOFullCompact {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
+  }
+
+  static assign<T = TDate>(value: T, fieldPath = "FDateTimeISOFullCompact"): Result<FDateTimeISOFullCompact, ExceptionValidation> {
+    const parsed = FDateTimeISOFullCompact.parse(value, fieldPath);
+    if (!parsed.success) return err(parsed.error);
+    const instance = new FDateTimeISOFullCompact(parsed.value, fieldPath);
+    const validation = instance.validate(parsed.value, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 }

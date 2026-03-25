@@ -10,20 +10,20 @@ if (isSuccess(status)) {
   console.log("toJSON:", status.value.toJSON());           // "active"
 }
 
-// Valor invalido — validateRaw aceita unknown
-const invalidValue = FAppStatus.validateRaw("deleted", "status");
+// Invalid value — create<unknown> accepts unknown
+const invalidValue = FAppStatus.create<unknown>("deleted", "status");
 if (isFailure(invalidValue)) {
   console.log("Erro enum:", invalidValue.error.detail);
 }
 
 // FHttpStatus
-const httpOk = FHttpStatus.create(200);
+const httpOk = FHttpStatus.create(OHttpStatus.OK);
 if (isSuccess(httpOk)) {
-  console.log("FHttpStatus:", httpOk.value.getValue()); // 200
+  console.log("FHttpStatus:", httpOk.value.getValue());
 }
 
 // Acessar valores do OHttpStatus (const object exportado)
-console.log("OHttpStatus.OK:", OHttpStatus.OK);               // 200
-console.log("OHttpStatus.NOT_FOUND:", OHttpStatus.NOT_FOUND);  // 404
+console.log("OHttpStatus.OK:", OHttpStatus.OK);
+console.log("OHttpStatus.NOT_FOUND:", OHttpStatus.NOT_FOUND);
 
 console.log("\nExemplo 02 concluido");

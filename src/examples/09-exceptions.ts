@@ -9,20 +9,20 @@ console.log("=== Exceptions (RFC 7807) ===\n");
 // ExceptionValidation
 const validation = ExceptionValidation.create("email", "Email inválido");
 console.log("Validation:", validation.toJSON());
-// { type, title, detail, status: 400, code, field: "email", retriable }
+// { type, title, detail, status, code, field: "email", retriable }
 
 // ExceptionBusiness — factory methods
 const duplicate = ExceptionBusiness.duplicateEntry("email");
 console.log("\nBusiness (duplicate):", duplicate.toJSON());
 
 const notAllowed = ExceptionBusiness.operationNotAllowed();
-console.log("Business (not allowed):", notAllowed.status); // 403
+console.log("Business (not allowed):", notAllowed.status);
 
 const invalidRule = ExceptionBusiness.invalidBusinessRule("saldo insuficiente");
 console.log("Business (rule):", invalidRule.detail);
 
 const notFound = ExceptionBusiness.notFound("Usuário");
-console.log("Business (not found):", notFound.status); // 404
+console.log("Business (not found):", notFound.status);
 
 // ExceptionNotFound
 console.log("\nExceptionNotFound disponível:", ExceptionNotFound.name);
@@ -33,7 +33,7 @@ console.log("ExceptionAuth disponível:", ExceptionAuth.name);
 // ExceptionOptimisticLock
 const lock = ExceptionOptimisticLock.create("Order", "123");
 console.log("\nOptimisticLock:", lock.toJSON());
-console.log("Status:", lock.status); // 409
+console.log("Status:", lock.status);
 
 // Todas herdam de Exceptions
 console.log("\nHerança:");

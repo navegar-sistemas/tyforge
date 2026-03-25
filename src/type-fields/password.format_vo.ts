@@ -1,4 +1,4 @@
-import { TypeField } from "@tyforge/type-fields/type-field.base";
+import { TypeField, TValidationLevel } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -27,21 +27,21 @@ export class FPassword extends TypeField<TPassword, TPasswordFormatted> {
     super(value, fieldPath);
   }
 
-  static validateRaw(
-    value: unknown,
+  protected override validate(
+    value: TPassword,
     fieldPath: string,
+    validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const base = TypeGuard.isString(value, fieldPath, 8, 128);
+    const base = super.validate(value, fieldPath, validateLevel);
     if (!base.success) return base;
-
-    if (typeof value !== "string") return base;
-    const str = value;
+    if (validateLevel !== "full") return OK_TRUE;
+    const v = this.getValue();
     if (
-      str.length < 8 ||
-      !FPassword.UPPERCASE_REGEX.test(str) ||
-      !FPassword.LOWERCASE_REGEX.test(str) ||
-      !FPassword.DIGIT_REGEX.test(str) ||
-      !FPassword.SPECIAL_REGEX.test(str)
+      v.length < 8 ||
+      !FPassword.UPPERCASE_REGEX.test(v) ||
+      !FPassword.LOWERCASE_REGEX.test(v) ||
+      !FPassword.DIGIT_REGEX.test(v) ||
+      !FPassword.SPECIAL_REGEX.test(v)
     ) {
       return err(
         ExceptionValidation.create(
@@ -50,17 +50,17 @@ export class FPassword extends TypeField<TPassword, TPasswordFormatted> {
         ),
       );
     }
-
     return OK_TRUE;
   }
 
-  static create(
-    raw: TPassword,
-    fieldPath = "Password",
-  ): Result<FPassword, ExceptionValidation> {
-    const validation = FPassword.validateRaw(raw, fieldPath);
+  static create<T = TPassword>(raw: T, fieldPath = "Password"): Result<FPassword, ExceptionValidation> {
+    const str = TypeGuard.isString(raw, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const value = TypeField.normalize(str.value, TypeField.createLevel, false);
+    const instance = new FPassword(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FPassword(raw, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: TPassword, fieldPath = "Password"): FPassword {
@@ -69,11 +69,14 @@ export class FPassword extends TypeField<TPassword, TPasswordFormatted> {
     return result.value;
   }
 
-  override validate(
-    value: TPassword,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    return FPassword.validateRaw(value, fieldPath);
+  static assign<T = TPassword>(value: T, fieldPath = "Password"): Result<FPassword, ExceptionValidation> {
+    const str = TypeGuard.isString(value, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const normalized = TypeField.normalize(str.value, TypeField.assignLevel, false);
+    const instance = new FPassword(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   override toString(): string {

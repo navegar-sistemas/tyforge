@@ -2,17 +2,17 @@ import { UseCase, isSuccess, isFailure, Exceptions } from "@tyforge/index";
 import { DtoCreateUser } from "./11-dto";
 import { User } from "./12-aggregates";
 
-console.log("=== UseCase (orquestração) ===\n");
+console.log("=== UseCase (orchestration) ===\n");
 
 // ═══════════════════════════════════════════════════════════════════
-// USE CASE — recebe DTO já validado, retorna domain model
+// USE CASE — receives already-validated DTO, returns domain model
 // ═══════════════════════════════════════════════════════════════════
 
 class RegisterUser extends UseCase<DtoCreateUser, User> {
   protected readonly _classInfo = { name: "RegisterUser", version: "1.0.0", description: "Registra um novo usuário" };
 
   async execute(dto: DtoCreateUser): Promise<User> {
-    // 1. Aggregate recebe TypeFields do DTO → aplica regras de negócio
+    // 1. Aggregate receives TypeFields from DTO -> applies business rules
     const userResult = User.create({
       name: dto.body.name,
       email: dto.body.email,
@@ -22,7 +22,7 @@ class RegisterUser extends UseCase<DtoCreateUser, User> {
 
     const user = userResult.value;
 
-    // 2. Persistir e despachar eventos
+    // 2. Persist and dispatch events
     console.log("  [repo] Salvando:", user.toJSON().id);
     for (const event of user.getDomainEvents()) {
       console.log("  [event]", event.eventName, event.payload);
@@ -34,13 +34,13 @@ class RegisterUser extends UseCase<DtoCreateUser, User> {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// EXECUTAR (simula controller)
+// EXECUTE (simulates controller)
 // ═══════════════════════════════════════════════════════════════════
 
 async function main() {
   const useCase = new RegisterUser();
 
-  // Sucesso — controller cria DTO, UseCase recebe já validado
+  // Success — controller creates DTO, UseCase receives already validated
   const dtoResult = DtoCreateUser.create({ name: "Maria Silva", email: "maria@test.com", age: 28 });
   if (isSuccess(dtoResult)) {
     try {
@@ -51,13 +51,13 @@ async function main() {
     }
   }
 
-  // Erro no DTO — controller trata antes de chamar UseCase
+  // DTO error — controller handles before calling UseCase
   const badDto = DtoCreateUser.create({ name: "Bad", email: "invalid", age: 25 });
   if (isFailure(badDto)) {
     console.log("\nErro na validação (controller):", badDto.error.detail);
   }
 
-  // Erro no Aggregate — regra de negócio (UseCase propaga)
+  // Aggregate error — business rule (UseCase propagates)
   const minorDto = DtoCreateUser.create({ name: "Menor", email: "menor@test.com", age: 15 });
   if (isSuccess(minorDto)) {
     try {

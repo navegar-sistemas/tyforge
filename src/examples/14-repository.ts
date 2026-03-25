@@ -7,10 +7,10 @@ import type { IRepositoryBase, ResultPromise, IPaginationParams } from "@tyforge
 import { User } from "./12-aggregates";
 import type { TUserJson } from "./12-aggregates";
 
-console.log("=== Repository + Paginação ===\n");
+console.log("=== Repository + Pagination ===\n");
 
 // ═══════════════════════════════════════════════════════════════════
-// REPOSITORY — implementação de IRepositoryBase<T>
+// REPOSITORY — IRepositoryBase<T> implementation
 // ═══════════════════════════════════════════════════════════════════
 
 class RepositoryUser implements IRepositoryBase<User> {
@@ -108,13 +108,13 @@ class RepositoryUser implements IRepositoryBase<User> {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// USO — operações diretas do repositório
+// USAGE — direct repository operations
 // ═══════════════════════════════════════════════════════════════════
 
 async function main() {
   const repo = new RepositoryUser();
 
-  // 1. Salvar aggregates diretamente
+  // 1. Save aggregates directly
   const names = ["Maria", "João", "Ana", "Pedro", "Carla"];
   for (const name of names) {
     const userResult = User.create({
@@ -127,15 +127,15 @@ async function main() {
       await repo.create(userResult.value);
     }
   }
-  console.log("5 usuários criados\n");
+  console.log("5 users created\n");
 
-  // 2. findAll sem paginação — retorna todos
+  // 2. findAll without pagination — returns all
   const all = await repo.findAll();
   if (isSuccess(all)) {
     console.log("findAll():", all.value.items.length, "itens, total:", all.value.total);
   }
 
-  // 3. findAll com paginação — página 1 (2 por página)
+  // 3. findAll with pagination — page 1 (2 per page)
   const page1 = await repo.findAll({ page: 1, pageSize: 2 });
   if (isSuccess(page1)) {
     console.log("\nPágina 1:");
@@ -146,7 +146,7 @@ async function main() {
     console.log("  totalPages:", page1.value.totalPages);
   }
 
-  // 4. findAll com paginação — página 3 (última, 1 item)
+  // 4. findAll with pagination — page 3 (last, 1 item)
   const page3 = await repo.findAll({ page: 3, pageSize: 2 });
   if (isSuccess(page3)) {
     console.log("\nPágina 3:");
@@ -183,13 +183,13 @@ async function main() {
     }
   }
 
-  // 8. Erro — duplicata
+  // 8. Error — duplicate
   if (isSuccess(all) && all.value.items.length > 0) {
     const duplicateResult = await repo.create(all.value.items[0]);
     if (isFailure(duplicateResult)) console.log("\nErro duplicata:", duplicateResult.error.detail);
   }
 
-  // 9. Erro — not found
+  // 9. Error — not found
   const fakeId = FId.generate();
   const notFoundResult = await repo.delete(fakeId);
   if (isFailure(notFoundResult)) console.log("Erro not found:", notFoundResult.error.detail);

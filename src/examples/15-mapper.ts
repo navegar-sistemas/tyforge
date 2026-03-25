@@ -10,7 +10,7 @@ import type { TUserJson } from "./12-aggregates";
 console.log("=== Mapper ===\n");
 
 // ═══════════════════════════════════════════════════════════════════
-// IMapper — Domain ↔ Persistência (responsabilidade única)
+// IMapper — Domain <-> Persistence (single responsibility)
 // ═══════════════════════════════════════════════════════════════════
 
 class MapperUser implements IMapper<User, TUserJson> {
@@ -38,7 +38,7 @@ class MapperUser implements IMapper<User, TUserJson> {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// DtoRes — montado pelo controller/use case, não pelo mapper
+// DtoRes — assembled by controller/use case, not by the mapper
 // ═══════════════════════════════════════════════════════════════════
 
 const userProfileSchema = {
@@ -79,12 +79,12 @@ export class DtoResUserProfile extends DtoRes<TDtoResUserProfileFullProps, TDtoR
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// USO
+// USAGE
 // ═══════════════════════════════════════════════════════════════════
 
 const mapper = new MapperUser();
 
-// 1. Persistência → Domain
+// 1. Persistence -> Domain
 const dbRow: TUserJson = {
   id: "019d0863-5d45-7246-b6d0-de5098bfd12e",
   name: "Maria Silva",
@@ -96,17 +96,17 @@ const dbRow: TUserJson = {
 const userResult = mapper.toDomain(dbRow);
 if (isFailure(userResult)) throw userResult.error;
 const user = userResult.value;
-console.log("Persistência → Domain:", user.toJSON());
+console.log("Persistence -> Domain:", user.toJSON());
 
-// 2. Domain → Persistência
+// 2. Domain -> Persistence
 const persistenceResult = mapper.toPersistence(user);
-if (isSuccess(persistenceResult)) console.log("Domain → Persistência:", persistenceResult.value);
+if (isSuccess(persistenceResult)) console.log("Domain -> Persistence:", persistenceResult.value);
 
-// 3. Domain → DtoRes (controller monta, não o mapper)
+// 3. Domain -> DtoRes (controller assembles, not the mapper)
 const profileResult = DtoResUserProfile.fromDomain(user);
 if (isSuccess(profileResult)) console.log("Domain → DtoRes:", profileResult.value.toJSON());
 
-// 4. Batch — múltiplos registros do banco
+// 4. Batch — multiple records from database
 const dbRows: TUserJson[] = [
   { id: "019d0863-5d45-7246-b6d0-de5098bfd12e", name: "Maria", email: "maria@test.com", age: 28, status: "active" },
   { id: "019d0863-5d45-7246-b6d0-de5098bfd13f", name: "João", email: "joao@test.com", age: 30, status: "active" },

@@ -1,6 +1,6 @@
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
-import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
+import { Result, ok, err, isFailure } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
@@ -21,38 +21,30 @@ export class FFullName extends TypeField<TFullName, TFullNameFormatted> {
     super(value, fieldPath);
   }
 
-  static validateRaw(
-    value: unknown,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    const base = TypeGuard.isString(value, fieldPath, 2, 140);
-    if (!base.success) return base;
-    return OK_TRUE;
-  }
-
-  static create(
-    raw: TFullName,
-    fieldPath = "FullName",
-  ): Result<FFullName, ExceptionValidation> {
-    const validation = FFullName.validateRaw(raw, fieldPath);
+  static create<T = TFullName>(raw: T, fieldPath = "FullName"): Result<FFullName, ExceptionValidation> {
+    const str = TypeGuard.isString(raw, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const value = TypeField.normalize(str.value, TypeField.createLevel);
+    const instance = new FFullName(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FFullName(raw, fieldPath));
+    return ok(instance);
   }
 
-  static createOrThrow(
-    raw: TFullName,
-    fieldPath = "FullName",
-  ): FFullName {
+  static createOrThrow(raw: TFullName, fieldPath = "FullName"): FFullName {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  override validate(
-    value: TFullName,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    return FFullName.validateRaw(value, fieldPath);
+  static assign<T = TFullName>(value: T, fieldPath = "FullName"): Result<FFullName, ExceptionValidation> {
+    const str = TypeGuard.isString(value, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const normalized = TypeField.normalize(str.value, TypeField.assignLevel);
+    const instance = new FFullName(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   override toString(): string {

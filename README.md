@@ -1,13 +1,15 @@
 # TyForge
 
+[Português](README.pt-BR.md)
+
 [![npm version](https://img.shields.io/npm/v/tyforge)](https://www.npmjs.com/package/tyforge)
 [![license](https://img.shields.io/npm/l/tyforge)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D24-green)](https://nodejs.org/)
 
-Validacao de schemas type-safe, Result pattern e building blocks DDD para TypeScript.
+Type-safe schema validation, Result pattern and DDD building blocks for TypeScript.
 
-## Instalacao
+## Installation
 
 ```bash
 npm install tyforge
@@ -38,26 +40,34 @@ if (isSuccess(result)) {
 }
 
 if (isFailure(result)) {
-  console.error(result.error.detail); // mensagem de validacao
+  console.error(result.error.detail); // validation message
 }
 ```
 
-## Modulos
+## Modules
 
-| Modulo | Descricao |
-|--------|-----------|
-| **Result Pattern** | `ok()`, `err()`, `map`, `flatMap`, `fold`, `match`, `all`, `allSettled` — error handling funcional |
-| **Schema Builder** | Validacao compilada de schemas com inferencia de tipos, `batchCreate`, `composeSchema` |
-| **Type Fields** | 25+ Value Objects validadores (FString, FEmail, FId, FInt, FDate...) |
-| **Domain Models** | Entity, ValueObject, Aggregate com domain events, Dto, DtoReq, DtoRes |
-| **Exceptions** | 18 tipos RFC 7807 com stack trace lazy |
+| Module | Description |
+|--------|-------------|
+| **Result Pattern** | `ok()`, `err()`, `map`, `flatMap`, `fold`, `match`, `all`, `allSettled` — functional error handling |
+| **Schema Builder** | Compiled schema validation with type inference, `batchCreate`, `composeSchema` |
+| **Type Fields** | 25+ validator Value Objects (FString, FEmail, FId, FInt, FDate...) |
+| **Domain Models** | Entity, ValueObject, Aggregate with domain events, Dto, DtoReq, DtoRes |
+| **Exceptions** | 18 RFC 7807 exception types with lazy stack trace |
 | **Application** | UseCase, IMapper, Saga, DomainEventDispatcher |
 | **Infrastructure** | IRepositoryBase, IRepositoryRead, Paginated, IUnitOfWork, IOutbox |
+| **Tools** | TypeGuard (extended), ToolObjectTransform (flatten/unflatten with prototype pollution protection) |
+| **Linter** | `npx tyforge-lint` with `--init` / `--update` / `--uninstall` for pre-commit hooks |
+| **Config** | `tyforge.config.json` — global validation levels (`full`, `type`, `none`) for `create` and `assign` |
 
-## Documentacao
+### Additional Features
 
-Documentacao completa em [tyforge.navegarsistemas.com.br](https://tyforge.navegarsistemas.com.br).
+- **Expose/Redaction** — `expose: "private" | "redacted"` in schema controls `toJSON()` field visibility
+- **Batch Create** — `batchCreate()` with parallel workers for high-throughput validation
 
-## Licenca
+## Documentation
+
+Full documentation at [tyforge.navegarsistemas.com.br](https://tyforge.navegarsistemas.com.br).
+
+## License
 
 MIT - [Navegar Sistemas](https://navegarsistemas.com.br/)

@@ -1,4 +1,4 @@
-import { TypeField } from "@tyforge/type-fields/type-field.base";
+import { TypeField, TValidationLevel } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -22,51 +22,40 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
     super(value, fieldPath);
   }
 
-  static validateRaw(
-    value: unknown,
+  protected override validate(
+    value: TPageSize,
     fieldPath: string,
+    validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const base = TypeGuard.isNumber(value, fieldPath, 1, 100, 0);
+    const base = super.validate(value, fieldPath, validateLevel);
     if (!base.success) return base;
-
+    if (validateLevel !== "full") return OK_TRUE;
     if (!Number.isInteger(value)) {
       return err(
-        ExceptionValidation.create(
-          fieldPath,
-          "Valor deve ser um número inteiro",
-        ),
+        ExceptionValidation.create(fieldPath, "Valor deve ser um número inteiro"),
       );
     }
-
-    if (typeof value !== "number") return base;
     if (value < 1) {
       return err(
-        ExceptionValidation.create(
-          fieldPath,
-          "Tamanho da página deve ser maior que 0",
-        ),
+        ExceptionValidation.create(fieldPath, "Tamanho da página deve ser maior que 0"),
       );
     }
-
     if (value > 100) {
       return err(
-        ExceptionValidation.create(
-          fieldPath,
-          "Tamanho da página não pode exceder 100",
-        ),
+        ExceptionValidation.create(fieldPath, "Tamanho da página não pode exceder 100"),
       );
     }
-
     return OK_TRUE;
   }
 
-  static create(
-    raw: TPageSize,
-    fieldPath = "PageSize",
-  ): Result<FPageSize, ExceptionValidation> {
-    const validation = FPageSize.validateRaw(raw, fieldPath);
+  static create<T = TPageSize>(raw: T, fieldPath = "PageSize"): Result<FPageSize, ExceptionValidation> {
+    const num = TypeGuard.extractNumber(raw, fieldPath);
+    if (isFailure(num)) return err(num.error);
+    const value = TypeField.normalize(num.value, TypeField.createLevel);
+    const instance = new FPageSize(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FPageSize(raw, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: TPageSize, fieldPath = "PageSize"): FPageSize {
@@ -75,11 +64,14 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
     return result.value;
   }
 
-  override validate(
-    value: TPageSize,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    return FPageSize.validateRaw(value, fieldPath);
+  static assign<T = TPageSize>(value: T, fieldPath = "PageSize"): Result<FPageSize, ExceptionValidation> {
+    const num = TypeGuard.extractNumber(value, fieldPath);
+    if (isFailure(num)) return err(num.error);
+    const normalized = TypeField.normalize(num.value, TypeField.assignLevel);
+    const instance = new FPageSize(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   override toString(): string {

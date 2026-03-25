@@ -1,6 +1,6 @@
 {
   "name": "tyforge",
-  "version": "0.1.8",
+  "version": "0.1.12",
   "description": "Type-safe schema validation, Result pattern, and DDD building blocks for TypeScript",
   "keywords": [
     "typescript",
@@ -30,6 +30,9 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "tyforge-lint": "./dist/lint/index.js"
+  },
   "files": [
     "dist",
     "README.md",
@@ -39,7 +42,8 @@
     "build": "tsc && tsc-alias",
     "prepublishOnly": "npm run build",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test src/**/*.test.ts"
+    "test": "tsx --test src/**/*.test.ts",
+    "postinstall": "node dist/lint/hooks/postinstall.js || true"
   },
   "dependencies": {
     "uuid": "^11.1.0"

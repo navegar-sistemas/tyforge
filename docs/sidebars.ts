@@ -130,5 +130,63 @@ export default {
         },
       ],
     },
+    {
+      type: "category",
+      label: "Tools",
+      collapsed: false,
+      items: [
+        {
+          type: "doc",
+          id: "tools/visao-geral",
+          label: "Visao Geral",
+        },
+        {
+          type: "doc",
+          id: "tools/type-guard",
+          label: "TypeGuard",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Application",
+      collapsed: false,
+      items: [
+        {
+          type: "doc",
+          id: "application/use-case",
+          label: "UseCase",
+        },
+        {
+          type: "doc",
+          id: "application/mapper",
+          label: "Mapper",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Infrastructure",
+      collapsed: false,
+      items: [
+        {
+          type: "doc",
+          id: "infrastructure/repository",
+          label: "Repository",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Configuracao",
+      collapsed: false,
+      items: [
+        {
+          type: "doc",
+          id: "config/configuracao-global",
+          label: "Configuracao Global",
+        },
+      ],
+    },
   ],
 };

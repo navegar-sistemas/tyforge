@@ -1,7 +1,7 @@
 import { DomainEvent } from "@tyforge/index";
 
 // ═══════════════════════════════════════════════════════════════════
-// Domain Events reutilizáveis — importados por outros exemplos
+// Reusable Domain Events — imported by other examples
 // ═══════════════════════════════════════════════════════════════════
 
 // ─── EventUserRegistered ───

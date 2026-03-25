@@ -1,4 +1,4 @@
-import { TypeField } from "@tyforge/type-fields/type-field.base";
+import { TypeField, TValidationLevel } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -23,16 +23,16 @@ export class FBearer extends TypeField<TBearer, TBearerFormatted> {
     super(value, fieldPath);
   }
 
-  static validateRaw(
-    value: unknown,
+  protected override validate(
+    value: TBearer,
     fieldPath: string,
+    validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const base = TypeGuard.isString(value, fieldPath, 100, 5000);
+    const base = super.validate(value, fieldPath, validateLevel);
     if (!base.success) return base;
-
-    if (typeof value !== "string") return base;
-    const str = value;
-    if (!str.startsWith(FBearer.BEARER_PREFIX) || str.length <= 7) {
+    if (validateLevel !== "full") return OK_TRUE;
+    const v = this.getValue();
+    if (!v.startsWith(FBearer.BEARER_PREFIX) || v.length <= 7) {
       return err(
         ExceptionValidation.create(
           fieldPath,
@@ -40,17 +40,17 @@ export class FBearer extends TypeField<TBearer, TBearerFormatted> {
         ),
       );
     }
-
     return OK_TRUE;
   }
 
-  static create(
-    raw: TBearer,
-    fieldPath = "Bearer",
-  ): Result<FBearer, ExceptionValidation> {
-    const validation = FBearer.validateRaw(raw, fieldPath);
+  static create<T = TBearer>(raw: T, fieldPath = "Bearer"): Result<FBearer, ExceptionValidation> {
+    const str = TypeGuard.isString(raw, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const value = TypeField.normalize(str.value, TypeField.createLevel, false);
+    const instance = new FBearer(value, fieldPath);
+    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
     if (!validation.success) return err(validation.error);
-    return ok(new FBearer(raw, fieldPath));
+    return ok(instance);
   }
 
   static createOrThrow(raw: TBearer, fieldPath = "Bearer"): FBearer {
@@ -59,11 +59,14 @@ export class FBearer extends TypeField<TBearer, TBearerFormatted> {
     return result.value;
   }
 
-  override validate(
-    value: TBearer,
-    fieldPath: string,
-  ): Result<true, ExceptionValidation> {
-    return FBearer.validateRaw(value, fieldPath);
+  static assign<T = TBearer>(value: T, fieldPath = "Bearer"): Result<FBearer, ExceptionValidation> {
+    const str = TypeGuard.isString(value, fieldPath);
+    if (isFailure(str)) return err(str.error);
+    const normalized = TypeField.normalize(str.value, TypeField.assignLevel, false);
+    const instance = new FBearer(normalized, fieldPath);
+    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
+    if (!validation.success) return err(validation.error);
+    return ok(instance);
   }
 
   override toString(): string {
@@ -71,13 +74,7 @@ export class FBearer extends TypeField<TBearer, TBearerFormatted> {
   }
 
   override formatted(): string {
-    const formatBearer: (value: TBearer) => TBearer = (value) => {
-      if (!value.startsWith("Bearer ")) {
-        return `Bearer ${value}`;
-      }
-      return value;
-    };
-    return formatBearer(this.getValue());
+    return String(this.getValue());
   }
 
   override getDescription(): string {
