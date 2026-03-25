@@ -51,14 +51,6 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
     protected readonly fieldPath: string,
   ) {}
 
-  protected static normalize<T extends string>(raw: T, validateLevel?: TValidationLevel, trim?: boolean): T;
-  protected static normalize<T>(raw: T, validateLevel?: TValidationLevel, trim?: boolean): T;
-  protected static normalize(raw: unknown, validateLevel: TValidationLevel = "full", trim = true): unknown {
-    if (validateLevel === "none") return raw;
-    if (trim && typeof raw === "string") return raw.trim();
-    return raw;
-  }
-
   /**
    * Resolve um valor de enum, validando por chave e/ou valor conforme config
    */
@@ -86,12 +78,13 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
   ): Result<true, ExceptionValidation> {
     if (validateLevel === "none") return OK_TRUE;
 
+    const cfg = this.config;
     const skipRange = validateLevel === "type";
 
-    if (!skipRange && "validateEnum" in this.config && this.config.validateEnum) {
-      const enumSet = getCachedEnumSet(this.config.validateEnum);
+    if (!skipRange && "validateEnum" in cfg && cfg.validateEnum) {
+      const enumSet = getCachedEnumSet(cfg.validateEnum);
       if (!enumSet.has(value)) {
-        const enumValues = getCachedEnumValues(this.config.validateEnum);
+        const enumValues = getCachedEnumValues(cfg.validateEnum);
         return err(
           ExceptionValidation.create(
             fieldPath,
@@ -103,11 +96,8 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
 
     if (skipRange) return OK_TRUE;
 
-    const { jsonSchemaType } = this.config;
-
-    switch (jsonSchemaType) {
+    switch (cfg.jsonSchemaType) {
       case "string": {
-        const cfg = this.config;
         const len = String(value).length;
         if ("maxLength" in cfg && len > cfg.maxLength) {
           return err(ExceptionValidation.create(fieldPath, `A string deve conter no máximo ${cfg.maxLength} caracteres.`));
@@ -118,7 +108,6 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
         return OK_TRUE;
       }
       case "number": {
-        const cfg = this.config;
         const n = Number(value);
         if ("max" in cfg && n > cfg.max) {
           return err(ExceptionValidation.create(fieldPath, `O valor deve ser no máximo ${cfg.max}.`));

@@ -28,9 +28,8 @@ export class FFullName extends TypeField<TFullName, TFullNameFormatted> {
   static create<T = TFullName>(raw: T, fieldPath = "FullName"): Result<FFullName, ExceptionValidation> {
     const typed = FFullName.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
-    const instance = new FFullName(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    const instance = new FFullName(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -44,9 +43,8 @@ export class FFullName extends TypeField<TFullName, TFullNameFormatted> {
   static assign<T = TFullName>(value: T, fieldPath = "FullName"): Result<FFullName, ExceptionValidation> {
     const typed = FFullName.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
-    const instance = new FFullName(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    const instance = new FFullName(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

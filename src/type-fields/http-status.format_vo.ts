@@ -37,9 +37,8 @@ export class FHttpStatus extends TypeField<THttpStatus, THttpStatusFormatted> {
   static create<T = THttpStatus>(raw: T, fieldPath = "HttpStatus"): Result<FHttpStatus, ExceptionValidation> {
     const typed = FHttpStatus.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
-    const instance = new FHttpStatus(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    const instance = new FHttpStatus(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -53,9 +52,8 @@ export class FHttpStatus extends TypeField<THttpStatus, THttpStatusFormatted> {
   static assign<T = THttpStatus>(value: T, fieldPath = "HttpStatus"): Result<FHttpStatus, ExceptionValidation> {
     const typed = FHttpStatus.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
-    const instance = new FHttpStatus(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    const instance = new FHttpStatus(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

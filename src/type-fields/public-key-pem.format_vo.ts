@@ -70,15 +70,14 @@ export class FPublicKeyPem extends TypeField<TPublicKeyPem, TPublicKeyPemFormatt
   }
 
   static validateType(value: unknown, fieldPath: string): Result<TPublicKeyPem, ExceptionValidation> {
-    return TypeGuard.isString(value, fieldPath);
+    return TypeGuard.extractString(value, fieldPath);
   }
 
   static create<T = TPublicKeyPem>(raw: T, fieldPath = "PublicKeyPem"): Result<FPublicKeyPem, ExceptionValidation> {
     const typed = FPublicKeyPem.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.createLevel, false);
-    const instance = new FPublicKeyPem(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    const instance = new FPublicKeyPem(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -92,9 +91,8 @@ export class FPublicKeyPem extends TypeField<TPublicKeyPem, TPublicKeyPemFormatt
   static assign<T = TPublicKeyPem>(value: T, fieldPath = "PublicKeyPem"): Result<FPublicKeyPem, ExceptionValidation> {
     const typed = FPublicKeyPem.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel, false);
-    const instance = new FPublicKeyPem(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    const instance = new FPublicKeyPem(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

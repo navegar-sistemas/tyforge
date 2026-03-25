@@ -44,15 +44,14 @@ export class FSignature extends TypeField<TSignature, TSignatureFormatted> {
   }
 
   static validateType(value: unknown, fieldPath: string): Result<TSignature, ExceptionValidation> {
-    return TypeGuard.isString(value, fieldPath);
+    return TypeGuard.extractString(value, fieldPath);
   }
 
   static create<T = TSignature>(raw: T, fieldPath = "Signature"): Result<FSignature, ExceptionValidation> {
     const typed = FSignature.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.createLevel, false);
-    const instance = new FSignature(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    const instance = new FSignature(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -66,9 +65,8 @@ export class FSignature extends TypeField<TSignature, TSignatureFormatted> {
   static assign<T = TSignature>(value: T, fieldPath = "Signature"): Result<FSignature, ExceptionValidation> {
     const typed = FSignature.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel, false);
-    const instance = new FSignature(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    const instance = new FSignature(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

@@ -28,9 +28,8 @@ export class FText extends TypeField<TText, TTextFormatted> {
   static create<T = TText>(raw: T, fieldPath = "Text"): Result<FText, ExceptionValidation> {
     const typed = FText.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
-    const instance = new FText(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    const instance = new FText(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -44,9 +43,8 @@ export class FText extends TypeField<TText, TTextFormatted> {
   static assign<T = TText>(value: T, fieldPath = "Text"): Result<FText, ExceptionValidation> {
     const typed = FText.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
-    const instance = new FText(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    const instance = new FText(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

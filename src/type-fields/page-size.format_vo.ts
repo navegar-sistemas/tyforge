@@ -55,9 +55,8 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
   static create<T = TPageSize>(raw: T, fieldPath = "PageSize"): Result<FPageSize, ExceptionValidation> {
     const typed = FPageSize.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
-    const instance = new FPageSize(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    const instance = new FPageSize(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -71,9 +70,8 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
   static assign<T = TPageSize>(value: T, fieldPath = "PageSize"): Result<FPageSize, ExceptionValidation> {
     const typed = FPageSize.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
-    const instance = new FPageSize(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    const instance = new FPageSize(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

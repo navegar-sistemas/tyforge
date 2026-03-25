@@ -37,9 +37,8 @@ export class FAppStatus extends TypeField<TAppStatus, TAppStatusFormatted> {
   static create<T = TAppStatus>(raw: T, fieldPath = "AppStatus"): Result<FAppStatus, ExceptionValidation> {
     const typed = FAppStatus.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
-    const instance = new FAppStatus(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    const instance = new FAppStatus(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -53,9 +52,8 @@ export class FAppStatus extends TypeField<TAppStatus, TAppStatusFormatted> {
   static assign<T = TAppStatus>(value: T, fieldPath = "AppStatus"): Result<FAppStatus, ExceptionValidation> {
     const typed = FAppStatus.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
-    const instance = new FAppStatus(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    const instance = new FAppStatus(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

@@ -54,15 +54,14 @@ export class FPassword extends TypeField<TPassword, TPasswordFormatted> {
   }
 
   static validateType(value: unknown, fieldPath: string): Result<TPassword, ExceptionValidation> {
-    return TypeGuard.isString(value, fieldPath);
+    return TypeGuard.extractString(value, fieldPath);
   }
 
   static create<T = TPassword>(raw: T, fieldPath = "Password"): Result<FPassword, ExceptionValidation> {
     const typed = FPassword.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.createLevel, false);
-    const instance = new FPassword(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    const instance = new FPassword(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -76,9 +75,8 @@ export class FPassword extends TypeField<TPassword, TPasswordFormatted> {
   static assign<T = TPassword>(value: T, fieldPath = "Password"): Result<FPassword, ExceptionValidation> {
     const typed = FPassword.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel, false);
-    const instance = new FPassword(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    const instance = new FPassword(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

@@ -28,9 +28,8 @@ export class FIdReq extends TypeField<TIdReq, TIdReqFormatted> {
   static create<T = TIdReq>(raw: T, fieldPath = "IdReq"): Result<FIdReq, ExceptionValidation> {
     const typed = FIdReq.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
-    const instance = new FIdReq(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    const instance = new FIdReq(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -44,9 +43,8 @@ export class FIdReq extends TypeField<TIdReq, TIdReqFormatted> {
   static assign<T = TIdReq>(value: T, fieldPath = "IdReq"): Result<FIdReq, ExceptionValidation> {
     const typed = FIdReq.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
-    const instance = new FIdReq(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    const instance = new FIdReq(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

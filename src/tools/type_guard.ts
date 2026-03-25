@@ -113,8 +113,8 @@ export class TypeGuard {
   static isString(
     value: unknown,
     fieldPath: string,
-    min = 1,
-    max = Number.MAX_SAFE_INTEGER,
+    min?: number,
+    max?: number,
   ): Result<string, ExceptionValidation> {
     if (typeof value !== "string") {
       return err(
@@ -122,7 +122,7 @@ export class TypeGuard {
       );
     }
     const trimmed = value.trim();
-    if (trimmed.length > max) {
+    if (max !== undefined && trimmed.length > max) {
       return err(
         ExceptionValidation.create(
           fieldPath,
@@ -130,7 +130,7 @@ export class TypeGuard {
         ),
       );
     }
-    if (trimmed.length < min) {
+    if (min !== undefined && trimmed.length < min) {
       return err(
         ExceptionValidation.create(
           fieldPath,
@@ -379,6 +379,13 @@ export class TypeGuard {
     }
     if (value.length > max) {
       return err(ExceptionValidation.create(fieldPath, `O array deve conter no máximo ${max} itens.`));
+    }
+    return ok(value);
+  }
+
+  static extractString(value: unknown, fieldPath: string): Result<string, ExceptionValidation> {
+    if (typeof value !== "string") {
+      return err(ExceptionValidation.create(fieldPath, "O valor deve ser uma string."));
     }
     return ok(value);
   }

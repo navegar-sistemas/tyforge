@@ -28,9 +28,8 @@ export class FDescription extends TypeField<TDescription, TDescriptionFormatted>
   static create<T = TDescription>(raw: T, fieldPath = "Description"): Result<FDescription, ExceptionValidation> {
     const typed = FDescription.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
-    const instance = new FDescription(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    const instance = new FDescription(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -44,9 +43,8 @@ export class FDescription extends TypeField<TDescription, TDescriptionFormatted>
   static assign<T = TDescription>(value: T, fieldPath = "Description"): Result<FDescription, ExceptionValidation> {
     const typed = FDescription.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
-    const instance = new FDescription(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    const instance = new FDescription(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

@@ -44,15 +44,14 @@ export class FBearer extends TypeField<TBearer, TBearerFormatted> {
   }
 
   static validateType(value: unknown, fieldPath: string): Result<TBearer, ExceptionValidation> {
-    return TypeGuard.isString(value, fieldPath);
+    return TypeGuard.extractString(value, fieldPath);
   }
 
   static create<T = TBearer>(raw: T, fieldPath = "Bearer"): Result<FBearer, ExceptionValidation> {
     const typed = FBearer.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.createLevel, false);
-    const instance = new FBearer(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    const instance = new FBearer(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -66,9 +65,8 @@ export class FBearer extends TypeField<TBearer, TBearerFormatted> {
   static assign<T = TBearer>(value: T, fieldPath = "Bearer"): Result<FBearer, ExceptionValidation> {
     const typed = FBearer.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel, false);
-    const instance = new FBearer(normalized, fieldPath);
-    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    const instance = new FBearer(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
