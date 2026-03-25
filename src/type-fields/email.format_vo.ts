@@ -23,12 +23,12 @@ export class FEmail extends TypeField<TEmail, TEmailFormatted> {
     super(value, fieldPath);
   }
 
-  protected override validate(
+  protected override validateRules(
     value: TEmail,
     fieldPath: string,
     validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const base = super.validate(value, fieldPath, validateLevel);
+    const base = super.validateRules(value, fieldPath, validateLevel);
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!FEmail.EMAIL_REGEX.test(this.getValue())) {
@@ -37,13 +37,17 @@ export class FEmail extends TypeField<TEmail, TEmailFormatted> {
     return OK_TRUE;
   }
 
+  static validateType(value: unknown, fieldPath: string): Result<TEmail, ExceptionValidation> {
+    return TypeGuard.isString(value, fieldPath);
+  }
+
   static create<T = TEmail>(raw: T, fieldPath = "Email"): Result<FEmail, ExceptionValidation> {
-    const str = TypeGuard.isString(raw, fieldPath);
-    if (isFailure(str)) return err(str.error);
-    const value = TypeField.normalize(str.value, TypeField.createLevel);
-    const instance = new FEmail(value, fieldPath);
-    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
-    if (!validation.success) return err(validation.error);
+    const typed = FEmail.validateType(raw, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
+    const instance = new FEmail(normalized, fieldPath);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
@@ -54,12 +58,12 @@ export class FEmail extends TypeField<TEmail, TEmailFormatted> {
   }
 
   static assign<T = TEmail>(value: T, fieldPath = "Email"): Result<FEmail, ExceptionValidation> {
-    const str = TypeGuard.isString(value, fieldPath);
-    if (isFailure(str)) return err(str.error);
-    const normalized = TypeField.normalize(str.value, TypeField.assignLevel);
+    const typed = FEmail.validateType(value, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
     const instance = new FEmail(normalized, fieldPath);
-    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
-    if (!validation.success) return err(validation.error);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 

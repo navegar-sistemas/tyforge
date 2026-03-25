@@ -28,15 +28,19 @@ export class FAppStatus extends TypeField<TAppStatus, TAppStatusFormatted> {
     super(value, fieldPath);
   }
 
-  static create<T = TAppStatus>(raw: T, fieldPath = "AppStatus"): Result<FAppStatus, ExceptionValidation> {
-    const str = TypeGuard.isString(raw, fieldPath);
+  static validateType(value: unknown, fieldPath: string): Result<TAppStatus, ExceptionValidation> {
+    const str = TypeGuard.isString(value, fieldPath);
     if (isFailure(str)) return err(str.error);
-    const enumResult = TypeField.resolveEnum(OAppStatus, str.value, fieldPath);
-    if (isFailure(enumResult)) return err(enumResult.error);
-    const value = TypeField.normalize(enumResult.value, TypeField.createLevel);
-    const instance = new FAppStatus(value, fieldPath);
-    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
-    if (!validation.success) return err(validation.error);
+    return TypeField.resolveEnum(OAppStatus, str.value, fieldPath);
+  }
+
+  static create<T = TAppStatus>(raw: T, fieldPath = "AppStatus"): Result<FAppStatus, ExceptionValidation> {
+    const typed = FAppStatus.validateType(raw, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
+    const instance = new FAppStatus(normalized, fieldPath);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
@@ -47,14 +51,12 @@ export class FAppStatus extends TypeField<TAppStatus, TAppStatusFormatted> {
   }
 
   static assign<T = TAppStatus>(value: T, fieldPath = "AppStatus"): Result<FAppStatus, ExceptionValidation> {
-    const str = TypeGuard.isString(value, fieldPath);
-    if (isFailure(str)) return err(str.error);
-    const enumResult = TypeField.resolveEnum(OAppStatus, str.value, fieldPath);
-    if (isFailure(enumResult)) return err(enumResult.error);
-    const normalized = TypeField.normalize(enumResult.value, TypeField.assignLevel);
+    const typed = FAppStatus.validateType(value, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
     const instance = new FAppStatus(normalized, fieldPath);
-    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
-    if (!validation.success) return err(validation.error);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 

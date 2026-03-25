@@ -25,12 +25,12 @@ export class FTraceId extends TypeField<TTraceId, TTraceIdFormatted> {
     super(value, fieldPath);
   }
 
-  protected override validate(
+  protected override validateRules(
     value: TTraceId,
     fieldPath: string,
     validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const base = super.validate(value, fieldPath, validateLevel);
+    const base = super.validateRules(value, fieldPath, validateLevel);
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!UUID_V7_PATTERN.test(this.getValue())) {
@@ -44,13 +44,17 @@ export class FTraceId extends TypeField<TTraceId, TTraceIdFormatted> {
     return OK_TRUE;
   }
 
+  static validateType(value: unknown, fieldPath: string): Result<TTraceId, ExceptionValidation> {
+    return TypeGuard.isString(value, fieldPath);
+  }
+
   static create<T = TTraceId>(raw: T, fieldPath = "TraceId"): Result<FTraceId, ExceptionValidation> {
-    const str = TypeGuard.isString(raw, fieldPath);
-    if (isFailure(str)) return err(str.error);
-    const value = TypeField.normalize(str.value, TypeField.createLevel);
-    const instance = new FTraceId(value, fieldPath);
-    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
-    if (!validation.success) return err(validation.error);
+    const typed = FTraceId.validateType(raw, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
+    const instance = new FTraceId(normalized, fieldPath);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
@@ -61,12 +65,12 @@ export class FTraceId extends TypeField<TTraceId, TTraceIdFormatted> {
   }
 
   static assign<T = TTraceId>(value: T, fieldPath = "TraceId"): Result<FTraceId, ExceptionValidation> {
-    const str = TypeGuard.isString(value, fieldPath);
-    if (isFailure(str)) return err(str.error);
-    const normalized = TypeField.normalize(str.value, TypeField.assignLevel);
+    const typed = FTraceId.validateType(value, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
     const instance = new FTraceId(normalized, fieldPath);
-    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
-    if (!validation.success) return err(validation.error);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 

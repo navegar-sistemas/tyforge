@@ -19,11 +19,17 @@ export class FJson extends TypeField<TJson, TJsonFormatted> {
     super(value, fieldPath);
   }
 
+  static validateType(value: unknown, fieldPath: string): Result<TJson, ExceptionValidation> {
+    if (!TypeGuard.isRecord(value)) return err(ExceptionValidation.create(fieldPath, "Expected object"));
+    return ok(value);
+  }
+
   static create<T = TJson>(raw: T, fieldPath = "Json"): Result<FJson, ExceptionValidation> {
-    if (!TypeGuard.isRecord(raw)) return err(ExceptionValidation.create(fieldPath, "Expected object"));
-    const instance = new FJson(raw, fieldPath);
-    const validation = instance.validate(raw, fieldPath, TypeField.createLevel);
-    if (!validation.success) return err(validation.error);
+    const typed = FJson.validateType(raw, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const instance = new FJson(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
@@ -34,10 +40,11 @@ export class FJson extends TypeField<TJson, TJsonFormatted> {
   }
 
   static assign<T = TJson>(value: T, fieldPath = "Json"): Result<FJson, ExceptionValidation> {
-    if (!TypeGuard.isRecord(value)) return err(ExceptionValidation.create(fieldPath, "Expected object"));
-    const instance = new FJson(value, fieldPath);
-    const validation = instance.validate(value, fieldPath, TypeField.assignLevel);
-    if (!validation.success) return err(validation.error);
+    const typed = FJson.validateType(value, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const instance = new FJson(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 

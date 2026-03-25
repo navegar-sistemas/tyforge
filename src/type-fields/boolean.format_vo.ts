@@ -19,13 +19,17 @@ export class FBoolean extends TypeField<TBoolean, TBooleanFormatted> {
     super(value, fieldPath);
   }
 
+  static validateType(value: unknown, fieldPath: string): Result<TBoolean, ExceptionValidation> {
+    return TypeGuard.extractBoolean(value, fieldPath);
+  }
+
   static create<T = TBoolean>(raw: T, fieldPath = "Boolean"): Result<FBoolean, ExceptionValidation> {
-    const bool = TypeGuard.extractBoolean(raw, fieldPath);
-    if (isFailure(bool)) return err(bool.error);
-    const value = TypeField.normalize(bool.value, TypeField.createLevel);
-    const instance = new FBoolean(value, fieldPath);
-    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
-    if (!validation.success) return err(validation.error);
+    const typed = FBoolean.validateType(raw, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
+    const instance = new FBoolean(normalized, fieldPath);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
@@ -36,12 +40,12 @@ export class FBoolean extends TypeField<TBoolean, TBooleanFormatted> {
   }
 
   static assign<T = TBoolean>(value: T, fieldPath = "Boolean"): Result<FBoolean, ExceptionValidation> {
-    const bool = TypeGuard.extractBoolean(value, fieldPath);
-    if (isFailure(bool)) return err(bool.error);
-    const normalized = TypeField.normalize(bool.value, TypeField.assignLevel);
+    const typed = FBoolean.validateType(value, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
     const instance = new FBoolean(normalized, fieldPath);
-    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
-    if (!validation.success) return err(validation.error);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 

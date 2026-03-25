@@ -22,12 +22,12 @@ export class FApiKey extends TypeField<TApiKey, TApiKeyFormatted> {
     super(value, fieldPath);
   }
 
-  protected override validate(
+  protected override validateRules(
     value: TApiKey,
     fieldPath: string,
     validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const base = super.validate(value, fieldPath, validateLevel);
+    const base = super.validateRules(value, fieldPath, validateLevel);
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!validate(this.getValue())) {
@@ -38,13 +38,17 @@ export class FApiKey extends TypeField<TApiKey, TApiKeyFormatted> {
     return OK_TRUE;
   }
 
+  static validateType(value: unknown, fieldPath: string): Result<TApiKey, ExceptionValidation> {
+    return TypeGuard.isString(value, fieldPath);
+  }
+
   static create<T = TApiKey>(raw: T, fieldPath = "ApiKey"): Result<FApiKey, ExceptionValidation> {
-    const str = TypeGuard.isString(raw, fieldPath);
-    if (isFailure(str)) return err(str.error);
-    const value = TypeField.normalize(str.value, TypeField.createLevel);
-    const instance = new FApiKey(value, fieldPath);
-    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
-    if (!validation.success) return err(validation.error);
+    const typed = FApiKey.validateType(raw, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
+    const instance = new FApiKey(normalized, fieldPath);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
@@ -55,12 +59,12 @@ export class FApiKey extends TypeField<TApiKey, TApiKeyFormatted> {
   }
 
   static assign<T = TApiKey>(value: T, fieldPath = "ApiKey"): Result<FApiKey, ExceptionValidation> {
-    const str = TypeGuard.isString(value, fieldPath);
-    if (isFailure(str)) return err(str.error);
-    const normalized = TypeField.normalize(str.value, TypeField.assignLevel);
+    const typed = FApiKey.validateType(value, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
     const instance = new FApiKey(normalized, fieldPath);
-    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
-    if (!validation.success) return err(validation.error);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 

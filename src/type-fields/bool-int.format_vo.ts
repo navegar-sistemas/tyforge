@@ -29,15 +29,19 @@ export class FBoolInt extends TypeField<TBoolInt, TBoolIntFormatted> {
     super(value, fieldPath);
   }
 
-  static create<T = TBoolInt>(raw: T, fieldPath = "BoolInt"): Result<FBoolInt, ExceptionValidation> {
-    const num = TypeGuard.extractNumber(raw, fieldPath);
+  static validateType(value: unknown, fieldPath: string): Result<TBoolInt, ExceptionValidation> {
+    const num = TypeGuard.extractNumber(value, fieldPath);
     if (isFailure(num)) return err(num.error);
-    const enumResult = TypeField.resolveEnum(OBoolInt, num.value, fieldPath);
-    if (isFailure(enumResult)) return err(enumResult.error);
-    const value = TypeField.normalize(enumResult.value, TypeField.createLevel);
-    const instance = new FBoolInt(value, fieldPath);
-    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
-    if (!validation.success) return err(validation.error);
+    return TypeField.resolveEnum(OBoolInt, num.value, fieldPath);
+  }
+
+  static create<T = TBoolInt>(raw: T, fieldPath = "BoolInt"): Result<FBoolInt, ExceptionValidation> {
+    const typed = FBoolInt.validateType(raw, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
+    const instance = new FBoolInt(normalized, fieldPath);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
@@ -48,14 +52,12 @@ export class FBoolInt extends TypeField<TBoolInt, TBoolIntFormatted> {
   }
 
   static assign<T = TBoolInt>(value: T, fieldPath = "BoolInt"): Result<FBoolInt, ExceptionValidation> {
-    const num = TypeGuard.extractNumber(value, fieldPath);
-    if (isFailure(num)) return err(num.error);
-    const enumResult = TypeField.resolveEnum(OBoolInt, num.value, fieldPath);
-    if (isFailure(enumResult)) return err(enumResult.error);
-    const normalized = TypeField.normalize(enumResult.value, TypeField.assignLevel);
+    const typed = FBoolInt.validateType(value, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
     const instance = new FBoolInt(normalized, fieldPath);
-    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
-    if (!validation.success) return err(validation.error);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 

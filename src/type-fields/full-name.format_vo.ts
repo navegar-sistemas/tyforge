@@ -21,13 +21,17 @@ export class FFullName extends TypeField<TFullName, TFullNameFormatted> {
     super(value, fieldPath);
   }
 
+  static validateType(value: unknown, fieldPath: string): Result<TFullName, ExceptionValidation> {
+    return TypeGuard.isString(value, fieldPath);
+  }
+
   static create<T = TFullName>(raw: T, fieldPath = "FullName"): Result<FFullName, ExceptionValidation> {
-    const str = TypeGuard.isString(raw, fieldPath);
-    if (isFailure(str)) return err(str.error);
-    const value = TypeField.normalize(str.value, TypeField.createLevel);
-    const instance = new FFullName(value, fieldPath);
-    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
-    if (!validation.success) return err(validation.error);
+    const typed = FFullName.validateType(raw, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
+    const instance = new FFullName(normalized, fieldPath);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
@@ -38,12 +42,12 @@ export class FFullName extends TypeField<TFullName, TFullNameFormatted> {
   }
 
   static assign<T = TFullName>(value: T, fieldPath = "FullName"): Result<FFullName, ExceptionValidation> {
-    const str = TypeGuard.isString(value, fieldPath);
-    if (isFailure(str)) return err(str.error);
-    const normalized = TypeField.normalize(str.value, TypeField.assignLevel);
+    const typed = FFullName.validateType(value, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
     const instance = new FFullName(normalized, fieldPath);
-    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
-    if (!validation.success) return err(validation.error);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 

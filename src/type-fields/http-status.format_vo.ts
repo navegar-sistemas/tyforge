@@ -28,15 +28,19 @@ export class FHttpStatus extends TypeField<THttpStatus, THttpStatusFormatted> {
     super(value, fieldPath);
   }
 
-  static create<T = THttpStatus>(raw: T, fieldPath = "HttpStatus"): Result<FHttpStatus, ExceptionValidation> {
-    const num = TypeGuard.extractNumber(raw, fieldPath);
+  static validateType(value: unknown, fieldPath: string): Result<THttpStatus, ExceptionValidation> {
+    const num = TypeGuard.extractNumber(value, fieldPath);
     if (isFailure(num)) return err(num.error);
-    const enumResult = TypeField.resolveEnum(OHttpStatus, num.value, fieldPath);
-    if (isFailure(enumResult)) return err(enumResult.error);
-    const value = TypeField.normalize(enumResult.value, TypeField.createLevel);
-    const instance = new FHttpStatus(value, fieldPath);
-    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
-    if (!validation.success) return err(validation.error);
+    return TypeField.resolveEnum(OHttpStatus, num.value, fieldPath);
+  }
+
+  static create<T = THttpStatus>(raw: T, fieldPath = "HttpStatus"): Result<FHttpStatus, ExceptionValidation> {
+    const typed = FHttpStatus.validateType(raw, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
+    const instance = new FHttpStatus(normalized, fieldPath);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
@@ -47,14 +51,12 @@ export class FHttpStatus extends TypeField<THttpStatus, THttpStatusFormatted> {
   }
 
   static assign<T = THttpStatus>(value: T, fieldPath = "HttpStatus"): Result<FHttpStatus, ExceptionValidation> {
-    const num = TypeGuard.extractNumber(value, fieldPath);
-    if (isFailure(num)) return err(num.error);
-    const enumResult = TypeField.resolveEnum(OHttpStatus, num.value, fieldPath);
-    if (isFailure(enumResult)) return err(enumResult.error);
-    const normalized = TypeField.normalize(enumResult.value, TypeField.assignLevel);
+    const typed = FHttpStatus.validateType(value, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
     const instance = new FHttpStatus(normalized, fieldPath);
-    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
-    if (!validation.success) return err(validation.error);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 

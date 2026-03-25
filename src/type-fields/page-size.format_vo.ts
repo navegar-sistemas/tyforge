@@ -22,12 +22,12 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
     super(value, fieldPath);
   }
 
-  protected override validate(
+  protected override validateRules(
     value: TPageSize,
     fieldPath: string,
     validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const base = super.validate(value, fieldPath, validateLevel);
+    const base = super.validateRules(value, fieldPath, validateLevel);
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!Number.isInteger(value)) {
@@ -48,13 +48,17 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
     return OK_TRUE;
   }
 
+  static validateType(value: unknown, fieldPath: string): Result<TPageSize, ExceptionValidation> {
+    return TypeGuard.extractNumber(value, fieldPath);
+  }
+
   static create<T = TPageSize>(raw: T, fieldPath = "PageSize"): Result<FPageSize, ExceptionValidation> {
-    const num = TypeGuard.extractNumber(raw, fieldPath);
-    if (isFailure(num)) return err(num.error);
-    const value = TypeField.normalize(num.value, TypeField.createLevel);
-    const instance = new FPageSize(value, fieldPath);
-    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
-    if (!validation.success) return err(validation.error);
+    const typed = FPageSize.validateType(raw, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
+    const instance = new FPageSize(normalized, fieldPath);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
@@ -65,12 +69,12 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
   }
 
   static assign<T = TPageSize>(value: T, fieldPath = "PageSize"): Result<FPageSize, ExceptionValidation> {
-    const num = TypeGuard.extractNumber(value, fieldPath);
-    if (isFailure(num)) return err(num.error);
-    const normalized = TypeField.normalize(num.value, TypeField.assignLevel);
+    const typed = FPageSize.validateType(value, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
     const instance = new FPageSize(normalized, fieldPath);
-    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
-    if (!validation.success) return err(validation.error);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 

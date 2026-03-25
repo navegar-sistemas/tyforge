@@ -79,24 +79,15 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
     );
   }
 
-  /**
-   * Validates the value against the configured schema.
-   * @param validateLevel Controls validation depth:
-   *   - "full": type + range/length + enum (default)
-   *   - "type": type check only (no range/length, no enum)
-   *   - "none": skip all validation
-   */
-  protected validate(
+  protected validateRules(
     value: TPrimitive,
     fieldPath: string,
     validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
     if (validateLevel === "none") return OK_TRUE;
 
-    const { jsonSchemaType } = this.config;
     const skipRange = validateLevel === "type";
 
-    // Enum validation only runs in "full" mode
     if (!skipRange && "validateEnum" in this.config && this.config.validateEnum) {
       const enumSet = getCachedEnumSet(this.config.validateEnum);
       if (!enumSet.has(value)) {
@@ -110,50 +101,41 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
       }
     }
 
+    if (skipRange) return OK_TRUE;
+
+    const { jsonSchemaType } = this.config;
+
     switch (jsonSchemaType) {
       case "string": {
         const cfg = this.config;
-        const strResult = TypeGuard.isString(
-          value,
-          fieldPath,
-          skipRange ? 0 : ("minLength" in cfg ? cfg.minLength : undefined),
-          skipRange ? undefined : ("maxLength" in cfg ? cfg.maxLength : undefined),
-        );
-        if (!strResult.success) return err(strResult.error);
+        const len = String(value).length;
+        if ("maxLength" in cfg && len > cfg.maxLength) {
+          return err(ExceptionValidation.create(fieldPath, `A string deve conter no máximo ${cfg.maxLength} caracteres.`));
+        }
+        if ("minLength" in cfg && len < cfg.minLength) {
+          return err(ExceptionValidation.create(fieldPath, `A string deve conter no mínimo ${cfg.minLength} caracteres úteis.`));
+        }
         return OK_TRUE;
       }
       case "number": {
         const cfg = this.config;
-        return TypeGuard.isNumber(
-          value,
-          fieldPath,
-          skipRange ? undefined : ("min" in cfg ? cfg.min : undefined),
-          skipRange ? undefined : ("max" in cfg ? cfg.max : undefined),
-          skipRange ? undefined : ("decimalPrecision" in cfg ? cfg.decimalPrecision : undefined),
-        );
+        const n = Number(value);
+        if ("max" in cfg && n > cfg.max) {
+          return err(ExceptionValidation.create(fieldPath, `O valor deve ser no máximo ${cfg.max}.`));
+        }
+        if ("min" in cfg && n < cfg.min) {
+          return err(ExceptionValidation.create(fieldPath, `O valor deve ser no mínimo ${cfg.min}.`));
+        }
+        if ("decimalPrecision" in cfg) {
+          const [, decimals] = n.toString().split(".");
+          if ((decimals?.length ?? 0) > cfg.decimalPrecision) {
+            return err(ExceptionValidation.create(fieldPath, `O valor deve ter no máximo ${cfg.decimalPrecision} casas decimais.`));
+          }
+        }
+        return OK_TRUE;
       }
-      case "boolean":
-        return TypeGuard.isBoolean(value, fieldPath);
-      case "object":
-        return TypeGuard.isObject(value, fieldPath);
-      case "array": {
-        const cfg = this.config;
-        return TypeGuard.isArray(
-          value,
-          fieldPath,
-          skipRange ? 0 : ("minItems" in cfg ? cfg.minItems ?? 0 : 0),
-          skipRange ? undefined : ("maxItems" in cfg ? cfg.maxItems ?? Infinity : Infinity),
-        );
-      }
-      case "Date":
-        return TypeGuard.isDate(value, fieldPath);
       default:
-        return err(
-          ExceptionValidation.create(
-            fieldPath,
-            `Tipo de valor não suportado: ${typeof jsonSchemaType === "string" ? jsonSchemaType : JSON.stringify(jsonSchemaType)}`,
-          ),
-        );
+        return OK_TRUE;
     }
   }
 

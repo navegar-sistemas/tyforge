@@ -22,12 +22,12 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
     super(value, fieldPath);
   }
 
-  protected override validate(
+  protected override validateRules(
     value: TInt,
     fieldPath: string,
     validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
-    const base = super.validate(value, fieldPath, validateLevel);
+    const base = super.validateRules(value, fieldPath, validateLevel);
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!Number.isInteger(value)) {
@@ -38,13 +38,17 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
     return OK_TRUE;
   }
 
+  static validateType(value: unknown, fieldPath: string): Result<TInt, ExceptionValidation> {
+    return TypeGuard.extractNumber(value, fieldPath);
+  }
+
   static create<T = TInt>(raw: T, fieldPath = "Int"): Result<FInt, ExceptionValidation> {
-    const num = TypeGuard.extractNumber(raw, fieldPath);
-    if (isFailure(num)) return err(num.error);
-    const value = TypeField.normalize(num.value, TypeField.createLevel);
-    const instance = new FInt(value, fieldPath);
-    const validation = instance.validate(value, fieldPath, TypeField.createLevel);
-    if (!validation.success) return err(validation.error);
+    const typed = FInt.validateType(raw, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.createLevel);
+    const instance = new FInt(normalized, fieldPath);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.createLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
@@ -55,12 +59,12 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
   }
 
   static assign<T = TInt>(value: T, fieldPath = "Int"): Result<FInt, ExceptionValidation> {
-    const num = TypeGuard.extractNumber(value, fieldPath);
-    if (isFailure(num)) return err(num.error);
-    const normalized = TypeField.normalize(num.value, TypeField.assignLevel);
+    const typed = FInt.validateType(value, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const normalized = TypeField.normalize(typed.value, TypeField.assignLevel);
     const instance = new FInt(normalized, fieldPath);
-    const validation = instance.validate(normalized, fieldPath, TypeField.assignLevel);
-    if (!validation.success) return err(validation.error);
+    const rules = instance.validateRules(normalized, fieldPath, TypeField.assignLevel);
+    if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
