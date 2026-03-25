@@ -12,16 +12,6 @@ import { TextReporter } from "./text-reporter";
 import { JsonReporter } from "./json-reporter";
 import type { IReporter } from "./reporter";
 import { loadLintConfig } from "./config";
-import { NoAnyRule } from "./rules/no-any.rule";
-import { NoCastRule } from "./rules/no-cast.rule";
-import { NoNonNullRule } from "./rules/no-non-null.rule";
-import { NoTsIgnoreRule } from "./rules/no-ts-ignore.rule";
-import { NoExportDefaultRule } from "./rules/no-export-default.rule";
-import { NoToJsonLowercaseRule } from "./rules/no-to-json-lowercase.rule";
-import { NoNewTypeFieldRule } from "./rules/no-new-type-field.rule";
-import { NoMagicHttpStatusRule } from "./rules/no-magic-http-status.rule";
-import { NoDeclareRule } from "./rules/no-declare.rule";
-import { NoSatisfiesWithoutPrefixRule } from "./rules/no-satisfies-without-prefix.rule";
 
 const cli = new ToolCliParser(process.argv.slice(2));
 
@@ -48,18 +38,7 @@ if (cli.hasFlag("--init")) {
   const config = loadLintConfig(cli.getFlagValue("--config"));
 
   const registry = new RuleRegistry();
-  registry.registerAll([
-    new NoAnyRule(),
-    new NoCastRule(),
-    new NoNonNullRule(),
-    new NoTsIgnoreRule(),
-    new NoExportDefaultRule(),
-    new NoToJsonLowercaseRule(),
-    new NoNewTypeFieldRule(),
-    new NoMagicHttpStatusRule("warning"),
-    new NoDeclareRule(),
-    new NoSatisfiesWithoutPrefixRule(),
-  ]);
+  registry.registerAll(RuleRegistry.createDefault());
   registry.applyConfig(config.rules);
 
   const discovery = new ToolFileDiscovery(config.root, config.exclude);

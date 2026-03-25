@@ -171,10 +171,10 @@ function createRunner(schema: Record<string, unknown>) {
             continue;
           }
           if (!creatable) continue;
-          const shouldUseFull = useAssign
+          const useCreateMethod = useAssign
             ? field.assignValidateLevel === "full"
             : field.createValidateLevel === "full";
-          const res = !shouldUseFull && field.hasAssign && creatable.assign
+          const res = !useCreateMethod && field.hasAssign && creatable.assign
             ? creatable.assign(value, fieldPath)
             : creatable.create(value, fieldPath);
           if (!res.success) return res;
@@ -192,7 +192,7 @@ function createRunner(schema: Record<string, unknown>) {
           }
           if (!creatable) continue;
           const arr: unknown[] = [];
-          const shouldUseFullArr = useAssign
+          const useCreateMethodArr = useAssign
             ? field.assignValidateLevel === "full"
             : field.createValidateLevel === "full";
           for (let j = 0; j < value.length; j++) {
@@ -200,7 +200,7 @@ function createRunner(schema: Record<string, unknown>) {
             if (required && (item === undefined || item === null)) {
               return err(requiredError(`${fieldPath}[${j}]`));
             }
-            const res = !shouldUseFullArr && field.hasAssign && creatable.assign
+            const res = !useCreateMethodArr && field.hasAssign && creatable.assign
               ? creatable.assign(item, `${fieldPath}[${j}]`)
               : creatable.create(item, `${fieldPath}[${j}]`);
             if (!res.success) return res;

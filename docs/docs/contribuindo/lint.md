@@ -17,9 +17,14 @@ Gerencia o registro e ativacao de regras. Cada regra pode ter sua severidade sob
 
 ```typescript
 const registry = new RuleRegistry();
-registry.registerAll([new NoAnyRule(), new NoCastRule()]);
+registry.registerAll(RuleRegistry.createDefault());
 registry.applyConfig({ "no-any": "error", "no-cast": "warning" });
 ```
+
+Metodos estaticos utilitarios:
+- `RuleRegistry.createDefault()` — retorna array com as 10 regras padrao instanciadas
+- `RuleRegistry.getDefaultRuleNames()` — retorna nomes das regras padrao
+- `RuleRegistry.getDefaultRuleCount()` — retorna quantidade de regras padrao
 
 ### DisableCommentParser
 

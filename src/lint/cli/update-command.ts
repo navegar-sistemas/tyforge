@@ -4,33 +4,7 @@ import { ToolDetect } from "./detect.tool";
 import { loadLintConfigExtended } from "../config/lint-config-loader";
 import { ConfigWriter } from "../config/lint-config-writer";
 import type { ILintConfigExtended } from "../config/lint-config-schema";
-
-import { NoAnyRule } from "../rules/no-any.rule";
-import { NoCastRule } from "../rules/no-cast.rule";
-import { NoNonNullRule } from "../rules/no-non-null.rule";
-import { NoTsIgnoreRule } from "../rules/no-ts-ignore.rule";
-import { NoExportDefaultRule } from "../rules/no-export-default.rule";
-import { NoToJsonLowercaseRule } from "../rules/no-to-json-lowercase.rule";
-import { NoNewTypeFieldRule } from "../rules/no-new-type-field.rule";
-import { NoMagicHttpStatusRule } from "../rules/no-magic-http-status.rule";
-import { NoDeclareRule } from "../rules/no-declare.rule";
-import { NoSatisfiesWithoutPrefixRule } from "../rules/no-satisfies-without-prefix.rule";
-
-function getAllRuleNames(): ReadonlyArray<string> {
-  const rules = [
-    new NoAnyRule(),
-    new NoCastRule(),
-    new NoNonNullRule(),
-    new NoTsIgnoreRule(),
-    new NoExportDefaultRule(),
-    new NoToJsonLowercaseRule(),
-    new NoNewTypeFieldRule(),
-    new NoMagicHttpStatusRule(),
-    new NoDeclareRule(),
-    new NoSatisfiesWithoutPrefixRule(),
-  ];
-  return rules.map(r => r.name);
-}
+import { RuleRegistry } from "../rule-registry";
 
 export class UpdateCommand {
   async execute(): Promise<void> {
@@ -53,7 +27,7 @@ export class UpdateCommand {
       return;
     }
 
-    const allRuleNames = getAllRuleNames();
+    const allRuleNames = RuleRegistry.getDefaultRuleNames();
     const existingRuleNames = new Set(Object.keys(existing.rules));
     const newRuleNames: string[] = [];
 
