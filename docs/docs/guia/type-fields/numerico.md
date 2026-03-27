@@ -1,15 +1,15 @@
 ---
-title: Numericos
+title: Numéricos
 sidebar_position: 3
 ---
 
-# Type Fields — Numericos
+# Type Fields — Numéricos
 
-Type Fields numericos encapsulam e validam valores inteiros com regras de faixa, precisao e enumeracao.
+Type Fields numéricos encapsulam e validam valores inteiros com regras de faixa, precisão e enumeração.
 
 ## Resumo
 
-| Classe | Min | Max | Decimal | Validacao extra | Arquivo |
+| Classe | Min | Max | Decimal | Validação extra | Arquivo |
 |--------|-----|-----|---------|-----------------|---------|
 | `FInt` | -2147483648 | 2147483647 | 0 | `Number.isInteger()` | `int.format_vo.ts` |
 | `FPageNumber` | 1 | `MAX_SAFE_INTEGER` | 0 | Inteiro >= 1 | `page-number.format_vo.ts` |
@@ -21,7 +21,7 @@ Type Fields numericos encapsulam e validam valores inteiros com regras de faixa,
 
 ## FInt
 
-Numero inteiro generico sem casas decimais. Cobre a faixa completa de inteiros de 32 bits.
+Número inteiro genérico sem casas decimais. Cobre a faixa completa de inteiros de 32 bits.
 
 ```typescript
 import { FInt } from "tyforge";
@@ -45,15 +45,15 @@ numero.toString(); // "42"
 }
 ```
 
-**Regras de validacao:**
-- Deve ser um numero valido dentro da faixa de inteiro 32-bit
-- Deve ser inteiro (`Number.isInteger()`) — valores decimais sao rejeitados
+**Regras de validação:**
+- Deve ser um número válido dentro da faixa de inteiro 32-bit
+- Deve ser inteiro (`Number.isInteger()`) — valores decimais são rejeitados
 
 ---
 
 ## FPageNumber
 
-Numero de pagina para paginacao. Garante que a pagina seja sempre >= 1.
+Número de página para paginação. Garante que a página seja sempre >= 1.
 
 ```typescript
 import { FPageNumber } from "tyforge";
@@ -65,15 +65,15 @@ const pagina = FPageNumber.createOrThrow(3);
 pagina.getValue(); // 3
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Deve ser um inteiro >= 1
-- Maximo: `Number.MAX_SAFE_INTEGER`
+- Máximo: `Number.MAX_SAFE_INTEGER`
 
 ---
 
 ## FPageSize
 
-Tamanho da pagina para paginacao. Limita a quantidade de itens por pagina entre 1 e 100.
+Tamanho da página para paginação. Limita a quantidade de itens por página entre 1 e 100.
 
 ```typescript
 import { FPageSize } from "tyforge";
@@ -85,15 +85,15 @@ const tamanho = FPageSize.createOrThrow(50);
 tamanho.getValue(); // 50
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Deve ser um inteiro entre 1 e 100
-- Valores maiores que 100 sao rejeitados para evitar consultas excessivas
+- Valores maiores que 100 são rejeitados para evitar consultas excessivas
 
 ---
 
 ## FFloat
 
-Numero decimal generico. Aceita qualquer valor numerico finito dentro da faixa de inteiros seguros do JavaScript (`Number.MIN_SAFE_INTEGER` a `Number.MAX_SAFE_INTEGER`), com ate 10 casas decimais.
+Número decimal genérico. Aceita qualquer valor numérico finito dentro da faixa de inteiros seguros do JavaScript (`Number.MIN_SAFE_INTEGER` a `Number.MAX_SAFE_INTEGER`), com até 10 casas decimais.
 
 ```typescript
 import { FFloat } from "tyforge";
@@ -117,16 +117,16 @@ preco.toString(); // "99.9"
 }
 ```
 
-**Regras de validacao:**
-- Deve ser um numero valido dentro da faixa de `MIN_SAFE_INTEGER` a `MAX_SAFE_INTEGER`
-- Deve ser um numero finito (`Number.isFinite()`) — `Infinity`, `-Infinity` e `NaN` sao rejeitados
-- Aceita ate 10 casas decimais
+**Regras de validação:**
+- Deve ser um número válido dentro da faixa de `MIN_SAFE_INTEGER` a `MAX_SAFE_INTEGER`
+- Deve ser um número finito (`Number.isFinite()`) — `Infinity`, `-Infinity` e `NaN` são rejeitados
+- Aceita até 10 casas decimais
 
 ---
 
 ## FBoolInt
 
-Valor booleano codificado como inteiro. Utiliza o enum `OBoolInt` para validacao.
+Valor booleano codificado como inteiro. Utiliza o enum `OBoolInt` para validação.
 
 ```typescript
 import { FBoolInt, OBoolInt } from "tyforge";
@@ -157,6 +157,6 @@ export type TKeyBoolInt = keyof typeof OBoolInt;  // "INVALIDO" | "VALIDO"
 export type TBoolInt = (typeof OBoolInt)[TKeyBoolInt]; // 0 | 1
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Aceita apenas os valores do enum: `0` (INVALIDO) ou `1` (VALIDO)
-- Qualquer outro valor numerico e rejeitado
+- Qualquer outro valor numérico é rejeitado

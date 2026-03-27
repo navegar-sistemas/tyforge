@@ -5,7 +5,7 @@ sidebar_position: 12
 
 # Type Fields — Enums
 
-Type Fields baseados em enums (`const` objects) para valores controlados e finitos. Cada enum TypeField exporta um objeto `O[Nome]` com os valores validos, e valida contra esse enum automaticamente.
+Type Fields baseados em enums (`const` objects) para valores controlados e finitos. Cada enum TypeField exporta um objeto `O[Nome]` com os valores válidos, e valida contra esse enum automaticamente.
 
 ## Resumo
 
@@ -16,18 +16,18 @@ Type Fields baseados em enums (`const` objects) para valores controlados e finit
 | `FMaritalStatus` | `OMaritalStatus` | `SINGLE`, `MARRIED`, `DIVORCED`, `WIDOWED`, `COMMON_LAW` | `marital-status.format_vo.ts` |
 | `FTransactionStatus` | `OTransactionStatus` | `SUCCESS`, `PENDING`, `FAILED`, `CANCELED`, `PROCESSING` | `transaction-status.format_vo.ts` |
 | `FAppStatus` | `OAppStatus` | `ACTIVE` (`"active"`), `INACTIVE` (`"inactive"`) | `app-status.format_vo.ts` |
-| `FHttpStatus` | `OHttpStatus` | Codigos HTTP (200, 201, 400, 404, 500...) | `http-status.format_vo.ts` |
-| `FStateCode` | — | 2 letras maiusculas; locale `br`: UFs validas | `state-code.format_vo.ts` |
+| `FHttpStatus` | `OHttpStatus` | Códigos HTTP (200, 201, 400, 404, 500...) | `http-status.format_vo.ts` |
+| `FStateCode` | — | 2 letras maiúsculas; locale `br`: UFs válidas | `state-code.format_vo.ts` |
 | `FBoolInt` | `OBoolInt` | `0` (INVALIDO), `1` (VALIDO) | `bool-int.format_vo.ts` |
 
 ---
 
-## Padrao O\{Nome\}
+## Padrão O\{Nome\}
 
-Todos os enum TypeFields seguem o mesmo padrao: um objeto `const` (prefixo `O`) define os valores validos, e o TypeField valida contra ele.
+Todos os enum TypeFields seguem o mesmo padrão: um objeto `const` (prefixo `O`) define os valores válidos, e o TypeField valida contra ele.
 
 ```typescript
-// 1. Objeto const com os valores validos
+// 1. Objeto const com os valores válidos
 export const OPersonType = {
   INDIVIDUAL: "INDIVIDUAL",
   LEGAL_ENTITY: "LEGAL_ENTITY",
@@ -60,7 +60,7 @@ const schema = {
 
 ## FPersonType
 
-Tipo de pessoa: fisica (individual) ou juridica (legal entity).
+Tipo de pessoa: física (individual) ou jurídica (legal entity).
 
 ```typescript
 import { FPersonType, OPersonType } from "tyforge";
@@ -81,14 +81,14 @@ export const OPersonType = {
 } as const;
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Aceita apenas `"INDIVIDUAL"` ou `"LEGAL_ENTITY"`
 
 ---
 
 ## FGender
 
-Identidade de genero.
+Identidade de gênero.
 
 ```typescript
 import { FGender, OGender } from "tyforge";
@@ -111,7 +111,7 @@ export const OGender = {
 } as const;
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Aceita apenas `"MALE"`, `"FEMALE"`, `"OTHER"` ou `"NOT_INFORMED"`
 
 ---
@@ -142,14 +142,14 @@ export const OMaritalStatus = {
 } as const;
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Aceita apenas `"SINGLE"`, `"MARRIED"`, `"DIVORCED"`, `"WIDOWED"` ou `"COMMON_LAW"`
 
 ---
 
 ## FTransactionStatus
 
-Status de processamento de transacao financeira.
+Status de processamento de transação financeira.
 
 ```typescript
 import { FTransactionStatus, OTransactionStatus } from "tyforge";
@@ -173,14 +173,14 @@ export const OTransactionStatus = {
 } as const;
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Aceita apenas `"SUCCESS"`, `"PENDING"`, `"FAILED"`, `"CANCELED"` ou `"PROCESSING"`
 
 ---
 
 ## FAppStatus
 
-Status de uma aplicacao no sistema. Os valores sao em lowercase (`"active"`, `"inactive"`).
+Status de uma aplicação no sistema. Os valores são em lowercase (`"active"`, `"inactive"`).
 
 ```typescript
 import { FAppStatus, OAppStatus } from "tyforge";
@@ -193,7 +193,7 @@ status.getValue(); // "active"
 status.isActive(); // true
 ```
 
-### Criacao a partir de booleano
+### Criação a partir de booleano
 
 ```typescript
 import { FAppStatus } from "tyforge";
@@ -205,7 +205,7 @@ const inativo = FAppStatus.fromBoolean(false);
 inativo.getValue(); // "inactive"
 ```
 
-### Geracao de status padrao
+### Geração de status padrão
 
 ```typescript
 import { FAppStatus } from "tyforge";
@@ -223,21 +223,21 @@ export const OAppStatus = {
 } as const;
 ```
 
-**Metodos estaticos:**
+**Métodos estáticos:**
 - `fromBoolean(isActive)` — converte booleano para status
-- `generate()` — cria instancia com status `"active"`
+- `generate()` — cria instância com status `"active"`
 
-**Metodos de instancia:**
+**Métodos de instância:**
 - `isActive()` — retorna `true` se o status for `"active"`
 
-**Regras de validacao:**
+**Regras de validação:**
 - Aceita apenas `"active"` ou `"inactive"`
 
 ---
 
 ## FHttpStatus
 
-Codigo de status HTTP conforme especificacao RFC 7231. O tipo primitivo e `number`.
+Código de status HTTP conforme especificação RFC 7231. O tipo primitivo é `number`.
 
 ```typescript
 import { FHttpStatus, OHttpStatus } from "tyforge";
@@ -277,15 +277,15 @@ export const OHttpStatus = {
 } as const;
 ```
 
-**Regras de validacao:**
-- Aceita apenas os valores numericos do enum `OHttpStatus`
+**Regras de validação:**
+- Aceita apenas os valores numéricos do enum `OHttpStatus`
 - Nunca use magic numbers — sempre use `OHttpStatus.OK` em vez de `200`
 
 ---
 
 ## FStateCode
 
-Codigo de estado ou provincia (2 letras maiusculas). Com locale `"br"`, valida contra as UFs brasileiras.
+Código de estado ou província (2 letras maiúsculas). Com locale `"br"`, valida contra as UFs brasileiras.
 
 ```typescript
 import { FStateCode } from "tyforge";
@@ -304,26 +304,26 @@ import { FStateCode, TypeField } from "tyforge";
 
 TypeField.configure({ locale: "br" });
 
-// Aceita UFs validas
+// Aceita UFs válidas
 const sp = FStateCode.createOrThrow("SP");
 const rj = FStateCode.createOrThrow("RJ");
 
-// Rejeita codigos invalidos
+// Rejeita códigos inválidos
 const invalido = FStateCode.create("XX");
 // Result com erro: "Invalid Brazilian state code: XX"
 ```
 
-**UFs validas (locale `br`):** AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PE, PI, PR, RJ, RN, RO, RR, RS, SC, SE, SP, TO.
+**UFs válidas (locale `br`):** AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PE, PI, PR, RJ, RN, RO, RR, RS, SC, SE, SP, TO.
 
-**Regras de validacao:**
-- Exatamente 2 letras maiusculas (`/^[A-Z]{2}$/`)
+**Regras de validação:**
+- Exatamente 2 letras maiúsculas (`/^[A-Z]{2}$/`)
 - Locale `br`: valida contra a lista de UFs brasileiras
 
 ---
 
 ## FBoolInt
 
-Valor booleano codificado como inteiro (`0` ou `1`). Util para integracao com bancos de dados e APIs que representam booleanos como inteiros.
+Valor booleano codificado como inteiro (`0` ou `1`). Útil para integração com bancos de dados e APIs que representam booleanos como inteiros.
 
 ```typescript
 import { FBoolInt, OBoolInt } from "tyforge";
@@ -347,6 +347,6 @@ export const OBoolInt = {
 } as const;
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Aceita apenas `0` (INVALIDO) ou `1` (VALIDO)
-- Qualquer outro valor numerico e rejeitado
+- Qualquer outro valor numérico é rejeitado

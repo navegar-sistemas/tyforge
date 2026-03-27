@@ -5,32 +5,32 @@ sidebar_position: 5
 
 # Type Fields — Identificadores
 
-Type Fields de identificacao encapsulam UUIDs, tokens de autenticacao e assinaturas digitais com validacao rigorosa de formato.
+Type Fields de identificação encapsulam UUIDs, tokens de autenticação e assinaturas digitais com validação rigorosa de formato.
 
 ## Resumo
 
-| Classe | Tipo | Comprimento | Validacao extra | Arquivo |
+| Classe | Tipo | Comprimento | Validação extra | Arquivo |
 |--------|------|-------------|-----------------|---------|
-| `FId` | UUID (qualquer versao) | 36 | Regex UUID | `id.format_vo.ts` |
+| `FId` | UUID (qualquer versão) | 36 | Regex UUID | `id.format_vo.ts` |
 | `FIdReq` | String livre | 1–36 | — | `id-req.format_vo.ts` |
 | `FTraceId` | UUID v7 | 36 | Regex UUID v7 (RFC 9562) | `trace-id.format_vo.ts` |
-| `FApiKey` | UUID v4 | 36 | `uuid.validate()` + versao 4 | `api-key.format_vo.ts` |
+| `FApiKey` | UUID v4 | 36 | `uuid.validate()` + versão 4 | `api-key.format_vo.ts` |
 | `FBearer` | Token JWT | 100–5000 | Prefixo `"Bearer "` | `bearer.format_vo.ts` |
 | `FSignature` | Base64 | 64–512 | Regex base64 | `signature.format_vo.ts` |
 | `FIdentifier` | Classe base abstrata | — | `validateType` + `generateId` | `identifier.format_vo.ts` |
 | `FTransactionId` | UUID | 36 | `uuid.validate()` | `transaction-id.format_vo.ts` |
 | `FDeviceId` | UUID | 36 | `uuid.validate()` | `device-id.format_vo.ts` |
 | `FCorrelationId` | UUID | 36 | `uuid.validate()` | `correlation-id.format_vo.ts` |
-| `FReconciliationId` | Alfanumerico | 1–35 | Regex `^[a-zA-Z0-9]+$` | `reconciliation-id.format_vo.ts` |
-| `FIdempotencyKey` | Alfanumerico + hifens | 32–36 | Regex `^[a-zA-Z0-9\-]+$` | `idempotency-key.format_vo.ts` |
+| `FReconciliationId` | Alfanumérico | 1–35 | Regex `^[a-zA-Z0-9]+$` | `reconciliation-id.format_vo.ts` |
+| `FIdempotencyKey` | Alfanumérico + hifens | 32–36 | Regex `^[a-zA-Z0-9\-]+$` | `idempotency-key.format_vo.ts` |
 | `FCertificateThumbprint` | Hexadecimal | 40 ou 64 | Regex hex + comprimento exato | `certificate-thumbprint.format_vo.ts` |
-| `FBankNsu` | Alfanumerico | 1–20 | Regex `^[a-zA-Z0-9]+$` | `bank-nsu.format_vo.ts` |
+| `FBankNsu` | Alfanumérico | 1–20 | Regex `^[a-zA-Z0-9]+$` | `bank-nsu.format_vo.ts` |
 
 ---
 
 ## FId
 
-Identificador unico universal (UUID). Utilizado como chave primaria de entidades e agregados. Gera UUIDs v7 (ordenados temporalmente) via metodo `generate()`.
+Identificador único universal (UUID). Utilizado como chave primária de entidades e agregados. Gera UUIDs v7 (ordenados temporalmente) via método `generate()`.
 
 ```typescript
 import { FId } from "tyforge";
@@ -48,17 +48,17 @@ const uuidStr = FId.generateId();
 // "0193a5e7-..."
 ```
 
-**Metodos estaticos:**
-- `create(raw, fieldPath?)` — valida e cria instancia
-- `createOrThrow(raw, fieldPath?)` — lanca excecao se invalido
-- `generate()` — gera nova instancia com UUID v7
+**Métodos estáticos:**
+- `create(raw, fieldPath?)` — valida e cria instância
+- `createOrThrow(raw, fieldPath?)` — lança exceção se inválido
+- `generate()` — gera nova instância com UUID v7
 - `generateId()` — retorna string UUID v7 sem wrapper
 
 ---
 
 ## FIdReq
 
-Identificador de requisicao. Aceita qualquer string de 1 a 36 caracteres, sem restricao de formato UUID. Utilizado para rastrear requisicoes externas e garantir idempotencia.
+Identificador de requisição. Aceita qualquer string de 1 a 36 caracteres, sem restrição de formato UUID. Utilizado para rastrear requisições externas e garantir idempotência.
 
 ```typescript
 import { FIdReq } from "tyforge";
@@ -75,7 +75,7 @@ id.formatted(); // "meu-id-externo" (com trim)
 
 ## FTraceId
 
-Identificador de rastreamento distribuido no formato UUID v7 (RFC 9562). Contém timestamp embutido para ordenacao temporal. Ideal para correlacionar logs e metricas entre microservicos.
+Identificador de rastreamento distribuído no formato UUID v7 (RFC 9562). Contém timestamp embutido para ordenação temporal. Ideal para correlacionar logs e métricas entre microsserviços.
 
 ```typescript
 import { FTraceId } from "tyforge";
@@ -84,37 +84,37 @@ import { FTraceId } from "tyforge";
 const traceId = FTraceId.generate();
 traceId.getValue(); // "0193a5e7-8b3c-7d4e-9f1a-2b3c4d5e6f7a"
 
-// Validar trace ID recebido (no microservico)
+// Validar trace ID recebido (no microsserviço)
 const result = FTraceId.create(headers["x-trace-id"]);
 
 // Extrair timestamp do trace ID
 const timestamp = traceId.getTimestamp();
-// Date object com o momento da geracao
+// Date object com o momento da geração
 
-// Verificar validade sem criar instancia
+// Verificar validade sem criar instância
 const valido = FTraceId.isValid("0193a5e7-8b3c-7d4e-9f1a-2b3c4d5e6f7a");
 // true
 ```
 
-**Metodos estaticos:**
-- `generate()` — gera nova instancia com UUID v7
+**Métodos estáticos:**
+- `generate()` — gera nova instância com UUID v7
 - `generateString()` — retorna string UUID v7 sem wrapper
-- `isValid(value)` — verifica se e UUID v7 valido
-- `getPattern()` — retorna regex para validacao externa
+- `isValid(value)` — verifica se é UUID v7 válido
+- `getPattern()` — retorna regex para validação externa
 
-**Metodos de instancia:**
+**Métodos de instância:**
 - `getTimestamp()` — extrai o `Date` embutido no UUID v7
 - `parse()` — retorna `{ timestamp, version, variant }` do UUID
 
-**Diferenca entre `FId` e `FTraceId`:**
-- `FId` — identificador de entidade/agregado (aceita qualquer versao UUID)
-- `FTraceId` — identificador de requisicao (obrigatoriamente UUID v7 para ordenacao temporal)
+**Diferença entre `FId` e `FTraceId`:**
+- `FId` — identificador de entidade/agregado (aceita qualquer versão UUID)
+- `FTraceId` — identificador de requisição (obrigatoriamente UUID v7 para ordenação temporal)
 
 ---
 
 ## FApiKey
 
-Chave de API no formato UUID v4 para autenticacao de aplicacoes cliente.
+Chave de API no formato UUID v4 para autenticação de aplicações cliente.
 
 ```typescript
 import { FApiKey } from "tyforge";
@@ -131,19 +131,19 @@ apiKey.toSafeDisplay();
 FApiKey.isValid("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"); // true
 ```
 
-**Metodos estaticos:**
-- `generate()` — gera nova instancia com UUID v4
+**Métodos estáticos:**
+- `generate()` — gera nova instância com UUID v4
 - `generateString()` — retorna string UUID v4 sem wrapper
-- `isValid(value)` — verifica se e UUID v4 valido
+- `isValid(value)` — verifica se é UUID v4 válido
 
-**Metodos de instancia:**
-- `toSafeDisplay()` — retorna a chave mascarada, exibindo apenas o primeiro e ultimo segmento
+**Métodos de instância:**
+- `toSafeDisplay()` — retorna a chave mascarada, exibindo apenas o primeiro e último segmento
 
 ---
 
 ## FBearer
 
-Token de acesso Bearer para autenticacao em APIs. Deve comecar com o prefixo `"Bearer "` e ter entre 100 e 5000 caracteres.
+Token de acesso Bearer para autenticação em APIs. Deve começar com o prefixo `"Bearer "` e ter entre 100 e 5000 caracteres.
 
 ```typescript
 import { FBearer } from "tyforge";
@@ -156,16 +156,16 @@ const bearer = FBearer.createOrThrow(token);
 bearer.formatted(); // Garante prefixo "Bearer "
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento entre 100 e 5000 caracteres
-- Deve comecar com `"Bearer "` (com espaco)
-- Conteudo apos o prefixo deve ser nao-vazio
+- Deve começar com `"Bearer "` (com espaço)
+- Conteúdo após o prefixo deve ser não-vazio
 
 ---
 
 ## FSignature
 
-Assinatura digital no formato base64. Utilizada para verificacao de autenticidade e integridade de dados.
+Assinatura digital no formato base64. Utilizada para verificação de autenticidade e integridade de dados.
 
 ```typescript
 import { FSignature } from "tyforge";
@@ -178,37 +178,37 @@ const assinatura = FSignature.createOrThrow(sig);
 assinatura.formatted(); // Valor com trim
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento entre 64 e 512 caracteres
-- Deve ser uma string base64 valida (`/^[A-Za-z0-9+/]+=*$/`)
-- Conteudo limpo (sem espacos) deve ter no minimo 64 caracteres
+- Deve ser uma string base64 válida (`/^[A-Za-z0-9+/]+=*$/`)
+- Conteúdo limpo (sem espaços) deve ter no mínimo 64 caracteres
 
 ---
 
 ## FIdentifier
 
-Classe base abstrata para todos os TypeFields de identificacao. Nao impoe formato especifico — as subclasses definem suas proprias regras de validacao (UUID, alfanumerico, hexadecimal, etc). Fornece `validateType()` para narrowing de tipo e `generateId()` para geracao de UUIDs v7.
+Classe base abstrata para todos os TypeFields de identificação. Não impõe formato específico — as subclasses definem suas próprias regras de validação (UUID, alfanumérico, hexadecimal, etc). Fornece `validateType()` para narrowing de tipo e `generateId()` para geração de UUIDs v7.
 
 ```typescript
 import { FIdentifier } from "tyforge";
 
-// FIdentifier e abstrata — nao pode ser instanciada diretamente.
+// FIdentifier é abstrata — não pode ser instanciada diretamente.
 // Use as subclasses concretas (FTransactionId, FDeviceId, etc).
 
-// Gerar um UUID v7 (disponivel em todas as subclasses)
+// Gerar um UUID v7 (disponível em todas as subclasses)
 const uuid = FIdentifier.generateId();
 // "0193a5e7-8b3c-7d4e-9f1a-2b3c4d5e6f7a"
 ```
 
-**Metodos estaticos:**
-- `validateType(value, fieldPath)` — valida que o valor e uma string
+**Métodos estáticos:**
+- `validateType(value, fieldPath)` — valida que o valor é uma string
 - `generateId()` — retorna string UUID v7 sem wrapper
 
 ---
 
 ## FTransactionId
 
-Identificador unico de transacao no formato UUID. Utilizado para rastrear transacoes financeiras, pedidos e operacoes de negocio.
+Identificador único de transação no formato UUID. Utilizado para rastrear transações financeiras, pedidos e operações de negócio.
 
 ```typescript
 import { FTransactionId } from "tyforge";
@@ -225,15 +225,15 @@ const id = FTransactionId.createOrThrow("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d");
 id.getValue(); // "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
 ```
 
-**Metodos estaticos:**
-- `create(raw, fieldPath?)` — valida e cria instancia
-- `createOrThrow(raw, fieldPath?)` — lanca excecao se invalido
-- `assign(value, fieldPath?)` — hidratacao do banco
-- `generate(fieldPath?)` — gera nova instancia com UUID v7
+**Métodos estáticos:**
+- `create(raw, fieldPath?)` — valida e cria instância
+- `createOrThrow(raw, fieldPath?)` — lança exceção se inválido
+- `assign(value, fieldPath?)` — hidratação do banco
+- `generate(fieldPath?)` — gera nova instância com UUID v7
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento exato de 36 caracteres
-- Deve ser um UUID valido (`uuid.validate()`)
+- Deve ser um UUID válido (`uuid.validate()`)
 
 ---
 
@@ -253,21 +253,21 @@ const result = FDeviceId.create("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d");
 // Result<FDeviceId, ExceptionValidation>
 ```
 
-**Metodos estaticos:**
-- `create(raw, fieldPath?)` — valida e cria instancia
-- `createOrThrow(raw, fieldPath?)` — lanca excecao se invalido
-- `assign(value, fieldPath?)` — hidratacao do banco
-- `generate(fieldPath?)` — gera nova instancia com UUID v7
+**Métodos estáticos:**
+- `create(raw, fieldPath?)` — valida e cria instância
+- `createOrThrow(raw, fieldPath?)` — lança exceção se inválido
+- `assign(value, fieldPath?)` — hidratação do banco
+- `generate(fieldPath?)` — gera nova instância com UUID v7
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento exato de 36 caracteres
-- Deve ser um UUID valido (`uuid.validate()`)
+- Deve ser um UUID válido (`uuid.validate()`)
 
 ---
 
 ## FCorrelationId
 
-Identificador de correlacao no formato UUID para rastreamento de requisicoes entre sistemas distribuidos. Permite vincular logs, eventos e metricas de diferentes microservicos a uma mesma operacao.
+Identificador de correlação no formato UUID para rastreamento de requisições entre sistemas distribuídos. Permite vincular logs, eventos e métricas de diferentes microsserviços a uma mesma operação.
 
 ```typescript
 import { FCorrelationId } from "tyforge";
@@ -276,26 +276,26 @@ import { FCorrelationId } from "tyforge";
 const correlationId = FCorrelationId.generate();
 correlationId.getValue(); // "0193a5e7-8b3c-7d4e-9f1a-2b3c4d5e6f7a"
 
-// Validar correlation ID recebido (nos microservicos)
+// Validar correlation ID recebido (nos microsserviços)
 const result = FCorrelationId.create(headers["x-correlation-id"]);
 // Result<FCorrelationId, ExceptionValidation>
 ```
 
-**Metodos estaticos:**
-- `create(raw, fieldPath?)` — valida e cria instancia
-- `createOrThrow(raw, fieldPath?)` — lanca excecao se invalido
-- `assign(value, fieldPath?)` — hidratacao do banco
-- `generate(fieldPath?)` — gera nova instancia com UUID v7
+**Métodos estáticos:**
+- `create(raw, fieldPath?)` — valida e cria instância
+- `createOrThrow(raw, fieldPath?)` — lança exceção se inválido
+- `assign(value, fieldPath?)` — hidratação do banco
+- `generate(fieldPath?)` — gera nova instância com UUID v7
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento exato de 36 caracteres
-- Deve ser um UUID valido (`uuid.validate()`)
+- Deve ser um UUID válido (`uuid.validate()`)
 
 ---
 
 ## FReconciliationId
 
-Identificador de conciliacao para correspondencia de pagamentos e transacoes financeiras. Aceita strings alfanumericas de ate 35 caracteres, compativel com padroes bancarios e de adquirentes.
+Identificador de conciliação para correspondência de pagamentos e transações financeiras. Aceita strings alfanuméricas de até 35 caracteres, compatível com padrões bancários e de adquirentes.
 
 ```typescript
 import { FReconciliationId } from "tyforge";
@@ -307,15 +307,15 @@ const id = FReconciliationId.createOrThrow("TXN987654321");
 id.getValue(); // "TXN987654321"
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento entre 1 e 35 caracteres
-- Deve conter apenas caracteres alfanumericos (`/^[a-zA-Z0-9]+$/`)
+- Deve conter apenas caracteres alfanuméricos (`/^[a-zA-Z0-9]+$/`)
 
 ---
 
 ## FIdempotencyKey
 
-Chave de idempotencia para prevenir operacoes duplicadas. Aceita strings alfanumericas com hifens, tipicamente UUIDs ou hashes. Essencial para garantir que retentativas de requisicao nao causem efeitos colaterais duplicados.
+Chave de idempotência para prevenir operações duplicadas. Aceita strings alfanuméricas com hifens, tipicamente UUIDs ou hashes. Essencial para garantir que retentativas de requisição não causem efeitos colaterais duplicados.
 
 ```typescript
 import { FIdempotencyKey } from "tyforge";
@@ -327,15 +327,15 @@ const key = FIdempotencyKey.createOrThrow("550e8400e29b41d4a716446655440000");
 key.getValue(); // "550e8400e29b41d4a716446655440000"
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento entre 32 e 36 caracteres
-- Deve conter apenas caracteres alfanumericos e hifens (`/^[a-zA-Z0-9\-]+$/`)
+- Deve conter apenas caracteres alfanuméricos e hifens (`/^[a-zA-Z0-9\-]+$/`)
 
 ---
 
 ## FCertificateThumbprint
 
-Thumbprint (impressao digital) de certificado digital em formato hexadecimal. Suporta SHA-1 (40 caracteres) e SHA-256 (64 caracteres). Utilizado para identificar certificados em integracao com APIs de pagamento, assinatura digital e mTLS.
+Thumbprint (impressão digital) de certificado digital em formato hexadecimal. Suporta SHA-1 (40 caracteres) e SHA-256 (64 caracteres). Utilizado para identificar certificados em integração com APIs de pagamento, assinatura digital e mTLS.
 
 ```typescript
 import { FCertificateThumbprint } from "tyforge";
@@ -351,7 +351,7 @@ const sha256 = FCertificateThumbprint.createOrThrow(
 sha256.getValue(); // "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Deve conter apenas caracteres hexadecimais (`/^[0-9A-Fa-f]+$/`)
 - Comprimento deve ser exatamente 40 (SHA-1) ou 64 (SHA-256) caracteres
 
@@ -359,7 +359,7 @@ sha256.getValue(); // "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b
 
 ## FBankNsu
 
-NSU (Numero Sequencial Unico) bancario — identificador alfanumerico de comprovante ou transacao emitido pela adquirente ou processador de pagamento.
+NSU (Número Sequencial Único) bancário — identificador alfanumérico de comprovante ou transação emitido pela adquirente ou processador de pagamento.
 
 ```typescript
 import { FBankNsu } from "tyforge";
@@ -371,6 +371,6 @@ const nsu = FBankNsu.createOrThrow("NSU20240315001");
 nsu.getValue(); // "NSU20240315001"
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento entre 1 e 20 caracteres
-- Deve conter apenas caracteres alfanumericos (`/^[a-zA-Z0-9]+$/`)
+- Deve conter apenas caracteres alfanuméricos (`/^[a-zA-Z0-9]+$/`)

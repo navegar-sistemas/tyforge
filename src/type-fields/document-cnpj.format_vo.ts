@@ -72,8 +72,7 @@ export class FDocumentCnpj extends TypeField<TDocumentCnpj, TDocumentCnpjFormatt
   }
 
   override formatted(): TDocumentCnpjFormatted {
-    const v = this.getValue();
-    return `${v.substring(0, 2)}.${v.substring(2, 5)}.${v.substring(5, 8)}/${v.substring(8, 12)}-${v.substring(12, 14)}`;
+    return TypeField.applyMask(this.getValue(), [2, ".", 3, ".", 3, "/", 4, "-", 2]);
   }
 
   override getDescription(): string {

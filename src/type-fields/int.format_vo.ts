@@ -32,7 +32,7 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
     if (validateLevel !== "full") return OK_TRUE;
     if (!Number.isInteger(value)) {
       return err(
-        ExceptionValidation.create(fieldPath, "Valor deve ser um número inteiro"),
+        ExceptionValidation.create(fieldPath, "Value must be an integer"),
       );
     }
     return OK_TRUE;
@@ -40,6 +40,14 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
 
   static validateType(value: unknown, fieldPath: string): Result<TInt, ExceptionValidation> {
     return TypeGuard.extractNumber(value, fieldPath);
+  }
+
+  static formCreate(raw: unknown, fieldPath = "Int"): Result<FInt, ExceptionValidation> {
+    return FInt.create(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  }
+
+  static formAssign(raw: unknown, fieldPath = "Int"): Result<FInt, ExceptionValidation> {
+    return FInt.assign(TypeField.normalizeFormInput(raw, "number"), fieldPath);
   }
 
   static create<T = TInt>(raw: T, fieldPath = "Int"): Result<FInt, ExceptionValidation> {
@@ -70,7 +78,7 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
     return String(this.getValue());
   }
 
-  override formatted(): string {
+  override formatted(): TIntFormatted {
     return String(this.getValue());
   }
 

@@ -49,6 +49,51 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
     if (options.locale) TypeField.locale = options.locale;
   }
 
+  // Progressive mask: applies separators only when enough digits exist.
+  // Pattern example: [3, ".", 3, ".", 3, "-", 2] for CPF (XXX.XXX.XXX-XX).
+  static applyMask(value: string, pattern: (number | string)[]): string {
+    let result = "";
+    let pos = 0;
+    for (const part of pattern) {
+      if (pos >= value.length) break;
+      if (typeof part === "number") {
+        result += value.substring(pos, pos + part);
+        pos += part;
+      } else {
+        if (pos < value.length) result += part;
+      }
+    }
+    return result;
+  }
+
+  // Normalizes form input (always string) to the expected primitive type.
+  // Called by formCreate/formAssign before delegating to create/assign.
+  // Rejects hex (0x), octal (0o), binary (0b), scientific notation (1e5), Infinity.
+  // Supports locale decimal separators: "10,50" → 10.50 (comma → dot).
+  private static readonly FORM_NUMBER_REGEX = /^-?\d+([.,]\d+)?$/;
+
+  static normalizeFormInput(value: unknown, targetType: string): unknown {
+    if (typeof value !== "string") return value;
+    const trimmed = value.trim();
+    switch (targetType) {
+      case "number": {
+        if (trimmed === "") return trimmed;
+        if (!TypeField.FORM_NUMBER_REGEX.test(trimmed)) return trimmed;
+        const normalized = trimmed.replace(",", ".");
+        const n = Number(normalized);
+        return isNaN(n) ? trimmed : n;
+      }
+      case "boolean": {
+        const lower = trimmed.toLowerCase();
+        if (lower === "true" || lower === "1") return true;
+        if (lower === "false" || lower === "0") return false;
+        return trimmed;
+      }
+      default:
+        return trimmed;
+    }
+  }
+
   abstract readonly typeInference: string;
   abstract readonly config: ITypeFieldConfig<TPrimitive>;
 

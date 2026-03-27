@@ -42,6 +42,14 @@ export class FMoney extends TypeField<TMoney, TMoneyFormatted> {
     return TypeGuard.extractNumber(value, fieldPath);
   }
 
+  static formCreate(raw: unknown, fieldPath = "Money"): Result<FMoney, ExceptionValidation> {
+    return FMoney.create(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  }
+
+  static formAssign(raw: unknown, fieldPath = "Money"): Result<FMoney, ExceptionValidation> {
+    return FMoney.assign(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  }
+
   static create<T = TMoney>(raw: T, fieldPath = "Money"): Result<FMoney, ExceptionValidation> {
     const typed = FMoney.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);

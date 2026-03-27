@@ -1,25 +1,25 @@
 ---
-title: Bancario
+title: Bancário
 sidebar_position: 9
 ---
 
-# Type Fields — Bancario
+# Type Fields — Bancário
 
-Type Fields para dados bancarios e de pagamento. Varios campos sao locale-aware e aplicam regras especificas quando `TypeField.locale` esta configurado como `"br"` (Brasil).
+Type Fields para dados bancários e de pagamento. Vários campos são locale-aware e aplicam regras específicas quando `TypeField.locale` está configurado como `"br"` (Brasil).
 
 ## Resumo
 
-| Classe | Min | Max | Validacao extra | Arquivo |
+| Classe | Min | Max | Validação extra | Arquivo |
 |--------|-----|-----|-----------------|---------|
-| `FBankCode` | 1 | 20 | Numerico; locale `br`: ISPB 8 digitos | `bank-code.format_vo.ts` |
-| `FBankBranch` | 1 | 20 | Numerico; locale `br`: 4 digitos | `bank-branch.format_vo.ts` |
-| `FBankAccountNumber` | 1 | 34 | Alfanumerico; locale `br`: 1-13 digitos + digito verificador | `bank-account-number.format_vo.ts` |
-| `FBankNsu` | 1 | 20 | Alfanumerico | `bank-nsu.format_vo.ts` |
-| `FBankE2eId` | 1 | 35 | Alfanumerico | `bank-e2e-id.format_vo.ts` |
-| `FEmvQrCodePayload` | 1 | 1000 | String generica | `emv-qr-code-payload.format_vo.ts` |
+| `FBankCode` | 1 | 20 | Numérico; locale `br`: ISPB 8 dígitos | `bank-code.format_vo.ts` |
+| `FBankBranch` | 1 | 20 | Numérico; locale `br`: 4 dígitos | `bank-branch.format_vo.ts` |
+| `FBankAccountNumber` | 1 | 34 | Alfanumérico; locale `br`: 1-13 dígitos + dígito verificador | `bank-account-number.format_vo.ts` |
+| `FBankNsu` | 1 | 20 | Alfanumérico | `bank-nsu.format_vo.ts` |
+| `FBankE2eId` | 1 | 35 | Alfanumérico | `bank-e2e-id.format_vo.ts` |
+| `FEmvQrCodePayload` | 1 | 1000 | String genérica | `emv-qr-code-payload.format_vo.ts` |
 
-:::tip Configuracao de locale
-Para ativar as validacoes especificas do Brasil, configure o locale no bootstrap da aplicacao:
+:::tip Configuração de locale
+Para ativar as validações específicas do Brasil, configure o locale no bootstrap da aplicação:
 
 ```typescript
 import { TypeField } from "tyforge";
@@ -34,7 +34,7 @@ Isso afeta `FBankCode`, `FBankBranch` e `FBankAccountNumber`.
 
 ## FBankCode
 
-Codigo de identificacao bancaria. No modo generico, aceita qualquer string numerica de 1 a 20 caracteres. Com locale `"br"`, exige exatamente 8 digitos numericos no formato ISPB (Identificador do Sistema de Pagamentos Brasileiro).
+Código de identificação bancária. No modo genérico, aceita qualquer string numérica de 1 a 20 caracteres. Com locale `"br"`, exige exatamente 8 dígitos numéricos no formato ISPB (Identificador do Sistema de Pagamentos Brasileiro).
 
 ```typescript
 import { FBankCode } from "tyforge";
@@ -53,24 +53,24 @@ import { FBankCode, TypeField } from "tyforge";
 
 TypeField.configure({ locale: "br" });
 
-// Aceita ISPB de 8 digitos
+// Aceita ISPB de 8 dígitos
 const itau = FBankCode.createOrThrow("60701190");
 itau.getValue(); // "60701190"
 
-// Rejeita formatos invalidos
+// Rejeita formatos inválidos
 const invalido = FBankCode.create("123");
 // Result com erro: "ISPB bank code must be exactly 8 numeric digits"
 ```
 
-**Regras de validacao:**
-- Apenas digitos numericos (`/^\d+$/`)
-- Locale `br`: exatamente 8 digitos numericos (ISPB)
+**Regras de validação:**
+- Apenas dígitos numéricos (`/^\d+$/`)
+- Locale `br`: exatamente 8 dígitos numéricos (ISPB)
 
 ---
 
 ## FBankBranch
 
-Numero da agencia bancaria. No modo generico, aceita qualquer string numerica. Com locale `"br"`, exige exatamente 4 digitos.
+Número da agência bancária. No modo genérico, aceita qualquer string numérica. Com locale `"br"`, exige exatamente 4 dígitos.
 
 ```typescript
 import { FBankBranch } from "tyforge";
@@ -89,24 +89,24 @@ import { FBankBranch, TypeField } from "tyforge";
 
 TypeField.configure({ locale: "br" });
 
-// Aceita agencia de 4 digitos
+// Aceita agência de 4 dígitos
 const ag = FBankBranch.createOrThrow("1234");
 ag.getValue(); // "1234"
 
-// Rejeita formatos invalidos
+// Rejeita formatos inválidos
 const invalido = FBankBranch.create("12");
 // Result com erro: "Brazilian bank branch must be exactly 4 numeric digits"
 ```
 
-**Regras de validacao:**
-- Apenas digitos numericos (`/^\d+$/`)
-- Locale `br`: exatamente 4 digitos numericos
+**Regras de validação:**
+- Apenas dígitos numéricos (`/^\d+$/`)
+- Locale `br`: exatamente 4 dígitos numéricos
 
 ---
 
 ## FBankAccountNumber
 
-Numero da conta bancaria. No modo generico, aceita strings alfanumericas de ate 34 caracteres. Com locale `"br"`, exige de 1 a 13 digitos numericos, opcionalmente seguidos de digito verificador (`-D`).
+Número da conta bancária. No modo genérico, aceita strings alfanuméricas de até 34 caracteres. Com locale `"br"`, exige de 1 a 13 dígitos numéricos, opcionalmente seguidos de dígito verificador (`-D`).
 
 ```typescript
 import { FBankAccountNumber } from "tyforge";
@@ -128,20 +128,20 @@ TypeField.configure({ locale: "br" });
 // Conta simples
 const conta1 = FBankAccountNumber.createOrThrow("12345678");
 
-// Conta com digito verificador
+// Conta com dígito verificador
 const conta2 = FBankAccountNumber.createOrThrow("12345678-9");
 conta2.getValue(); // "12345678-9"
 ```
 
-**Regras de validacao:**
-- Alfanumerico (ate 34 caracteres)
-- Locale `br`: 1 a 13 digitos numericos, opcionalmente seguidos de `-D` (digito verificador)
+**Regras de validação:**
+- Alfanumérico (até 34 caracteres)
+- Locale `br`: 1 a 13 dígitos numéricos, opcionalmente seguidos de `-D` (dígito verificador)
 
 ---
 
 ## FBankNsu
 
-NSU (Numero Sequencial Unico) — identificador alfanumerico de recibo ou transacao emitido pelo processador de pagamento.
+NSU (Número Sequencial Único) — identificador alfanumérico de recibo ou transação emitido pelo processador de pagamento.
 
 ```typescript
 import { FBankNsu } from "tyforge";
@@ -153,15 +153,15 @@ const nsu = FBankNsu.createOrThrow("123456789012");
 nsu.getValue(); // "123456789012"
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento entre 1 e 20 caracteres
-- Apenas caracteres alfanumericos (`/^[a-zA-Z0-9]+$/`)
+- Apenas caracteres alfanuméricos (`/^[a-zA-Z0-9]+$/`)
 
 ---
 
 ## FBankE2eId
 
-Identificador end-to-end (E2E) para transacoes de pagamento instantaneo. Utilizado para rastrear uma transacao da origem ao destino.
+Identificador end-to-end (E2E) para transações de pagamento instantâneo. Utilizado para rastrear uma transação da origem ao destino.
 
 ```typescript
 import { FBankE2eId } from "tyforge";
@@ -173,15 +173,15 @@ const e2e = FBankE2eId.createOrThrow("E00000000202301011234abcdefghij");
 e2e.getValue(); // "E00000000202301011234abcdefghij"
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento entre 1 e 35 caracteres
-- Apenas caracteres alfanumericos (`/^[a-zA-Z0-9]+$/`)
+- Apenas caracteres alfanuméricos (`/^[a-zA-Z0-9]+$/`)
 
 ---
 
 ## FEmvQrCodePayload
 
-Payload de QR Code no padrao EMV — string codificada contendo dados de pagamento (comerciante, valor, moeda) para processamento de pagamentos instantaneos.
+Payload de QR Code no padrão EMV — string codificada contendo dados de pagamento (comerciante, valor, moeda) para processamento de pagamentos instantâneos.
 
 ```typescript
 import { FEmvQrCodePayload } from "tyforge";
@@ -194,6 +194,6 @@ const qr = FEmvQrCodePayload.createOrThrow(payload);
 qr.getValue(); // string completa do payload
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento entre 1 e 1000 caracteres
-- Aceita qualquer string valida (a validacao de estrutura EMV e responsabilidade da camada de negocio)
+- Aceita qualquer string válida (a validação de estrutura EMV é responsabilidade da camada de negócio)

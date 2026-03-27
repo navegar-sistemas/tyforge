@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.23] - 2026-03-27
+
+### Added
+- `applyMask()` shared utility (`mask.util.ts`) for progressive document masking
+
+### Fixed
+- Portuguese error messages translated to English in `FInt`, `FPageNumber`, `FPageSize`
+- `formatted()` return type aliases fixed in `FInt`, `FBoolean`, `FPageNumber`, `FPageSize`
+- `applyMask` deduplicated — extracted from 3 document files to shared `mask.util.ts`
+- Documentation: corrected Portuguese accents across all Docusaurus pages
+
 ## [0.1.22] - 2026-03-27
 
 ### Added

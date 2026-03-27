@@ -5,16 +5,16 @@ sidebar_position: 4
 
 # Docker
 
-O site de documentacao roda em Docker com Docusaurus.
+O site de documentação roda em Docker com Docusaurus.
 
-## Producao
+## Produção
 
 ```bash
 cd docs
 docker compose -f docker-compose.yml up
 ```
 
-Serve o site estatico na porta **4200** com limites de recursos, filesystem read-only, healthcheck e logging configurados.
+Serve o site estático na porta **4200** com limites de recursos, filesystem read-only, healthcheck e logging configurados.
 
 ## Desenvolvimento
 
@@ -30,27 +30,27 @@ docker compose up
 
 O override de desenvolvimento:
 
-| Config | Producao | Desenvolvimento |
+| Config | Produção | Desenvolvimento |
 |--------|----------|-----------------|
-| Dockerfile | `Dockerfile` (build estatico + serve) | `Dockerfile.dev` (docusaurus start --poll) |
+| Dockerfile | `Dockerfile` (build estático + serve) | `Dockerfile.dev` (docusaurus start --poll) |
 | Filesystem | `read_only: true` | `read_only: false` |
-| Memoria | 256M | 2G |
+| Memória | 256M | 2G |
 | CPU | 1 | 2 |
 | PIDs | 100 | 200 |
 | Healthcheck | wget a cada 30s | desabilitado |
-| Hot reload | nao | sim (volumes montados) |
+| Hot reload | não | sim (volumes montados) |
 
-O webpack do Docusaurus em dev consome mais memoria e processos que o `serve` estatico de producao — por isso os limites sao maiores no override.
+O webpack do Docusaurus em dev consome mais memória e processos que o `serve` estático de produção — por isso os limites são maiores no override.
 
 ## Volumes montados (dev)
 
 ```yaml
 volumes:
-  - ./docs:/app/docs        # Conteudo markdown
+  - ./docs:/app/docs        # Conteúdo markdown
   - ./src:/app/src          # Componentes React
-  - ./static:/app/static    # Arquivos estaticos
+  - ./static:/app/static    # Arquivos estáticos
   - ./docusaurus.config.js  # Config principal
-  - ./sidebars.ts           # Navegacao
+  - ./sidebars.ts           # Navegação
 ```
 
-Editar qualquer arquivo montado dispara recompilacao automatica (~600ms).
+Editar qualquer arquivo montado dispara recompilação automática (~600ms).

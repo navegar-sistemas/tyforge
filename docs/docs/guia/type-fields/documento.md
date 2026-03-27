@@ -5,31 +5,31 @@ sidebar_position: 8
 
 # Type Fields — Documentos
 
-Type Fields para validacao de documentos de identificacao. Inclui documentos brasileiros (CPF, CNPJ, RG) e tipos genericos para sistemas multi-locale.
+Type Fields para validação de documentos de identificação. Inclui documentos brasileiros (CPF, CNPJ, RG) e tipos genéricos para sistemas multi-locale.
 
 ## Resumo
 
-| Classe | Min | Max | Validacao extra | Arquivo |
+| Classe | Min | Max | Validação extra | Arquivo |
 |--------|-----|-----|-----------------|---------|
-| `FDocumentId` | 1 | 20 | Alfanumerico; locale `br`: 11 digitos (CPF) ou 14 (CNPJ) | `document-id.format_vo.ts` |
-| `FDocumentCpf` | 11 | 11 | Exatamente 11 digitos numericos | `document-cpf.format_vo.ts` |
-| `FDocumentCnpj` | 14 | 14 | Exatamente 14 digitos numericos | `document-cnpj.format_vo.ts` |
-| `FDocumentCpfOrCnpj` | 11 | 14 | 11 digitos (CPF) ou 14 digitos (CNPJ) | `document-cpf-or-cnpj.format_vo.ts` |
-| `FDocumentRg` | 7 | 14 | Alfanumerico | `document-rg.format_vo.ts` |
+| `FDocumentId` | 1 | 20 | Alfanumérico; locale `br`: 11 dígitos (CPF) ou 14 (CNPJ) | `document-id.format_vo.ts` |
+| `FDocumentCpf` | 11 | 11 | Exatamente 11 dígitos numéricos | `document-cpf.format_vo.ts` |
+| `FDocumentCnpj` | 14 | 14 | Exatamente 14 dígitos numéricos | `document-cnpj.format_vo.ts` |
+| `FDocumentCpfOrCnpj` | 11 | 14 | 11 dígitos (CPF) ou 14 dígitos (CNPJ) | `document-cpf-or-cnpj.format_vo.ts` |
+| `FDocumentRg` | 7 | 14 | Alfanumérico | `document-rg.format_vo.ts` |
 | `FDocumentType` | 1 | 20 | Enum `ODocumentType` | `document-type.format_vo.ts` |
-| `FDocumentStateRegistration` | 1 | 20 | Apenas digitos numericos | `document-state-registration.format_vo.ts` |
-| `FDocumentMunicipalRegistration` | 1 | 20 | Apenas digitos numericos | `document-municipal-registration.format_vo.ts` |
+| `FDocumentStateRegistration` | 1 | 20 | Apenas dígitos numéricos | `document-state-registration.format_vo.ts` |
+| `FDocumentMunicipalRegistration` | 1 | 20 | Apenas dígitos numéricos | `document-municipal-registration.format_vo.ts` |
 
 ---
 
 ## FDocumentId
 
-Identificador generico de documento com validacao locale-aware. No modo padrao, aceita qualquer string alfanumerica de 1 a 20 caracteres. Com `TypeField.locale = "br"`, valida especificamente CPF (11 digitos) ou CNPJ (14 digitos).
+Identificador genérico de documento com validação locale-aware. No modo padrão, aceita qualquer string alfanumérica de 1 a 20 caracteres. Com `TypeField.locale = "br"`, valida especificamente CPF (11 dígitos) ou CNPJ (14 dígitos).
 
 ```typescript
 import { FDocumentId } from "tyforge";
 
-// Modo generico (qualquer locale)
+// Modo genérico (qualquer locale)
 const result = FDocumentId.create("ABC123456");
 // Result<FDocumentId, ExceptionValidation>
 
@@ -44,26 +44,26 @@ import { FDocumentId, TypeField } from "tyforge";
 
 TypeField.configure({ locale: "br" });
 
-// Aceita CPF (11 digitos)
+// Aceita CPF (11 dígitos)
 const cpf = FDocumentId.createOrThrow("12345678901");
 
-// Aceita CNPJ (14 digitos)
+// Aceita CNPJ (14 dígitos)
 const cnpj = FDocumentId.createOrThrow("12345678000190");
 
-// Rejeita formatos invalidos para locale br
+// Rejeita formatos inválidos para locale br
 const invalido = FDocumentId.create("ABC123");
 // Result com erro: "Brazilian document must be exactly 11 digits (CPF) or 14 digits (CNPJ)"
 ```
 
-**Regras de validacao:**
-- Modo generico: apenas caracteres alfanumericos (`/^[a-zA-Z0-9]+$/`)
-- Locale `br`: exatamente 11 digitos (CPF) ou 14 digitos (CNPJ)
+**Regras de validação:**
+- Modo genérico: apenas caracteres alfanuméricos (`/^[a-zA-Z0-9]+$/`)
+- Locale `br`: exatamente 11 dígitos (CPF) ou 14 dígitos (CNPJ)
 
 ---
 
 ## FDocumentCpf
 
-Numero de CPF brasileiro (Cadastro de Pessoas Fisicas). Armazena 11 digitos numericos e oferece formatacao automatica no padrao XXX.XXX.XXX-XX.
+Número de CPF brasileiro (Cadastro de Pessoas Físicas). Armazena 11 dígitos numéricos e oferece formatação automática no padrão XXX.XXX.XXX-XX.
 
 ```typescript
 import { FDocumentCpf } from "tyforge";
@@ -76,15 +76,15 @@ cpf.getValue();  // "12345678901"
 cpf.formatted(); // "123.456.789-01"
 ```
 
-**Regras de validacao:**
-- Exatamente 11 digitos numericos (`/^\d{11}$/`)
-- Valores com pontuacao ou letras sao rejeitados
+**Regras de validação:**
+- Exatamente 11 dígitos numéricos (`/^\d{11}$/`)
+- Valores com pontuação ou letras são rejeitados
 
 ---
 
 ## FDocumentCnpj
 
-Numero de CNPJ brasileiro (Cadastro Nacional da Pessoa Juridica). Armazena 14 digitos numericos e oferece formatacao automatica no padrao XX.XXX.XXX/XXXX-XX.
+Número de CNPJ brasileiro (Cadastro Nacional da Pessoa Jurídica). Armazena 14 dígitos numéricos e oferece formatação automática no padrão XX.XXX.XXX/XXXX-XX.
 
 ```typescript
 import { FDocumentCnpj } from "tyforge";
@@ -97,15 +97,15 @@ cnpj.getValue();  // "12345678000190"
 cnpj.formatted(); // "12.345.678/0001-90"
 ```
 
-**Regras de validacao:**
-- Exatamente 14 digitos numericos (`/^\d{14}$/`)
-- Valores com pontuacao ou letras sao rejeitados
+**Regras de validação:**
+- Exatamente 14 dígitos numéricos (`/^\d{14}$/`)
+- Valores com pontuação ou letras são rejeitados
 
 ---
 
 ## FDocumentCpfOrCnpj
 
-Aceita tanto CPF (11 digitos) quanto CNPJ (14 digitos). Util para campos onde o tipo de pessoa (fisica ou juridica) nao e conhecido previamente. Oferece metodos para identificar o tipo do documento.
+Aceita tanto CPF (11 dígitos) quanto CNPJ (14 dígitos). Útil para campos onde o tipo de pessoa (física ou jurídica) não é conhecido previamente. Oferece métodos para identificar o tipo do documento.
 
 ```typescript
 import { FDocumentCpfOrCnpj } from "tyforge";
@@ -123,20 +123,20 @@ cnpj.isCnpj();    // true
 cnpj.formatted(); // "12.345.678/0001-90"
 ```
 
-**Metodos de instancia:**
-- `isCpf()` — retorna `true` se o documento tem 11 digitos (CPF)
-- `isCnpj()` — retorna `true` se o documento tem 14 digitos (CNPJ)
-- `formatted()` — formata automaticamente no padrao correspondente
+**Métodos de instância:**
+- `isCpf()` — retorna `true` se o documento tem 11 dígitos (CPF)
+- `isCnpj()` — retorna `true` se o documento tem 14 dígitos (CNPJ)
+- `formatted()` — formata automaticamente no padrão correspondente
 
-**Regras de validacao:**
-- Deve ser exatamente 11 digitos (CPF) ou 14 digitos (CNPJ)
-- Apenas digitos numericos
+**Regras de validação:**
+- Deve ser exatamente 11 dígitos (CPF) ou 14 dígitos (CNPJ)
+- Apenas dígitos numéricos
 
 ---
 
 ## FDocumentRg
 
-Numero de RG brasileiro (Registro Geral / Carteira de Identidade). Aceita caracteres alfanumericos entre 7 e 14 posicoes.
+Número de RG brasileiro (Registro Geral / Carteira de Identidade). Aceita caracteres alfanuméricos entre 7 e 14 posições.
 
 ```typescript
 import { FDocumentRg } from "tyforge";
@@ -148,15 +148,15 @@ const rg = FDocumentRg.createOrThrow("12345678X");
 rg.getValue(); // "12345678X"
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento entre 7 e 14 caracteres
-- Apenas caracteres alfanumericos (`/^[a-zA-Z0-9]+$/`)
+- Apenas caracteres alfanuméricos (`/^[a-zA-Z0-9]+$/`)
 
 ---
 
 ## FDocumentType
 
-Tipo de documento de identificacao. Validado contra o enum `ODocumentType`.
+Tipo de documento de identificação. Validado contra o enum `ODocumentType`.
 
 ```typescript
 import { FDocumentType, ODocumentType } from "tyforge";
@@ -190,15 +190,15 @@ export type TDocumentType = (typeof ODocumentType)[TKeyDocumentType];
 // "NATIONAL_ID" | "DRIVER_LICENSE" | "PASSPORT" | "RESIDENCE_PERMIT" | "TAX_ID"
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Aceita apenas os valores do enum `ODocumentType`
-- Qualquer outro valor e rejeitado
+- Qualquer outro valor é rejeitado
 
 ---
 
 ## FDocumentStateRegistration
 
-Numero de inscricao estadual (IE). Armazena apenas digitos numericos com comprimento variavel (1 a 20 caracteres).
+Número de inscrição estadual (IE). Armazena apenas dígitos numéricos com comprimento variável (1 a 20 caracteres).
 
 ```typescript
 import { FDocumentStateRegistration } from "tyforge";
@@ -210,15 +210,15 @@ const ie = FDocumentStateRegistration.createOrThrow("1234567890");
 ie.getValue(); // "1234567890"
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento entre 1 e 20 caracteres
-- Apenas digitos numericos (`/^\d+$/`)
+- Apenas dígitos numéricos (`/^\d+$/`)
 
 ---
 
 ## FDocumentMunicipalRegistration
 
-Numero de inscricao municipal (IM). Armazena apenas digitos numericos com comprimento variavel (1 a 20 caracteres).
+Número de inscrição municipal (IM). Armazena apenas dígitos numéricos com comprimento variável (1 a 20 caracteres).
 
 ```typescript
 import { FDocumentMunicipalRegistration } from "tyforge";
@@ -230,6 +230,6 @@ const im = FDocumentMunicipalRegistration.createOrThrow("987654321");
 im.getValue(); // "987654321"
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento entre 1 e 20 caracteres
-- Apenas digitos numericos (`/^\d+$/`)
+- Apenas dígitos numéricos (`/^\d+$/`)

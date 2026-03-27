@@ -5,13 +5,13 @@ sidebar_position: 4
 
 # Type Fields — Datas
 
-Type Fields de data encapsulam valores `Date` com formatos ISO 8601 especificos. Todos estendem a classe abstrata `FDate`, que por sua vez estende `TypeField<Date, string>`.
+Type Fields de data encapsulam valores `Date` com formatos ISO 8601 específicos. Todos estendem a classe abstrata `FDate`, que por sua vez estende `TypeField<Date, string>`.
 
-Todos os campos de data aceitam tanto `string` quanto `Date` no metodo `create()`. O valor e armazenado internamente como `Date` e formatado conforme o formato especifico via `toString()` e `formatted()`.
+Todos os campos de data aceitam tanto `string` quanto `Date` no método `create()`. O valor é armazenado internamente como `Date` e formatado conforme o formato específico via `toString()` e `formatted()`.
 
 ## Resumo
 
-| Classe | Formato de saida | Exemplo | Arquivo |
+| Classe | Formato de saída | Exemplo | Arquivo |
 |--------|-----------------|---------|---------|
 | `FDateTimeISOZMillis` | `YYYY-MM-DDTHH:mm:ss.sssZ` | `2024-01-15T10:30:00.000Z` | `date.format_vo.ts` |
 | `FDateTimeISOZ` | `YYYY-MM-DDTHH:mm:ssZ` | `2024-01-15T10:30:00Z` | `date.format_vo.ts` |
@@ -24,7 +24,7 @@ Todos os campos de data aceitam tanto `string` quanto `Date` no metodo `create()
 
 ## FDateTimeISOZMillis
 
-Formato ISO 8601 completo com fuso Zulu e milissegundos. E o formato mais preciso disponivel.
+Formato ISO 8601 completo com fuso Zulu e milissegundos. É o formato mais preciso disponível.
 
 ```typescript
 import { FDateTimeISOZMillis } from "tyforge";
@@ -36,7 +36,7 @@ const result = FDateTimeISOZMillis.create("2024-01-15T10:30:00.000Z");
 // A partir de Date
 const fromDate = FDateTimeISOZMillis.create(new Date());
 
-// Gerar data atual como instancia
+// Gerar data atual como instância
 const agora = FDateTimeISOZMillis.generate();
 agora.toString(); // "2024-01-15T10:30:00.000Z"
 
@@ -45,10 +45,10 @@ const str = FDateTimeISOZMillis.generateToString();
 // "2024-01-15T10:30:00.000Z"
 ```
 
-**Metodos estaticos adicionais:**
-- `generate()` — cria instancia com `new Date()` atual
-- `generateToString(date?)` — retorna string formatada sem criar instancia
-- `createOrThrow(date)` — lanca excecao se a data for invalida
+**Métodos estáticos adicionais:**
+- `generate()` — cria instância com `new Date()` atual
+- `generateToString(date?)` — retorna string formatada sem criar instância
+- `createOrThrow(date)` — lança exceção se a data for inválida
 
 ---
 
@@ -66,7 +66,7 @@ const data = FDateTimeISOZ.createOrThrow(new Date());
 data.toString(); // "2024-01-15T10:30:00Z"
 ```
 
-**Metodos estaticos adicionais:**
+**Métodos estáticos adicionais:**
 - `generateDateString(date?)` — retorna string no formato UTC sem milissegundos
 
 ---
@@ -138,7 +138,7 @@ abstract class FDate extends TypeField<Date, string> {
   // Config compartilhado
   static readonly config: ITypeFieldConfig<Date> = { jsonSchemaType: "Date" };
 
-  // Cada subclasse implementa a formatacao
+  // Cada subclasse implementa a formatação
   protected abstract formatValue(date: Date): string;
 
   // toString(), formatted(), getDescription() e getShortDescription()
@@ -146,4 +146,4 @@ abstract class FDate extends TypeField<Date, string> {
 }
 ```
 
-O `toJSON()` de domain models com campos `FDate` respeita a configuracao `{ date: 'string' | 'date' }` — quando `date: 'string'`, o valor e serializado via `toString()` no formato especifico da subclasse.
+O `toJSON()` de domain models com campos `FDate` respeita a configuração `{ date: 'string' | 'date' }` — quando `date: 'string'`, o valor é serializado via `toString()` no formato específico da subclasse.

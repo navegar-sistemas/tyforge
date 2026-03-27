@@ -5,11 +5,11 @@ sidebar_position: 10
 
 # Type Fields — PIX
 
-Type Fields para o sistema de pagamentos instantaneos PIX do Banco Central do Brasil. Cobrem chaves PIX multi-formato e o enum de tipo de chave.
+Type Fields para o sistema de pagamentos instantâneos PIX do Banco Central do Brasil. Cobrem chaves PIX multi-formato e o enum de tipo de chave.
 
 ## Resumo
 
-| Classe | Min | Max | Validacao extra | Arquivo |
+| Classe | Min | Max | Validação extra | Arquivo |
 |--------|-----|-----|-----------------|---------|
 | `FPixKey` | 1 | 77 | CPF, CNPJ, telefone, email ou EVP | `pix-key.format_vo.ts` |
 | `FPixKeyType` | 1 | 10 | Enum `OPixKeyType` | `pix-key-type.format_vo.ts` |
@@ -18,7 +18,7 @@ Type Fields para o sistema de pagamentos instantaneos PIX do Banco Central do Br
 
 ## FPixKey
 
-Chave PIX multi-formato. Aceita os cinco tipos de chave definidos pelo Banco Central: CPF, CNPJ, telefone, email e EVP (chave aleatoria).
+Chave PIX multi-formato. Aceita os cinco tipos de chave definidos pelo Banco Central: CPF, CNPJ, telefone, email e EVP (chave aleatória).
 
 ```typescript
 import { FPixKey } from "tyforge";
@@ -27,7 +27,7 @@ const result = FPixKey.create("12345678901");
 // Result<FPixKey, ExceptionValidation>
 ```
 
-### Chave CPF (11 digitos)
+### Chave CPF (11 dígitos)
 
 ```typescript
 import { FPixKey } from "tyforge";
@@ -36,7 +36,7 @@ const cpf = FPixKey.createOrThrow("12345678901");
 cpf.getValue(); // "12345678901"
 ```
 
-### Chave CNPJ (14 digitos)
+### Chave CNPJ (14 dígitos)
 
 ```typescript
 import { FPixKey } from "tyforge";
@@ -54,7 +54,7 @@ const telefone = FPixKey.createOrThrow("+5511999998888");
 telefone.getValue(); // "+5511999998888"
 ```
 
-### Chave email (contem @)
+### Chave email (contém @)
 
 ```typescript
 import { FPixKey } from "tyforge";
@@ -63,7 +63,7 @@ const email = FPixKey.createOrThrow("usuario@exemplo.com");
 email.getValue(); // "usuario@exemplo.com"
 ```
 
-### Chave EVP (aleatoria, 32-36 alfanumericos)
+### Chave EVP (aleatória, 32-36 alfanuméricos)
 
 ```typescript
 import { FPixKey } from "tyforge";
@@ -72,15 +72,15 @@ const evp = FPixKey.createOrThrow("a629532e-7693-4846-852d-1bbff57b00a9");
 evp.getValue(); // "a629532e-7693-4846-852d-1bbff57b00a9"
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento entre 1 e 77 caracteres
-- Caracteres permitidos: alfanumericos, `@`, `.`, `+`, `-`, `_`
+- Caracteres permitidos: alfanuméricos, `@`, `.`, `+`, `-`, `_`
 - Deve corresponder a pelo menos um dos formatos:
-  - **CPF**: exatamente 11 digitos numericos
-  - **CNPJ**: exatamente 14 digitos numericos
+  - **CPF**: exatamente 11 dígitos numéricos
+  - **CNPJ**: exatamente 14 dígitos numéricos
   - **Telefone**: inicia com `+`
-  - **Email**: contem `@`
-  - **EVP**: 32 a 36 caracteres alfanumericos (incluindo hifens)
+  - **Email**: contém `@`
+  - **EVP**: 32 a 36 caracteres alfanuméricos (incluindo hifens)
 
 ---
 
@@ -131,6 +131,6 @@ const schema = {
 } satisfies ISchema;
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Aceita apenas os valores do enum: `"CPF"`, `"CNPJ"`, `"EMAIL"`, `"PHONE"` ou `"EVP"`
-- Qualquer outro valor e rejeitado
+- Qualquer outro valor é rejeitado

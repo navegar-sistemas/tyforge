@@ -32,12 +32,12 @@ export class FPageNumber extends TypeField<TPageNumber, TPageNumberFormatted> {
     if (validateLevel !== "full") return OK_TRUE;
     if (!Number.isInteger(value)) {
       return err(
-        ExceptionValidation.create(fieldPath, "Valor deve ser um número inteiro"),
+        ExceptionValidation.create(fieldPath, "Value must be an integer"),
       );
     }
     if (value < 1) {
       return err(
-        ExceptionValidation.create(fieldPath, "Página deve ser maior ou igual a 1"),
+        ExceptionValidation.create(fieldPath, "Page number must be at least 1"),
       );
     }
     return OK_TRUE;
@@ -45,6 +45,14 @@ export class FPageNumber extends TypeField<TPageNumber, TPageNumberFormatted> {
 
   static validateType(value: unknown, fieldPath: string): Result<TPageNumber, ExceptionValidation> {
     return TypeGuard.extractNumber(value, fieldPath);
+  }
+
+  static formCreate(raw: unknown, fieldPath = "PageNumber"): Result<FPageNumber, ExceptionValidation> {
+    return FPageNumber.create(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  }
+
+  static formAssign(raw: unknown, fieldPath = "PageNumber"): Result<FPageNumber, ExceptionValidation> {
+    return FPageNumber.assign(TypeField.normalizeFormInput(raw, "number"), fieldPath);
   }
 
   static create<T = TPageNumber>(raw: T, fieldPath = "PageNumber"): Result<FPageNumber, ExceptionValidation> {
@@ -75,7 +83,7 @@ export class FPageNumber extends TypeField<TPageNumber, TPageNumberFormatted> {
     return String(this.getValue());
   }
 
-  override formatted(): string {
+  override formatted(): TPageNumberFormatted {
     return String(this.getValue());
   }
 

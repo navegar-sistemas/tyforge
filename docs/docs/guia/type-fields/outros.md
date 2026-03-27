@@ -5,14 +5,14 @@ sidebar_position: 6
 
 # Type Fields — Outros
 
-Type Fields complementares para booleanos, objetos JSON, status HTTP, status de aplicacao e chaves publicas PEM.
+Type Fields complementares para booleanos, objetos JSON, status HTTP, status de aplicação e chaves públicas PEM.
 
 ## Resumo
 
-| Classe | Tipo primitivo | Validacao | Arquivo |
+| Classe | Tipo primitivo | Validação | Arquivo |
 |--------|---------------|-----------|---------|
-| `FBoolean` | `boolean` | Coercao de string/number para boolean | `boolean.format_vo.ts` |
-| `FJson` | `Record<string, unknown>` | Objeto JSON valido | `json.format_vo.ts` |
+| `FBoolean` | `boolean` | Coerção de string/number para boolean | `boolean.format_vo.ts` |
+| `FJson` | `Record<string, unknown>` | Objeto JSON válido | `json.format_vo.ts` |
 | `FHttpStatus` | `number` (enum) | Enum `OHttpStatus` | `http-status.format_vo.ts` |
 | `FAppStatus` | `string` (enum) | `"active"` ou `"inactive"` | `status-aplicacao.format_vo.ts` |
 | `FPublicKeyPem` | `string` | Formato PEM com headers BEGIN/END | `public-key-pem.format_vo.ts` |
@@ -21,7 +21,7 @@ Type Fields complementares para booleanos, objetos JSON, status HTTP, status de 
 
 ## FBoolean
 
-Valor booleano com coercao inteligente. Aceita `boolean`, `string` (`"true"`, `"false"`, `"1"`, `"0"`, `"yes"`, `"no"`) e `number` (`1`, `0`).
+Valor booleano com coerção inteligente. Aceita `boolean`, `string` (`"true"`, `"false"`, `"1"`, `"0"`, `"yes"`, `"no"`) e `number` (`1`, `0`).
 
 ```typescript
 import { FBoolean } from "tyforge";
@@ -29,11 +29,11 @@ import { FBoolean } from "tyforge";
 const result = FBoolean.create(true);
 // Result<FBoolean, ExceptionValidation>
 
-// Coercao a partir de string
+// Coerção a partir de string
 const fromString = FBoolean.createOrThrow("yes");
 fromString.getValue(); // true
 
-// Coercao a partir de number
+// Coerção a partir de number
 const fromNumber = FBoolean.createOrThrow(0);
 fromNumber.getValue(); // false
 ```
@@ -48,7 +48,7 @@ fromNumber.getValue(); // false
 
 ## FJson
 
-Objeto JSON generico (`Record<string, unknown>`). Aceita tanto objetos quanto strings JSON validas (que sao parseadas automaticamente).
+Objeto JSON genérico (`Record<string, unknown>`). Aceita tanto objetos quanto strings JSON válidas (que são parseadas automaticamente).
 
 ```typescript
 import { FJson } from "tyforge";
@@ -63,15 +63,15 @@ const fromStr = FJson.create('{"chave": "valor"}');
 const json = FJson.createOrThrow({ dados: [1, 2, 3] });
 ```
 
-**Metodos de instancia:**
+**Métodos de instância:**
 
-| Metodo | Retorno | Descricao |
+| Método | Retorno | Descrição |
 |--------|---------|-----------|
 | `serialize()` | `string` | Serializa para string JSON |
 | `get(key)` | `unknown` | Retorna valor de uma chave |
 | `has(key)` | `boolean` | Verifica se chave existe |
 | `keys()` | `string[]` | Lista todas as chaves |
-| `isEmpty()` | `boolean` | Verifica se objeto esta vazio |
+| `isEmpty()` | `boolean` | Verifica se objeto está vazio |
 
 ```typescript
 const json = FJson.createOrThrow({ nome: "Maria", idade: 30 });
@@ -81,14 +81,14 @@ json.has("idade");    // true
 json.keys();          // ["nome", "idade"]
 json.isEmpty();       // false
 json.serialize();     // '{"nome":"Maria","idade":30}'
-json.formatted();     // JSON formatado com indentacao (2 espacos)
+json.formatted();     // JSON formatado com indentação (2 espaços)
 ```
 
 ---
 
 ## FHttpStatus
 
-Codigo de status HTTP conforme especificacao RFC 7231. Validado contra o enum `OHttpStatus`.
+Código de status HTTP conforme especificação RFC 7231. Validado contra o enum `OHttpStatus`.
 
 ```typescript
 import { FHttpStatus, OHttpStatus } from "tyforge";
@@ -130,13 +130,13 @@ export const OHttpStatus = {
 
 **Tipos relacionados:**
 - `TKeyHttpStatus` — chaves do enum (`"OK"`, `"CREATED"`, etc.)
-- `THttpStatus` — valores numericos do enum (`200`, `201`, etc.)
+- `THttpStatus` — valores numéricos do enum (`200`, `201`, etc.)
 
 ---
 
 ## FAppStatus
 
-Status de uma aplicacao no sistema. Aceita apenas os valores `"active"` ou `"inactive"`.
+Status de uma aplicação no sistema. Aceita apenas os valores `"active"` ou `"inactive"`.
 
 ```typescript
 import { FAppStatus, OStatusAplicacao } from "tyforge";
@@ -148,7 +148,7 @@ const result = FAppStatus.create("active");
 const status = FAppStatus.fromBoolean(true);
 status.getValue(); // "active"
 
-// Gerar status ativo por padrao
+// Gerar status ativo por padrão
 const ativo = FAppStatus.generate();
 ativo.getValue(); // "active"
 
@@ -165,18 +165,18 @@ export const OStatusAplicacao = {
 } as const;
 ```
 
-**Metodos estaticos:**
+**Métodos estáticos:**
 - `fromBoolean(isActive)` — converte booleano para status
-- `generate()` — cria instancia com status `"active"`
+- `generate()` — cria instância com status `"active"`
 
-**Metodos de instancia:**
+**Métodos de instância:**
 - `isActive()` — retorna `true` se o status for `"active"`
 
 ---
 
 ## FPublicKeyPem
 
-Chave publica no formato PEM (Privacy-Enhanced Mail) para autenticacao assimetrica. Valida a presenca dos delimitadores e o conteudo base64.
+Chave pública no formato PEM (Privacy-Enhanced Mail) para autenticação assimétrica. Valida a presença dos delimitadores e o conteúdo base64.
 
 ```typescript
 import { FPublicKeyPem } from "tyforge";
@@ -192,7 +192,7 @@ const chave = FPublicKeyPem.createOrThrow(pem);
 chave.formatted(); // Valor com trim
 ```
 
-**Regras de validacao:**
+**Regras de validação:**
 - Comprimento entre 100 e 1000 caracteres
 - Deve conter `-----BEGIN PUBLIC KEY-----` e `-----END PUBLIC KEY-----`
-- Conteudo entre os delimitadores deve ser base64 valido com no minimo 100 caracteres
+- Conteúdo entre os delimitadores deve ser base64 válido com no mínimo 100 caracteres

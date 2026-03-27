@@ -40,6 +40,14 @@ export class FFloat extends TypeField<TFloat, TFloatFormatted> {
     return TypeGuard.extractNumber(value, fieldPath);
   }
 
+  static formCreate(raw: unknown, fieldPath = "Float"): Result<FFloat, ExceptionValidation> {
+    return FFloat.create(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  }
+
+  static formAssign(raw: unknown, fieldPath = "Float"): Result<FFloat, ExceptionValidation> {
+    return FFloat.assign(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  }
+
   static create<T = TFloat>(raw: T, fieldPath = "Float"): Result<FFloat, ExceptionValidation> {
     const typed = FFloat.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);

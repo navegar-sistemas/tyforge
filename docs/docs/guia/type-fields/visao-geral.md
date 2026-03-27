@@ -5,14 +5,14 @@ sidebar_position: 1
 
 # Type Fields
 
-**Type Fields** sao Value Objects validados que encapsulam valores primitivos com regras de validacao embutidas. Cada TypeField garante, no momento da criacao, que o valor armazenado respeita suas restricoes — eliminando a necessidade de validacoes manuais dispersas pelo codigo.
+**Type Fields** são Value Objects validados que encapsulam valores primitivos com regras de validação embutidas. Cada TypeField garante, no momento da criação, que o valor armazenado respeita suas restrições — eliminando a necessidade de validações manuais dispersas pelo código.
 
 :::tip Zero Boilerplate
-TyForge inclui TypeFields prontos para padroes comuns: strings, emails, moeda (com aritmetica), bancario, autenticacao. A filosofia e: instalar, importar, usar — sem codigo de validacao customizado. Se um padrao e recorrente, ele pertence ao TyForge.
+TyForge inclui TypeFields prontos para padrões comuns: strings, emails, moeda (com aritmética), bancário, autenticação. A filosofia é: instalar, importar, usar — sem código de validação customizado. Se um padrão é recorrente, ele pertence ao TyForge.
 :::
 
 :::info Locale-aware
-TypeFields locale-aware usam `TypeField.locale` para aplicar regras especificas no `validateRules()`. Uma unica classe com logica condicional — sem heranca por locale. Default: `"international"`. Configure via `TypeField.configure({ locale: "br" })`.
+TypeFields locale-aware usam `TypeField.locale` para aplicar regras específicas no `validateRules()`. Uma única classe com lógica condicional — sem herança por locale. Default: `"international"`. Configure via `TypeField.configure({ locale: "br" })`.
 :::
 
 ## Classe base: `TypeField<TPrimitive, TFormatted>`
@@ -26,7 +26,7 @@ abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
 
   protected constructor(value: TPrimitive, fieldPath: string);
 
-  // Metodos de instancia
+  // Métodos de instância
   getValue(): TPrimitive;
   formatted(): TFormatted;
   equals(other?: TypeField<TPrimitive, TFormatted>): boolean;
@@ -40,54 +40,69 @@ abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
 }
 ```
 
-### Metodos estaticos (implementados por cada subclasse)
+### Métodos estáticos (implementados por cada subclasse)
 
-Toda subclasse concreta implementa quatro metodos estaticos:
+Toda subclasse concreta implementa quatro métodos estáticos:
 
 ```typescript
-// Validacao de tipo (narrowing) — retorna o valor tipado ou erro
+// Validação de tipo (narrowing) — retorna o valor tipado ou erro
 static validateType(value: unknown, fieldPath: string): Result<TPrimitive, ExceptionValidation>;
 
 // Retorna Result — caminho seguro para dados de entrada (hot path)
 static create<T = TPrimitive>(value: T, fieldPath?: string): Result<Instance, ExceptionValidation>;
 
-// Lanca excecao se falhar — conveniencia para try/catch
+// Lança exceção se falhar — conveniência para try/catch
 static createOrThrow(value: TPrimitive, fieldPath?: string): Instance;
 
-// Retorna Result — caminho seguro para hidratacao de dados persistidos
+// Retorna Result — caminho seguro para hidratação de dados persistidos
 static assign<T = TPrimitive>(value: T, fieldPath?: string): Result<Instance, ExceptionValidation>;
 ```
 
-O generic `<T = TPrimitive>` nos metodos `create` e `assign` permite aceitar `unknown` quando chamado explicitamente pelo `SchemaBuilder`, mantendo type safety quando usado diretamente.
+O generic `<T = TPrimitive>` nos métodos `create` e `assign` permite aceitar `unknown` quando chamado explicitamente pelo `SchemaBuilder`, mantendo type safety quando usado diretamente.
 
-O metodo `validateType()` e um metodo estatico que faz narrowing do valor usando `TypeGuard` (ex: `TypeGuard.isString()`). Ele e chamado tanto por `create()` quanto por `assign()` antes de instanciar o TypeField.
+O método `validateType()` é um método estático que faz narrowing do valor usando `TypeGuard` (ex: `TypeGuard.isString()`). Ele é chamado tanto por `create()` quanto por `assign()` antes de instanciar o TypeField.
 
-O metodo `create()` retorna um `Result<T, ExceptionValidation>`, permitindo tratamento explicito de erros. Internamente chama `validateType()` + `validateRules()` com `TypeField.createLevel`.
+O método `create()` retorna um `Result<T, ExceptionValidation>`, permitindo tratamento explícito de erros. Internamente chama `validateType()` + `validateRules()` com `TypeField.createLevel`.
 
-O metodo `assign()` segue o mesmo fluxo, mas usa `TypeField.assignLevel` para validacao. E usado para hidratar dados ja persistidos (ex: registros do banco de dados).
+O método `assign()` segue o mesmo fluxo, mas usa `TypeField.assignLevel` para validação. É usado para hidratar dados já persistidos (ex: registros do banco de dados).
 
-O metodo `createOrThrow()` lanca a excecao diretamente, sendo util em contextos onde try/catch e preferido.
+O método `createOrThrow()` lança a exceção diretamente, sendo útil em contextos onde try/catch é preferido.
 
-### Niveis de validacao (createLevel / assignLevel)
+### Métodos de formulário: `formCreate()` / `formAssign()`
 
-A classe base `TypeField` expoe duas propriedades estaticas publicas que controlam a profundidade da validacao:
+TypeFields numéricos e booleanos possuem métodos `formCreate()` e `formAssign()` que normalizam dados de formulário (sempre string) antes de validar:
+
+```typescript
+// Formulário envia "42" como string
+const result = FInt.formCreate("42");
+// normaliza "42" → 42, depois chama FInt.create(42)
+
+const bool = FBoolean.formCreate("true");
+// normaliza "true" → true, depois chama FBoolean.create(true)
+```
+
+Disponível em: `FInt`, `FFloat`, `FMoney`, `FPageNumber`, `FPageSize`, `FBoolean`.
+
+### Níveis de validação (createLevel / assignLevel)
+
+A classe base `TypeField` expõe duas propriedades estáticas públicas que controlam a profundidade da validação:
 
 ```typescript
 static createLevel: TValidationLevel = "full";
 static assignLevel: TValidationLevel = "type";
 ```
 
-Esses niveis sao definidos com valores padrao hardcoded e podem ser alterados via `TypeField.configure()`. Afetam como os TypeFields validam valores em cada modo:
+Esses níveis são definidos com valores padrão hardcoded e podem ser alterados via `TypeField.configure()`. Afetam como os TypeFields validam valores em cada modo:
 
-| Nivel | Descricao |
+| Nível | Descrição |
 |-------|-----------|
-| `"full"` | Validacao completa: tipo + faixa/comprimento + enum |
-| `"type"` | Apenas verificacao de tipo (sem faixa, comprimento ou enum) |
-| `"none"` | Nenhuma validacao — valor aceito sem verificacao |
+| `"full"` | Validação completa: tipo + faixa/comprimento + enum |
+| `"type"` | Apenas verificação de tipo (sem faixa, comprimento ou enum) |
+| `"none"` | Nenhuma validação — valor aceito sem verificação |
 
-### Metodo `TypeField.configure()`
+### Método `TypeField.configure()`
 
-Permite alterar os niveis de validacao em tempo de execucao:
+Permite alterar os níveis de validação em tempo de execução:
 
 ```typescript
 static configure(levels: { create?: TValidationLevel; assign?: TValidationLevel }): void;
@@ -101,14 +116,14 @@ import { TypeField } from "tyforge";
 TypeField.configure({ create: "full", assign: "none" });
 ```
 
-Isso e util para ajustar o comportamento de validacao por ambiente (ex: desabilitar validacao no `assign` em producao para maximizar performance).
+Isso é útil para ajustar o comportamento de validação por ambiente (ex: desabilitar validação no `assign` em produção para maximizar performance).
 
-### Validacao em duas etapas: `validateType()` + `validateRules()`
+### Validação em duas etapas: `validateType()` + `validateRules()`
 
-Cada TypeField concreto implementa a validacao em duas etapas separadas:
+Cada TypeField concreto implementa a validação em duas etapas separadas:
 
-1. **`validateType()`** (estatico) — faz narrowing do tipo usando `TypeGuard`. Garante que o valor e do tipo primitivo esperado (string, number, boolean, etc).
-2. **`validateRules()`** (instancia) — valida regras de negocio (comprimento, faixa, enum) conforme o nivel de validacao (`createLevel` ou `assignLevel`).
+1. **`validateType()`** (estático) — faz narrowing do tipo usando `TypeGuard`. Garante que o valor é do tipo primitivo esperado (string, number, boolean, etc).
+2. **`validateRules()`** (instância) — valida regras de negócio (comprimento, faixa, enum) conforme o nível de validação (`createLevel` ou `assignLevel`).
 
 ```typescript
 // Exemplo do fluxo interno de FString.create()
@@ -122,26 +137,26 @@ static create<T = TString>(raw: T, fieldPath = "String"): Result<FString, Except
 }
 ```
 
-Essa separacao elimina validacao dupla — `validateType()` e chamado uma unica vez e o resultado tipado e reaproveitado.
+Essa separação elimina validação dupla — `validateType()` é chamado uma única vez e o resultado tipado é reaproveitado.
 
-## `ITypeFieldConfig` — Configuracao de validacao
+## `ITypeFieldConfig` — Configuração de validação
 
-A configuracao e um tipo discriminado por `jsonSchemaType`. Cada tipo primitivo possui campos especificos:
+A configuração é um tipo discriminado por `jsonSchemaType`. Cada tipo primitivo possui campos específicos:
 
-| `jsonSchemaType` | Campos adicionais | Descricao |
+| `jsonSchemaType` | Campos adicionais | Descrição |
 |------------------|-------------------|-----------|
-| `"string"` | `minLength`, `maxLength` | Comprimento minimo e maximo da string |
-| `"number"` | `min`, `max`, `decimalPrecision` | Faixa numerica e casas decimais |
-| `"boolean"` | — | Verificacao de tipo booleano |
-| `"object"` | — | Verificacao de tipo objeto |
+| `"string"` | `minLength`, `maxLength` | Comprimento mínimo e máximo da string |
+| `"number"` | `min`, `max`, `decimalPrecision` | Faixa numérica e casas decimais |
+| `"boolean"` | — | Verificação de tipo booleano |
+| `"object"` | — | Verificação de tipo objeto |
 | `"array"` | `minItems?`, `maxItems?` | Limites de itens no array |
-| `"Date"` | — | Verificacao de tipo Date |
+| `"Date"` | — | Verificação de tipo Date |
 
 Todos os configs possuem o campo opcional `serializeAsString` e `validateEnum` (para tipos com enum).
 
-### Validacao por enum
+### Validação por enum
 
-O metodo estatico protegido `resolveEnum()` valida valores contra um objeto enum com cache via `WeakMap`:
+O método estático protegido `resolveEnum()` valida valores contra um objeto enum com cache via `WeakMap`:
 
 ```typescript
 protected static resolveEnum<E extends Record<string, string | number>>(
@@ -151,9 +166,9 @@ protected static resolveEnum<E extends Record<string, string | number>>(
 ): Result<E[keyof E], ExceptionValidation>;
 ```
 
-## Convencao de nomenclatura
+## Convenção de nomenclatura
 
-| Convencao | Exemplo |
+| Convenção | Exemplo |
 |-----------|---------|
 | Prefixo `F` no nome da classe | `FString`, `FEmail`, `FId` |
 | Prefixo `T` no tipo primitivo | `TString`, `TEmail`, `TId` |
@@ -196,7 +211,7 @@ export class FCpf extends TypeField<TCpf, TCpfFormatted> {
     // Business rules specific to CPF format
     const digits = value.replace(/\D/g, "");
     if (digits.length !== 11) {
-      return err(ExceptionValidation.create(fieldPath, "CPF deve ter 11 digitos"));
+      return err(ExceptionValidation.create(fieldPath, "CPF deve ter 11 dígitos"));
     }
     return OK_TRUE;
   }
@@ -239,7 +254,7 @@ export class FCpf extends TypeField<TCpf, TCpfFormatted> {
   }
 
   override getDescription(): string {
-    return "Cadastro de Pessoa Fisica (CPF)";
+    return "Cadastro de Pessoa Física (CPF)";
   }
 
   override getShortDescription(): string {
@@ -248,16 +263,16 @@ export class FCpf extends TypeField<TCpf, TCpfFormatted> {
 }
 ```
 
-## Proximos passos
+## Próximos passos
 
 - [Strings](/guia/type-fields/string) — FString, FEmail, FPassword, FFullName, FDescription, FText, FBusinessName
-- [Numericos](/guia/type-fields/numerico) — FInt, FFloat, FPageNumber, FPageSize, FBoolInt
+- [Numéricos](/guia/type-fields/numerico) — FInt, FFloat, FPageNumber, FPageSize, FBoolInt
 - [Moeda](/guia/type-fields/moeda) — FMoney, FCurrency
 - [Datas](/guia/type-fields/data) — FDateTimeISOZMillis, FDateTimeISOZ, FDateISODate, FDateISOCompact
 - [Identificadores](/guia/type-fields/identificador) — FIdentifier, FId, FIdReq, FTraceId, FTransactionId, FDeviceId, FCorrelationId, FReconciliationId, FIdempotencyKey
 - [Documentos](/guia/type-fields/documento) — FDocumentId, FDocumentCpf, FDocumentCnpj, FDocumentCpfOrCnpj, FDocumentRg, FDocumentType, FDocumentStateRegistration, FDocumentMunicipalRegistration
-- [Bancario](/guia/type-fields/bancario) — FBankCode, FBankBranch, FBankAccountNumber, FBankNsu, FBankE2eId, FEmvQrCodePayload
+- [Bancário](/guia/type-fields/bancario) — FBankCode, FBankBranch, FBankAccountNumber, FBankNsu, FBankE2eId, FEmvQrCodePayload
 - [PIX](/guia/type-fields/pix) — FPixKey, FPixKeyType
-- [Seguranca](/guia/type-fields/seguranca) — FApiKey, FBearer, FSignature, FPublicKeyPem, FCertificateThumbprint, FHashAlgorithm, FTotpCode, FTotpSecret
+- [Segurança](/guia/type-fields/seguranca) — FApiKey, FBearer, FSignature, FPublicKeyPem, FCertificateThumbprint, FHashAlgorithm, FTotpCode, FTotpSecret
 - [Enums](/guia/type-fields/enums) — FPersonType, FGender, FMaritalStatus, FTransactionStatus, FAppStatus, FHttpStatus, FStateCode
 - [Outros](/guia/type-fields/outros) — FBoolean, FJson

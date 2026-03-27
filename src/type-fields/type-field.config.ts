@@ -54,12 +54,17 @@ interface DateConfig extends BaseConfig {
  * Configuração de validação para TypeField,
  * exigindo campos conforme o tipo primitivo TPrimitive
  */
-// prettier-ignore
-export type ITypeFieldConfig<TPrimitive> =
-  TPrimitive extends string ? StringConfig :
-  TPrimitive extends number ? NumberConfig :
-  TPrimitive extends unknown[] ? ArrayConfig :
-  TPrimitive extends boolean ? BooleanConfig :
-  TPrimitive extends Date ? DateConfig :
-  TPrimitive extends object ? ObjectConfig :
+export type ITypeFieldConfig<TPrimitive> = TPrimitive extends string
+  ? StringConfig
+  : TPrimitive extends number
+    ? NumberConfig
+    : TPrimitive extends unknown[]
+      ? ArrayConfig
+      : TPrimitive extends boolean
+        ? BooleanConfig
+        : TPrimitive extends Date
+          ? DateConfig
+          : TPrimitive extends object
+            ? ObjectConfig
+            :
   BaseConfig;

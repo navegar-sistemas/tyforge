@@ -32,17 +32,17 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
     if (validateLevel !== "full") return OK_TRUE;
     if (!Number.isInteger(value)) {
       return err(
-        ExceptionValidation.create(fieldPath, "Valor deve ser um número inteiro"),
+        ExceptionValidation.create(fieldPath, "Value must be an integer"),
       );
     }
     if (value < 1) {
       return err(
-        ExceptionValidation.create(fieldPath, "Tamanho da página deve ser maior que 0"),
+        ExceptionValidation.create(fieldPath, "Page size must be greater than 0"),
       );
     }
     if (value > 100) {
       return err(
-        ExceptionValidation.create(fieldPath, "Tamanho da página não pode exceder 100"),
+        ExceptionValidation.create(fieldPath, "Page size must not exceed 100"),
       );
     }
     return OK_TRUE;
@@ -50,6 +50,14 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
 
   static validateType(value: unknown, fieldPath: string): Result<TPageSize, ExceptionValidation> {
     return TypeGuard.extractNumber(value, fieldPath);
+  }
+
+  static formCreate(raw: unknown, fieldPath = "PageSize"): Result<FPageSize, ExceptionValidation> {
+    return FPageSize.create(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  }
+
+  static formAssign(raw: unknown, fieldPath = "PageSize"): Result<FPageSize, ExceptionValidation> {
+    return FPageSize.assign(TypeField.normalizeFormInput(raw, "number"), fieldPath);
   }
 
   static create<T = TPageSize>(raw: T, fieldPath = "PageSize"): Result<FPageSize, ExceptionValidation> {
@@ -80,7 +88,7 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
     return String(this.getValue());
   }
 
-  override formatted(): string {
+  override formatted(): TPageSizeFormatted {
     return String(this.getValue());
   }
 

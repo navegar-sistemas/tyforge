@@ -23,6 +23,14 @@ export class FBoolean extends TypeField<TBoolean, TBooleanFormatted> {
     return TypeGuard.extractBoolean(value, fieldPath);
   }
 
+  static formCreate(raw: unknown, fieldPath = "Boolean"): Result<FBoolean, ExceptionValidation> {
+    return FBoolean.create(TypeField.normalizeFormInput(raw, "boolean"), fieldPath);
+  }
+
+  static formAssign(raw: unknown, fieldPath = "Boolean"): Result<FBoolean, ExceptionValidation> {
+    return FBoolean.assign(TypeField.normalizeFormInput(raw, "boolean"), fieldPath);
+  }
+
   static create<T = TBoolean>(raw: T, fieldPath = "Boolean"): Result<FBoolean, ExceptionValidation> {
     const typed = FBoolean.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
@@ -51,7 +59,7 @@ export class FBoolean extends TypeField<TBoolean, TBooleanFormatted> {
     return String(this.getValue());
   }
 
-  override formatted(): string {
+  override formatted(): TBooleanFormatted {
     return String(this.getValue());
   }
 

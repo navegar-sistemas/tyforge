@@ -1,11 +1,11 @@
 ---
-title: Configuracao Global
+title: Configuração Global
 sidebar_position: 1
 ---
 
-# Configuracao Global
+# Configuração Global
 
-O TyForge suporta configuracao global via arquivo `tyforge.config.json` na raiz do projeto. A configuracao controla o nivel de validacao dos schemas e dos TypeFields.
+O TyForge suporta configuração global via arquivo `tyforge.config.json` na raiz do projeto. A configuração controla o nível de validação dos schemas e dos TypeFields.
 
 ## Estrutura do arquivo
 
@@ -29,43 +29,43 @@ O TyForge suporta configuracao global via arquivo `tyforge.config.json` na raiz 
 }
 ```
 
-## Secao `schema`
+## Seção `schema`
 
 ### `schema.validate.create`
 
-Nivel de validacao usado pelo modo `create` do `SchemaBuilder`. O modo `create` e usado para validar dados de entrada novos (ex: input de formularios, APIs).
+Nível de validação usado pelo modo `create` do `SchemaBuilder`. O modo `create` é usado para validar dados de entrada novos (ex: input de formulários, APIs).
 
 ### `schema.validate.assign`
 
-Nivel de validacao usado pelo modo `assign` do `SchemaBuilder`. O modo `assign` e usado para hidratar dados ja persistidos (ex: registros do banco de dados).
+Nível de validação usado pelo modo `assign` do `SchemaBuilder`. O modo `assign` é usado para hidratar dados já persistidos (ex: registros do banco de dados).
 
-### Niveis de validacao (`TValidationLevel`)
+### Níveis de validação (`TValidationLevel`)
 
-| Nivel | Descricao |
+| Nível | Descrição |
 |-------|-----------|
-| `"full"` | Validacao completa: tipo + faixa/comprimento + enum. Padrao para `create` |
-| `"type"` | Apenas verificacao de tipo (sem validacao de faixa, comprimento ou enum). Padrao para `assign` |
-| `"none"` | Nenhuma validacao. O valor e aceito sem verificacao |
+| `"full"` | Validação completa: tipo + faixa/comprimento + enum. Padrão para `create` |
+| `"type"` | Apenas verificação de tipo (sem validação de faixa, comprimento ou enum). Padrão para `assign` |
+| `"none"` | Nenhuma validação. O valor é aceito sem verificação |
 
-A separacao entre `create` e `assign` existe porque:
+A separação entre `create` e `assign` existe porque:
 
-- **create** recebe dados de fontes externas nao confiaveis (usuario, API) — validacao completa e necessaria
-- **assign** recebe dados ja validados anteriormente e persistidos no banco — verificacao de tipo e suficiente para garantir integridade sem custo de validacao completa
+- **create** recebe dados de fontes externas não confiáveis (usuário, API) — validação completa é necessária
+- **assign** recebe dados já validados anteriormente e persistidos no banco — verificação de tipo é suficiente para garantir integridade sem custo de validação completa
 
 ## Comportamento do `loadTyForgeConfig()`
 
-A funcao `loadTyForgeConfig()` e usada apenas pelo CLI do linter (`tyforge-lint`) para carregar configuracoes. Ela **nao** e importada nem chamada pela biblioteca core (TypeFields, SchemaBuilder, etc).
+A função `loadTyForgeConfig()` é usada apenas pelo CLI do linter (`tyforge-lint`) para carregar configurações. Ela **não** é importada nem chamada pela biblioteca core (TypeFields, SchemaBuilder, etc).
 
 Seu comportamento:
 
-1. **Arquivo encontrado e valido** — carrega e valida todas as chaves
-2. **Arquivo nao encontrado** — usa os valores padrao silenciosamente
-3. **Arquivo com JSON invalido** — lanca erro com mensagem `"<path>: invalid JSON"`
-4. **Arquivo com chave desconhecida** — lanca erro com mensagem `"<path>: unknown config key "<key>""`
+1. **Arquivo encontrado e válido** — carrega e valida todas as chaves
+2. **Arquivo não encontrado** — usa os valores padrão silenciosamente
+3. **Arquivo com JSON inválido** — lança erro com mensagem `"<path>: invalid JSON"`
+4. **Arquivo com chave desconhecida** — lança erro com mensagem `"<path>: unknown config key "<key>""`
 
-### Valores padrao
+### Valores padrão
 
-Se o arquivo `tyforge.config.json` nao existir, os seguintes valores padrao sao aplicados:
+Se o arquivo `tyforge.config.json` não existir, os seguintes valores padrão são aplicados:
 
 ```json
 {
@@ -78,20 +78,20 @@ Se o arquivo `tyforge.config.json` nao existir, os seguintes valores padrao sao 
 }
 ```
 
-### Chaves permitidas no nivel raiz
+### Chaves permitidas no nível raiz
 
-Apenas duas chaves sao permitidas no nivel raiz:
+Apenas duas chaves são permitidas no nível raiz:
 
-| Chave | Tipo | Descricao |
+| Chave | Tipo | Descrição |
 |-------|------|-----------|
-| `schema` | `object` | Configuracao de validacao do SchemaBuilder |
-| `lint` | `object` | Configuracao do linter (opcional, veja secao abaixo) |
+| `schema` | `object` | Configuração de validação do SchemaBuilder |
+| `lint` | `object` | Configuração do linter (opcional, veja seção abaixo) |
 
-Qualquer outra chave gera um erro de configuracao.
+Qualquer outra chave gera um erro de configuração.
 
 ## TypeField.createLevel e TypeField.assignLevel
 
-A classe base `TypeField` expoe duas propriedades estaticas publicas com valores padrao hardcoded:
+A classe base `TypeField` expõe duas propriedades estáticas públicas com valores padrão hardcoded:
 
 ```typescript
 abstract class TypeField<TPrimitive, TFormatted> {
@@ -101,41 +101,41 @@ abstract class TypeField<TPrimitive, TFormatted> {
 }
 ```
 
-Essas propriedades sao usadas internamente pelos TypeFields concretos ao chamar `validateRules()` nos metodos `create()` e `assign()`.
+Essas propriedades são usadas internamente pelos TypeFields concretos ao chamar `validateRules()` nos métodos `create()` e `assign()`.
 
-**Importante:** a classe `TypeField` **nao** importa `tyforgeConfig` nem le o arquivo `tyforge.config.json`. Os niveis de validacao sao definidos com valores padrao hardcoded e podem ser alterados programaticamente via `TypeField.configure()`.
+**Importante:** a classe `TypeField` **não** importa `tyforgeConfig` nem lê o arquivo `tyforge.config.json`. Os níveis de validação são definidos com valores padrão hardcoded e podem ser alterados programaticamente via `TypeField.configure()`.
 
-## Metodo `TypeField.configure()`
+## Método `TypeField.configure()`
 
-Permite alterar os niveis de validacao em tempo de execucao:
+Permite alterar os níveis de validação em tempo de execução:
 
 ```typescript
 static configure(levels: { create?: TValidationLevel; assign?: TValidationLevel }): void;
 ```
 
-Exemplo de uso no bootstrap da aplicacao:
+Exemplo de uso no bootstrap da aplicação:
 
 ```typescript
 import { TypeField } from "tyforge";
 
-// Desabilita validacao no assign para maximizar performance
+// Desabilita validação no assign para maximizar performance
 TypeField.configure({ create: "full", assign: "none" });
 ```
 
-A integracao entre o arquivo `tyforge.config.json` e o `TypeField.configure()` fica a cargo do projeto consumidor. O CLI do linter (`tyforge-lint`) le o arquivo de configuracao, mas a biblioteca core nao faz isso automaticamente.
+A integração entre o arquivo `tyforge.config.json` e o `TypeField.configure()` fica a cargo do projeto consumidor. O CLI do linter (`tyforge-lint`) lê o arquivo de configuração, mas a biblioteca core não faz isso automaticamente.
 
-## Secao `lint`
+## Seção `lint`
 
-A secao `lint` dentro do `tyforge.config.json` configura o linter. Alternativamente, o linter pode ser configurado via um arquivo dedicado `tyforge-lint.config.json`.
+A seção `lint` dentro do `tyforge.config.json` configura o linter. Alternativamente, o linter pode ser configurado via um arquivo dedicado `tyforge-lint.config.json`.
 
-A ordem de prioridade para configuracao do linter:
+A ordem de prioridade para configuração do linter:
 
 1. Flag `--config <path>` na linha de comando
 2. Arquivo `tyforge-lint.config.json` na raiz do projeto
-3. Secao `lint` dentro de `tyforge.config.json`
-4. Valores padrao
+3. Seção `lint` dentro de `tyforge.config.json`
+4. Valores padrão
 
-Para detalhes completos sobre a configuracao do linter, consulte a [documentacao do Linter](/contribuindo/lint).
+Para detalhes completos sobre a configuração do linter, consulte a [documentação do Linter](/contribuindo/lint).
 
 ## Interface ITyForgeConfig
 
@@ -153,7 +153,7 @@ interface ITyForgeConfig {
 
 ## Exemplo de uso
 
-### Projeto com validacao relaxada no assign
+### Projeto com validação relaxada no assign
 
 ```json
 {
@@ -166,9 +166,9 @@ interface ITyForgeConfig {
 }
 ```
 
-Neste cenario, dados vindos do banco de dados nao passam por nenhuma validacao no `assign`, maximizando a performance em cenarios de leitura intensiva.
+Neste cenário, dados vindos do banco de dados não passam por nenhuma validação no `assign`, maximizando a performance em cenários de leitura intensiva.
 
-### Projeto em desenvolvimento com validacao completa
+### Projeto em desenvolvimento com validação completa
 
 ```json
 {
@@ -181,4 +181,4 @@ Neste cenario, dados vindos do banco de dados nao passam por nenhuma validacao n
 }
 ```
 
-Neste cenario, tanto `create` quanto `assign` validam completamente, util para detectar inconsistencias nos dados persistidos durante o desenvolvimento.
+Neste cenário, tanto `create` quanto `assign` validam completamente, útil para detectar inconsistências nos dados persistidos durante o desenvolvimento.

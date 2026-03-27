@@ -5,11 +5,11 @@ sidebar_position: 7
 
 # Type Fields — Moeda
 
-Type Fields monetarios encapsulam valores financeiros com precisao inteira (centavos), evitando problemas classicos de ponto flutuante. Oferecem aritmetica, comparacoes e conversao entre centavos e decimal.
+Type Fields monetários encapsulam valores financeiros com precisão inteira (centavos), evitando problemas clássicos de ponto flutuante. Oferecem aritmética, comparações e conversão entre centavos e decimal.
 
 ## Resumo
 
-| Classe | Tipo primitivo | Armazenamento | Validacao extra | Arquivo |
+| Classe | Tipo primitivo | Armazenamento | Validação extra | Arquivo |
 |--------|---------------|---------------|-----------------|---------|
 | `FMoney` | `number` (inteiro) | Centavos | `Number.isInteger()` | `money.format_vo.ts` |
 | `FCurrency` | `number` (decimal) | Centavos (converte automaticamente) | Herda de `FMoney` | `currency.format_vo.ts` |
@@ -18,7 +18,7 @@ Type Fields monetarios encapsulam valores financeiros com precisao inteira (cent
 
 ## FMoney
 
-Valor monetario armazenado como inteiro em centavos. Evita problemas de precisao de ponto flutuante representando todos os valores na menor unidade da moeda (ex: 1050 = R$ 10,50).
+Valor monetário armazenado como inteiro em centavos. Evita problemas de precisão de ponto flutuante representando todos os valores na menor unidade da moeda (ex: 1050 = R$ 10,50).
 
 ```typescript
 import { FMoney } from "tyforge";
@@ -31,7 +31,7 @@ valor.getValue(); // 1050 (centavos)
 valor.toDecimal(); // 10.50
 ```
 
-### Criacao a partir de decimal
+### Criação a partir de decimal
 
 ```typescript
 import { FMoney } from "tyforge";
@@ -44,9 +44,9 @@ valor.getValue(); // 0
 valor.isZero();   // true
 ```
 
-### Aritmetica
+### Aritmética
 
-Todas as operacoes retornam um novo `FMoney` via `Result`, garantindo imutabilidade:
+Todas as operações retornam um novo `FMoney` via `Result`, garantindo imutabilidade:
 
 ```typescript
 import { FMoney, isSuccess } from "tyforge";
@@ -67,7 +67,7 @@ if (isSuccess(diferenca)) {
 }
 ```
 
-### Comparacoes
+### Comparações
 
 ```typescript
 import { FMoney } from "tyforge";
@@ -83,28 +83,28 @@ a.isNegative();     // false
 a.isZero();         // false
 ```
 
-**Metodos estaticos:**
+**Métodos estáticos:**
 - `create(cents)` — cria a partir de centavos (inteiro)
-- `createOrThrow(cents)` — cria ou lanca excecao
+- `createOrThrow(cents)` — cria ou lança exceção
 - `fromDecimal(value)` — converte valor decimal para centavos (ex: 10.50 -> 1050)
-- `zero()` — cria instancia com valor zero
+- `zero()` — cria instância com valor zero
 
-**Metodos de instancia:**
+**Métodos de instância:**
 - `add(other)` — soma centavos e retorna novo `FMoney`
 - `subtract(other)` — subtrai centavos e retorna novo `FMoney`
 - `toDecimal()` — converte centavos para decimal (ex: 1050 -> 10.50)
-- `isZero()`, `isPositive()`, `isNegative()` — verificacoes de sinal
-- `isGreaterThan(other)`, `isLessThan(other)`, `isEqualTo(other)` — comparacoes
+- `isZero()`, `isPositive()`, `isNegative()` — verificações de sinal
+- `isGreaterThan(other)`, `isLessThan(other)`, `isEqualTo(other)` — comparações
 
-**Regras de validacao:**
-- Deve ser um numero inteiro (`Number.isInteger()`)
-- Faixa: `Number.MIN_SAFE_INTEGER` ate `Number.MAX_SAFE_INTEGER`
+**Regras de validação:**
+- Deve ser um número inteiro (`Number.isInteger()`)
+- Faixa: `Number.MIN_SAFE_INTEGER` até `Number.MAX_SAFE_INTEGER`
 
 ---
 
 ## FCurrency
 
-Camada de conveniencia sobre `FMoney` que aceita entrada decimal e converte automaticamente para centavos. Ideal para formularios e APIs onde o usuario informa valores com casas decimais.
+Camada de conveniência sobre `FMoney` que aceita entrada decimal e converte automaticamente para centavos. Ideal para formulários e APIs onde o usuário informa valores com casas decimais.
 
 ```typescript
 import { FCurrency } from "tyforge";
@@ -120,7 +120,7 @@ valor.formatted();      // "10.50"
 valor.toString();       // "10.50"
 ```
 
-### Diferenca entre create e assign
+### Diferença entre create e assign
 
 ```typescript
 import { FCurrency } from "tyforge";
@@ -146,9 +146,9 @@ zero.toDecimalValue(); // 0
 zero.formatted();      // "0.00"
 ```
 
-**Heranca:** `FCurrency` estende `FMoney`, herdando todos os metodos de aritmetica (`add`, `subtract`) e comparacao (`isGreaterThan`, `isLessThan`, `isEqualTo`, `isZero`, `isPositive`, `isNegative`).
+**Herança:** `FCurrency` estende `FMoney`, herdando todos os métodos de aritmética (`add`, `subtract`) e comparação (`isGreaterThan`, `isLessThan`, `isEqualTo`, `isZero`, `isPositive`, `isNegative`).
 
-**Regras de validacao:**
+**Regras de validação:**
 - Herda todas as regras de `FMoney`
 - `create()` recebe decimal e converte para centavos via `Math.round(value * 100)`
-- `assign()` recebe centavos diretamente (vindo da persistencia)
+- `assign()` recebe centavos diretamente (vindo da persistência)

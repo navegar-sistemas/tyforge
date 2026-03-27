@@ -72,8 +72,7 @@ export class FDocumentCpf extends TypeField<TDocumentCpf, TDocumentCpfFormatted>
   }
 
   override formatted(): TDocumentCpfFormatted {
-    const v = this.getValue();
-    return `${v.substring(0, 3)}.${v.substring(3, 6)}.${v.substring(6, 9)}-${v.substring(9, 11)}`;
+    return TypeField.applyMask(this.getValue(), [3, ".", 3, ".", 3, "-", 2]);
   }
 
   override getDescription(): string {
