@@ -77,7 +77,7 @@ export class FFloat extends TypeField<TFloat, TFloatFormatted> {
   }
 
   override formatted(): TFloatFormatted {
-    return String(this.getValue());
+    return TypeField.formatNumber(this.getValue(), { maximumFractionDigits: this.config.decimalPrecision });
   }
 
   override getDescription(): string {

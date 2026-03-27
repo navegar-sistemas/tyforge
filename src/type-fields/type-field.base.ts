@@ -6,6 +6,13 @@ import { ITypeFieldConfig } from "./type-field.config";
 export { TJsonSchemaType } from "./type-field.config";
 
 export type TValidationLevel = "full" | "type" | "none";
+export type TLocaleDisplay = "us" | "br";
+export type TLocaleRules = "us" | "br";
+
+const LOCALE_INTL: Record<TLocaleDisplay, string> = {
+  us: "en-US",
+  br: "pt-BR",
+};
 
 // Cache Object.values() to avoid repeated allocation
 const enumValuesCache = new WeakMap<object, unknown[]>();
@@ -41,12 +48,39 @@ function isEnumValue<E extends Record<string, string | number>>(
 export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
   static createLevel: TValidationLevel = "full";
   static assignLevel: TValidationLevel = "type";
-  static locale: string = "international";
+  static localeDisplay: TLocaleDisplay = "us";
+  static localeRules: TLocaleRules = "us";
 
-  static configure(options: { create?: TValidationLevel; assign?: TValidationLevel; locale?: string }): void {
-    if (options.create) TypeField.createLevel = options.create;
-    if (options.assign) TypeField.assignLevel = options.assign;
-    if (options.locale) TypeField.locale = options.locale;
+  static configure(options: {
+    create?: TValidationLevel;
+    assign?: TValidationLevel;
+    localeDisplay?: TLocaleDisplay;
+    localeRules?: TLocaleRules;
+  }): void {
+    if (options.create !== undefined) TypeField.createLevel = options.create;
+    if (options.assign !== undefined) TypeField.assignLevel = options.assign;
+    if (options.localeDisplay !== undefined) TypeField.localeDisplay = options.localeDisplay;
+    if (options.localeRules !== undefined) TypeField.localeRules = options.localeRules;
+  }
+
+  protected static assertNeverLocale(locale: never): never {
+    throw new Error(`Unhandled locale: ${String(locale)}`);
+  }
+
+  private static formatterCache = new Map<string, Intl.NumberFormat>();
+
+  protected static formatNumber(
+    value: number,
+    options?: { minimumFractionDigits?: number; maximumFractionDigits?: number },
+  ): string {
+    const locale = LOCALE_INTL[TypeField.localeDisplay];
+    const key = `${locale}:${options?.minimumFractionDigits ?? ""}:${options?.maximumFractionDigits ?? ""}`;
+    let formatter = TypeField.formatterCache.get(key);
+    if (!formatter) {
+      formatter = new Intl.NumberFormat(locale, options);
+      TypeField.formatterCache.set(key, formatter);
+    }
+    return formatter.format(value);
   }
 
   // Progressive mask: applies separators only when enough digits exist.

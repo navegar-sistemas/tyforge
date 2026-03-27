@@ -156,7 +156,7 @@ export class FMoney extends TypeField<TMoney, TMoneyFormatted> {
   }
 
   override formatted(): TMoneyFormatted {
-    return String(this.getValue());
+    return TypeField.formatNumber(this.toDecimal(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
   override getDescription(): string {

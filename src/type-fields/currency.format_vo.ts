@@ -68,7 +68,7 @@ export class FCurrency extends FMoney {
   }
 
   override formatted(): TCurrencyFormatted {
-    return this.toDecimalValue().toFixed(2);
+    return TypeField.formatNumber(this.toDecimalValue(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
   override toString(): string {

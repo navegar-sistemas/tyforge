@@ -32,14 +32,19 @@ export class FDocumentId extends TypeField<TDocumentId, TDocumentIdFormatted> {
     const base = super.validateRules(value, fieldPath, validateLevel);
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
-    if (TypeField.locale === "br") {
-      if (!BR_DOCUMENT_REGEX.test(value)) {
-        return err(ExceptionValidation.create(fieldPath, "Brazilian document must be exactly 11 digits (CPF) or 14 digits (CNPJ)"));
-      }
-    } else {
-      if (!ALPHANUMERIC_REGEX.test(value)) {
-        return err(ExceptionValidation.create(fieldPath, "Document ID must contain only alphanumeric characters"));
-      }
+    if (!ALPHANUMERIC_REGEX.test(value)) {
+      return err(ExceptionValidation.create(fieldPath, "Document ID must contain only alphanumeric characters"));
+    }
+    switch (TypeField.localeRules) {
+      case "us":
+        break;
+      case "br":
+        if (!BR_DOCUMENT_REGEX.test(value)) {
+          return err(ExceptionValidation.create(fieldPath, "Brazilian document must be exactly 11 digits (CPF) or 14 digits (CNPJ)"));
+        }
+        break;
+      default:
+        TypeField.assertNeverLocale(TypeField.localeRules);
     }
     return OK_TRUE;
   }
@@ -81,7 +86,7 @@ export class FDocumentId extends TypeField<TDocumentId, TDocumentIdFormatted> {
   }
 
   override getDescription(): string {
-    return "Generic document identifier (alphanumeric). Locale-aware: validates CPF (11 digits) or CNPJ (14 digits) when TypeField.locale is 'br'.";
+    return "Generic document identifier (alphanumeric). Locale-aware: validates CPF (11 digits) or CNPJ (14 digits) when TypeField.localeRules is 'br'.";
   }
 
   override getShortDescription(): string {

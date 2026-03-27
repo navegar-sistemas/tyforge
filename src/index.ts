@@ -39,7 +39,7 @@ export { composeSchema } from "./schema/schema-compose";
 
 // ── Type Fields ─────────────────────────────────────────────────
 export { TypeField } from "./type-fields/type-field.base";
-export type { TJsonSchemaType, TValidationLevel } from "./type-fields/type-field.base";
+export type { TJsonSchemaType, TValidationLevel, TLocaleDisplay, TLocaleRules } from "./type-fields/type-field.base";
 export type { ITypeFieldConfig } from "./type-fields/type-field.config";
 export { FBankAccountNumber } from "./type-fields/bank-account-number.format_vo";
 export type { TBankAccountNumber, TBankAccountNumberFormatted } from "./type-fields/bank-account-number.format_vo";

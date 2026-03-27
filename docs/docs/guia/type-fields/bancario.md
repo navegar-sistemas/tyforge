@@ -5,7 +5,7 @@ sidebar_position: 9
 
 # Type Fields — Bancário
 
-Type Fields para dados bancários e de pagamento. Vários campos são locale-aware e aplicam regras específicas quando `TypeField.locale` está configurado como `"br"` (Brasil).
+Type Fields para dados bancários e de pagamento. Vários campos são locale-aware e aplicam regras específicas quando `TypeField.localeRules` está configurado como `"br"` (Brasil).
 
 ## Resumo
 
@@ -24,7 +24,7 @@ Para ativar as validações específicas do Brasil, configure o locale no bootst
 ```typescript
 import { TypeField } from "tyforge";
 
-TypeField.configure({ locale: "br" });
+TypeField.configure({ localeRules: "br" });
 ```
 
 Isso afeta `FBankCode`, `FBankBranch` e `FBankAccountNumber`.
@@ -51,7 +51,7 @@ banco.getValue(); // "00000000"
 ```typescript
 import { FBankCode, TypeField } from "tyforge";
 
-TypeField.configure({ locale: "br" });
+TypeField.configure({ localeRules: "br" });
 
 // Aceita ISPB de 8 dígitos
 const itau = FBankCode.createOrThrow("60701190");
@@ -87,7 +87,7 @@ agencia.getValue(); // "0001"
 ```typescript
 import { FBankBranch, TypeField } from "tyforge";
 
-TypeField.configure({ locale: "br" });
+TypeField.configure({ localeRules: "br" });
 
 // Aceita agência de 4 dígitos
 const ag = FBankBranch.createOrThrow("1234");
@@ -123,7 +123,7 @@ conta.getValue(); // "123456"
 ```typescript
 import { FBankAccountNumber, TypeField } from "tyforge";
 
-TypeField.configure({ locale: "br" });
+TypeField.configure({ localeRules: "br" });
 
 // Conta simples
 const conta1 = FBankAccountNumber.createOrThrow("12345678");

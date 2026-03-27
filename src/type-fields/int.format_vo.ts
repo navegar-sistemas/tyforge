@@ -79,14 +79,14 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
   }
 
   override formatted(): TIntFormatted {
-    return String(this.getValue());
+    return TypeField.formatNumber(this.getValue(), { maximumFractionDigits: 0 });
   }
 
   override getDescription(): string {
-    return "Número inteiro sem casas decimais. Campo genérico para armazenar valores numéricos inteiros, utilizado quando não há regras específicas de validação ou limites.";
+    return "Integer number with no decimal places. Generic field for storing whole numeric values.";
   }
 
   override getShortDescription(): string {
-    return "Número inteiro";
+    return "Integer";
   }
 }

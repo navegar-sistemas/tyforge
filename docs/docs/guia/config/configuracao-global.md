@@ -107,10 +107,15 @@ Essas propriedades são usadas internamente pelos TypeFields concretos ao chamar
 
 ## Método `TypeField.configure()`
 
-Permite alterar os níveis de validação em tempo de execução:
+Permite alterar níveis de validação e locales em tempo de execução:
 
 ```typescript
-static configure(levels: { create?: TValidationLevel; assign?: TValidationLevel }): void;
+static configure(options: {
+  create?: TValidationLevel;
+  assign?: TValidationLevel;
+  localeDisplay?: TLocaleDisplay;
+  localeRules?: TLocaleRules;
+}): void;
 ```
 
 Exemplo de uso no bootstrap da aplicação:
@@ -120,7 +125,13 @@ import { TypeField } from "tyforge";
 
 // Desabilita validação no assign para maximizar performance
 TypeField.configure({ create: "full", assign: "none" });
+
+// Configura locale brasileiro (formatação + regras de validação)
+TypeField.configure({ localeDisplay: "br", localeRules: "br" });
 ```
+
+- `localeDisplay` — controla formatação (`formatted()`, `formatNumber()`). Valores: `"us"` | `"br"`
+- `localeRules` — controla regras de validação de negócio. Valores: `"us"` | `"br"`
 
 A integração entre o arquivo `tyforge.config.json` e o `TypeField.configure()` fica a cargo do projeto consumidor. O CLI do linter (`tyforge-lint`) lê o arquivo de configuração, mas a biblioteca core não faz isso automaticamente.
 

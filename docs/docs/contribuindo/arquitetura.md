@@ -5,59 +5,70 @@ sidebar_position: 1
 
 import MermaidDiagram from '@site/src/components/MermaidDiagram';
 
-# Visao Geral da Arquitetura
+# Visão Geral da Arquitetura
 
-O TyForge e organizado em camadas com dependencias unidirecionais. Cada modulo superior depende apenas dos modulos abaixo dele, garantindo isolamento e testabilidade.
+O TyForge é organizado em camadas com dependências unidirecionais. Cada módulo superior depende apenas dos módulos abaixo dele, garantindo isolamento e testabilidade.
 
-## Diagrama de dependencias
+## Diagrama de dependências
 
 <MermaidDiagram chart={`
 graph TD
-  Result["Result Pattern<br/><i>base, sem dependencias</i>"]
+  Result["Result Pattern<br/><i>base, sem dependências</i>"]
   Exceptions["Exceptions<br/><i>depende de Result, HTTP constants</i>"]
-  Tools["Tools<br/><i>TypeGuard, ToolParse, ToolFormatting</i>"]
+  Tools["Tools<br/><i>TypeGuard, ToolObjectTransform, ToolCliParser</i>"]
   TypeFields["Type Fields<br/><i>depende de Result, Exceptions, TypeGuard</i>"]
   Schema["Schema Builder<br/><i>depende de TypeFields, Result, Exceptions</i>"]
   DomainModels["Domain Models<br/><i>depende de TypeFields, Result</i>"]
+  Application["Application<br/><i>UseCase, IMapper, CQRS</i>"]
+  Infrastructure["Infrastructure<br/><i>IRepositoryBase, Paginated, IUnitOfWork</i>"]
 
   Result --> Exceptions
   Result --> Tools
   Result --> TypeFields
   Result --> Schema
   Result --> DomainModels
+  Result --> Application
+  Result --> Infrastructure
   Exceptions --> TypeFields
   Exceptions --> Schema
+  Exceptions --> Application
+  Exceptions --> Infrastructure
   Tools --> TypeFields
   TypeFields --> Schema
   TypeFields --> DomainModels
+  DomainModels --> Application
+  DomainModels --> Infrastructure
+  Schema --> Application
 `} />
 
-### Direcao das dependencias
+### Direção das dependências
 
-- **Result** e a camada base — nao depende de nenhum outro modulo interno.
+- **Result** é a camada base — não depende de nenhum outro módulo interno.
 - **Exceptions** depende apenas de Result e das constantes HTTP.
-- **Tools** (TypeGuard, ToolParse, ToolFormattingDateISO8601) sao utilitarios puros usados em varias camadas.
+- **Tools** (TypeGuard, ToolObjectTransform, ToolCliParser, ToolFileDiscovery, ToolGit) são utilitários puros usados em várias camadas.
 - **Type Fields** consome Result, Exceptions e TypeGuard para validar e encapsular valores primitivos.
-- **Schema Builder** orquestra TypeFields, Result e Exceptions para compilar e executar validacoes.
+- **Schema Builder** orquestra TypeFields, Result e Exceptions para compilar e executar validações.
 - **Domain Models** utiliza TypeFields e Result para construir Entity, ValueObject, Aggregate e Dto.
+- **Application** contém UseCase e IMapper, orquestrando Domain Models e Schemas para casos de uso da aplicação.
+- **Infrastructure** define interfaces de repositório, paginação e Unit of Work para a camada de persistência.
 
-## Principios de arquitetura
+## Princípios de arquitetura
 
 ### Result over throw
 
-Caminhos quentes (hot paths) utilizam `Result<T, E>` para controle de fluxo. Excecoes via `throw` sao reservadas exclusivamente para os metodos `createOrThrow`, destinados a contextos onde o chamador prefere capturar via try/catch.
+Caminhos quentes (hot paths) utilizam `Result<T, E>` para controle de fluxo. Exceções via `throw` são reservadas exclusivamente para os métodos `createOrThrow`, destinados a contextos onde o chamador prefere capturar via try/catch.
 
 ```typescript
 // Hot path — retorna Result
 const result = FEmail.create("usuario@email.com");
 
-// Conveniencia — lanca excecao se falhar
+// Conveniência — lança exceção se falhar
 const email = FEmail.createOrThrow("usuario@email.com");
 ```
 
 ### Imutabilidade
 
-Singletons como `OK_TRUE` sao congelados com `Object.freeze()` para evitar mutacao acidental e eliminar alocacoes desnecessarias no hot path de validacao.
+Singletons como `OK_TRUE` são congelados com `Object.freeze()` para evitar mutação acidental e eliminar alocações desnecessárias no hot path de validação.
 
 ```typescript
 export const OK_TRUE: Result<true, never> = Object.freeze({
@@ -68,50 +79,56 @@ export const OK_TRUE: Result<true, never> = Object.freeze({
 
 ### Lazy stack traces
 
-As excecoes do TyForge capturam o stack trace apenas quando a propriedade `.stack` e acessada pela primeira vez. Isso evita o custo de captura em cenarios onde o stack nao e necessario (ex.: validacoes em massa).
+As exceções do TyForge capturam o stack trace apenas quando a propriedade `.stack` é acessada pela primeira vez. Isso evita o custo de captura em cenários onde o stack não é necessário (ex.: validações em massa).
 
-### Compilacao de schemas
+### Compilação de schemas
 
-O `SchemaBuilder.compile()` analisa o schema uma unica vez e gera um validador otimizado. Chamadas subsequentes a `.create()` e `.assign()` executam a validacao sem re-analisar a estrutura do schema.
+O `SchemaBuilder.compile()` analisa o schema uma única vez e gera um validador otimizado. Chamadas subsequentes a `.create()` e `.assign()` executam a validação sem re-analisar a estrutura do schema.
 
 ```typescript
 // Compila uma vez
 const validator = SchemaBuilder.compile(userSchema);
 
-// Executa N vezes sem re-compilacao
+// Executa N vezes sem re-compilação
 const r1 = validator.create(data1);
 const r2 = validator.create(data2);
 ```
 
-### Composicao
+### Composição
 
-TypeFields se compoem em Entities, que se compoem em Aggregates. Cada nivel reutiliza a validacao da camada inferior via Result, formando uma cadeia de validacao composicional.
+TypeFields se compõem em Entities, que se compõem em Aggregates. Cada nível reutiliza a validação da camada inferior via Result, formando uma cadeia de validação composicional.
 
-## Estrutura do codigo-fonte
+## Estrutura do código-fonte
 
 ```
 src/
   result/          — Result<T, E>, ok(), err(), map, flatMap, fold, match, all
-  exceptions/      — 18 tipos de excecao RFC 7807
-  type-fields/     — TypeField<TPrimitive, TFormatted> e 25+ implementacoes
-  schema/          — SchemaBuilder.compile() e tipos de inferencia
+  exceptions/      — 18 tipos de exceção RFC 7807
+  type-fields/     — TypeField<TPrimitive, TFormatted> e 50+ implementações
+  schema/          — SchemaBuilder.compile() e tipos de inferência
   domain-models/   — Entity, ValueObject, Aggregate, Dto, DomainEvent
-  tools/           — TypeGuard, ToolParse, ToolFormattingDateISO8601
-  constants/       — OHttpStatus, THttpStatus
-  index.ts         — re-exportacoes publicas
+  application/     — UseCase, IMapper, CQRS
+  infrastructure/  — IRepositoryBase, Paginated, IUnitOfWork
+  tools/           — TypeGuard, ToolObjectTransform, ToolCliParser, ToolFileDiscovery, ToolGit
+  config/          — loadTyForgeConfig(), ITyForgeConfig
+  lint/            — tyforge-lint CLI e regras
+  index.ts         — re-exportações públicas
 ```
 
-### Descricao dos diretorios
+### Descrição dos diretórios
 
-| Diretorio | Responsabilidade |
+| Diretório | Responsabilidade |
 |-----------|-----------------|
-| `result/` | Tipo `Result<T, E>` e funcoes utilitarias (`ok`, `err`, `isSuccess`, `isFailure`, `map`, `flatMap`, `fold`, `match`, `getOrElse`, `orElse`, `all`, `toPromise`) |
-| `exceptions/` | 18 tipos de excecao baseados em RFC 7807 (`ExceptionValidation`, `ExceptionBusiness`, `ExceptionNotFound`, `ExceptionDb`, `ExceptionAuth`, `ExceptionUnexpected` e outros) |
-| `type-fields/` | Classe base `TypeField<TPrimitive>` e implementacoes concretas como `FString`, `FEmail`, `FId`, `FInt`, `FBoolean`, `FDate*`, `FPassword`, etc. |
-| `schema/` | `SchemaBuilder` com metodo `compile()`, tipos de inferencia `InferJson` e `InferProps` |
+| `result/` | Tipo `Result<T, E>` e funções utilitárias (`ok`, `err`, `isSuccess`, `isFailure`, `map`, `flatMap`, `fold`, `match`, `getOrElse`, `orElse`, `all`, `toPromise`) |
+| `exceptions/` | 18 tipos de exceção baseados em RFC 7807 (`ExceptionValidation`, `ExceptionBusiness`, `ExceptionNotFound`, `ExceptionDb`, `ExceptionAuth`, `ExceptionUnexpected` e outros) |
+| `type-fields/` | Classe base `TypeField<TPrimitive, TFormatted>` e 50+ implementações concretas como `FString`, `FEmail`, `FId`, `FInt`, `FBoolean`, `FDate*`, `FMoney`, `FPassword`, `FPixKey`, `FDocumentCpf` etc. |
+| `schema/` | `SchemaBuilder` com método `compile()`, tipos de inferência `InferJson` e `InferProps`, batch processing |
 | `domain-models/` | Classes base `Entity`, `ValueObject`, `Aggregate` (com domain events), `Dto` e `DomainEvent` |
-| `tools/` | Utilitarios: `TypeGuard` (verificacoes de tipo), `ToolParse` (parsing seguro), `ToolFormattingDateISO8601` (formatacao de datas) |
-| `constants/` | Constantes HTTP: `OHttpStatus` (objeto com status codes) e `THttpStatus` (tipo) |
+| `application/` | `UseCase` (recebe Dto, retorna domain model), `IMapper` (conversão Domain/Persistência), CQRS |
+| `infrastructure/` | `IRepositoryBase<T>` com `findAll(params?: IPaginationParams)`, `Paginated<T>`, `IUnitOfWork` |
+| `tools/` | Utilitários: `TypeGuard` (verificações de tipo), `ToolObjectTransform` (flatten/unflatten de objetos), `ToolCliParser` (parsing de argumentos CLI), `ToolFileDiscovery` (busca de arquivos por extensão), `ToolGit` (operações git) |
+| `config/` | Sistema de configuração global: `loadTyForgeConfig()`, `ITyForgeConfig`, `tyforge.config.json` |
+| `lint/` | Linter de padrões: `tyforge-lint` CLI, `RuleRegistry`, regras de verificação, reporters |
 
 ## Build
 
@@ -126,7 +143,7 @@ O comando executa `tsc && tsc-alias`:
 
 ### Path aliases
 
-Os aliases sao definidos no `tsconfig.json`:
+Os aliases são definidos no `tsconfig.json`:
 
 ```json
 {
@@ -144,6 +161,6 @@ Durante o desenvolvimento, `@tyforge/result` resolve para `src/result`. No build
 |-------------|-------|
 | Formato | CommonJS |
 | Target | ES2022 |
-| Diretorio | `dist/` |
+| Diretório | `dist/` |
 | Declarations | `.d.ts` com declaration maps |
 | Source maps | Habilitados |

@@ -25,5 +25,20 @@ export default {
       id: "lint",
       label: "Linter",
     },
+    {
+      type: "doc",
+      id: "convencoes",
+      label: "Convenções",
+    },
+    {
+      type: "doc",
+      id: "criando-type-fields",
+      label: "Criando TypeFields",
+    },
+    {
+      type: "doc",
+      id: "testes",
+      label: "Testes",
+    },
   ],
 };

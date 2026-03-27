@@ -13,12 +13,12 @@ export default {
     {
       type: "category",
       label: "Result Pattern",
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           type: "doc",
           id: "result/visao-geral",
-          label: "Visao Geral",
+          label: "Visão Geral",
         },
         {
           type: "doc",
@@ -30,34 +30,34 @@ export default {
     {
       type: "category",
       label: "Schema Builder",
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           type: "doc",
           id: "schema/visao-geral",
-          label: "Visao Geral",
+          label: "Visão Geral",
         },
         {
           type: "doc",
           id: "schema/compile",
-          label: "Compilacao e Modos",
+          label: "Compilação e Modos",
         },
         {
           type: "doc",
           id: "schema/tipos",
-          label: "Inferencia de Tipos",
+          label: "Inferência de Tipos",
         },
       ],
     },
     {
       type: "category",
       label: "Type Fields",
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           type: "doc",
           id: "type-fields/visao-geral",
-          label: "Visao Geral",
+          label: "Visão Geral",
         },
         {
           type: "doc",
@@ -67,7 +67,7 @@ export default {
         {
           type: "doc",
           id: "type-fields/numerico",
-          label: "Numericos",
+          label: "Numéricos",
         },
         {
           type: "doc",
@@ -119,12 +119,12 @@ export default {
     {
       type: "category",
       label: "Domain Models",
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           type: "doc",
           id: "domain-models/visao-geral",
-          label: "Visao Geral",
+          label: "Visão Geral",
         },
         {
           type: "doc",
@@ -151,29 +151,29 @@ export default {
     {
       type: "category",
       label: "Exceptions",
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           type: "doc",
           id: "exceptions/visao-geral",
-          label: "Visao Geral",
+          label: "Visão Geral",
         },
         {
           type: "doc",
           id: "exceptions/tipos",
-          label: "Tipos de Excecao",
+          label: "Tipos de Exceção",
         },
       ],
     },
     {
       type: "category",
       label: "Tools",
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           type: "doc",
           id: "tools/visao-geral",
-          label: "Visao Geral",
+          label: "Visão Geral",
         },
         {
           type: "doc",
@@ -185,7 +185,7 @@ export default {
     {
       type: "category",
       label: "Application",
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           type: "doc",
@@ -202,7 +202,7 @@ export default {
     {
       type: "category",
       label: "Infrastructure",
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           type: "doc",
@@ -213,8 +213,8 @@ export default {
     },
     {
       type: "category",
-      label: "Configuracao",
-      collapsed: false,
+      label: "Configuração",
+      collapsed: true,
       items: [
         {
           type: "doc",

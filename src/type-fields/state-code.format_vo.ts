@@ -40,8 +40,16 @@ export class FStateCode extends TypeField<TStateCode, TStateCodeFormatted> {
     if (!STATE_CODE_REGEX.test(value)) {
       return err(ExceptionValidation.create(fieldPath, "State code must contain exactly 2 uppercase letters"));
     }
-    if (TypeField.locale === "br" && !VALID_STATES_BR.has(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Invalid Brazilian state code"));
+    switch (TypeField.localeRules) {
+      case "us":
+        break;
+      case "br":
+        if (!VALID_STATES_BR.has(value)) {
+          return err(ExceptionValidation.create(fieldPath, "Invalid Brazilian state code"));
+        }
+        break;
+      default:
+        TypeField.assertNeverLocale(TypeField.localeRules);
     }
     return OK_TRUE;
   }
@@ -83,7 +91,7 @@ export class FStateCode extends TypeField<TStateCode, TStateCodeFormatted> {
   }
 
   override getDescription(): string {
-    return "State or province code (2 uppercase letters). Locale-aware: validates against known state codes when TypeField.locale is set.";
+    return "State or province code (2 uppercase letters). Locale-aware: validates against known state codes when TypeField.localeRules is 'br'.";
   }
 
   override getShortDescription(): string {

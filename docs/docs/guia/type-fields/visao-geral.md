@@ -12,7 +12,7 @@ TyForge inclui TypeFields prontos para padrões comuns: strings, emails, moeda (
 :::
 
 :::info Locale-aware
-TypeFields locale-aware usam `TypeField.locale` para aplicar regras específicas no `validateRules()`. Uma única classe com lógica condicional — sem herança por locale. Default: `"international"`. Configure via `TypeField.configure({ locale: "br" })`.
+O sistema de locale tem dois eixos: `localeDisplay` (formatação) e `localeRules` (regras de validação). Tipos estritos (`TLocaleDisplay`, `TLocaleRules`) garantem exaustividade em compile-time. Default: `"us"`. Configure via `TypeField.configure({ localeDisplay: "br", localeRules: "br" })`.
 :::
 
 ## Classe base: `TypeField<TPrimitive, TFormatted>`
@@ -102,10 +102,15 @@ Esses níveis são definidos com valores padrão hardcoded e podem ser alterados
 
 ### Método `TypeField.configure()`
 
-Permite alterar os níveis de validação em tempo de execução:
+Permite alterar níveis de validação e locales em tempo de execução:
 
 ```typescript
-static configure(levels: { create?: TValidationLevel; assign?: TValidationLevel }): void;
+static configure(options: {
+  create?: TValidationLevel;
+  assign?: TValidationLevel;
+  localeDisplay?: TLocaleDisplay;
+  localeRules?: TLocaleRules;
+}): void;
 ```
 
 Exemplo de uso:
@@ -113,10 +118,15 @@ Exemplo de uso:
 ```typescript
 import { TypeField } from "tyforge";
 
+// Ajustar validação por ambiente
 TypeField.configure({ create: "full", assign: "none" });
+
+// Configurar locale brasileiro (formatação + regras)
+TypeField.configure({ localeDisplay: "br", localeRules: "br" });
 ```
 
-Isso é útil para ajustar o comportamento de validação por ambiente (ex: desabilitar validação no `assign` em produção para maximizar performance).
+- `localeDisplay` controla formatação (`formatted()`, `formatNumber()`)
+- `localeRules` controla regras de validação de negócio (bancário, documentos, estados)
 
 ### Validação em duas etapas: `validateType()` + `validateRules()`
 

@@ -35,8 +35,16 @@ export class FBankCode extends TypeField<TBankCode, TBankCodeFormatted> {
     if (!DIGITS_REGEX.test(value)) {
       return err(ExceptionValidation.create(fieldPath, "Bank code must contain only numeric digits"));
     }
-    if (TypeField.locale === "br" && !ISPB_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "ISPB bank code must be exactly 8 numeric digits"));
+    switch (TypeField.localeRules) {
+      case "us":
+        break;
+      case "br":
+        if (!ISPB_REGEX.test(value)) {
+          return err(ExceptionValidation.create(fieldPath, "ISPB bank code must be exactly 8 numeric digits"));
+        }
+        break;
+      default:
+        TypeField.assertNeverLocale(TypeField.localeRules);
     }
     return OK_TRUE;
   }
@@ -78,7 +86,7 @@ export class FBankCode extends TypeField<TBankCode, TBankCodeFormatted> {
   }
 
   override getDescription(): string {
-    return "Bank identification code (numeric). Locale-aware: enforces ISPB 8-digit format when TypeField.locale is 'br'.";
+    return "Bank identification code (numeric). Locale-aware: enforces ISPB 8-digit format when TypeField.localeRules is 'br'.";
   }
 
   override getShortDescription(): string {

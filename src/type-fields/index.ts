@@ -110,4 +110,5 @@ export {
 } from "./transaction-status.format_vo";
 export { TypeField } from "./type-field.base";
 export { TJsonSchemaType } from "./type-field.base";
+export type { TValidationLevel, TLocaleDisplay, TLocaleRules } from "./type-field.base";
 export type { ITypeFieldConfig } from "./type-field.config";
