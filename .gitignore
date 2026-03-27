@@ -15,6 +15,9 @@ todo/
 planejamento.rb
 seguranca.md
 
+# Support (test projects)
+support/
+
 # Docker
 docker-compose.override.yml
 

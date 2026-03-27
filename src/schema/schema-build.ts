@@ -5,7 +5,7 @@ import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 import { err, ok, Result } from "@tyforge/result";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 import { TypeField } from "@tyforge/type-fields/type-field.base";
-import { createParallelProcessor } from "./batch-parallel";
+import type { TAssignUnknown } from "./schema-types";
 
 // ── Type Guards (zero casts) ────────────────────────────────────
 
@@ -248,6 +248,28 @@ function createRunner(schema: Record<string, unknown>) {
   };
 }
 
+// ── Sequential Batch ─────────────────────────────────────────────
+
+type Runner = (data: unknown, basePath: string, mode: "create" | "assign") => Result<Record<string, unknown>, Exceptions>;
+
+function runSequential<TSchema extends ISchema>(
+  items: unknown[],
+  runner: Runner,
+): IBatchCreateResult<TSchema> {
+  const successes: InferProps<TSchema>[] = [];
+  const failures: IBatchCreateError[] = [];
+  for (let i = 0; i < items.length; i++) {
+    const result = runner(items[i], "", "create");
+    assertResultType<InferProps<TSchema>>(result);
+    if (result.success) {
+      successes.push(result.value);
+    } else {
+      failures.push({ index: i, error: result.error });
+    }
+  }
+  return { ok: successes, errors: failures };
+}
+
 // ── Public API ───────────────────────────────────────────────────
 
 export type { IBatchCreateError, IBatchCreateOptions, IBatchCreateResult } from "./schema-types";
@@ -290,36 +312,30 @@ export class SchemaBuilder {
       batchCreate(items: unknown[], options?: IBatchCreateOptions): IBatchCreateResult<TSchema> | Promise<IBatchCreateResult<TSchema>> {
         const concurrency = options?.concurrency ?? 1;
 
-        // Parallel mode — worker threads (Node.js only)
-        // In browser/React Native, createParallelProcessor() returns null (via browser field stub)
+        // Parallel mode — dynamic import prevents Metro/bundlers from resolving node:worker_threads.
+        // In browser/React Native, import() fails or returns null processor — falls back to sequential.
         if (concurrency > 1) {
-          const processor = createParallelProcessor();
-          if (processor) {
-            const assign = (data: unknown): Result<InferProps<TSchema>, Exceptions> => {
-              const r = runner(data, "", "assign");
-              assertResultType<InferProps<TSchema>>(r);
-              return r;
-            };
-            return processor.process(schema, items, {
-              concurrency,
-              chunkSize: options?.chunkSize ?? 10000,
-            }, assign);
-          }
+          const assignFn: TAssignUnknown<TSchema> = (data) => {
+            const r = runner(data, "", "assign");
+            assertResultType<InferProps<TSchema>>(r);
+            return r;
+          };
+          const sequential = (): IBatchCreateResult<TSchema> => runSequential<TSchema>(items, runner);
+          return import("./batch-parallel")
+            .then(({ createParallelProcessor }) => {
+              const processor = createParallelProcessor();
+              if (processor) {
+                return processor.process(schema, items, {
+                  concurrency,
+                  chunkSize: options?.chunkSize ?? 10000,
+                }, assignFn);
+              }
+              return sequential();
+            })
+            .catch(() => sequential());
         }
 
-        // Sequential mode (default)
-        const successes: InferProps<TSchema>[] = [];
-        const failures: IBatchCreateError[] = [];
-        for (let i = 0; i < items.length; i++) {
-          const result = runner(items[i], "", "create");
-          assertResultType<InferProps<TSchema>>(result);
-          if (result.success) {
-            successes.push(result.value);
-          } else {
-            failures.push({ index: i, error: result.error });
-          }
-        }
-        return { ok: successes, errors: failures };
+        return runSequential(items, runner);
       },
     };
   }
