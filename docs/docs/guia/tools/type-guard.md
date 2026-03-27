@@ -341,10 +341,10 @@ TypeGuard.isHex("hello", "hash");           // err(...)
 | `isString` | `Result<string>` | String trimada com limites de comprimento |
 | `isNumber` | `Result<true>` | Numero com faixa e precisao decimal |
 | `isInteger` | `Result<true>` | Inteiro com faixa |
-| `isPositiveInteger` | `Result<true>` | Inteiro >= 0 |
-| `isNegativeInteger` | `Result<true>` | Inteiro <= -1 |
-| `isPositiveNumber` | `Result<true>` | Numero >= 0 com precisao |
-| `isNegativeNumber` | `Result<true>` | Numero < 0 com precisao |
+| `isPositiveInteger` | `Result<true>` | Inteiro positivo ou zero |
+| `isNegativeInteger` | `Result<true>` | Inteiro negativo |
+| `isPositiveNumber` | `Result<true>` | Numero positivo ou zero com precisao |
+| `isNegativeNumber` | `Result<true>` | Numero negativo com precisao |
 | `isBoolean` | `Result<true>` | Booleano |
 | `isObject` | `Result<true>` | Objeto nao-nulo, nao-array |
 | `isArray` | `Result<true>` | Array com limites de tamanho |
