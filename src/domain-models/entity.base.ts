@@ -17,6 +17,7 @@ export abstract class Entity<
 
   public equals(other: this): boolean {
     if (!other) return false;
+    if (this === other) return true;
     if (other.constructor !== this.constructor) return false;
     if (!this.id || !other.id) return false;
     return this.id.getValue() === other.id.getValue();

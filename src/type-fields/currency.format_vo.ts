@@ -18,6 +18,14 @@ export class FCurrency extends FMoney {
     super(cents, fieldPath);
   }
 
+  static formCreate(raw: unknown, fieldPath = "Currency"): Result<FCurrency, ExceptionValidation> {
+    return FCurrency.create(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  }
+
+  static formAssign(raw: unknown, fieldPath = "Currency"): Result<FCurrency, ExceptionValidation> {
+    return FCurrency.assign(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  }
+
   // Accepts decimal input, converts to integer cents internally.
   static override create<T = TCurrency>(raw: T, fieldPath = "Currency"): Result<FCurrency, ExceptionValidation> {
     const typed = TypeGuard.extractNumber(raw, fieldPath);
@@ -35,7 +43,12 @@ export class FCurrency extends FMoney {
     return result.value;
   }
 
-  // Assign expects cents (from persistence), same as FMoney.
+  /**
+   * Assign from persisted integer cents (NOT decimal).
+   * Use create() for decimal input.
+   * @example FCurrency.create(10.50)  // decimal -> 1050 cents
+   * @example FCurrency.assign(1050)   // cents from DB -> 1050 cents
+   */
   static override assign<T = TMoney>(value: T, fieldPath = "Currency"): Result<FCurrency, ExceptionValidation> {
     const typed = TypeGuard.extractNumber(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);

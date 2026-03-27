@@ -13,6 +13,8 @@ const HEX_REGEX = /^[0-9A-Fa-f]+$/;
 export class FCertificateThumbprint extends FIdentifier {
   override readonly typeInference = "FCertificateThumbprint";
 
+  // Two-level validation: config range (40-64) rejects obvious outliers at the base level,
+  // while validateRules further restricts to exactly 40 (SHA-1) or 64 (SHA-256) characters.
   override readonly config: ITypeFieldConfig<TCertificateThumbprint> = {
     jsonSchemaType: "string",
     minLength: 40,

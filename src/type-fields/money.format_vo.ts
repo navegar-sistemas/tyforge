@@ -78,8 +78,7 @@ export class FMoney extends TypeField<TMoney, TMoneyFormatted> {
    * Converts a decimal amount (e.g. 10.50) to integer cents and returns an FMoney instance.
    */
   static fromDecimal(value: number, fieldPath = "Money"): Result<FMoney, ExceptionValidation> {
-    const cents = Math.round(value * 100);
-    return FMoney.create(cents, fieldPath);
+    return FMoney.create(Math.round(value * 100), fieldPath);
   }
 
   /**

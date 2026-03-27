@@ -80,7 +80,11 @@ function extractValidateLevels(entry: unknown): { assignValidateLevel: TValidati
   };
 }
 
-function compileFields(schema: Record<string, unknown>, basePath: string): ICompiledField[] {
+function compileFields(schema: Record<string, unknown>, basePath: string, depth = 0): ICompiledField[] {
+  if (depth >= SchemaBuilder.maxDepth) {
+    throw new Error(`Schema nesting exceeds maximum depth of ${SchemaBuilder.maxDepth} at path: ${basePath}`);
+  }
+
   const fields: ICompiledField[] = [];
 
   for (const key of Object.keys(schema)) {
@@ -119,7 +123,7 @@ function compileFields(schema: Record<string, unknown>, basePath: string): IComp
           kind: isArray ? EFieldKind.ArrayNestedSchema : EFieldKind.NestedSchema,
           creatable: null,
           hasAssign: false,
-          nestedValidator: { fields: compileFields(t, path), run: createRunner(t) },
+          nestedValidator: { fields: compileFields(t, path, depth + 1), run: createRunner(t) },
           assignValidateLevel,
           createValidateLevel,
         });
@@ -132,7 +136,7 @@ function compileFields(schema: Record<string, unknown>, basePath: string): IComp
         kind: EFieldKind.NestedSchema,
         creatable: null,
         hasAssign: false,
-        nestedValidator: { fields: compileFields(entry, path), run: createRunner(entry) },
+        nestedValidator: { fields: compileFields(entry, path, depth + 1), run: createRunner(entry) },
         assignValidateLevel: "type",
         createValidateLevel: "full",
       });
@@ -283,6 +287,19 @@ export interface ICompiledSchema<TSchema extends ISchema> {
 }
 
 export class SchemaBuilder {
+  private static _maxDepth = 50;
+
+  static get maxDepth(): number {
+    return SchemaBuilder._maxDepth;
+  }
+
+  static set maxDepth(value: number) {
+    if (value < 1 || !Number.isInteger(value)) {
+      throw new Error("SchemaBuilder.maxDepth must be a positive integer");
+    }
+    SchemaBuilder._maxDepth = value;
+  }
+
   static compile<TSchema extends ISchema>(
     schema: TSchema,
   ): ICompiledSchema<TSchema> {
@@ -328,6 +345,7 @@ export class SchemaBuilder {
                 return processor.process(schema, items, {
                   concurrency,
                   chunkSize: options?.chunkSize ?? 10000,
+                  workerTimeout: options?.workerTimeout,
                 }, assignFn);
               }
               return sequential();

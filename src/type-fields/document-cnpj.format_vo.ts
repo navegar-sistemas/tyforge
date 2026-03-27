@@ -10,6 +10,22 @@ export type TDocumentCnpjFormatted = string;
 export class FDocumentCnpj extends TypeField<TDocumentCnpj, TDocumentCnpjFormatted> {
   private static readonly CNPJ_REGEX = /^\d{14}$/;
 
+  private static isValidCheckDigits(cnpj: string): boolean {
+    if (/^(\d)\1{13}$/.test(cnpj)) return false;
+    const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    const weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    let sum = 0;
+    for (let i = 0; i < 12; i++) sum += Number(cnpj[i]) * weights1[i];
+    let remainder = sum % 11;
+    const check1 = remainder < 2 ? 0 : 11 - remainder;
+    if (check1 !== Number(cnpj[12])) return false;
+    sum = 0;
+    for (let i = 0; i < 13; i++) sum += Number(cnpj[i]) * weights2[i];
+    remainder = sum % 11;
+    const check2 = remainder < 2 ? 0 : 11 - remainder;
+    return check2 === Number(cnpj[13]);
+  }
+
   override readonly typeInference = "FDocumentCnpj";
 
   override readonly config: ITypeFieldConfig<TDocumentCnpj> = {
@@ -34,6 +50,10 @@ export class FDocumentCnpj extends TypeField<TDocumentCnpj, TDocumentCnpjFormatt
 
     if (!FDocumentCnpj.CNPJ_REGEX.test(value)) {
       return err(ExceptionValidation.create(fieldPath, "CNPJ must contain exactly 14 numeric digits."));
+    }
+
+    if (!FDocumentCnpj.isValidCheckDigits(value)) {
+      return err(ExceptionValidation.create(fieldPath, "CNPJ has invalid check digits."));
     }
 
     return OK_TRUE;

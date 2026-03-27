@@ -17,6 +17,10 @@ export class FPassword extends TypeField<TPassword, TPasswordFormatted> {
     serializeAsString: false,
   };
 
+  // Password complexity is enforced on ASCII characters only. Unicode characters
+  // are accepted in the password value but do not count toward complexity
+  // requirements. This follows the NIST SP 800-63B recommendation of accepting
+  // all Unicode while checking complexity against the ASCII subset.
   private static readonly UPPERCASE_REGEX = /[A-Z]/;
   private static readonly LOWERCASE_REGEX = /[a-z]/;
   private static readonly DIGIT_REGEX = /[0-9]/;

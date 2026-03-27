@@ -10,6 +10,31 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.25] - 2026-03-27
+
+### Added
+- Husky pre-commit hooks — shared across all contributors via `.husky/pre-commit`
+- Pre-commit runs 5 checks: typecheck, tests, tyforge-lint, docs build (local), docs Docker build (production)
+- `"prepare": "husky"` in package.json — hooks install automatically on `npm install`
+- `SchemaBuilder.maxDepth` — configurable maximum schema nesting depth (default: 50, validated via getter/setter)
+- CPF/CNPJ check digit validation (mod 11 algorithm) in `FDocumentCpf`, `FDocumentCnpj`, `FDocumentCpfOrCnpj`
+- `FCurrency.formCreate()` and `FCurrency.formAssign()` — form input normalization for decimal currency
+- `seguranca.md` — documentation page for security TypeFields
+
+### Changed
+- Replaced native `.git/hooks/pre-commit` with Husky (committed to git, shared across team)
+- Worker timeout now configurable via `IBatchCreateOptions.workerTimeout` (default: 30s)
+- PIX key validation: stricter email (`user@domain.tld`) and phone (`+digits 10-15`) format checks
+- `FPassword` complexity documented as ASCII-only per NIST SP 800-63B
+- `FTotpSecret` base32 regex fixed to reject scattered padding
+
+### Fixed
+- `batch-parallel.ts`: clearTimeout moved to finally block (prevents timer memory leak on rejection)
+- `batch-parallel.ts`: worker results collected via indexed Map (prevents race condition)
+- `batch-parallel.ts`: worker termination now properly awaited on error
+- `TypeGuard.isEnumKey`: type guard added before `.toString()` — rejects non-string/non-number input (prevents type coercion bypass)
+- User input removed from all ExceptionValidation error messages (prevents XSS when messages are rendered in HTML)
+
 ## [0.1.24] - 2026-03-27
 
 ### Changed

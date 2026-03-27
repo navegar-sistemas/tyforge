@@ -7,8 +7,6 @@ import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { isFailure } from "@tyforge/result/result";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
-const WORKER_TIMEOUT_MS = 30000;
-
 interface IWorkerSuccess {
   index: number;
   value: unknown;
@@ -41,7 +39,7 @@ class ParallelBatchProcessor implements IParallelProcessor {
   async process<TSchema extends ISchema>(
     schema: TSchema,
     items: unknown[],
-    options: { concurrency: number; chunkSize: number },
+    options: { concurrency: number; chunkSize: number; workerTimeout?: number },
     assignUnknown: TAssignUnknown<TSchema>,
   ): Promise<IBatchCreateResult<TSchema>> {
     const { Worker } = await import("node:worker_threads");
@@ -61,8 +59,9 @@ class ParallelBatchProcessor implements IParallelProcessor {
     const chunks = this.splitChunks(items, options.chunkSize);
     const maxConcurrency = Math.min(options.concurrency, nodeOs.cpus().length, 16);
     const workerCount = Math.min(maxConcurrency, chunks.length);
+    const timeout = options.workerTimeout ?? 30000;
 
-    const workerResults = await this.runWorkers(serializedSchema, chunks, workerCount, createWorker);
+    const workerResults = await this.runWorkers(serializedSchema, chunks, workerCount, createWorker, timeout);
 
     return this.reconstructResults<TSchema>(workerResults, assignUnknown);
   }
@@ -108,19 +107,23 @@ class ParallelBatchProcessor implements IParallelProcessor {
     chunks: { items: unknown[]; startIndex: number }[],
     workerCount: number,
     createWorker: TWorkerFactory,
+    workerTimeout: number,
   ): Promise<IWorkerResult[]> {
-    const results: IWorkerResult[] = [];
+    const resultMap = new Map<number, IWorkerResult>();
+    let chunkIndex = 0;
     const pendingChunks = [...chunks];
     const activeWorkers: IWorkerHandle[] = [];
 
     const processChunk = async (): Promise<void> => {
       while (pendingChunks.length > 0) {
+        const localIndex = chunkIndex++;
         const chunk = pendingChunks.shift();
         if (!chunk) break;
 
         const worker = createWorker();
         activeWorkers.push(worker);
 
+        let timer: ReturnType<typeof setTimeout> | undefined;
         try {
           const workerDone = new Promise<IWorkerResult>((resolve, reject) => {
             worker.on("message", resolve);
@@ -131,11 +134,11 @@ class ParallelBatchProcessor implements IParallelProcessor {
               startIndex: chunk.startIndex,
             });
           });
-          const timer = setTimeout(() => { worker.terminate(); }, WORKER_TIMEOUT_MS);
+          timer = setTimeout(() => { worker.terminate(); }, workerTimeout);
           const result = await workerDone;
-          clearTimeout(timer);
-          results.push(result);
+          resultMap.set(localIndex, result);
         } finally {
+          clearTimeout(timer);
           worker.terminate();
           const idx = activeWorkers.indexOf(worker);
           if (idx !== -1) activeWorkers.splice(idx, 1);
@@ -151,11 +154,15 @@ class ParallelBatchProcessor implements IParallelProcessor {
     try {
       await Promise.all(workerPromises);
     } catch (err) {
-      for (const w of activeWorkers) w.terminate();
+      await Promise.all(activeWorkers.map(w => w.terminate()));
       throw err;
     }
 
-    return results;
+    return Array.from({ length: resultMap.size }, (_, i) => {
+      const r = resultMap.get(i);
+      if (!r) throw new Error("Missing worker result for chunk " + i);
+      return r;
+    });
   }
 
   private reconstructResults<TSchema extends ISchema>(

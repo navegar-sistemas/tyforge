@@ -19,6 +19,10 @@ export abstract class Aggregate<
     return Object.freeze([...this._domainEvents]);
   }
 
+  /**
+   * Clears all domain events. MUST be called after events are dispatched
+   * to prevent memory leaks in long-lived aggregates.
+   */
   public clearDomainEvents(): void {
     this._domainEvents = [];
   }

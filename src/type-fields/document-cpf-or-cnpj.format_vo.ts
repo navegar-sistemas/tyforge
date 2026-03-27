@@ -11,6 +11,36 @@ const CPF_REGEX = /^\d{11}$/;
 const CNPJ_REGEX = /^\d{14}$/;
 
 export class FDocumentCpfOrCnpj extends TypeField<TDocumentCpfOrCnpj, TDocumentCpfOrCnpjFormatted> {
+  private static isValidCpfCheckDigits(cpf: string): boolean {
+    if (/^(\d)\1{10}$/.test(cpf)) return false;
+    let sum = 0;
+    for (let i = 0; i < 9; i++) sum += Number(cpf[i]) * (10 - i);
+    let remainder = (sum * 10) % 11;
+    if (remainder === 10) remainder = 0;
+    if (remainder !== Number(cpf[9])) return false;
+    sum = 0;
+    for (let i = 0; i < 10; i++) sum += Number(cpf[i]) * (11 - i);
+    remainder = (sum * 10) % 11;
+    if (remainder === 10) remainder = 0;
+    return remainder === Number(cpf[10]);
+  }
+
+  private static isValidCnpjCheckDigits(cnpj: string): boolean {
+    if (/^(\d)\1{13}$/.test(cnpj)) return false;
+    const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    const weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    let sum = 0;
+    for (let i = 0; i < 12; i++) sum += Number(cnpj[i]) * weights1[i];
+    let remainder = sum % 11;
+    const check1 = remainder < 2 ? 0 : 11 - remainder;
+    if (check1 !== Number(cnpj[12])) return false;
+    sum = 0;
+    for (let i = 0; i < 13; i++) sum += Number(cnpj[i]) * weights2[i];
+    remainder = sum % 11;
+    const check2 = remainder < 2 ? 0 : 11 - remainder;
+    return check2 === Number(cnpj[13]);
+  }
+
   override readonly typeInference = "FDocumentCpfOrCnpj";
 
   override readonly config: ITypeFieldConfig<TDocumentCpfOrCnpj> = {
@@ -35,6 +65,15 @@ export class FDocumentCpfOrCnpj extends TypeField<TDocumentCpfOrCnpj, TDocumentC
     if (!CPF_REGEX.test(value) && !CNPJ_REGEX.test(value)) {
       return err(ExceptionValidation.create(fieldPath, "Document must be a valid CPF (11 digits) or CNPJ (14 digits)"));
     }
+
+    if (value.length === 11 && !FDocumentCpfOrCnpj.isValidCpfCheckDigits(value)) {
+      return err(ExceptionValidation.create(fieldPath, "CPF has invalid check digits."));
+    }
+
+    if (value.length === 14 && !FDocumentCpfOrCnpj.isValidCnpjCheckDigits(value)) {
+      return err(ExceptionValidation.create(fieldPath, "CNPJ has invalid check digits."));
+    }
+
     return OK_TRUE;
   }
 

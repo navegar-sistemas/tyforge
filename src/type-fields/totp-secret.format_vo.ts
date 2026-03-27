@@ -8,7 +8,7 @@ export type TTotpSecret = string;
 export type TTotpSecretFormatted = string;
 
 export class FTotpSecret extends TypeField<TTotpSecret, TTotpSecretFormatted> {
-  private static readonly BASE32_REGEX = /^[A-Z2-7]+=*$/;
+  private static readonly BASE32_REGEX = /^[A-Z2-7]+={0,6}$/;
   override readonly typeInference = "FTotpSecret";
 
   override readonly config: ITypeFieldConfig<TTotpSecret> = {

@@ -18,7 +18,7 @@ export interface IParallelProcessor {
   process<TSchema extends ISchema>(
     schema: TSchema,
     items: unknown[],
-    options: { concurrency: number; chunkSize: number },
+    options: { concurrency: number; chunkSize: number; workerTimeout?: number },
     assignUnknown: TAssignUnknown<TSchema>,
   ): Promise<IBatchCreateResult<TSchema>>;
 }
@@ -36,6 +36,7 @@ export interface IBatchCreateError {
 export interface IBatchCreateOptions {
   concurrency?: number;
   chunkSize?: number;
+  workerTimeout?: number;
 }
 
 export function getVisibilityLevel(expose: TExposeLevel | undefined): number {

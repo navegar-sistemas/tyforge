@@ -41,7 +41,7 @@ export class FStateCode extends TypeField<TStateCode, TStateCodeFormatted> {
       return err(ExceptionValidation.create(fieldPath, "State code must contain exactly 2 uppercase letters"));
     }
     if (TypeField.locale === "br" && !VALID_STATES_BR.has(value)) {
-      return err(ExceptionValidation.create(fieldPath, `Invalid Brazilian state code: ${value}`));
+      return err(ExceptionValidation.create(fieldPath, "Invalid Brazilian state code"));
     }
     return OK_TRUE;
   }

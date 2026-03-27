@@ -29,7 +29,7 @@ function validateLevel(
   const enumCheck = TypeGuard.isEnumValue(OValidateLevel, str.value, key);
   if (isFailure(enumCheck)) throw new Error(enumCheck.error.detail);
   if (str.value === "full" || str.value === "type" || str.value === "none") return str.value;
-  throw new Error(`${key}: invalid value "${str.value}"`);
+  throw new Error(`${key}: invalid value`);
 }
 
 function validateAndBuildConfig(raw: unknown, filePath: string): ITyForgeConfig {

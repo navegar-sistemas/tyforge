@@ -117,7 +117,7 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
     return err(
       ExceptionValidation.create(
         fieldPath,
-        `Invalid enum value: ${typeof raw === "string" ? raw : JSON.stringify(raw)}`,
+        "Invalid enum value",
       ),
     );
   }

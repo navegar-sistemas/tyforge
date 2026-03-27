@@ -109,7 +109,7 @@ if (parentPort) {
       }
       const result = compiled.createUnknown(item);
       if (result.success) {
-        successes.push({ index: msg.startIndex + i, value: msg.items[i] });
+        successes.push({ index: msg.startIndex + i, value: item });
       } else {
         const errJson = result.error.toJSON();
         if (TypeGuard.isRecord(errJson)) {

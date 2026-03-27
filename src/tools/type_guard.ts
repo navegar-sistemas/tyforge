@@ -4,17 +4,15 @@ import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 export class TypeGuard {
   static isEnumKey<T extends object>(
     enumObj: T,
-    value: string | number,
+    value: unknown,
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
-    return Object.keys(enumObj).includes(value.toString())
+    if (typeof value !== "string" && typeof value !== "number") {
+      return err(ExceptionValidation.create(fieldPath, "Enum key must be a string or number"));
+    }
+    return Object.keys(enumObj).includes(typeof value === "number" ? value.toString() : value)
       ? OK_TRUE
-      : err(
-          ExceptionValidation.create(
-            fieldPath,
-            `O valor '${value}' não é uma chave válida do enum.`,
-          ),
-        );
+      : err(ExceptionValidation.create(fieldPath, "Invalid enum key"));
   }
 
   static isEnumValue<T extends object>(
@@ -27,7 +25,7 @@ export class TypeGuard {
       : err(
           ExceptionValidation.create(
             fieldPath,
-            `O valor '${value}' não é um valor válido do enum.`,
+            "Invalid enum value",
           ),
         );
   }
@@ -110,6 +108,9 @@ export class TypeGuard {
     );
   }
 
+  // Returns the trimmed string. Trimming is intentional — TypeFields expect
+  // normalized input without leading/trailing whitespace. Use extractString()
+  // for whitespace-preserving validation (sensitive fields like passwords).
   static isString(
     value: unknown,
     fieldPath: string,

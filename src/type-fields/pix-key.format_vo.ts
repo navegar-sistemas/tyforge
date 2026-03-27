@@ -39,8 +39,8 @@ export class FPixKey extends TypeField<TPixKey, TPixKeyFormatted> {
     const len = value.length;
     const isCpf = len === 11 && DIGITS_ONLY_REGEX.test(value);
     const isCnpj = len === 14 && DIGITS_ONLY_REGEX.test(value);
-    const isPhone = value.startsWith("+");
-    const isEmail = value.includes("@");
+    const isPhone = /^\+\d{10,15}$/.test(value);
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     const isEvp = EVP_REGEX.test(value);
     if (!isCpf && !isCnpj && !isPhone && !isEmail && !isEvp) {
       return err(ExceptionValidation.create(fieldPath, "PIX key must be a valid CPF (11 digits), CNPJ (14 digits), phone (+XX...), email (contains @), or EVP (32-36 alphanumeric)"));
