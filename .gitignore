@@ -12,6 +12,8 @@ benchmark/
 CLAUDE.md
 .claude/
 todo/
+planejamento.rb
+seguranca.md
 
 # Docker
 docker-compose.override.yml
