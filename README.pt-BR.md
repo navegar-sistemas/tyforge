@@ -9,6 +9,8 @@
 
 Validação de schemas type-safe, Result pattern e building blocks DDD para TypeScript.
 
+**Zero boilerplate** — instale, importe, use. TyForge fornece TypeFields prontos para padrões comuns (strings, emails, moeda, bancário, autenticação) para que você escreva lógica de domínio, não código de validação.
+
 ## Instalação
 
 ```bash
@@ -50,7 +52,7 @@ if (isFailure(result)) {
 |--------|-----------|
 | **Result Pattern** | `ok()`, `err()`, `map`, `flatMap`, `fold`, `match`, `all`, `allSettled` — error handling funcional |
 | **Schema Builder** | Validação compilada de schemas com inferência de tipos, `batchCreate`, `composeSchema` |
-| **Type Fields** | 25+ Value Objects validadores (FString, FEmail, FId, FInt, FDate...) |
+| **Type Fields** | 50+ Value Objects validadores (FString, FEmail, FId, FInt, FDate...) |
 | **Domain Models** | Entity, ValueObject, Aggregate com domain events, Dto, DtoReq, DtoRes |
 | **Exceptions** | 18 tipos RFC 7807 com stack trace lazy |
 | **Application** | UseCase, IMapper, Saga, DomainEventDispatcher |

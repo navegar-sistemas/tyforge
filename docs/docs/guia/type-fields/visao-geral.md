@@ -7,6 +7,14 @@ sidebar_position: 1
 
 **Type Fields** sao Value Objects validados que encapsulam valores primitivos com regras de validacao embutidas. Cada TypeField garante, no momento da criacao, que o valor armazenado respeita suas restricoes — eliminando a necessidade de validacoes manuais dispersas pelo codigo.
 
+:::tip Zero Boilerplate
+TyForge inclui TypeFields prontos para padroes comuns: strings, emails, moeda (com aritmetica), bancario, autenticacao. A filosofia e: instalar, importar, usar — sem codigo de validacao customizado. Se um padrao e recorrente, ele pertence ao TyForge.
+:::
+
+:::info Locale-aware
+TypeFields locale-aware usam `TypeField.locale` para aplicar regras especificas no `validateRules()`. Uma unica classe com logica condicional — sem heranca por locale. Default: `"international"`. Configure via `TypeField.configure({ locale: "br" })`.
+:::
+
 ## Classe base: `TypeField<TPrimitive, TFormatted>`
 
 Todos os Type Fields estendem a classe abstrata `TypeField<TPrimitive, TFormatted>`:
@@ -242,8 +250,14 @@ export class FCpf extends TypeField<TCpf, TCpfFormatted> {
 
 ## Proximos passos
 
-- [Strings](/guia/type-fields/string) — FString, FEmail, FPassword, FFullName, FDescription, FText
-- [Numericos](/guia/type-fields/numerico) — FInt, FPageNumber, FPageSize, FBoolInt
+- [Strings](/guia/type-fields/string) — FString, FEmail, FPassword, FFullName, FDescription, FText, FBusinessName
+- [Numericos](/guia/type-fields/numerico) — FInt, FFloat, FPageNumber, FPageSize, FBoolInt
+- [Moeda](/guia/type-fields/moeda) — FMoney, FCurrency
 - [Datas](/guia/type-fields/data) — FDateTimeISOZMillis, FDateTimeISOZ, FDateISODate, FDateISOCompact
-- [Identificadores](/guia/type-fields/identificador) — FId, FIdReq, FTraceId, FApiKey, FBearer, FSignature
-- [Outros](/guia/type-fields/outros) — FBoolean, FJson, FHttpStatus, FAppStatus, FPublicKeyPem
+- [Identificadores](/guia/type-fields/identificador) — FIdentifier, FId, FIdReq, FTraceId, FTransactionId, FDeviceId, FCorrelationId, FReconciliationId, FIdempotencyKey
+- [Documentos](/guia/type-fields/documento) — FDocumentId, FDocumentCpf, FDocumentCnpj, FDocumentCpfOrCnpj, FDocumentRg, FDocumentType, FDocumentStateRegistration, FDocumentMunicipalRegistration
+- [Bancario](/guia/type-fields/bancario) — FBankCode, FBankBranch, FBankAccountNumber, FBankNsu, FBankE2eId, FEmvQrCodePayload
+- [PIX](/guia/type-fields/pix) — FPixKey, FPixKeyType
+- [Seguranca](/guia/type-fields/seguranca) — FApiKey, FBearer, FSignature, FPublicKeyPem, FCertificateThumbprint, FHashAlgorithm, FTotpCode, FTotpSecret
+- [Enums](/guia/type-fields/enums) — FPersonType, FGender, FMaritalStatus, FTransactionStatus, FAppStatus, FHttpStatus, FStateCode
+- [Outros](/guia/type-fields/outros) — FBoolean, FJson

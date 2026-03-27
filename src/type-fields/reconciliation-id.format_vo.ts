@@ -4,72 +4,78 @@ import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeField } from "@tyforge/type-fields/type-field.base";
 import { FIdentifier, TIdentifier } from "./identifier.format_vo";
-import { validate as uuidValidate, version as uuidVersion } from "uuid";
 
-export type TTraceId = TIdentifier;
-export type TTraceIdFormatted = string;
+export type TReconciliationId = TIdentifier;
+export type TReconciliationIdFormatted = string;
 
-export class FTraceId extends FIdentifier {
-  override readonly typeInference = "FTraceId";
+const ALPHANUMERIC_REGEX = /^[a-zA-Z0-9]+$/;
 
-  override readonly config: ITypeFieldConfig<TTraceId> = {
+export class FReconciliationId extends FIdentifier {
+  override readonly typeInference = "FReconciliationId";
+
+  override readonly config: ITypeFieldConfig<TReconciliationId> = {
     jsonSchemaType: "string",
-    minLength: 36,
-    maxLength: 36,
+    minLength: 1,
+    maxLength: 35,
     serializeAsString: false,
   };
 
-  private constructor(value: TTraceId, fieldPath: string) {
+  private constructor(value: TReconciliationId, fieldPath: string) {
     super(value, fieldPath);
   }
 
   protected override validateRules(
-    value: TTraceId,
+    value: TReconciliationId,
     fieldPath: string,
     validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
     const base = super.validateRules(value, fieldPath, validateLevel);
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
-    if (!uuidValidate(value) || uuidVersion(value) !== 7) {
-      return err(ExceptionValidation.create(fieldPath, "TraceId must be a valid UUID v7"));
+    if (!ALPHANUMERIC_REGEX.test(value)) {
+      return err(ExceptionValidation.create(fieldPath, "Reconciliation ID must contain only alphanumeric characters"));
     }
     return OK_TRUE;
   }
 
-  static create<T = TTraceId>(raw: T, fieldPath = "TraceId"): Result<FTraceId, ExceptionValidation> {
+
+  static create<T = TReconciliationId>(raw: T, fieldPath = "ReconciliationId"): Result<FReconciliationId, ExceptionValidation> {
     const typed = FIdentifier.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const instance = new FTraceId(typed.value, fieldPath);
+    const instance = new FReconciliationId(typed.value, fieldPath);
     const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TTraceId, fieldPath = "TraceId"): FTraceId {
-    const result = FTraceId.create(raw, fieldPath);
+  static createOrThrow(raw: TReconciliationId, fieldPath = "ReconciliationId"): FReconciliationId {
+    const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TTraceId>(value: T, fieldPath = "TraceId"): Result<FTraceId, ExceptionValidation> {
-    const typed = FIdentifier.validateType(value, fieldPath);
+  static assign<T = TReconciliationId>(value: T, fieldPath = "ReconciliationId"): Result<FReconciliationId, ExceptionValidation> {
+    const typed = FReconciliationId.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
-    const instance = new FTraceId(typed.value, fieldPath);
+    const instance = new FReconciliationId(typed.value, fieldPath);
     const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static generate(fieldPath = "TraceId"): FTraceId {
-    return new FTraceId(FIdentifier.generateId(), fieldPath);
+  override toString(): string {
+    return String(this.getValue());
+  }
+
+  override formatted(): TReconciliationIdFormatted {
+    return String(this.getValue());
   }
 
   override getDescription(): string {
-    return "Trace identifier (UUID v7 required). Used for distributed tracing with embedded timestamp.";
+    return "Reconciliation identifier for payment matching (alphanumeric, up to 35 characters).";
   }
 
   override getShortDescription(): string {
-    return "Trace ID";
+    return "Reconciliation ID";
   }
 }

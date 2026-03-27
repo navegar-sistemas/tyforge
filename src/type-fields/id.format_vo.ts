@@ -1,17 +1,15 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/type-field.base";
+import { TValidationLevel } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
-import { TypeGuard } from "@tyforge/tools/type_guard";
-import { v7 as uuidv7 } from "uuid";
+import { TypeField } from "@tyforge/type-fields/type-field.base";
+import { FIdentifier, TIdentifier } from "./identifier.format_vo";
+import { validate as uuidValidate } from "uuid";
 
-export type TId = string;
+export type TId = TIdentifier;
 export type TIdFormatted = string;
 
-const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-export class FId extends TypeField<TId, TIdFormatted> {
+export class FId extends FIdentifier {
   override readonly typeInference = "FId";
 
   override readonly config: ITypeFieldConfig<TId> = {
@@ -33,18 +31,14 @@ export class FId extends TypeField<TId, TIdFormatted> {
     const base = super.validateRules(value, fieldPath, validateLevel);
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
-    if (!UUID_REGEX.test(this.getValue())) {
-      return err(ExceptionValidation.create(fieldPath, "ID deve ser um UUID válido"));
+    if (!uuidValidate(value)) {
+      return err(ExceptionValidation.create(fieldPath, "ID must be a valid UUID"));
     }
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TId, ExceptionValidation> {
-    return TypeGuard.isString(value, fieldPath);
-  }
-
   static create<T = TId>(raw: T, fieldPath = "Id"): Result<FId, ExceptionValidation> {
-    const typed = FId.validateType(raw, fieldPath);
+    const typed = FIdentifier.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FId(typed.value, fieldPath);
     const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
@@ -53,13 +47,13 @@ export class FId extends TypeField<TId, TIdFormatted> {
   }
 
   static createOrThrow(raw: TId, fieldPath = "Id"): FId {
-    const result = this.create(raw, fieldPath);
+    const result = FId.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
   static assign<T = TId>(value: T, fieldPath = "Id"): Result<FId, ExceptionValidation> {
-    const typed = FId.validateType(value, fieldPath);
+    const typed = FIdentifier.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FId(typed.value, fieldPath);
     const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
@@ -67,28 +61,15 @@ export class FId extends TypeField<TId, TIdFormatted> {
     return ok(instance);
   }
 
-  static generate(): FId {
-    const uuid = uuidv7();
-    return FId.createOrThrow(uuid, "Id");
-  }
-
-  static generateId(): string {
-    return uuidv7();
-  }
-
-  override toString(): string {
-    return String(this.getValue());
-  }
-
-  override formatted(): string {
-    return String(this.getValue());
+  static generate(fieldPath = "Id"): FId {
+    return new FId(FIdentifier.generateId(), fieldPath);
   }
 
   override getDescription(): string {
-    return "Identificador único universal (UUID) de um registro, entidade ou objeto no sistema. Deve ser uma string no formato UUID válido (qualquer versão) que serve como chave primária para identificação e referência.";
+    return "Unique identifier (UUID). Primary key for entities and aggregates.";
   }
 
   override getShortDescription(): string {
-    return "Identificador único (UUID)";
+    return "ID";
   }
 }

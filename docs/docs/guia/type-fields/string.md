@@ -17,6 +17,7 @@ Type Fields do tipo string encapsulam e validam textos com regras especificas de
 | `FFullName` | 2 | 140 | — | `nome-completo.format_vo.ts` |
 | `FDescription` | 1 | 1000 | — | `descricao.format_vo.ts` |
 | `FText` | 1 | 4000 | — | `text.format_vo.ts` |
+| `FBusinessName` | 1 | 100 | — | `business-name.format_vo.ts` |
 
 ---
 
@@ -144,3 +145,22 @@ texto.getValue(); // "Conteudo extenso aqui"
 
 **Regras de validacao:**
 - Comprimento entre 1 e 4000 caracteres
+
+---
+
+## FBusinessName
+
+Nome comercial ou razao social de uma empresa. Aceita qualquer string entre 1 e 100 caracteres. Ideal para campos de nome fantasia, razao social ou denominacao comercial.
+
+```typescript
+import { FBusinessName } from "tyforge";
+
+const result = FBusinessName.create("Navegar Sistemas Ltda");
+// Result<FBusinessName, ExceptionValidation>
+
+const nome = FBusinessName.createOrThrow("Tech Solutions Corp");
+nome.getValue(); // "Tech Solutions Corp"
+```
+
+**Regras de validacao:**
+- Comprimento entre 1 e 100 caracteres

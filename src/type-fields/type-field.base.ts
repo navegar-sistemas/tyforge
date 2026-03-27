@@ -41,10 +41,12 @@ function isEnumValue<E extends Record<string, string | number>>(
 export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
   static createLevel: TValidationLevel = "full";
   static assignLevel: TValidationLevel = "type";
+  static locale: string = "international";
 
-  static configure(levels: { create?: TValidationLevel; assign?: TValidationLevel }): void {
-    if (levels.create) TypeField.createLevel = levels.create;
-    if (levels.assign) TypeField.assignLevel = levels.assign;
+  static configure(options: { create?: TValidationLevel; assign?: TValidationLevel; locale?: string }): void {
+    if (options.create) TypeField.createLevel = options.create;
+    if (options.assign) TypeField.assignLevel = options.assign;
+    if (options.locale) TypeField.locale = options.locale;
   }
 
   abstract readonly typeInference: string;
@@ -70,7 +72,7 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
     return err(
       ExceptionValidation.create(
         fieldPath,
-        `Valor de enum inválido: ${typeof raw === "string" ? raw : JSON.stringify(raw)}`,
+        `Invalid enum value: ${typeof raw === "string" ? raw : JSON.stringify(raw)}`,
       ),
     );
   }
@@ -92,7 +94,7 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
         return err(
           ExceptionValidation.create(
             fieldPath,
-            `Valor deve pertencer ao enum: ${enumValues.join(", ")}`,
+            `Value must be one of: ${enumValues.join(", ")}`,
           ),
         );
       }
@@ -104,25 +106,25 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
       case "string": {
         const len = String(value).length;
         if ("maxLength" in cfg && len > cfg.maxLength) {
-          return err(ExceptionValidation.create(fieldPath, `A string deve conter no máximo ${cfg.maxLength} caracteres.`));
+          return err(ExceptionValidation.create(fieldPath, `String must contain at most ${cfg.maxLength} characters.`));
         }
         if ("minLength" in cfg && len < cfg.minLength) {
-          return err(ExceptionValidation.create(fieldPath, `A string deve conter no mínimo ${cfg.minLength} caracteres úteis.`));
+          return err(ExceptionValidation.create(fieldPath, `String must contain at least ${cfg.minLength} characters.`));
         }
         return OK_TRUE;
       }
       case "number": {
         const n = Number(value);
         if ("max" in cfg && n > cfg.max) {
-          return err(ExceptionValidation.create(fieldPath, `O valor deve ser no máximo ${cfg.max}.`));
+          return err(ExceptionValidation.create(fieldPath, `Value must be at most ${cfg.max}.`));
         }
         if ("min" in cfg && n < cfg.min) {
-          return err(ExceptionValidation.create(fieldPath, `O valor deve ser no mínimo ${cfg.min}.`));
+          return err(ExceptionValidation.create(fieldPath, `Value must be at least ${cfg.min}.`));
         }
         if ("decimalPrecision" in cfg) {
           const [, decimals] = n.toString().split(".");
           if ((decimals?.length ?? 0) > cfg.decimalPrecision) {
-            return err(ExceptionValidation.create(fieldPath, `O valor deve ter no máximo ${cfg.decimalPrecision} casas decimais.`));
+            return err(ExceptionValidation.create(fieldPath, `Value must have at most ${cfg.decimalPrecision} decimal places.`));
           }
         }
         return OK_TRUE;
@@ -158,11 +160,11 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
     if (typeof this._value === "string") {
       const parsed = parseInt(this._value, 10);
       if (isNaN(parsed)) {
-        return err(ExceptionValidation.create(this.fieldPath, "Valor não pode ser convertido para inteiro."));
+        return err(ExceptionValidation.create(this.fieldPath, "Value cannot be converted to integer."));
       }
       return ok(parsed);
     }
-    return err(ExceptionValidation.create(this.fieldPath, "toInt só pode ser usado com strings ou números."));
+    return err(ExceptionValidation.create(this.fieldPath, "toInt can only be used with strings or numbers."));
   }
 
   getDocumentationAux(): {

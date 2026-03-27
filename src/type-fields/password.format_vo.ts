@@ -46,7 +46,7 @@ export class FPassword extends TypeField<TPassword, TPasswordFormatted> {
       return err(
         ExceptionValidation.create(
           fieldPath,
-          "Senha deve ter no mínimo 8 caracteres, incluindo maiúscula, minúscula, número e caractere especial",
+          "Password must be at least 8 characters and include uppercase, lowercase, digit, and special character",
         ),
       );
     }
@@ -85,15 +85,15 @@ export class FPassword extends TypeField<TPassword, TPasswordFormatted> {
     return String(this.getValue());
   }
 
-  override formatted(): string {
+  override formatted(): TPasswordFormatted {
     return String(this.getValue());
   }
 
   override getDescription(): string {
-    return "Senha de acesso segura para autenticação de usuários. Deve conter no mínimo 8 caracteres, incluindo pelo menos uma letra maiúscula, uma letra minúscula, um número e um caractere especial. Utilizada para proteger o acesso a contas e sistemas com autenticação forte.";
+    return "Secure password with minimum complexity requirements (uppercase, lowercase, digit, special character). At least 8 characters.";
   }
 
   override getShortDescription(): string {
-    return "Senha segura de acesso";
+    return "Password";
   }
 }

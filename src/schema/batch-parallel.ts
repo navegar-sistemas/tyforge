@@ -1,16 +1,12 @@
-import { Worker } from "node:worker_threads";
-import * as path from "node:path";
-import * as os from "node:os";
+// Node.js-only imports (worker_threads, path, os) are loaded lazily inside
+// process() to avoid crashing bundlers like Metro (React Native) that resolve
+// all top-level require() calls at build time — even for unused code paths.
+
 import type { ISchema, InferProps, IParallelProcessor, IBatchCreateResult, IBatchCreateError, TAssignUnknown } from "./schema-types";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { isFailure } from "@tyforge/result/result";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
-// Worker threads require an absolute file path (Node.js API limitation).
-// The extension is derived from the current file to match dev (.ts) vs prod (.js).
-const WORKER_EXT = path.extname(__filename);
-const WORKER_PATH = path.resolve(__dirname, `batch-worker${WORKER_EXT}`);
-const IS_TYPESCRIPT = WORKER_EXT === ".ts";
 const WORKER_TIMEOUT_MS = 30000;
 
 interface IWorkerSuccess {
@@ -28,30 +24,45 @@ interface IWorkerResult {
   failures: IWorkerFailure[];
 }
 
+interface IWorkerHandle {
+  on(event: "message", listener: (value: IWorkerResult) => void): void;
+  on(event: "error", listener: (err: Error) => void): void;
+  postMessage(value: unknown): void;
+  terminate(): Promise<number>;
+}
+
+type TWorkerFactory = () => IWorkerHandle;
+
 export function createParallelProcessor(): IParallelProcessor | null {
   return new ParallelBatchProcessor();
 }
 
 class ParallelBatchProcessor implements IParallelProcessor {
-  private createWorker(): Worker {
-    if (IS_TYPESCRIPT) {
-      return new Worker(WORKER_PATH, { execArgv: ["--require", "tsx/cjs"] });
-    }
-    return new Worker(WORKER_PATH);
-  }
-
   async process<TSchema extends ISchema>(
     schema: TSchema,
     items: unknown[],
     options: { concurrency: number; chunkSize: number },
     assignUnknown: TAssignUnknown<TSchema>,
   ): Promise<IBatchCreateResult<TSchema>> {
+    const { Worker } = await import("node:worker_threads");
+    const nodePath = await import("node:path");
+    const nodeOs = await import("node:os");
+
+    const ext = nodePath.extname(__filename);
+    const workerPath = nodePath.resolve(__dirname, `batch-worker${ext}`);
+    const isTs = ext === ".ts";
+
+    const createWorker: TWorkerFactory = () => {
+      if (isTs) return new Worker(workerPath, { execArgv: ["--require", "tsx/cjs"] });
+      return new Worker(workerPath);
+    };
+
     const serializedSchema = this.serializeSchema(schema);
     const chunks = this.splitChunks(items, options.chunkSize);
-    const maxConcurrency = Math.min(options.concurrency, os.cpus().length, 16);
+    const maxConcurrency = Math.min(options.concurrency, nodeOs.cpus().length, 16);
     const workerCount = Math.min(maxConcurrency, chunks.length);
 
-    const workerResults = await this.runWorkers(serializedSchema, chunks, workerCount);
+    const workerResults = await this.runWorkers(serializedSchema, chunks, workerCount, createWorker);
 
     return this.reconstructResults<TSchema>(workerResults, assignUnknown);
   }
@@ -96,17 +107,18 @@ class ParallelBatchProcessor implements IParallelProcessor {
     serializedSchema: Record<string, unknown>,
     chunks: { items: unknown[]; startIndex: number }[],
     workerCount: number,
+    createWorker: TWorkerFactory,
   ): Promise<IWorkerResult[]> {
     const results: IWorkerResult[] = [];
     const pendingChunks = [...chunks];
-    const activeWorkers: Worker[] = [];
+    const activeWorkers: IWorkerHandle[] = [];
 
     const processChunk = async (): Promise<void> => {
       while (pendingChunks.length > 0) {
         const chunk = pendingChunks.shift();
         if (!chunk) break;
 
-        const worker = this.createWorker();
+        const worker = createWorker();
         activeWorkers.push(worker);
 
         try {

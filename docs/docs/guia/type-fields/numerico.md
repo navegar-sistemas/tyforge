@@ -14,6 +14,7 @@ Type Fields numericos encapsulam e validam valores inteiros com regras de faixa,
 | `FInt` | -2147483648 | 2147483647 | 0 | `Number.isInteger()` | `int.format_vo.ts` |
 | `FPageNumber` | 1 | `MAX_SAFE_INTEGER` | 0 | Inteiro >= 1 | `page-number.format_vo.ts` |
 | `FPageSize` | 1 | 100 | 0 | Inteiro entre 1 e 100 | `page-size.format_vo.ts` |
+| `FFloat` | `MIN_SAFE_INTEGER` | `MAX_SAFE_INTEGER` | 10 | `Number.isFinite()` | `float.format_vo.ts` |
 | `FBoolInt` | 0 | 1 | 0 | Enum `OBoolInt` (0 ou 1) | `bool-int.format_vo.ts` |
 
 ---
@@ -87,6 +88,39 @@ tamanho.getValue(); // 50
 **Regras de validacao:**
 - Deve ser um inteiro entre 1 e 100
 - Valores maiores que 100 sao rejeitados para evitar consultas excessivas
+
+---
+
+## FFloat
+
+Numero decimal generico. Aceita qualquer valor numerico finito dentro da faixa de inteiros seguros do JavaScript (`Number.MIN_SAFE_INTEGER` a `Number.MAX_SAFE_INTEGER`), com ate 10 casas decimais.
+
+```typescript
+import { FFloat } from "tyforge";
+
+const result = FFloat.create(3.14);
+// Result<FFloat, ExceptionValidation>
+
+const preco = FFloat.createOrThrow(99.90);
+preco.getValue(); // 99.9
+preco.toString(); // "99.9"
+```
+
+**Config:**
+
+```typescript
+{
+  jsonSchemaType: "number",
+  min: Number.MIN_SAFE_INTEGER,
+  max: Number.MAX_SAFE_INTEGER,
+  decimalPrecision: 10,
+}
+```
+
+**Regras de validacao:**
+- Deve ser um numero valido dentro da faixa de `MIN_SAFE_INTEGER` a `MAX_SAFE_INTEGER`
+- Deve ser um numero finito (`Number.isFinite()`) — `Infinity`, `-Infinity` e `NaN` sao rejeitados
+- Aceita ate 10 casas decimais
 
 ---
 
