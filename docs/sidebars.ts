@@ -2,8 +2,13 @@ export default {
   guia: [
     {
       type: "doc",
+      id: "CHANGELOG",
+      label: "Changelog",
+    },
+    {
+      type: "doc",
       id: "introducao",
-      label: "Introducao",
+      label: "Introdução",
     },
     {
       type: "category",
@@ -73,6 +78,36 @@ export default {
           type: "doc",
           id: "type-fields/identificador",
           label: "Identificadores",
+        },
+        {
+          type: "doc",
+          id: "type-fields/moeda",
+          label: "Moeda",
+        },
+        {
+          type: "doc",
+          id: "type-fields/documento",
+          label: "Documentos",
+        },
+        {
+          type: "doc",
+          id: "type-fields/bancario",
+          label: "Bancário",
+        },
+        {
+          type: "doc",
+          id: "type-fields/pix",
+          label: "PIX",
+        },
+        {
+          type: "doc",
+          id: "type-fields/seguranca",
+          label: "Segurança",
+        },
+        {
+          type: "doc",
+          id: "type-fields/enums",
+          label: "Enums",
         },
         {
           type: "doc",
@@ -184,7 +219,7 @@ export default {
         {
           type: "doc",
           id: "config/configuracao-global",
-          label: "Configuracao Global",
+          label: "Configuração Global",
         },
       ],
     },
