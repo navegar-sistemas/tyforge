@@ -47,8 +47,7 @@
     "dist",
     "README.md",
     "README.pt-BR.md",
-    "LICENSE",
-    "CHANGELOG.md"
+    "LICENSE"
   ],
   "publishConfig": {
     "access": "public"
