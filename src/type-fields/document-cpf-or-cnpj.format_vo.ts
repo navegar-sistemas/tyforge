@@ -81,9 +81,9 @@ export class FDocumentCpfOrCnpj extends TypeField<TDocumentCpfOrCnpj, TDocumentC
   override formatted(): TDocumentCpfOrCnpjFormatted {
     const v = this.getValue();
     if (v.length <= 11) {
-      return TypeField.applyMask(v, [3, ".", 3, ".", 3, "-", 2]);
+      return FDocumentCpfOrCnpj.applyMask(v, [3, ".", 3, ".", 3, "-", 2]);
     }
-    return TypeField.applyMask(v, [2, ".", 3, ".", 3, "/", 4, "-", 2]);
+    return FDocumentCpfOrCnpj.applyMask(v, [2, ".", 3, ".", 3, "/", 4, "-", 2]);
   }
 
   override getDescription(): string {

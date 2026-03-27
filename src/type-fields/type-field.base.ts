@@ -51,7 +51,7 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
 
   // Progressive mask: applies separators only when enough digits exist.
   // Pattern example: [3, ".", 3, ".", 3, "-", 2] for CPF (XXX.XXX.XXX-XX).
-  static applyMask(value: string, pattern: (number | string)[]): string {
+  protected static applyMask(value: string, pattern: (number | string)[]): string {
     let result = "";
     let pos = 0;
     for (const part of pattern) {

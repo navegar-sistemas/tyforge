@@ -7,7 +7,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --no-audit --no-fund --loglevel error
 
 COPY . .
-RUN npm run build
+RUN npm run build && rm -rf node_modules
 
 # Stage 2: Serve (Nginx Alpine)
 FROM nginx:stable-alpine

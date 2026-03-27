@@ -72,7 +72,7 @@ export class FDocumentCnpj extends TypeField<TDocumentCnpj, TDocumentCnpjFormatt
   }
 
   override formatted(): TDocumentCnpjFormatted {
-    return TypeField.applyMask(this.getValue(), [2, ".", 3, ".", 3, "/", 4, "-", 2]);
+    return FDocumentCnpj.applyMask(this.getValue(), [2, ".", 3, ".", 3, "/", 4, "-", 2]);
   }
 
   override getDescription(): string {

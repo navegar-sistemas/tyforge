@@ -10,6 +10,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.24] - 2026-03-27
+
+### Changed
+- `TypeField.applyMask()` changed to `protected static` — only accessible by subclasses via `formatted()`
+- Document TypeFields now call `applyMask` via own class name instead of `TypeField.applyMask()`
+- Removed standalone `mask.util.ts` — moved to base class
+- nginx.conf: removed duplicate security headers (handled by host reverse proxy)
+- Dockerfile.dev: added `COPY . .` for standalone builds
+- Dockerfile: added `rm -rf node_modules` after build to reduce cache
+- Sidebar: added Changelog and new TypeField categories (Moeda, Documentos, Bancário, PIX, Segurança, Enums)
+
 ## [0.1.23] - 2026-03-27
 
 ### Added

@@ -72,7 +72,7 @@ export class FDocumentCpf extends TypeField<TDocumentCpf, TDocumentCpfFormatted>
   }
 
   override formatted(): TDocumentCpfFormatted {
-    return TypeField.applyMask(this.getValue(), [3, ".", 3, ".", 3, "-", 2]);
+    return FDocumentCpf.applyMask(this.getValue(), [3, ".", 3, ".", 3, "-", 2]);
   }
 
   override getDescription(): string {
