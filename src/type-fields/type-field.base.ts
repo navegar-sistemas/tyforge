@@ -2,7 +2,6 @@ import { err, ok, Result, OK_TRUE } from "@tyforge/result";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 import { ExceptionValidation } from "@tyforge/exceptions";
 import { ITypeFieldConfig } from "./type-field.config";
-import { tyforgeConfig } from "@tyforge/config/tyforge-config";
 
 export { TJsonSchemaType } from "./type-field.config";
 
@@ -40,8 +39,13 @@ function isEnumValue<E extends Record<string, string | number>>(
 }
 
 export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
-  protected static readonly createLevel = tyforgeConfig.schema.validate.create;
-  protected static readonly assignLevel = tyforgeConfig.schema.validate.assign;
+  static createLevel: TValidationLevel = "full";
+  static assignLevel: TValidationLevel = "type";
+
+  static configure(levels: { create?: TValidationLevel; assign?: TValidationLevel }): void {
+    if (levels.create) TypeField.createLevel = levels.create;
+    if (levels.assign) TypeField.assignLevel = levels.assign;
+  }
 
   abstract readonly typeInference: string;
   abstract readonly config: ITypeFieldConfig<TPrimitive>;

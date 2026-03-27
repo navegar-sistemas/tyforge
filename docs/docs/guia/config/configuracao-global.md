@@ -54,7 +54,9 @@ A separacao entre `create` e `assign` existe porque:
 
 ## Comportamento do `loadTyForgeConfig()`
 
-A funcao `loadTyForgeConfig()` e chamada automaticamente na inicializacao da biblioteca. Seu comportamento:
+A funcao `loadTyForgeConfig()` e usada apenas pelo CLI do linter (`tyforge-lint`) para carregar configuracoes. Ela **nao** e importada nem chamada pela biblioteca core (TypeFields, SchemaBuilder, etc).
+
+Seu comportamento:
 
 1. **Arquivo encontrado e valido** — carrega e valida todas as chaves
 2. **Arquivo nao encontrado** — usa os valores padrao silenciosamente
@@ -89,33 +91,38 @@ Qualquer outra chave gera um erro de configuracao.
 
 ## TypeField.createLevel e TypeField.assignLevel
 
-A classe base `TypeField` expoe duas propriedades estaticas protegidas que refletem a configuracao global:
+A classe base `TypeField` expoe duas propriedades estaticas publicas com valores padrao hardcoded:
 
 ```typescript
 abstract class TypeField<TPrimitive, TFormatted> {
-  protected static readonly createLevel = tyforgeConfig.schema.validate.create;
-  protected static readonly assignLevel = tyforgeConfig.schema.validate.assign;
+  static createLevel: TValidationLevel = "full";
+  static assignLevel: TValidationLevel = "type";
   // ...
 }
 ```
 
-Essas propriedades sao usadas internamente pelo `SchemaBuilder` ao chamar `create()` ou `assign()` nos TypeFields. Os TypeFields concretos podem consultar esses niveis para ajustar seu comportamento de validacao.
+Essas propriedades sao usadas internamente pelos TypeFields concretos ao chamar `validateRules()` nos metodos `create()` e `assign()`.
 
-## Metodo normalize
+**Importante:** a classe `TypeField` **nao** importa `tyforgeConfig` nem le o arquivo `tyforge.config.json`. Os niveis de validacao sao definidos com valores padrao hardcoded e podem ser alterados programaticamente via `TypeField.configure()`.
 
-A classe base `TypeField` possui um metodo estatico `normalize` que prepara o valor antes da validacao:
+## Metodo `TypeField.configure()`
+
+Permite alterar os niveis de validacao em tempo de execucao:
 
 ```typescript
-protected static normalize(raw: unknown, validateLevel?: TValidationLevel, trim?: boolean): unknown
+static configure(levels: { create?: TValidationLevel; assign?: TValidationLevel }): void;
 ```
 
-| Parametro | Padrao | Descricao |
-|-----------|--------|-----------|
-| `raw` | — | Valor bruto a ser normalizado |
-| `validateLevel` | `"full"` | Nivel de validacao. Se `"none"`, retorna o valor sem modificacao |
-| `trim` | `true` | Se deve aplicar `trim()` em strings |
+Exemplo de uso no bootstrap da aplicacao:
 
-Quando `validateLevel` e `"none"`, o `normalize` retorna o valor sem nenhuma transformacao. Caso contrario, strings sao trimadas por padrao. TypeFields sensiveis (como `FPassword`, `FBearer`, `FSignature`) usam `trim = false` para preservar espacos significativos.
+```typescript
+import { TypeField } from "tyforge";
+
+// Desabilita validacao no assign para maximizar performance
+TypeField.configure({ create: "full", assign: "none" });
+```
+
+A integracao entre o arquivo `tyforge.config.json` e o `TypeField.configure()` fica a cargo do projeto consumidor. O CLI do linter (`tyforge-lint`) le o arquivo de configuracao, mas a biblioteca core nao faz isso automaticamente.
 
 ## Secao `lint`
 

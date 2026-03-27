@@ -7,8 +7,8 @@ import {
 import type { TValidationLevel } from "./schema-types";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 import { err, ok, Result } from "@tyforge/result";
-import { tyforgeConfig } from "@tyforge/config/tyforge-config";
 import { TypeGuard } from "@tyforge/tools/type_guard";
+import { TypeField } from "@tyforge/type-fields/type-field.base";
 
 // ── Type Guards (zero casts) ────────────────────────────────────
 
@@ -71,15 +71,15 @@ interface CompiledValidator {
 }
 
 function extractValidateLevels(entry: unknown): { assignValidateLevel: TValidationLevel; createValidateLevel: TValidationLevel } {
-  const defaults = { assignValidateLevel: tyforgeConfig.schema.validate.assign, createValidateLevel: tyforgeConfig.schema.validate.create };
+  const defaults = { assignValidateLevel: TypeField.assignLevel, createValidateLevel: TypeField.createLevel };
   if (!TypeGuard.isRecord(entry)) return defaults;
   const v = entry["validate"];
   if (!TypeGuard.isRecord(v)) return defaults;
   const assign = v["assign"];
   const create = v["create"];
   return {
-    assignValidateLevel: (assign === "full" || assign === "type" || assign === "none") ? assign : tyforgeConfig.schema.validate.assign,
-    createValidateLevel: (create === "full" || create === "type" || create === "none") ? create : tyforgeConfig.schema.validate.create,
+    assignValidateLevel: (assign === "full" || assign === "type" || assign === "none") ? assign : TypeField.assignLevel,
+    createValidateLevel: (create === "full" || create === "type" || create === "none") ? create : TypeField.createLevel,
   };
 }
 

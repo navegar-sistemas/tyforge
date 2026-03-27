@@ -34,30 +34,42 @@ abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
 
 ### Metodos estaticos (implementados por cada subclasse)
 
-Toda subclasse concreta implementa dois factory methods com generics:
+Toda subclasse concreta implementa quatro metodos estaticos:
 
 ```typescript
-// Retorna Result — caminho seguro (hot path)
+// Validacao de tipo (narrowing) — retorna o valor tipado ou erro
+static validateType(value: unknown, fieldPath: string): Result<TPrimitive, ExceptionValidation>;
+
+// Retorna Result — caminho seguro para dados de entrada (hot path)
 static create<T = TPrimitive>(value: T, fieldPath?: string): Result<Instance, ExceptionValidation>;
 
 // Lanca excecao se falhar — conveniencia para try/catch
 static createOrThrow(value: TPrimitive, fieldPath?: string): Instance;
+
+// Retorna Result — caminho seguro para hidratacao de dados persistidos
+static assign<T = TPrimitive>(value: T, fieldPath?: string): Result<Instance, ExceptionValidation>;
 ```
 
-O generic `<T = TPrimitive>` no metodo `create` permite aceitar `unknown` quando chamado explicitamente pelo `SchemaBuilder`, mantendo type safety quando usado diretamente.
+O generic `<T = TPrimitive>` nos metodos `create` e `assign` permite aceitar `unknown` quando chamado explicitamente pelo `SchemaBuilder`, mantendo type safety quando usado diretamente.
 
-O metodo `create()` retorna um `Result<T, ExceptionValidation>`, permitindo tratamento explicito de erros. O metodo `createOrThrow()` lanca a excecao diretamente, sendo util em contextos onde try/catch e preferido.
+O metodo `validateType()` e um metodo estatico que faz narrowing do valor usando `TypeGuard` (ex: `TypeGuard.isString()`). Ele e chamado tanto por `create()` quanto por `assign()` antes de instanciar o TypeField.
+
+O metodo `create()` retorna um `Result<T, ExceptionValidation>`, permitindo tratamento explicito de erros. Internamente chama `validateType()` + `validateRules()` com `TypeField.createLevel`.
+
+O metodo `assign()` segue o mesmo fluxo, mas usa `TypeField.assignLevel` para validacao. E usado para hidratar dados ja persistidos (ex: registros do banco de dados).
+
+O metodo `createOrThrow()` lanca a excecao diretamente, sendo util em contextos onde try/catch e preferido.
 
 ### Niveis de validacao (createLevel / assignLevel)
 
-A classe base `TypeField` expoe duas propriedades estaticas protegidas que controlam a profundidade da validacao:
+A classe base `TypeField` expoe duas propriedades estaticas publicas que controlam a profundidade da validacao:
 
 ```typescript
-protected static readonly createLevel = tyforgeConfig.schema.validate.create;
-protected static readonly assignLevel = tyforgeConfig.schema.validate.assign;
+static createLevel: TValidationLevel = "full";
+static assignLevel: TValidationLevel = "type";
 ```
 
-Esses niveis sao definidos pela [configuracao global](/guia/config/configuracao-global) (`tyforge.config.json`) e afetam como os TypeFields validam valores em cada modo:
+Esses niveis sao definidos com valores padrao hardcoded e podem ser alterados via `TypeField.configure()`. Afetam como os TypeFields validam valores em cada modo:
 
 | Nivel | Descricao |
 |-------|-----------|
@@ -65,17 +77,44 @@ Esses niveis sao definidos pela [configuracao global](/guia/config/configuracao-
 | `"type"` | Apenas verificacao de tipo (sem faixa, comprimento ou enum) |
 | `"none"` | Nenhuma validacao — valor aceito sem verificacao |
 
-### Metodo normalize
+### Metodo `TypeField.configure()`
 
-Antes da validacao, o valor bruto passa pelo metodo `normalize`:
+Permite alterar os niveis de validacao em tempo de execucao:
 
 ```typescript
-protected static normalize(raw: unknown, validateLevel?: TValidationLevel, trim?: boolean): unknown
+static configure(levels: { create?: TValidationLevel; assign?: TValidationLevel }): void;
 ```
 
-O `normalize` aplica `trim()` em strings por padrao. Quando `validateLevel` e `"none"`, retorna o valor sem modificacao.
+Exemplo de uso:
 
-TypeFields sensiveis (como `FPassword`, `FBearer`, `FSignature`) usam `trim = false` para preservar espacos significativos no valor original.
+```typescript
+import { TypeField } from "tyforge";
+
+TypeField.configure({ create: "full", assign: "none" });
+```
+
+Isso e util para ajustar o comportamento de validacao por ambiente (ex: desabilitar validacao no `assign` em producao para maximizar performance).
+
+### Validacao em duas etapas: `validateType()` + `validateRules()`
+
+Cada TypeField concreto implementa a validacao em duas etapas separadas:
+
+1. **`validateType()`** (estatico) — faz narrowing do tipo usando `TypeGuard`. Garante que o valor e do tipo primitivo esperado (string, number, boolean, etc).
+2. **`validateRules()`** (instancia) — valida regras de negocio (comprimento, faixa, enum) conforme o nivel de validacao (`createLevel` ou `assignLevel`).
+
+```typescript
+// Exemplo do fluxo interno de FString.create()
+static create<T = TString>(raw: T, fieldPath = "String"): Result<FString, ExceptionValidation> {
+  const typed = FString.validateType(raw, fieldPath);        // etapa 1: narrowing
+  if (isFailure(typed)) return err(typed.error);
+  const instance = new FString(typed.value, fieldPath);
+  const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel); // etapa 2: regras
+  if (!rules.success) return err(rules.error);
+  return ok(instance);
+}
+```
+
+Essa separacao elimina validacao dupla — `validateType()` e chamado uma unica vez e o resultado tipado e reaproveitado.
 
 ## `ITypeFieldConfig` — Configuracao de validacao
 
@@ -115,14 +154,16 @@ protected static resolveEnum<E extends Record<string, string | number>>(
 ## Exemplo: criando um TypeField customizado
 
 ```typescript
-import { TypeField } from "tyforge";
+import { TypeField, TValidationLevel } from "tyforge";
 import { ITypeFieldConfig } from "tyforge";
-import { Result, ok, err, isFailure } from "tyforge";
+import { Result, ok, err, isFailure, OK_TRUE } from "tyforge";
 import { ExceptionValidation } from "tyforge";
+import { TypeGuard } from "tyforge";
 
 export type TCpf = string;
+export type TCpfFormatted = string;
 
-export class FCpf extends TypeField<TCpf> {
+export class FCpf extends TypeField<TCpf, TCpfFormatted> {
   override readonly typeInference = "FCpf";
 
   override readonly config: ITypeFieldConfig<TCpf> = {
@@ -136,27 +177,57 @@ export class FCpf extends TypeField<TCpf> {
     super(value, fieldPath);
   }
 
-  static create(
-    raw: TCpf,
-    fieldPath = "Cpf",
-  ): Result<FCpf, ExceptionValidation> {
-    // Validacao customizada aqui
-    const digits = raw.replace(/\D/g, "");
+  protected override validateRules(
+    value: TCpf,
+    fieldPath: string,
+    validateLevel: TValidationLevel = "full",
+  ): Result<true, ExceptionValidation> {
+    const base = super.validateRules(value, fieldPath, validateLevel);
+    if (!base.success) return base;
+    if (validateLevel !== "full") return OK_TRUE;
+    // Business rules specific to CPF format
+    const digits = value.replace(/\D/g, "");
     if (digits.length !== 11) {
       return err(ExceptionValidation.create(fieldPath, "CPF deve ter 11 digitos"));
     }
-    return ok(new FCpf(digits, fieldPath));
+    return OK_TRUE;
+  }
+
+  static validateType(value: unknown, fieldPath: string): Result<TCpf, ExceptionValidation> {
+    return TypeGuard.isString(value, fieldPath);
+  }
+
+  static create<T = TCpf>(raw: T, fieldPath = "Cpf"): Result<FCpf, ExceptionValidation> {
+    const typed = FCpf.validateType(raw, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const instance = new FCpf(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    if (!rules.success) return err(rules.error);
+    return ok(instance);
   }
 
   static createOrThrow(raw: TCpf, fieldPath = "Cpf"): FCpf {
-    const result = this.create(raw, fieldPath);
+    const result = FCpf.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  override formatted(): string {
+  static assign<T = TCpf>(value: T, fieldPath = "Cpf"): Result<FCpf, ExceptionValidation> {
+    const typed = FCpf.validateType(value, fieldPath);
+    if (isFailure(typed)) return err(typed.error);
+    const instance = new FCpf(typed.value, fieldPath);
+    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    if (!rules.success) return err(rules.error);
+    return ok(instance);
+  }
+
+  override formatted(): TCpfFormatted {
     const v = this.getValue();
     return `${v.slice(0, 3)}.${v.slice(3, 6)}.${v.slice(6, 9)}-${v.slice(9)}`;
+  }
+
+  override toString(): string {
+    return this.getValue();
   }
 
   override getDescription(): string {
