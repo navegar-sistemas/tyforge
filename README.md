@@ -73,3 +73,4 @@ Full documentation at [tyforge.navegarsistemas.com.br](https://tyforge.navegarsi
 ## License
 
 MIT - [Navegar Sistemas](https://navegarsistemas.com.br/)
+
