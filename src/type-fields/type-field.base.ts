@@ -7,7 +7,7 @@ export { TJsonSchemaType } from "./type-field.config";
 
 export type TValidationLevel = "full" | "type" | "none";
 
-// Cache de Object.values() para evitar alocação repetida
+// Cache Object.values() to avoid repeated allocation
 const enumValuesCache = new WeakMap<object, unknown[]>();
 
 function getCachedEnumValues(enumObj: object): unknown[] {
@@ -19,7 +19,7 @@ function getCachedEnumValues(enumObj: object): unknown[] {
   return cached;
 }
 
-// Cache de Set para lookup O(1) em validação de enum
+// Cache Set for O(1) lookup in enum validation
 const enumSetCache = new WeakMap<object, Set<unknown>>();
 
 function getCachedEnumSet(enumObj: object): Set<unknown> {
@@ -56,7 +56,7 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
   ) {}
 
   /**
-   * Resolve um valor de enum, validando por chave e/ou valor conforme config
+   * Resolves an enum value, validating by key and/or value according to config
    */
   protected static resolveEnum<E extends Record<string, string | number>>(
     enumObj: E,
@@ -132,7 +132,7 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
     }
   }
 
-  /** Retorna o valor primitivo bruto */
+  /** Returns the raw primitive value */
   getValue(): TPrimitive {
     return this._value;
   }

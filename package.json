@@ -1,6 +1,6 @@
 {
   "name": "tyforge",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "Type-safe schema validation, Result pattern, and DDD building blocks for TypeScript",
   "keywords": [
     "typescript",
@@ -38,6 +38,9 @@
   },
   "bin": {
     "tyforge-lint": "./dist/lint/index.js"
+  },
+  "browser": {
+    "./dist/schema/batch-parallel.js": "./dist/schema/batch-parallel.browser.js"
   },
   "sideEffects": false,
   "files": [

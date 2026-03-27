@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.19] - 2026-03-27
+
+### Added
+- `browser` field in package.json — transparent Node.js/browser module substitution
+- `batch-parallel.browser.ts` stub for browser/React Native environments
+- `IParallelProcessor` interface, `IBatchCreateResult` type, `TAssignUnknown` type
+- `createParallelProcessor()` factory function (replaces direct class export)
+- `E` prefix convention for pure TypeScript `const enum` declarations
+
+### Changed
+- Batch parallel module refactored: dependency injection via `assignUnknown` parameter eliminates circular dependency with `schema-build.ts`
+- `IBatchCreateError`, `IBatchCreateOptions`, `IBatchCreateResult` moved to `schema-types.ts` (single source of truth)
+- Internal naming: `FieldKind` → `EFieldKind`, `CompiledField` → `ICompiledField`, `CompiledValidator` → `ICompiledValidator`
+- `batchCreate()` with `concurrency > 1` falls back to sequential in browser (no error)
+
+### Fixed
+- Circular dependency between `schema-build.ts` and `batch-parallel.ts`
+- Portuguese comments translated to English in `type-field.base.ts` and `schema-types.ts`
+- Redundant `String()` wrapper in `batch-parallel.ts` worker result reconstruction
+
 ## [0.1.18] - 2026-03-26
 
 ### Added

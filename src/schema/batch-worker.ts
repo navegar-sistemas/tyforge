@@ -49,7 +49,7 @@ function deserializeSchema(raw: Record<string, unknown>): ISchema {
     if (TypeGuard.isRecord(value) && "type" in value) {
       const typeName = value["type"];
       const nameCheck = TypeGuard.isString(typeName, key);
-      if (nameCheck.success && nameCheck.value in FIELD_REGISTRY) {
+      if (nameCheck.success && Object.prototype.hasOwnProperty.call(FIELD_REGISTRY, nameCheck.value)) {
         const fieldClass = FIELD_REGISTRY[nameCheck.value];
         if (isFieldType(fieldClass)) {
           schema[key] = buildFieldEntry(value, fieldClass);
@@ -60,7 +60,7 @@ function deserializeSchema(raw: Record<string, unknown>): ISchema {
       if (TypeGuard.isRecord(entry) && "type" in entry) {
         const typeName = entry["type"];
         const nameCheck = TypeGuard.isString(typeName, key);
-        if (nameCheck.success && nameCheck.value in FIELD_REGISTRY) {
+        if (nameCheck.success && Object.prototype.hasOwnProperty.call(FIELD_REGISTRY, nameCheck.value)) {
           const fieldClass = FIELD_REGISTRY[nameCheck.value];
           if (isFieldType(fieldClass)) {
             schema[key] = [buildFieldEntry(entry, fieldClass)];

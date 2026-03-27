@@ -25,7 +25,7 @@ export { ExceptionText } from "./exceptions/text.exception";
 
 // ── Schema ──────────────────────────────────────────────────────
 export { SchemaBuilder } from "./schema/schema-build";
-export type { ICompiledSchema, IBatchCreateError, IBatchCreateOptions } from "./schema/schema-build";
+export type { ICompiledSchema, IBatchCreateError, IBatchCreateOptions, IBatchCreateResult } from "./schema/schema-build";
 export type {
   IFieldConfig,
   ISchema,

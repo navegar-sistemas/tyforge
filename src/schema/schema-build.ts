@@ -1,14 +1,11 @@
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
-import {
-  ISchema,
-  InferJson,
-  InferProps,
-} from "./schema-types";
-import type { TValidationLevel } from "./schema-types";
+import { ISchema, InferJson, InferProps } from "./schema-types";
+import type { TValidationLevel, IBatchCreateResult, IBatchCreateOptions, IBatchCreateError } from "./schema-types";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 import { err, ok, Result } from "@tyforge/result";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 import { TypeField } from "@tyforge/type-fields/type-field.base";
+import { createParallelProcessor } from "./batch-parallel";
 
 // ── Type Guards (zero casts) ────────────────────────────────────
 
@@ -46,27 +43,27 @@ function assertRecord(data: unknown): asserts data is Record<string, unknown> {
 const requiredError = (path: string) =>
   ExceptionValidation.create(path, "Required field missing.");
 
-const enum FieldKind {
+const enum EFieldKind {
   Creatable,
   NestedSchema,
   ArrayCreatable,
   ArrayNestedSchema,
 }
 
-interface CompiledField {
+interface ICompiledField {
   key: string;
   path: string;
   required: boolean;
-  kind: FieldKind;
+  kind: EFieldKind;
   creatable: Creatable | null;
   hasAssign: boolean;
-  nestedValidator: CompiledValidator | null;
+  nestedValidator: ICompiledValidator | null;
   assignValidateLevel: TValidationLevel;
   createValidateLevel: TValidationLevel;
 }
 
-interface CompiledValidator {
-  fields: CompiledField[];
+interface ICompiledValidator {
+  fields: ICompiledField[];
   run(data: unknown, basePath: string, mode: "create" | "assign"): Result<Record<string, unknown>, Exceptions>;
 }
 
@@ -83,8 +80,8 @@ function extractValidateLevels(entry: unknown): { assignValidateLevel: TValidati
   };
 }
 
-function compileFields(schema: Record<string, unknown>, basePath: string): CompiledField[] {
-  const fields: CompiledField[] = [];
+function compileFields(schema: Record<string, unknown>, basePath: string): ICompiledField[] {
+  const fields: ICompiledField[] = [];
 
   for (const key of Object.keys(schema)) {
     let entry: unknown = schema[key];
@@ -107,7 +104,7 @@ function compileFields(schema: Record<string, unknown>, basePath: string): Compi
         fields.push({
           key, path,
           required: entry.required !== false,
-          kind: isArray ? FieldKind.ArrayCreatable : FieldKind.Creatable,
+          kind: isArray ? EFieldKind.ArrayCreatable : EFieldKind.Creatable,
           creatable: t,
           hasAssign: hasAssign(t),
           nestedValidator: null,
@@ -119,7 +116,7 @@ function compileFields(schema: Record<string, unknown>, basePath: string): Compi
         fields.push({
           key, path,
           required: entry.required !== false,
-          kind: isArray ? FieldKind.ArrayNestedSchema : FieldKind.NestedSchema,
+          kind: isArray ? EFieldKind.ArrayNestedSchema : EFieldKind.NestedSchema,
           creatable: null,
           hasAssign: false,
           nestedValidator: { fields: compileFields(t, path), run: createRunner(t) },
@@ -132,7 +129,7 @@ function compileFields(schema: Record<string, unknown>, basePath: string): Compi
       fields.push({
         key, path,
         required: true,
-        kind: FieldKind.NestedSchema,
+        kind: EFieldKind.NestedSchema,
         creatable: null,
         hasAssign: false,
         nestedValidator: { fields: compileFields(entry, path), run: createRunner(entry) },
@@ -146,7 +143,7 @@ function compileFields(schema: Record<string, unknown>, basePath: string): Compi
 }
 
 function createRunner(schema: Record<string, unknown>) {
-  let compiled: CompiledField[] | null = null;
+  let compiled: ICompiledField[] | null = null;
 
   return function run(data: unknown, basePath: string, mode: "create" | "assign"): Result<Record<string, unknown>, Exceptions> {
     if (!compiled) compiled = compileFields(schema, basePath);
@@ -165,7 +162,7 @@ function createRunner(schema: Record<string, unknown>) {
       const value = data[key];
 
       switch (kind) {
-        case FieldKind.Creatable: {
+        case EFieldKind.Creatable: {
           if (value === undefined || value === null) {
             if (required) return err(requiredError(fieldPath));
             continue;
@@ -182,7 +179,7 @@ function createRunner(schema: Record<string, unknown>) {
           break;
         }
 
-        case FieldKind.ArrayCreatable: {
+        case EFieldKind.ArrayCreatable: {
           if (value === undefined || value === null) {
             if (required) return err(requiredError(fieldPath));
             continue;
@@ -210,7 +207,7 @@ function createRunner(schema: Record<string, unknown>) {
           break;
         }
 
-        case FieldKind.NestedSchema: {
+        case EFieldKind.NestedSchema: {
           if (value === undefined || value === null) {
             if (required) return err(requiredError(fieldPath));
             continue;
@@ -222,7 +219,7 @@ function createRunner(schema: Record<string, unknown>) {
           break;
         }
 
-        case FieldKind.ArrayNestedSchema: {
+        case EFieldKind.ArrayNestedSchema: {
           if (value === undefined || value === null) {
             if (required) return err(requiredError(fieldPath));
             continue;
@@ -253,30 +250,14 @@ function createRunner(schema: Record<string, unknown>) {
 
 // ── Public API ───────────────────────────────────────────────────
 
-export interface IBatchCreateError {
-  index: number;
-  error: Exceptions;
-}
-
-export interface IBatchCreateOptions {
-  concurrency?: number;
-  chunkSize?: number;
-}
-
-interface IParallelBatchProcessor {
-  process<TSchema extends ISchema>(schema: TSchema, items: unknown[], options: { concurrency: number; chunkSize: number }): Promise<{ ok: InferProps<TSchema>[]; errors: IBatchCreateError[] }>;
-}
-
-function isConstructable(value: unknown): value is new () => IParallelBatchProcessor {
-  return typeof value === "function";
-}
+export type { IBatchCreateError, IBatchCreateOptions, IBatchCreateResult } from "./schema-types";
 
 export interface ICompiledSchema<TSchema extends ISchema> {
   create(data: InferJson<TSchema>, path?: string): Result<InferProps<TSchema>, Exceptions>;
   createUnknown(data: unknown, path?: string): Result<InferProps<TSchema>, Exceptions>;
   assign(data: InferJson<TSchema>, path?: string): Result<InferProps<TSchema>, Exceptions>;
   assignUnknown(data: unknown, path?: string): Result<InferProps<TSchema>, Exceptions>;
-  batchCreate(items: unknown[], options?: IBatchCreateOptions): { ok: InferProps<TSchema>[]; errors: IBatchCreateError[] } | Promise<{ ok: InferProps<TSchema>[]; errors: IBatchCreateError[] }>;
+  batchCreate(items: unknown[], options?: IBatchCreateOptions): IBatchCreateResult<TSchema> | Promise<IBatchCreateResult<TSchema>>;
 }
 
 export class SchemaBuilder {
@@ -306,21 +287,24 @@ export class SchemaBuilder {
         assertResultType<InferProps<TSchema>>(result);
         return result;
       },
-      batchCreate(items: unknown[], options?: IBatchCreateOptions) {
+      batchCreate(items: unknown[], options?: IBatchCreateOptions): IBatchCreateResult<TSchema> | Promise<IBatchCreateResult<TSchema>> {
         const concurrency = options?.concurrency ?? 1;
 
-        // Parallel mode — delegate to worker threads
+        // Parallel mode — worker threads (Node.js only)
+        // In browser/React Native, createParallelProcessor() returns null (via browser field stub)
         if (concurrency > 1) {
-          const mod: Record<string, unknown> = require("./batch-parallel");
-          const Ctor = mod["ParallelBatchProcessor"];
-          if (!isConstructable(Ctor)) {
-            throw new TypeError("Failed to load ParallelBatchProcessor from batch-parallel module");
+          const processor = createParallelProcessor();
+          if (processor) {
+            const assign = (data: unknown): Result<InferProps<TSchema>, Exceptions> => {
+              const r = runner(data, "", "assign");
+              assertResultType<InferProps<TSchema>>(r);
+              return r;
+            };
+            return processor.process(schema, items, {
+              concurrency,
+              chunkSize: options?.chunkSize ?? 10000,
+            }, assign);
           }
-          const processor = new Ctor();
-          return processor.process(schema, items, {
-            concurrency,
-            chunkSize: options?.chunkSize ?? 10_000,
-          });
         }
 
         // Sequential mode (default)

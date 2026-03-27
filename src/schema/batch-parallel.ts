@@ -1,17 +1,17 @@
 import { Worker } from "node:worker_threads";
 import * as path from "node:path";
 import * as os from "node:os";
-import type { ISchema, InferProps } from "./schema-types";
-import type { IBatchCreateError } from "./schema-build";
-import { SchemaBuilder } from "./schema-build";
+import type { ISchema, InferProps, IParallelProcessor, IBatchCreateResult, IBatchCreateError, TAssignUnknown } from "./schema-types";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { isFailure } from "@tyforge/result/result";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
-export interface IBatchCreateOptions {
-  concurrency?: number;
-  chunkSize?: number;
-}
+// Worker threads require an absolute file path (Node.js API limitation).
+// The extension is derived from the current file to match dev (.ts) vs prod (.js).
+const WORKER_EXT = path.extname(__filename);
+const WORKER_PATH = path.resolve(__dirname, `batch-worker${WORKER_EXT}`);
+const IS_TYPESCRIPT = WORKER_EXT === ".ts";
+const WORKER_TIMEOUT_MS = 30000;
 
 interface IWorkerSuccess {
   index: number;
@@ -28,32 +28,24 @@ interface IWorkerResult {
   failures: IWorkerFailure[];
 }
 
-export class ParallelBatchProcessor {
-  private readonly workerPath: string;
-  private readonly isDevMode: boolean;
+export function createParallelProcessor(): IParallelProcessor | null {
+  return new ParallelBatchProcessor();
+}
 
-  constructor() {
-    const tsPath = path.resolve(__dirname, "batch-worker.ts");
-    const jsPath = path.resolve(__dirname, "batch-worker.js");
-
-    this.isDevMode = __filename.endsWith(".ts");
-    this.workerPath = this.isDevMode ? tsPath : jsPath;
-  }
-
+class ParallelBatchProcessor implements IParallelProcessor {
   private createWorker(): Worker {
-    if (this.isDevMode) {
-      return new Worker(this.workerPath, {
-        execArgv: ["--require", "tsx/cjs"],
-      });
+    if (IS_TYPESCRIPT) {
+      return new Worker(WORKER_PATH, { execArgv: ["--require", "tsx/cjs"] });
     }
-    return new Worker(this.workerPath);
+    return new Worker(WORKER_PATH);
   }
 
   async process<TSchema extends ISchema>(
     schema: TSchema,
     items: unknown[],
-    options: Required<IBatchCreateOptions>,
-  ): Promise<{ ok: InferProps<TSchema>[]; errors: IBatchCreateError[] }> {
+    options: { concurrency: number; chunkSize: number },
+    assignUnknown: TAssignUnknown<TSchema>,
+  ): Promise<IBatchCreateResult<TSchema>> {
     const serializedSchema = this.serializeSchema(schema);
     const chunks = this.splitChunks(items, options.chunkSize);
     const maxConcurrency = Math.min(options.concurrency, os.cpus().length, 16);
@@ -61,7 +53,7 @@ export class ParallelBatchProcessor {
 
     const workerResults = await this.runWorkers(serializedSchema, chunks, workerCount);
 
-    return this.reconstructResults<TSchema>(schema, workerResults);
+    return this.reconstructResults<TSchema>(workerResults, assignUnknown);
   }
 
   private serializeSchema(schema: Record<string, unknown>): Record<string, unknown> {
@@ -118,7 +110,7 @@ export class ParallelBatchProcessor {
         activeWorkers.push(worker);
 
         try {
-          const result = await new Promise<IWorkerResult>((resolve, reject) => {
+          const workerDone = new Promise<IWorkerResult>((resolve, reject) => {
             worker.on("message", resolve);
             worker.on("error", reject);
             worker.postMessage({
@@ -127,6 +119,9 @@ export class ParallelBatchProcessor {
               startIndex: chunk.startIndex,
             });
           });
+          const timer = setTimeout(() => { worker.terminate(); }, WORKER_TIMEOUT_MS);
+          const result = await workerDone;
+          clearTimeout(timer);
           results.push(result);
         } finally {
           worker.terminate();
@@ -152,10 +147,9 @@ export class ParallelBatchProcessor {
   }
 
   private reconstructResults<TSchema extends ISchema>(
-    schema: TSchema,
     workerResults: IWorkerResult[],
-  ): { ok: InferProps<TSchema>[]; errors: IBatchCreateError[] } {
-    const validator = SchemaBuilder.compile(schema);
+    assignUnknown: TAssignUnknown<TSchema>,
+  ): IBatchCreateResult<TSchema> {
     const allSuccesses: { index: number; value: InferProps<TSchema> }[] = [];
     const allFailures: IBatchCreateError[] = [];
 
@@ -165,7 +159,7 @@ export class ParallelBatchProcessor {
           allFailures.push({ index: success.index, error: ExceptionValidation.create("root", "Expected object from worker") });
           continue;
         }
-        const assigned = validator.assignUnknown(success.value);
+        const assigned = assignUnknown(success.value);
         if (isFailure(assigned)) {
           allFailures.push({ index: success.index, error: assigned.error });
         } else {
@@ -174,15 +168,14 @@ export class ParallelBatchProcessor {
       }
 
       for (const failure of result.failures) {
-        const detail = TypeGuard.isString(failure.error["detail"], "detail").success
-          ? String(failure.error["detail"])
-          : "Validation failed";
-        const field = TypeGuard.isString(failure.error["field"], "field").success
-          ? String(failure.error["field"])
-          : "unknown";
+        const detailResult = TypeGuard.isString(failure.error["detail"], "detail");
+        const fieldResult = TypeGuard.isString(failure.error["field"], "field");
         allFailures.push({
           index: failure.index,
-          error: ExceptionValidation.create(field, detail),
+          error: ExceptionValidation.create(
+            fieldResult.success ? fieldResult.value : "unknown",
+            detailResult.success ? detailResult.value : "Validation failed",
+          ),
         });
       }
     }

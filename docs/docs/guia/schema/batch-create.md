@@ -36,6 +36,10 @@ console.log(result.errors[0].index); // 1 (indice original)
 
 ## Paralelo (worker threads)
 
+:::info Browser / React Native
+O modo paralelo (`concurrency > 1`) requer Node.js com `worker_threads`. Em ambientes browser ou React Native, `batchCreate()` faz fallback automatico para o modo sequencial — sem erro, sem configuracao. O campo `browser` no `package.json` do TyForge cuida dessa troca de forma transparente.
+:::
+
 Para grandes volumes de dados (100K+ itens), use worker threads para paralelizar a validacao:
 
 ```typescript

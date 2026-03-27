@@ -14,9 +14,11 @@ export class ToolFileDiscovery {
   }
 
   findByPaths(paths: string[], extension: string): string[] {
+    const basePath = path.resolve(this.rootDir) + path.sep;
     const results: string[] = [];
     for (const p of paths) {
       const resolved = path.resolve(p);
+      if (!resolved.startsWith(basePath) && resolved !== path.resolve(this.rootDir)) continue;
       if (fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()) {
         const sub = new ToolFileDiscovery(resolved, this.excludePatterns);
         results.push(...sub.findByExtension(extension));
