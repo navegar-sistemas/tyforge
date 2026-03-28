@@ -354,6 +354,7 @@ npx tyforge-lint --init       # setup pre-commit hooks (Husky/Lefthook/native)
 | **Exceptions** | RFC 7807 exception types with lazy stack trace and `OHttpStatus` constants |
 | **Application** | UseCase, IMapper, Saga, DomainEventDispatcher, CQRS interfaces |
 | **Infrastructure** | IRepositoryBase, IRepositoryRead, Paginated, IUnitOfWork, IOutbox |
+| **HTTP Client** | `ServiceHttp` abstract base class — secure HTTP client with Result pattern, SSRF/CRLF/path traversal protection, timeout, `ExceptionHttp` |
 | **Tools** | TypeGuard, ToolObjectTransform (flatten/unflatten), ToolCliParser, ToolFileDiscovery, ToolGit |
 | **Linter** | `npx tyforge-lint` — 10 rules with `--init` / `--fix` / `--format json` for CI |
 | **Config** | `tyforge.config.json` — global validation levels (`full`, `type`, `none`) and linter settings |
@@ -382,6 +383,7 @@ import { FString, FEmail } from "tyforge/type-fields";
 import { ExceptionValidation } from "tyforge/exceptions";
 import { SchemaBuilder } from "tyforge/schema";
 import { TypeGuard } from "tyforge/tools";
+import { ServiceHttp, ExceptionHttp } from "tyforge/http";
 ```
 
 ## Documentation

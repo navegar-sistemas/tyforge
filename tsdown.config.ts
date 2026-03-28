@@ -11,6 +11,7 @@ export default defineConfig({
     "schema/batch-parallel": "src/schema/batch-parallel.ts",
     "schema/batch-parallel.browser": "src/schema/batch-parallel.browser.ts",
     "tools/index": "src/tools/index.ts",
+    "http/index": "src/http/index.ts",
     "lint/index": "src/lint/index.ts",
     "pre-commit/index": "src/pre-commit/index.ts",
     "config/tyforge-config": "src/config/tyforge-config.ts",

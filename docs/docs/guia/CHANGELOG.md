@@ -10,6 +10,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.29] - 2026-03-28
+
+### Added
+- Módulo HTTP (`tyforge/http`): abstração de HTTP client com `ServiceHttp`, `ServiceHttpSecurity` e `ExceptionHttp`
+- `ServiceHttp`: classe abstrata base com `fetch()` nativo, Result pattern e métodos de conveniência (`get`, `post`, `put`, `delete`, `patch`)
+- `ServiceHttpSecurity`: prevenção de path traversal, SSRF, CRLF injection, null bytes e prototype pollution em headers
+- `ExceptionHttp`: exceções HTTP com factory methods (`unsafeEndpoint`, `failedUrlConstruction`, `failedSerialization`, `externalApiFailed`, `authFailed`, `timeout`)
+- Suporte a timeout via `AbortController` com upper bound de 300s
+- Validação de valores não-primitivos em query params e form body (rejeita objetos/arrays)
+- Proteção contra vazamento de dados externos via `externalError` non-enumerable
+- Campo `retriable` correto por factory method (apenas `externalApiFailed` e `timeout` são retriáveis)
+- Subpath export `tyforge/http` no `package.json`
+- Testes para `ServiceHttp`, `ServiceHttpSecurity` e `ExceptionHttp`
+- Documentação do módulo HTTP
+
+### Changed
+- `IExternalError` agora exportada nos barrels (`http/index.ts` e `index.ts`)
+- `IRequestOptions` renomeada para `TRequestOptions` — agora derivada via `Omit<IRequestParams, "endpoint" | "method" | "data">` (zero duplicação)
+- `ExceptionHttp.authFailed(cause?)` agora aceita o erro original e o armazena via `Error.cause` (non-enumerable)
+
 ## [0.1.28] - 2026-03-28
 
 ### Added

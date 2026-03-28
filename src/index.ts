@@ -37,6 +37,13 @@ export type {
 export { OExposeLevel, getVisibilityLevel } from "./schema/schema-types";
 export { composeSchema } from "./schema/schema-compose";
 
+// ── HTTP ────────────────────────────────────────────────────────
+export { ServiceHttp } from "./http/service-http.base";
+export { ServiceHttpSecurity } from "./http/service-http.security";
+export { ExceptionHttp } from "./http/exception-http";
+export type { IExternalError } from "./http/exception-http";
+export type { IRequestParams, IHttpResponse, THttpResult, THttpMethod, THttpFormat, TRequestOptions } from "./http/service-http.types";
+
 // ── Type Fields ─────────────────────────────────────────────────
 export { TypeField } from "./type-fields/type-field.base";
 export type { TJsonSchemaType, TValidationLevel, TLocaleDisplay, TLocaleRegion, TLocaleData, TFormatTarget } from "./type-fields/type-field.base";

@@ -189,6 +189,18 @@ export default {
     },
     {
       type: "category",
+      label: "HTTP Client",
+      collapsed: true,
+      items: [
+        {
+          type: "doc",
+          id: "http/visao-geral",
+          label: "Visão Geral",
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "Application",
       collapsed: true,
       items: [

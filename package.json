@@ -1,6 +1,6 @@
 {
   "name": "tyforge",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "description": "Type-safe schema validation, Result pattern, and DDD building blocks for TypeScript",
   "keywords": [
     "typescript",
@@ -55,6 +55,10 @@
     "./tools": {
       "import": "./dist/tools/index.js",
       "types": "./dist/tools/index.d.ts"
+    },
+    "./http": {
+      "import": "./dist/http/index.js",
+      "types": "./dist/http/index.d.ts"
     }
   },
   "bin": {

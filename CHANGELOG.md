@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.1.29] - 2026-03-28
+
+### Added
+- Módulo HTTP (`tyforge/http`): abstração de HTTP client com `ServiceHttp`, `ServiceHttpSecurity` e `ExceptionHttp`
+- `ServiceHttp`: classe abstrata base com `fetch()` nativo, Result pattern e métodos de conveniência (`get`, `post`, `put`, `delete`, `patch`)
+- `ServiceHttpSecurity`: prevenção de path traversal, SSRF, CRLF injection, null bytes e prototype pollution em headers
+- `ExceptionHttp`: exceções HTTP com factory methods (`unsafeEndpoint`, `failedUrlConstruction`, `failedSerialization`, `externalApiFailed`, `authFailed`, `timeout`)
+- Suporte a timeout via `AbortController` com upper bound de 300s
+- Validação de valores não-primitivos em query params e form body (rejeita objetos/arrays)
+- Proteção contra vazamento de dados externos via `externalError` non-enumerable
+- Campo `retriable` correto por factory method (apenas `externalApiFailed` e `timeout` são retriáveis)
+- Subpath export `tyforge/http` no `package.json`
+- Testes para `ServiceHttp`, `ServiceHttpSecurity` e `ExceptionHttp`
+- Documentação do módulo HTTP
+
+### Changed
+- `IExternalError` agora exportada nos barrels (`http/index.ts` e `index.ts`)
+- `IRequestOptions` renomeada para `TRequestOptions` — agora derivada via `Omit<IRequestParams, "endpoint" | "method" | "data">` (zero duplicação)
+- `ExceptionHttp.authFailed(cause?)` agora aceita o erro original e o armazena via `Error.cause` (non-enumerable)
+
 ## [0.1.28] - 2026-03-28
 
 ### Added
@@ -228,21 +248,4 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 - `normalize()` from TypeField base
 - `parseString()` from TypeField base
 - Node.js tools from main barrel export (moved to direct imports)
-
-## [0.1.10] - 2026-03-23
-
-### Added
-- Lint module with 10 rules (no-any, no-cast, no-non-null, no-ts-ignore, no-export-default, no-to-json-lowercase, no-new-type-field, no-magic-http-status, no-declare, no-satisfies-without-prefix)
-- `batchCreate()` with optional worker thread parallelism
-- `tyforge.config.json` global configuration
-- `composeSchema()` for schema composition
-- 15 canonical examples (01-15)
-- Comprehensive test suite (246 tests)
-- Benchmark suite (TyForge vs Zod) with Docker support
-
-### Changed
-- Package renamed from `@navegar-sistemas/tyforge` to `tyforge`
-- DTOs split into `DtoReq` (request) and `DtoRes` (response)
-- `IMapper` with `toDomainPaginated()` method
-- `IRepositoryBase` with bulk operations and pagination
 
