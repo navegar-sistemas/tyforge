@@ -24,7 +24,7 @@ Type Fields para validação de documentos de identificação. Inclui documentos
 
 ## FDocumentId
 
-Identificador genérico de documento com validação locale-aware. No modo padrão, aceita qualquer string alfanumérica de 1 a 20 caracteres. Com `TypeField.localeRules = "br"`, valida especificamente CPF (11 dígitos) ou CNPJ (14 dígitos).
+Identificador genérico de documento com validação locale-aware. No modo padrão, aceita qualquer string alfanumérica de 1 a 20 caracteres. Com `TypeField.localeRegion = "br"`, valida especificamente CPF (11 dígitos) ou CNPJ (14 dígitos).
 
 ```typescript
 import { FDocumentId } from "tyforge";
@@ -42,7 +42,7 @@ doc.getValue(); // "ABC123456"
 ```typescript
 import { FDocumentId, TypeField } from "tyforge";
 
-TypeField.configure({ localeRules: "br" });
+TypeField.configure({ localeRegion: "br" });
 
 // Aceita CPF (11 dígitos)
 const cpf = FDocumentId.createOrThrow("12345678901");

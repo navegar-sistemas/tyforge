@@ -1,4 +1,4 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/type-field.base";
+import { TypeField, TValidationLevel, TFormatTarget } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -78,8 +78,8 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
     return String(this.getValue());
   }
 
-  override formatted(): TIntFormatted {
-    return TypeField.formatNumber(this.getValue(), { maximumFractionDigits: 0 });
+  override formatted(target: TFormatTarget = "display"): TIntFormatted {
+    return TypeField.formatNumber(this.getValue(), { maximumFractionDigits: 0 }, target);
   }
 
   override getDescription(): string {

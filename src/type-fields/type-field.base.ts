@@ -7,12 +7,12 @@ export { TJsonSchemaType } from "./type-field.config";
 
 export type TValidationLevel = "full" | "type" | "none";
 export type TLocaleDisplay = "us" | "br";
-export type TLocaleRules = "us" | "br";
+export type TLocaleRegion = "us" | "br";
+export type TLocaleData = "us" | "br";
+export type TFormatTarget = "display" | "data";
 
-const LOCALE_INTL: Record<TLocaleDisplay, string> = {
-  us: "en-US",
-  br: "pt-BR",
-};
+const LOCALE_INTL_DISPLAY: Record<TLocaleDisplay, string> = { us: "en-US", br: "pt-BR" };
+const LOCALE_INTL_DATA: Record<TLocaleData, string> = { us: "en-US", br: "pt-BR" };
 
 // Cache Object.values() to avoid repeated allocation
 const enumValuesCache = new WeakMap<object, unknown[]>();
@@ -49,18 +49,21 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
   static createLevel: TValidationLevel = "full";
   static assignLevel: TValidationLevel = "type";
   static localeDisplay: TLocaleDisplay = "us";
-  static localeRules: TLocaleRules = "us";
+  static localeRegion: TLocaleRegion = "us";
+  static localeData: TLocaleData = "us";
 
   static configure(options: {
     create?: TValidationLevel;
     assign?: TValidationLevel;
     localeDisplay?: TLocaleDisplay;
-    localeRules?: TLocaleRules;
+    localeRegion?: TLocaleRegion;
+    localeData?: TLocaleData;
   }): void {
     if (options.create !== undefined) TypeField.createLevel = options.create;
     if (options.assign !== undefined) TypeField.assignLevel = options.assign;
     if (options.localeDisplay !== undefined) TypeField.localeDisplay = options.localeDisplay;
-    if (options.localeRules !== undefined) TypeField.localeRules = options.localeRules;
+    if (options.localeRegion !== undefined) TypeField.localeRegion = options.localeRegion;
+    if (options.localeData !== undefined) TypeField.localeData = options.localeData;
   }
 
   protected static assertNeverLocale(locale: never): never {
@@ -72,9 +75,12 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
   protected static formatNumber(
     value: number,
     options?: { minimumFractionDigits?: number; maximumFractionDigits?: number },
+    target: TFormatTarget = "display",
   ): string {
-    const locale = LOCALE_INTL[TypeField.localeDisplay];
-    const key = `${locale}:${options?.minimumFractionDigits ?? ""}:${options?.maximumFractionDigits ?? ""}`;
+    const locale = target === "data"
+      ? LOCALE_INTL_DATA[TypeField.localeData]
+      : LOCALE_INTL_DISPLAY[TypeField.localeDisplay];
+    const key = `${target}:${locale}:${options?.minimumFractionDigits ?? ""}:${options?.maximumFractionDigits ?? ""}`;
     let formatter = TypeField.formatterCache.get(key);
     if (!formatter) {
       formatter = new Intl.NumberFormat(locale, options);
@@ -220,7 +226,7 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
 
   abstract getDescription(): string;
   abstract getShortDescription(): string;
-  abstract formatted(): TFormatted;
+  abstract formatted(target?: TFormatTarget): TFormatted;
 
   equals(other?: TypeField<TPrimitive, TFormatted>): boolean {
     return (

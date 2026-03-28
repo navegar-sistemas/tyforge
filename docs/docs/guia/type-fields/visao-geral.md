@@ -12,7 +12,7 @@ TyForge inclui TypeFields prontos para padrões comuns: strings, emails, moeda (
 :::
 
 :::info Locale-aware
-O sistema de locale tem dois eixos: `localeDisplay` (formatação) e `localeRules` (regras de validação). Tipos estritos (`TLocaleDisplay`, `TLocaleRules`) garantem exaustividade em compile-time. Default: `"us"`. Configure via `TypeField.configure({ localeDisplay: "br", localeRules: "br" })`.
+O sistema de locale tem três eixos: `localeDisplay` (formatação de exibição), `localeRegion` (regras de validação) e `localeData` (formatação para API/persistência). Tipos estritos (`TLocaleDisplay`, `TLocaleRegion`, `TLocaleData`) garantem exaustividade em compile-time. Default: `"us"`. Configure via `TypeField.configure({ localeDisplay: "br", localeRegion: "br", localeData: "br" })`.
 :::
 
 ## Classe base: `TypeField<TPrimitive, TFormatted>`
@@ -29,6 +29,7 @@ abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
   // Métodos de instância
   getValue(): TPrimitive;
   formatted(): TFormatted;
+  formatted(target?: TFormatTarget): TFormatted;
   equals(other?: TypeField<TPrimitive, TFormatted>): boolean;
   toString(): string;
   toInt(): Result<number, ExceptionValidation>;
@@ -109,7 +110,8 @@ static configure(options: {
   create?: TValidationLevel;
   assign?: TValidationLevel;
   localeDisplay?: TLocaleDisplay;
-  localeRules?: TLocaleRules;
+  localeRegion?: TLocaleRegion;
+  localeData?: TLocaleData;
 }): void;
 ```
 
@@ -121,12 +123,13 @@ import { TypeField } from "tyforge";
 // Ajustar validação por ambiente
 TypeField.configure({ create: "full", assign: "none" });
 
-// Configurar locale brasileiro (formatação + regras)
-TypeField.configure({ localeDisplay: "br", localeRules: "br" });
+// Configurar locale brasileiro (exibição + regras + dados)
+TypeField.configure({ localeDisplay: "br", localeRegion: "br", localeData: "br" });
 ```
 
-- `localeDisplay` controla formatação (`formatted()`, `formatNumber()`)
-- `localeRules` controla regras de validação de negócio (bancário, documentos, estados)
+- `localeDisplay` controla formatação de exibição (`formatted()`, `formatNumber()`)
+- `localeRegion` controla regras de validação de negócio (bancário, documentos, estados)
+- `localeData` controla formatação para API/persistência (`formatted("data")`)
 
 ### Validação em duas etapas: `validateType()` + `validateRules()`
 

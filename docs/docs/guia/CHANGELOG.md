@@ -10,6 +10,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.27] - 2026-03-27
+
+### Added
+- `TLocaleRegion` type — strict union (`"us" | "br"`) for country business rules (replaces `TLocaleRules`)
+- `TLocaleData` type — strict union (`"us" | "br"`) for API/persistence formatting
+- `TFormatTarget` type — `"display" | "data"` parameter for `formatted(target?)` method
+- `LOCALE_INTL_DISPLAY` and `LOCALE_INTL_DATA` — separate exhaustive Record maps from locale to BCP 47 Intl codes
+
+### Changed
+- **BREAKING:** `localeRules` renamed to `localeRegion` (`TLocaleRules` → `TLocaleRegion`)
+- **BREAKING:** `TypeField.configure()` now accepts `localeRegion` and `localeData` (3 independent axes)
+- `formatted(target?: TFormatTarget)` — accepts optional target parameter (`"display"` default, `"data"` for API/persistence)
+- `formatNumber()` unified with `target` parameter — replaces separate `formatDataNumber()` method
+- Documentation: all `dataFormatted()` references replaced with `formatted("data")`
+- Documentation: all `localeRules` references replaced with `localeRegion`
+
 ## [0.1.26] - 2026-03-27
 
 ### Added

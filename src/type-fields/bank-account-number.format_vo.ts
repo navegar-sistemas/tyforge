@@ -35,7 +35,7 @@ export class FBankAccountNumber extends TypeField<TBankAccountNumber, TBankAccou
     if (!ALPHANUMERIC_REGEX.test(value.replace(/-/g, ""))) {
       return err(ExceptionValidation.create(fieldPath, "Bank account number must contain only alphanumeric characters"));
     }
-    switch (TypeField.localeRules) {
+    switch (TypeField.localeRegion) {
       case "us":
         break;
       case "br":
@@ -44,7 +44,7 @@ export class FBankAccountNumber extends TypeField<TBankAccountNumber, TBankAccou
         }
         break;
       default:
-        TypeField.assertNeverLocale(TypeField.localeRules);
+        TypeField.assertNeverLocale(TypeField.localeRegion);
     }
     return OK_TRUE;
   }
@@ -86,7 +86,7 @@ export class FBankAccountNumber extends TypeField<TBankAccountNumber, TBankAccou
   }
 
   override getDescription(): string {
-    return "Bank account number (alphanumeric, up to 34 characters). Locale-aware: enforces Brazilian format (1-13 digits + check digit) when TypeField.localeRules is 'br'.";
+    return "Bank account number (alphanumeric, up to 34 characters). Locale-aware: enforces Brazilian format (1-13 digits + check digit) when TypeField.localeRegion is 'br'.";
   }
 
   override getShortDescription(): string {

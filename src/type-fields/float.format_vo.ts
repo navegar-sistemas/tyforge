@@ -1,4 +1,4 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/type-field.base";
+import { TypeField, TValidationLevel, TFormatTarget } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -76,8 +76,8 @@ export class FFloat extends TypeField<TFloat, TFloatFormatted> {
     return String(this.getValue());
   }
 
-  override formatted(): TFloatFormatted {
-    return TypeField.formatNumber(this.getValue(), { maximumFractionDigits: this.config.decimalPrecision });
+  override formatted(target: TFormatTarget = "display"): TFloatFormatted {
+    return TypeField.formatNumber(this.getValue(), { maximumFractionDigits: this.config.decimalPrecision }, target);
   }
 
   override getDescription(): string {

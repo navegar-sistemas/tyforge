@@ -35,7 +35,7 @@ export class FBankBranch extends TypeField<TBankBranch, TBankBranchFormatted> {
     if (!DIGITS_REGEX.test(value)) {
       return err(ExceptionValidation.create(fieldPath, "Bank branch must contain only numeric digits"));
     }
-    switch (TypeField.localeRules) {
+    switch (TypeField.localeRegion) {
       case "us":
         break;
       case "br":
@@ -44,7 +44,7 @@ export class FBankBranch extends TypeField<TBankBranch, TBankBranchFormatted> {
         }
         break;
       default:
-        TypeField.assertNeverLocale(TypeField.localeRules);
+        TypeField.assertNeverLocale(TypeField.localeRegion);
     }
     return OK_TRUE;
   }
@@ -86,7 +86,7 @@ export class FBankBranch extends TypeField<TBankBranch, TBankBranchFormatted> {
   }
 
   override getDescription(): string {
-    return "Bank branch number (numeric). Locale-aware: enforces 4-digit format when TypeField.localeRules is 'br'.";
+    return "Bank branch number (numeric). Locale-aware: enforces 4-digit format when TypeField.localeRegion is 'br'.";
   }
 
   override getShortDescription(): string {

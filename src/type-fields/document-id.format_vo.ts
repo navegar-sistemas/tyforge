@@ -35,7 +35,7 @@ export class FDocumentId extends TypeField<TDocumentId, TDocumentIdFormatted> {
     if (!ALPHANUMERIC_REGEX.test(value)) {
       return err(ExceptionValidation.create(fieldPath, "Document ID must contain only alphanumeric characters"));
     }
-    switch (TypeField.localeRules) {
+    switch (TypeField.localeRegion) {
       case "us":
         break;
       case "br":
@@ -44,7 +44,7 @@ export class FDocumentId extends TypeField<TDocumentId, TDocumentIdFormatted> {
         }
         break;
       default:
-        TypeField.assertNeverLocale(TypeField.localeRules);
+        TypeField.assertNeverLocale(TypeField.localeRegion);
     }
     return OK_TRUE;
   }
@@ -86,7 +86,7 @@ export class FDocumentId extends TypeField<TDocumentId, TDocumentIdFormatted> {
   }
 
   override getDescription(): string {
-    return "Generic document identifier (alphanumeric). Locale-aware: validates CPF (11 digits) or CNPJ (14 digits) when TypeField.localeRules is 'br'.";
+    return "Generic document identifier (alphanumeric). Locale-aware: validates CPF (11 digits) or CNPJ (14 digits) when TypeField.localeRegion is 'br'.";
   }
 
   override getShortDescription(): string {

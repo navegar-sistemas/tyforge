@@ -114,7 +114,8 @@ static configure(options: {
   create?: TValidationLevel;
   assign?: TValidationLevel;
   localeDisplay?: TLocaleDisplay;
-  localeRules?: TLocaleRules;
+  localeRegion?: TLocaleRegion;
+  localeData?: TLocaleData;
 }): void;
 ```
 
@@ -126,12 +127,13 @@ import { TypeField } from "tyforge";
 // Desabilita validação no assign para maximizar performance
 TypeField.configure({ create: "full", assign: "none" });
 
-// Configura locale brasileiro (formatação + regras de validação)
-TypeField.configure({ localeDisplay: "br", localeRules: "br" });
+// Configura locale brasileiro (exibição + regras de validação + dados)
+TypeField.configure({ localeDisplay: "br", localeRegion: "br", localeData: "br" });
 ```
 
-- `localeDisplay` — controla formatação (`formatted()`, `formatNumber()`). Valores: `"us"` | `"br"`
-- `localeRules` — controla regras de validação de negócio. Valores: `"us"` | `"br"`
+- `localeDisplay` — controla formatação de exibição (`formatted()`, `formatNumber()`). Valores: `"us"` | `"br"`
+- `localeRegion` — controla regras de validação de negócio. Valores: `"us"` | `"br"`
+- `localeData` — controla formatação para API/persistência (`formatted("data")`). Valores: `"us"` | `"br"`
 
 A integração entre o arquivo `tyforge.config.json` e o `TypeField.configure()` fica a cargo do projeto consumidor. O CLI do linter (`tyforge-lint`) lê o arquivo de configuração, mas a biblioteca core não faz isso automaticamente.
 

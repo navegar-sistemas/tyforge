@@ -302,7 +302,7 @@ uf.getValue(); // "SP"
 ```typescript
 import { FStateCode, TypeField } from "tyforge";
 
-TypeField.configure({ localeRules: "br" });
+TypeField.configure({ localeRegion: "br" });
 
 // Aceita UFs válidas
 const sp = FStateCode.createOrThrow("SP");

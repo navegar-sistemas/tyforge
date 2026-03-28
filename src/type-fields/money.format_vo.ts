@@ -1,4 +1,4 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/type-field.base";
+import { TypeField, TValidationLevel, TFormatTarget } from "@tyforge/type-fields/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -155,8 +155,8 @@ export class FMoney extends TypeField<TMoney, TMoneyFormatted> {
     return String(this.getValue());
   }
 
-  override formatted(): TMoneyFormatted {
-    return TypeField.formatNumber(this.toDecimal(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  override formatted(target: TFormatTarget = "display"): TMoneyFormatted {
+    return TypeField.formatNumber(this.toDecimal(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }, target);
   }
 
   override getDescription(): string {

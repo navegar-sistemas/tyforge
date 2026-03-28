@@ -232,21 +232,24 @@ const schema = {
 // => { name: "Maria", email: "maria@email.com", password: "S3cur3!Pass" }
 ```
 
-### Sistema de locale — display + regras, configurados independentemente
+### Sistema de locale — display + region + data, configurados independentemente
 
 ```typescript
 import { TypeField, FBankCode, FCurrency, FDocumentCpf } from "tyforge";
 
-// Configurar separadamente: como exibir vs quais regras aplicar
-TypeField.configure({ localeDisplay: "br", localeRules: "br" });
+// Configurar três eixos separadamente: exibição, regras de região e formatação de dados
+TypeField.configure({ localeDisplay: "br", localeRegion: "br", localeData: "br" });
 
-// localeRules: "br" → exige formato ISPB de 8 dígitos
+// localeRegion: "br" → exige formato ISPB de 8 dígitos
 FBankCode.createOrThrow("60701190"); // OK (ISPB do Itaú)
 
 // localeDisplay: "br" → formata com separadores brasileiros
 FCurrency.createOrThrow(1234.50).formatted(); // "1.234,50"
 
-// Tipos estritos (TLocaleDisplay, TLocaleRules) com exhaustive switch:
+// localeData: "br" → formatted("data") para formatação de API/persistência
+FCurrency.createOrThrow(1234.50).formatted("data"); // formato para API
+
+// Tipos estritos (TLocaleDisplay, TLocaleRegion, TLocaleData) com exhaustive switch:
 // adicionar um novo locale causa erros de compilação onde o tratamento está faltando
 ```
 

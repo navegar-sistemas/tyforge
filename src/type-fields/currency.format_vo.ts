@@ -1,4 +1,4 @@
-import { TypeField } from "@tyforge/type-fields/type-field.base";
+import { TypeField, TFormatTarget } from "@tyforge/type-fields/type-field.base";
 import { Result, ok, err, isFailure } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
@@ -67,8 +67,8 @@ export class FCurrency extends FMoney {
     return this.getValue() / 100;
   }
 
-  override formatted(): TCurrencyFormatted {
-    return TypeField.formatNumber(this.toDecimalValue(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  override formatted(target: TFormatTarget = "display"): TCurrencyFormatted {
+    return TypeField.formatNumber(this.toDecimalValue(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }, target);
   }
 
   override toString(): string {

@@ -263,7 +263,7 @@ export {
 
 ## TypeFields locale-aware
 
-TypeFields que dependem de localidade (ex: `FBankCode`, `FBankBranch`, `FStateCode`, `FBankAccountNumber`) utilizam `TypeField.localeRules` para aplicar regras específicas no `validateRules()`. Não há herança por locale — uma única classe com lógica condicional via `switch` exaustivo:
+TypeFields que dependem de localidade (ex: `FBankCode`, `FBankBranch`, `FStateCode`, `FBankAccountNumber`) utilizam `TypeField.localeRegion` para aplicar regras específicas no `validateRules()`. O método `formatted("data")` utiliza `TypeField.localeData` para formatar valores destinados a APIs ou persistência. Não há herança por locale — uma única classe com lógica condicional via `switch` exaustivo:
 
 ```typescript
 protected override validateRules(
@@ -281,7 +281,7 @@ protected override validateRules(
   }
 
   // Validações específicas por locale
-  switch (TypeField.localeRules) {
+  switch (TypeField.localeRegion) {
     case "us":
       break;
     case "br":
@@ -292,7 +292,7 @@ protected override validateRules(
       }
       break;
     default:
-      TypeField.assertNeverLocale(TypeField.localeRules);
+      TypeField.assertNeverLocale(TypeField.localeRegion);
   }
 
   return OK_TRUE;
@@ -304,8 +304,9 @@ protected override validateRules(
 - O `switch` deve ser **exaustivo**: todos os locales suportados devem ter um `case`, e o `default` deve chamar `TypeField.assertNeverLocale()` para garantir verificação em tempo de compilação
 - Regras de localidade são aplicadas apenas quando `validateLevel === "full"`
 - O locale padrão é `"us"` (Estados Unidos)
-- Para configurar o locale, usar `TypeField.configure({ localeRules: "br" })` no bootstrap da aplicação
+- Para configurar o locale, usar `TypeField.configure({ localeRegion: "br", localeData: "br" })` no bootstrap da aplicação
 - Locales suportados: `"us"` (Estados Unidos), `"br"` (Brasil)
+- `localeData` controla formatação para API/persistência via `formatted("data")`
 
 ## Checklist de validação
 
