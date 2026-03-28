@@ -40,5 +40,15 @@ export default {
       id: "testes",
       label: "Testes",
     },
+    {
+      type: "doc",
+      id: "pre-commit",
+      label: "Pre-commit",
+    },
+    {
+      type: "doc",
+      id: "seguranca-framework",
+      label: "Segurança do Framework",
+    },
   ],
 };

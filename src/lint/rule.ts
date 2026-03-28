@@ -4,7 +4,6 @@ export interface IRuleViolation {
   message: string;
   filePath: string;
   line: number;
-  fix?: string;
 }
 
 export abstract class Rule {

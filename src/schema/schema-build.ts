@@ -5,7 +5,7 @@ import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 import { err, ok, Result } from "@tyforge/result";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 import { TypeField } from "@tyforge/type-fields/type-field.base";
-import type { TAssignUnknown } from "./schema-types";
+import type { TAssignFn } from "./schema-types";
 
 // ── Type Guards (zero casts) ────────────────────────────────────
 
@@ -279,10 +279,8 @@ function runSequential<TSchema extends ISchema>(
 export type { IBatchCreateError, IBatchCreateOptions, IBatchCreateResult } from "./schema-types";
 
 export interface ICompiledSchema<TSchema extends ISchema> {
-  create(data: InferJson<TSchema>, path?: string): Result<InferProps<TSchema>, Exceptions>;
-  createUnknown(data: unknown, path?: string): Result<InferProps<TSchema>, Exceptions>;
-  assign(data: InferJson<TSchema>, path?: string): Result<InferProps<TSchema>, Exceptions>;
-  assignUnknown(data: unknown, path?: string): Result<InferProps<TSchema>, Exceptions>;
+  create<T = InferJson<TSchema>>(data: T, path?: string): Result<InferProps<TSchema>, Exceptions>;
+  assign<T = InferJson<TSchema>>(data: T, path?: string): Result<InferProps<TSchema>, Exceptions>;
   batchCreate(items: unknown[], options?: IBatchCreateOptions): IBatchCreateResult<TSchema> | Promise<IBatchCreateResult<TSchema>>;
 }
 
@@ -306,33 +304,28 @@ export class SchemaBuilder {
     const runner = createRunner(schema);
 
     return {
-      create(data: InferJson<TSchema>, path = ""): Result<InferProps<TSchema>, Exceptions> {
+      create<T = InferJson<TSchema>>(data: T, path = ""): Result<InferProps<TSchema>, Exceptions> {
         const result = runner(data, path, "create");
         assertResultType<InferProps<TSchema>>(result);
         return result;
       },
-      createUnknown(data: unknown, path = ""): Result<InferProps<TSchema>, Exceptions> {
-        const result = runner(data, path, "create");
-        assertResultType<InferProps<TSchema>>(result);
-        return result;
-      },
-      assign(data: InferJson<TSchema>, path = ""): Result<InferProps<TSchema>, Exceptions> {
-        const result = runner(data, path, "assign");
-        assertResultType<InferProps<TSchema>>(result);
-        return result;
-      },
-      assignUnknown(data: unknown, path = ""): Result<InferProps<TSchema>, Exceptions> {
+      assign<T = InferJson<TSchema>>(data: T, path = ""): Result<InferProps<TSchema>, Exceptions> {
         const result = runner(data, path, "assign");
         assertResultType<InferProps<TSchema>>(result);
         return result;
       },
       batchCreate(items: unknown[], options?: IBatchCreateOptions): IBatchCreateResult<TSchema> | Promise<IBatchCreateResult<TSchema>> {
-        const concurrency = options?.concurrency ?? 1;
+        if (items.length > 1000000) {
+          throw new Error("Batch size exceeds maximum of 1000000 items");
+        }
+
+        const concurrency = Math.max(1, Math.floor(options?.concurrency ?? 1));
+        const chunkSize = Math.max(1, Math.min(Math.floor(options?.chunkSize ?? 10000), 100000));
 
         // Parallel mode — dynamic import prevents Metro/bundlers from resolving node:worker_threads.
         // In browser/React Native, import() fails or returns null processor — falls back to sequential.
         if (concurrency > 1) {
-          const assignFn: TAssignUnknown<TSchema> = (data) => {
+          const assignFn: TAssignFn<TSchema> = (data) => {
             const r = runner(data, "", "assign");
             assertResultType<InferProps<TSchema>>(r);
             return r;
@@ -344,7 +337,7 @@ export class SchemaBuilder {
               if (processor) {
                 return processor.process(schema, items, {
                   concurrency,
-                  chunkSize: options?.chunkSize ?? 10000,
+                  chunkSize,
                   workerTimeout: options?.workerTimeout,
                 }, assignFn);
               }

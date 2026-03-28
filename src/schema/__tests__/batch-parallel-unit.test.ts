@@ -6,7 +6,7 @@ import { FString } from "@tyforge/type-fields/string.format_vo";
 import { FEmail } from "@tyforge/type-fields/email.format_vo";
 import { FInt } from "@tyforge/type-fields/int.format_vo";
 import { FBoolean } from "@tyforge/type-fields/boolean.format_vo";
-import type { ISchema, IParallelProcessor, TAssignUnknown } from "@tyforge/schema/schema-types";
+import type { ISchema, IParallelProcessor, TAssignFn } from "@tyforge/schema/schema-types";
 
 // ── Schemas ─────────────────────────────────────────────────────
 
@@ -132,9 +132,9 @@ describe("batchCreate — parallel", () => {
 
 describe("ParallelBatchProcessor", () => {
   let processor: IParallelProcessor;
-  const assignSimple: TAssignUnknown<typeof simpleSchema> = (data) => validator.assignUnknown(data);
+  const assignSimple: TAssignFn<typeof simpleSchema> = (data) => validator.assign<unknown>(data);
   const nestedValidator = SchemaBuilder.compile(nestedSchema);
-  const assignNested: TAssignUnknown<typeof nestedSchema> = (data) => nestedValidator.assignUnknown(data);
+  const assignNested: TAssignFn<typeof nestedSchema> = (data) => nestedValidator.assign<unknown>(data);
 
   before(() => {
     const created = createParallelProcessor();

@@ -14,12 +14,12 @@ function HomepageHeader() {
           TyForge
         </h1>
         <p className={styles.heroSubtitle}>
-          Validacao de schemas type-safe, Result pattern e building blocks DDD para TypeScript.
+          Validação de schemas type-safe, Result pattern e building blocks DDD para TypeScript.
         </p>
         <code className={styles.heroInstall}>npm install tyforge</code>
         <div className={styles.heroButtons}>
           <Link className={styles.btnPrimary} to="/guia/introducao">
-            Ver Documentacao
+            Ver Documentação
           </Link>
           <Link className={styles.btnOutline} to="https://github.com/navegar-sistemas/tyforge">
             GitHub
@@ -38,15 +38,15 @@ type FeatureCard = {
 const features: FeatureCard[] = [
   {
     title: 'Result Pattern',
-    description: 'Error handling funcional sem try/catch. ok(), err(), map, flatMap, fold, match e all com inferencia completa.',
+    description: 'Error handling funcional sem try/catch. ok(), err(), map, flatMap, fold, match e all com inferência completa.',
   },
   {
     title: 'Schema Builder',
-    description: 'Validacao compilada de schemas com inferencia de tipos. Modos create (completo) e assign (parcial).',
+    description: 'Validação compilada de schemas com inferência de tipos. Modos create (completo) e assign (parcial).',
   },
   {
     title: 'Type Fields',
-    description: '25+ Value Objects validadores pre-construidos: FString, FEmail, FId, FInt, FDate e muito mais.',
+    description: 'Value Objects validadores pré-construídos: FString, FEmail, FMoney, FCurrency, FDocumentCpf e muito mais.',
   },
   {
     title: 'Domain Models',
@@ -54,11 +54,11 @@ const features: FeatureCard[] = [
   },
   {
     title: 'Exceptions',
-    description: '18 tipos de excecao RFC 7807 com stack trace lazy e factory methods para cenarios comuns.',
+    description: 'Tipos de exceção RFC 7807 com stack trace lazy e factory methods para cenários comuns.',
   },
   {
     title: 'Type-Safe',
-    description: 'Inferencia de tipos completa em todo o pipeline — do JSON de entrada aos props validados.',
+    description: 'Inferência de tipos completa em todo o pipeline — do JSON de entrada aos props validados.',
   },
 ];
 
@@ -66,7 +66,7 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title="TyForge - Navegar Sistemas"
-      description="Documentacao tecnica do TyForge: validacao type-safe, Result pattern, DDD building blocks para TypeScript."
+      description="Documentação técnica do TyForge: validação type-safe, Result pattern, DDD building blocks para TypeScript."
     >
       <HomepageHeader />
       <main className={styles.mainSection}>

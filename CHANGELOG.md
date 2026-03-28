@@ -6,6 +6,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.1.28] - 2026-03-28
+
+### Added
+- ESM output — `"type": "module"` in package.json, `module: "ES2022"` in tsconfig, tsdown as build tool
+- Pre-commit system rewritten in TypeScript OOP (`src/pre-commit/`) — 7 checks (6 blocking + 1 confirmable)
+- `CheckDeprecated` — blocks commit if any dependency is deprecated (uses `execFileSync`, deduplication)
+- `CheckVersions` — pinned version enforcement, npm outdated/audit cross-reference, Docker Hub API version check, CSP workaround monitor
+- `generate-csp.js` — post-build script extracts SHA-256 hashes of inline scripts, replaces `unsafe-inline` in nginx CSP
+- Contributing docs: `pre-commit.md`, `seguranca-framework.md` — new pages documenting pre-commit architecture and framework security hardening
+- `TypeGuard.isNumber()` — rejects `Infinity`/`-Infinity` with `Number.isFinite()` (matches `extractNumber()`)
+- `ToolObjectTransform.flatten()` — `maxDepth` parameter (default 100) with negative value validation
+- `ToolFileDiscovery.walkDirectory()` — skips symlinks to prevent directory traversal
+- Batch processing limits: batchCreate max 1M items, worker max 100K per chunk, concurrency 1-16, workerTimeout 1s-300s
+- `DANGEROUS_KEYS` filter in `batch-worker.ts` deserializeSchema (prototype pollution prevention)
+- HSTS header in nginx.conf (server + location blocks)
+- Gzip compression in nginx.conf
+- `package.json` files excludes `dist/**/*.js.map` from npm package
+
+### Changed
+- **BREAKING:** Output format changed from CommonJS to ESM (`"type": "module"`)
+- **BREAKING:** Build tool changed from `tsc && tsc-alias` to `tsdown`
+- **BREAKING:** `uuid` updated from ^11 (CJS) to 13.0.0 (ESM-only, types included)
+- **BREAKING:** `@types/uuid` removed (uuid v13 includes own types)
+- TypeScript updated from 5.9.3 to 6.0.2
+- React updated from 18.3.1 to 19.2.4
+- Docusaurus updated from 3.8.1 to 3.9.2 (all packages aligned)
+- Node Docker images updated to 24.14.1-alpine (8 CVEs fixed)
+- Nginx Docker image updated to 1.28.3-alpine (9 CVEs fixed)
+- All dependency versions pinned (no `^`, `~`, `>=` in any package.json)
+- `serialize-javascript` vulnerability resolved via npm overrides (7.0.5)
+- `.husky/pre-commit` reduced to 2 lines (`npx tsx src/pre-commit/index.ts`)
+- All `execSync` in pre-commit replaced with `execFileSync` (command injection prevention)
+- Worker threads: `removeAllListeners()` + `await terminate()` in finally, timeout rejects Promise
+- `batch-worker.ts` imports reordered, `parentPort?.postMessage` → `port.postMessage`
+- `SchemaBuilder.compile()` — `create<T>` and `assign<T>` with generics (removed `createUnknown`/`assignUnknown`)
+- `TAssignUnknown` renamed to `TAssignFn`
+- `file-discovery.tool.ts` — glob `?` now matches `[^/]` (not `/`)
+- Docker: `USER nginx` (prod) and `USER node` (dev) — no longer runs as root
+- Dockerfile smoke tests: `nginx -t` + `index.html` exists + CSP verification
+- Contributing docs: `docker.md` rewritten, `desenvolvimento.md` updated with ESM/TS6/React19/pre-commit
+- Removed numeric counts from all documentation (TypeFields, exceptions) to prevent staleness
+
+### Fixed
+- 0 npm vulnerabilities (root + docs)
+- CSP `unsafe-inline` replaced with SHA-256 hashes for inline scripts (generated per build)
+- Non-interactive terminal now blocks commit instead of auto-approving
+
 ## [0.1.27] - 2026-03-27
 
 ### Added
@@ -198,15 +245,4 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 - DTOs split into `DtoReq` (request) and `DtoRes` (response)
 - `IMapper` with `toDomainPaginated()` method
 - `IRepositoryBase` with bulk operations and pagination
-
-## [0.1.4] - 2026-03-20
-
-### Added
-- DDD checklist with 60 artifacts
-- Complete test coverage for all examples
-- Canonical naming conventions (F, T, I, O, Dto, DtoReq, DtoRes, Event, Exception, Repository, Mapper)
-
-### Changed
-- Schema builder hot path optimized
-- Node.js engine bumped to >=24
 

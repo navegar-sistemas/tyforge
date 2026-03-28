@@ -47,6 +47,11 @@ export default {
           id: "schema/tipos",
           label: "Inferência de Tipos",
         },
+        {
+          type: "doc",
+          id: "schema/batch-create",
+          label: "Batch Create",
+        },
       ],
     },
     {

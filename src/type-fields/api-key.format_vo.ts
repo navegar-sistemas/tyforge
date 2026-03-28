@@ -98,7 +98,7 @@ export class FApiKey extends TypeField<TApiKey, TApiKeyFormatted> {
   }
 
   override getDescription(): string {
-    return "Chave de API no formato UUID v4 para autenticacao de aplicacoes cliente.";
+    return "API key in UUID v4 format for client application authentication.";
   }
 
   override getShortDescription(): string {

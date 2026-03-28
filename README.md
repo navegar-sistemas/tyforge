@@ -4,7 +4,7 @@
 
 [![npm version](https://img.shields.io/npm/v/tyforge)](https://www.npmjs.com/package/tyforge)
 [![license](https://img.shields.io/npm/l/tyforge)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D24-green)](https://nodejs.org/)
 
 Type-safe schema validation, Result pattern and DDD building blocks for TypeScript.
@@ -166,7 +166,7 @@ const final = price.subtract(discount); // 850 cents
 ### Domain Models — Entity, Aggregate, Domain Events
 
 ```typescript
-import { SchemaBuilder, FId, FString, FEmail, isSuccess, isFailure } from "tyforge";
+import { SchemaBuilder, FId, FString, FEmail, ok, isFailure } from "tyforge";
 import { Aggregate, DomainEvent } from "tyforge";
 import type { ISchema, InferProps, InferJson } from "tyforge";
 
@@ -349,9 +349,9 @@ npx tyforge-lint --init       # setup pre-commit hooks (Husky/Lefthook/native)
 |--------|-------------|
 | **Result Pattern** | `ok()`, `err()`, `map`, `flatMap`, `fold`, `match`, `all`, `allSettled`, `toPromise` — functional error handling with zero exceptions |
 | **Schema Builder** | Compiled schema validation with `InferProps`/`InferJson` type inference, nested objects, arrays, `batchCreate`, `composeSchema` |
-| **Type Fields** | 50+ validator Value Objects — strings, emails, currency, banking, documents, PIX, security, enums, dates, identifiers |
+| **Type Fields** | Validator Value Objects — strings, emails, currency, banking, documents, PIX, security, enums, dates, identifiers |
 | **Domain Models** | Entity, ValueObject, Aggregate (with domain events), Dto, DtoReq, DtoRes — full DDD building blocks |
-| **Exceptions** | 18 RFC 7807 exception types with lazy stack trace and `OHttpStatus` constants |
+| **Exceptions** | RFC 7807 exception types with lazy stack trace and `OHttpStatus` constants |
 | **Application** | UseCase, IMapper, Saga, DomainEventDispatcher, CQRS interfaces |
 | **Infrastructure** | IRepositoryBase, IRepositoryRead, Paginated, IUnitOfWork, IOutbox |
 | **Tools** | TypeGuard, ToolObjectTransform (flatten/unflatten), ToolCliParser, ToolFileDiscovery, ToolGit |

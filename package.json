@@ -1,6 +1,6 @@
 {
   "name": "tyforge",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "description": "Type-safe schema validation, Result pattern, and DDD building blocks for TypeScript",
   "keywords": [
     "typescript",
@@ -28,31 +28,32 @@
   "bugs": {
     "url": "https://github.com/navegar-sistemas/tyforge/issues"
   },
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.js",
+      "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
     "./result": {
-      "require": "./dist/result/index.js",
+      "import": "./dist/result/index.js",
       "types": "./dist/result/index.d.ts"
     },
     "./type-fields": {
-      "require": "./dist/type-fields/index.js",
+      "import": "./dist/type-fields/index.js",
       "types": "./dist/type-fields/index.d.ts"
     },
     "./exceptions": {
-      "require": "./dist/exceptions/index.js",
+      "import": "./dist/exceptions/index.js",
       "types": "./dist/exceptions/index.d.ts"
     },
     "./schema": {
-      "require": "./dist/schema/index.js",
+      "import": "./dist/schema/index.js",
       "types": "./dist/schema/index.d.ts"
     },
     "./tools": {
-      "require": "./dist/tools/index.js",
+      "import": "./dist/tools/index.js",
       "types": "./dist/tools/index.d.ts"
     }
   },
@@ -65,6 +66,7 @@
   "sideEffects": false,
   "files": [
     "dist",
+    "!dist/**/*.js.map",
     "README.md",
     "README.pt-BR.md",
     "LICENSE"
@@ -73,7 +75,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc && tsc-alias",
+    "build": "tsdown",
     "prepublishOnly": "npm run build",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test src/**/*.test.ts",
@@ -81,15 +83,14 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "uuid": "^11.1.0"
+    "uuid": "13.0.0"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0",
-    "@types/uuid": "^10.0.0",
-    "husky": "^9.1.7",
-    "tsc-alias": "^1.8.16",
-    "tsx": "^4.21.0",
-    "typescript": "^5.7.3"
+    "@types/node": "25.5.0",
+    "husky": "9.1.7",
+    "tsdown": "0.21.6",
+    "tsx": "4.21.0",
+    "typescript": "6.0.2"
   },
   "engines": {
     "node": ">=24"

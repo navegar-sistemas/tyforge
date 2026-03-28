@@ -26,13 +26,15 @@ if (cwdArg) {
 }
 
 if (cli.hasFlag("--init")) {
-  const mod = cli.hasFlag("--update")
-    ? require("./cli/update-command")
-    : require("./cli/init-command");
-  const Command = cli.hasFlag("--update") ? mod.UpdateCommand : mod.InitCommand;
-  new Command().execute().then(() => process.exit(0)).catch(() => process.exit(1));
+  if (cli.hasFlag("--update")) {
+    const { UpdateCommand } = await import("./cli/update-command");
+    new UpdateCommand().execute().then(() => process.exit(0)).catch(() => process.exit(1));
+  } else {
+    const { InitCommand } = await import("./cli/init-command");
+    new InitCommand().execute().then(() => process.exit(0)).catch(() => process.exit(1));
+  }
 } else if (cli.hasFlag("--uninstall")) {
-  const { UninstallCommand } = require("./cli/uninstall-command");
+  const { UninstallCommand } = await import("./cli/uninstall-command");
   new UninstallCommand().execute().then(() => process.exit(0)).catch(() => process.exit(1));
 } else {
   const config = loadLintConfig(cli.getFlagValue("--config"));

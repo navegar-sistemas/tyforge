@@ -17,7 +17,7 @@ Todos os identificadores públicos devem seguir o sistema de prefixos abaixo. O 
 | `T` | Types (type aliases) | `TUserProps`, `TUserJson`, `TFloat` |
 | `I` | Interfaces | `ISchema`, `IMapper`, `IRepositoryBase` |
 | `O` | Objetos const enum (`as const`) | `OAppStatus`, `OHttpStatus`, `OGender` |
-| `E` | Pure const enums (TS `const enum`) | `EFieldKind`, `EValidationMode` |
+| `E` | Pure const enums (TS `const enum`) | `EFieldKind` |
 | `Dto` | DTOs genéricos | `DtoCreateUser` |
 | `DtoReq` | DTOs de request | `DtoReqCreateUser`, `DtoReqLogin` |
 | `DtoRes` | DTOs de response | `DtoResUserProfile` |

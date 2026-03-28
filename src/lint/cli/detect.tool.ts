@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 const CI_ENV_VARS = [
@@ -61,7 +62,8 @@ export class ToolDetect {
 
   static getPackageVersion(): string {
     try {
-      const pkgPath = path.resolve(__dirname, "..", "..", "..", "package.json");
+      const currentDir = path.dirname(fileURLToPath(import.meta.url));
+      const pkgPath = path.resolve(currentDir, "..", "..", "..", "package.json");
       const content = fs.readFileSync(pkgPath, "utf-8");
       const parsed: unknown = JSON.parse(content);
       if (TypeGuard.isRecord(parsed)) {

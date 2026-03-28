@@ -2,7 +2,7 @@
 // process() to avoid crashing bundlers like Metro (React Native) that resolve
 // all top-level require() calls at build time — even for unused code paths.
 
-import type { ISchema, InferProps, IParallelProcessor, IBatchCreateResult, IBatchCreateError, TAssignUnknown } from "./schema-types";
+import type { ISchema, InferProps, IParallelProcessor, IBatchCreateResult, IBatchCreateError, TAssignFn } from "./schema-types";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { isFailure } from "@tyforge/result/result";
 import { TypeGuard } from "@tyforge/tools/type_guard";
@@ -25,6 +25,7 @@ interface IWorkerResult {
 interface IWorkerHandle {
   on(event: "message", listener: (value: IWorkerResult) => void): void;
   on(event: "error", listener: (err: Error) => void): void;
+  removeAllListeners(): void;
   postMessage(value: unknown): void;
   terminate(): Promise<number>;
 }
@@ -40,44 +41,61 @@ class ParallelBatchProcessor implements IParallelProcessor {
     schema: TSchema,
     items: unknown[],
     options: { concurrency: number; chunkSize: number; workerTimeout?: number },
-    assignUnknown: TAssignUnknown<TSchema>,
+    assignFn: TAssignFn<TSchema>,
   ): Promise<IBatchCreateResult<TSchema>> {
     const { Worker } = await import("node:worker_threads");
     const nodePath = await import("node:path");
     const nodeOs = await import("node:os");
+    const { fileURLToPath } = await import("node:url");
 
-    const ext = nodePath.extname(__filename);
-    const workerPath = nodePath.resolve(__dirname, `batch-worker${ext}`);
+    const currentFile = fileURLToPath(import.meta.url);
+    const currentDir = nodePath.dirname(currentFile);
+    const ext = nodePath.extname(currentFile);
     const isTs = ext === ".ts";
 
+    // In dev (.ts), tsx ESM loader does not fully support worker threads.
+    // Use compiled dist/ which has .js extensions and runs as native ESM.
+    let resolvedWorkerPath: string;
+    if (isTs) {
+      const distWorkerPath = nodePath.resolve(currentDir, "..", "..", "dist", "schema", "batch-worker.js");
+      const nodeFs = await import("node:fs");
+      try {
+        nodeFs.accessSync(distWorkerPath);
+        resolvedWorkerPath = distWorkerPath;
+      } catch {
+        resolvedWorkerPath = nodePath.resolve(currentDir, `batch-worker${ext}`);
+      }
+    } else {
+      resolvedWorkerPath = nodePath.resolve(currentDir, `batch-worker${ext}`);
+    }
+
     const createWorker: TWorkerFactory = () => {
-      if (isTs) return new Worker(workerPath, { execArgv: ["--require", "tsx/cjs"] });
-      return new Worker(workerPath);
+      return new Worker(resolvedWorkerPath);
     };
 
     const serializedSchema = this.serializeSchema(schema);
     const chunks = this.splitChunks(items, options.chunkSize);
     const maxConcurrency = Math.min(options.concurrency, nodeOs.cpus().length, 16);
     const workerCount = Math.min(maxConcurrency, chunks.length);
-    const timeout = options.workerTimeout ?? 30000;
+    const timeout = Math.max(1000, Math.min(options.workerTimeout ?? 30000, 300000));
 
     const workerResults = await this.runWorkers(serializedSchema, chunks, workerCount, createWorker, timeout);
 
-    return this.reconstructResults<TSchema>(workerResults, assignUnknown);
+    return this.reconstructResults<TSchema>(workerResults, assignFn);
   }
 
   private serializeSchema(schema: Record<string, unknown>): Record<string, unknown> {
     const serialized: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(schema)) {
-      if (TypeGuard.isRecord(value) && "type" in value) {
+      if (TypeGuard.isRecord(value) && Object.prototype.hasOwnProperty.call(value, "type")) {
         const typeClass = value["type"];
         if (TypeGuard.isCallable(typeClass)) {
           serialized[key] = { ...value, type: typeClass.name };
         }
       } else if (Array.isArray(value) && value.length === 1) {
         const entry = value[0];
-        if (TypeGuard.isRecord(entry) && "type" in entry) {
+        if (TypeGuard.isRecord(entry) && Object.prototype.hasOwnProperty.call(entry, "type")) {
           const typeClass = entry["type"];
           if (TypeGuard.isCallable(typeClass)) {
             serialized[key] = [{ ...entry, type: typeClass.name }];
@@ -92,10 +110,11 @@ class ParallelBatchProcessor implements IParallelProcessor {
   }
 
   private splitChunks(items: unknown[], chunkSize: number): { items: unknown[]; startIndex: number }[] {
+    const safeChunkSize = Math.max(1, Math.min(chunkSize, items.length || 1));
     const chunks: { items: unknown[]; startIndex: number }[] = [];
-    for (let i = 0; i < items.length; i += chunkSize) {
+    for (let i = 0; i < items.length; i += safeChunkSize) {
       chunks.push({
-        items: items.slice(i, i + chunkSize),
+        items: items.slice(i, i + safeChunkSize),
         startIndex: i,
       });
     }
@@ -133,13 +152,18 @@ class ParallelBatchProcessor implements IParallelProcessor {
               items: chunk.items,
               startIndex: chunk.startIndex,
             });
+            timer = setTimeout(() => {
+              worker.removeAllListeners();
+              worker.terminate();
+              reject(new Error("Worker timed out after " + workerTimeout + "ms"));
+            }, workerTimeout);
           });
-          timer = setTimeout(() => { worker.terminate(); }, workerTimeout);
           const result = await workerDone;
           resultMap.set(localIndex, result);
         } finally {
           clearTimeout(timer);
-          worker.terminate();
+          worker.removeAllListeners();
+          await worker.terminate();
           const idx = activeWorkers.indexOf(worker);
           if (idx !== -1) activeWorkers.splice(idx, 1);
         }
@@ -167,7 +191,7 @@ class ParallelBatchProcessor implements IParallelProcessor {
 
   private reconstructResults<TSchema extends ISchema>(
     workerResults: IWorkerResult[],
-    assignUnknown: TAssignUnknown<TSchema>,
+    assignFn: TAssignFn<TSchema>,
   ): IBatchCreateResult<TSchema> {
     const allSuccesses: { index: number; value: InferProps<TSchema> }[] = [];
     const allFailures: IBatchCreateError[] = [];
@@ -178,7 +202,7 @@ class ParallelBatchProcessor implements IParallelProcessor {
           allFailures.push({ index: success.index, error: ExceptionValidation.create("root", "Expected object from worker") });
           continue;
         }
-        const assigned = assignUnknown(success.value);
+        const assigned = assignFn(success.value);
         if (isFailure(assigned)) {
           allFailures.push({ index: success.index, error: assigned.error });
         } else {

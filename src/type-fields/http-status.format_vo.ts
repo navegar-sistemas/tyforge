@@ -9,7 +9,8 @@ import {
   THttpStatus,
 } from "@tyforge/constants/http-status.constants";
 
-export { OHttpStatus, TKeyHttpStatus, THttpStatus };
+export { OHttpStatus };
+export type { TKeyHttpStatus, THttpStatus };
 export type THttpStatusFormatted = string;
 
 export class FHttpStatus extends TypeField<THttpStatus, THttpStatusFormatted> {

@@ -80,7 +80,7 @@ export class FBearer extends TypeField<TBearer, TBearerFormatted> {
   }
 
   override getDescription(): string {
-    return "Token de acesso Bearer para autenticação em APIs e serviços. Deve ser uma string JWT válida que contém informações de autorização e identidade do usuário. Utilizado para autenticação e autorização em requisições HTTP.";
+    return "Bearer access token for API authentication. Must be a valid JWT string.";
   }
 
   override getShortDescription(): string {

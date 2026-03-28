@@ -13,7 +13,6 @@ export type TJsonSchemaType =
 interface BaseConfig {
   jsonSchemaType: TJsonSchemaType;
   serializeAsString?: boolean;
-  trimOnNormalize?: boolean;
 }
 
 interface StringConfig extends BaseConfig {

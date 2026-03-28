@@ -38,6 +38,7 @@ export class ToolFileDiscovery {
       return results;
     }
     for (const entry of entries) {
+      if (entry.isSymbolicLink()) continue;
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory()) {
         if (entry.name === "node_modules" || entry.name === ".git") continue;
@@ -59,7 +60,8 @@ export class ToolFileDiscovery {
       .replace(/[.+^${}()|[\]\\]/g, "\\$&")
       .replace(/\*\*/g, "{{GLOBSTAR}}")
       .replace(/\*/g, "[^/]*")
-      .replace(/\{\{GLOBSTAR\}\}/g, ".*");
+      .replace(/\{\{GLOBSTAR\}\}/g, ".*")
+      .replace(/\?/g, "[^/]");
     return new RegExp(regexStr).test(filePath);
   }
 }

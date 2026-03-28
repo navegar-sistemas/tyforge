@@ -1,6 +1,6 @@
 ---
 id: introducao
-title: Introducao
+title: Introdução
 sidebar_position: 1
 ---
 
@@ -8,17 +8,17 @@ import MermaidDiagram from '@site/src/components/MermaidDiagram';
 
 # TyForge — Type-safe Validation Library
 
-**TyForge** e uma biblioteca TypeScript para validacao de schemas com seguranca de tipos, Result pattern e blocos de construcao para Domain-Driven Design, desenvolvida pela [Navegar Sistemas](https://github.com/navegar-sistemas).
+**TyForge** é uma biblioteca TypeScript para validação de schemas com segurança de tipos, Result pattern e blocos de construção para Domain-Driven Design, desenvolvida pela [Navegar Sistemas](https://github.com/navegar-sistemas).
 
-Toda operacao de validacao retorna um `Result<T, E>` em vez de lancar excecoes, garantindo tratamento de erros explicito e composicional em todo o fluxo da aplicacao.
+Toda operação de validação retorna um `Result<T, E>` em vez de lançar exceções, garantindo tratamento de erros explícito e composicional em todo o fluxo da aplicação.
 
-## Instalacao
+## Instalação
 
 ```bash
 npm install tyforge
 ```
 
-## Inicio rapido
+## Início rápido
 
 ```typescript
 import {
@@ -56,17 +56,17 @@ if (isFailure(result)) {
 }
 ```
 
-## Visao geral dos modulos
+## Visão geral dos módulos
 
-| Modulo | Descricao |
+| Módulo | Descrição |
 |--------|-----------|
 | **Result Pattern** | Tratamento de erros funcional com `ok()`, `err()`, `map`, `flatMap`, `fold`, `match`, `all` |
-| **Schema Builder** | Validacao compilada de schemas com inferencia completa de tipos |
-| **Type Fields** | 25+ Value Objects validadores (`FString`, `FEmail`, `FId`, `FInt`, `FDate`...) |
+| **Schema Builder** | Validação compilada de schemas com inferência completa de tipos |
+| **Type Fields** | Value Objects validadores (`FString`, `FEmail`, `FId`, `FMoney`, `FCurrency`, `FDocumentCpf`...) |
 | **Domain Models** | `Entity`, `ValueObject`, `Aggregate` com domain events, `Dto` |
-| **Exceptions** | 18 tipos RFC 7807 com stack trace lazy |
+| **Exceptions** | Tipos RFC 7807 com stack trace lazy |
 
-## Arquitetura de modulos
+## Arquitetura de módulos
 
 <MermaidDiagram chart={`
 graph TD
@@ -85,20 +85,20 @@ graph TD
   TypeFields --> DomainModels
 `} />
 
-O modulo **Result** e a base de toda a biblioteca — todos os demais modulos retornam `Result<T, E>` em suas operacoes de criacao e validacao. Os **Type Fields** consomem Result e Exceptions para validar valores primitivos, e sao utilizados tanto pelo **Schema Builder** (composicao de schemas) quanto pelos **Domain Models** (entidades e agregados).
+O módulo **Result** é a base de toda a biblioteca — todos os demais módulos retornam `Result<T, E>` em suas operações de criação e validação. Os **Type Fields** consomem Result e Exceptions para validar valores primitivos, e são utilizados tanto pelo **Schema Builder** (composição de schemas) quanto pelos **Domain Models** (entidades e agregados).
 
-## Stack tecnica
+## Stack técnica
 
 | Item | Detalhe |
 |------|---------|
-| Linguagem | TypeScript 5.7 |
-| Formato | CommonJS (ES2022) |
-| Runtime | Node >= 18 |
-| Dependencia | `uuid` (unica dependencia de producao) |
+| Linguagem | TypeScript |
+| Formato | ESM (ES2022) |
+| Runtime | Node >= 24 |
+| Dependência | `uuid` (única dependência de produção) |
 
-## Proximos passos
+## Próximos passos
 
-- [Visao Geral da Arquitetura](/contribuindo/arquitetura)
+- [Visão Geral da Arquitetura](/contribuindo/arquitetura)
 - [Result Pattern](/guia/result/visao-geral)
 - [Schema Builder](/guia/schema/visao-geral)
 - [Type Fields](/guia/type-fields/visao-geral)

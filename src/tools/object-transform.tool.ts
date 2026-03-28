@@ -3,12 +3,13 @@ import { TypeGuard } from "@tyforge/tools/type_guard";
 const DANGEROUS_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 
 export class ToolObjectTransform {
-  static flatten(obj: Record<string, unknown>, prefix = ""): Map<string, unknown> {
+  static flatten(obj: Record<string, unknown>, prefix = "", maxDepth = 100, depth = 0): Map<string, unknown> {
+    const safeMaxDepth = Math.max(1, maxDepth);
     const result = new Map<string, unknown>();
     for (const [key, val] of Object.entries(obj)) {
       const fullKey = prefix ? `${prefix}.${key}` : key;
-      if (TypeGuard.isRecord(val)) {
-        for (const [k, v] of ToolObjectTransform.flatten(val, fullKey)) {
+      if (TypeGuard.isRecord(val) && depth < safeMaxDepth) {
+        for (const [k, v] of ToolObjectTransform.flatten(val, fullKey, safeMaxDepth, depth + 1)) {
           result.set(k, v);
         }
       } else {

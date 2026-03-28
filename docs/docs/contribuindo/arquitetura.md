@@ -19,8 +19,8 @@ graph TD
   TypeFields["Type Fields<br/><i>depende de Result, Exceptions, TypeGuard</i>"]
   Schema["Schema Builder<br/><i>depende de TypeFields, Result, Exceptions</i>"]
   DomainModels["Domain Models<br/><i>depende de TypeFields, Result</i>"]
-  Application["Application<br/><i>UseCase, IMapper, CQRS</i>"]
-  Infrastructure["Infrastructure<br/><i>IRepositoryBase, Paginated, IUnitOfWork</i>"]
+  Application["Application<br/><i>UseCase, IMapper, CQRS e outros</i>"]
+  Infrastructure["Infrastructure<br/><i>IRepositoryBase, Paginated, IUnitOfWork e outros</i>"]
 
   Result --> Exceptions
   Result --> Tools
@@ -103,8 +103,8 @@ TypeFields se compõem em Entities, que se compõem em Aggregates. Cada nível r
 ```
 src/
   result/          — Result<T, E>, ok(), err(), map, flatMap, fold, match, all
-  exceptions/      — 18 tipos de exceção RFC 7807
-  type-fields/     — TypeField<TPrimitive, TFormatted> e 50+ implementações
+  exceptions/      — Tipos de exceção RFC 7807
+  type-fields/     — TypeField<TPrimitive, TFormatted> e implementações
   schema/          — SchemaBuilder.compile() e tipos de inferência
   domain-models/   — Entity, ValueObject, Aggregate, Dto, DomainEvent
   application/     — UseCase, IMapper, CQRS
@@ -120,8 +120,8 @@ src/
 | Diretório | Responsabilidade |
 |-----------|-----------------|
 | `result/` | Tipo `Result<T, E>` e funções utilitárias (`ok`, `err`, `isSuccess`, `isFailure`, `map`, `flatMap`, `fold`, `match`, `getOrElse`, `orElse`, `all`, `toPromise`) |
-| `exceptions/` | 18 tipos de exceção baseados em RFC 7807 (`ExceptionValidation`, `ExceptionBusiness`, `ExceptionNotFound`, `ExceptionDb`, `ExceptionAuth`, `ExceptionUnexpected` e outros) |
-| `type-fields/` | Classe base `TypeField<TPrimitive, TFormatted>` e 50+ implementações concretas como `FString`, `FEmail`, `FId`, `FInt`, `FBoolean`, `FDate*`, `FMoney`, `FPassword`, `FPixKey`, `FDocumentCpf` etc. |
+| `exceptions/` | Tipos de exceção baseados em RFC 7807 (`ExceptionValidation`, `ExceptionBusiness`, `ExceptionNotFound`, `ExceptionDb`, `ExceptionAuth`, `ExceptionUnexpected` e outros) |
+| `type-fields/` | Classe base `TypeField<TPrimitive, TFormatted>` e implementações concretas como `FString`, `FEmail`, `FId`, `FInt`, `FBoolean`, `FDate*`, `FMoney`, `FPassword`, `FPixKey`, `FDocumentCpf` etc. |
 | `schema/` | `SchemaBuilder` com método `compile()`, tipos de inferência `InferJson` e `InferProps`, batch processing |
 | `domain-models/` | Classes base `Entity`, `ValueObject`, `Aggregate` (com domain events), `Dto` e `DomainEvent` |
 | `application/` | `UseCase` (recebe Dto, retorna domain model), `IMapper` (conversão Domain/Persistência), CQRS |
@@ -136,10 +136,9 @@ src/
 npm run build
 ```
 
-O comando executa `tsc && tsc-alias`:
+O comando executa `tsdown`:
 
-1. **tsc** — compila TypeScript para JavaScript (CommonJS, ES2022) com declaration maps.
-2. **tsc-alias** — resolve os path aliases `@tyforge/*` para caminhos relativos no output.
+1. **tsdown** — compila TypeScript para JavaScript (ESM, ES2022) com declaration maps e resolve os path aliases `@tyforge/*` automaticamente.
 
 ### Path aliases
 
@@ -153,14 +152,14 @@ Os aliases são definidos no `tsconfig.json`:
 }
 ```
 
-Durante o desenvolvimento, `@tyforge/result` resolve para `src/result`. No build, `tsc-alias` converte para caminhos relativos (`./result`).
+Durante o desenvolvimento, `@tyforge/result` resolve para `src/result`. No build, tsdown resolve path aliases automaticamente para caminhos relativos (`./result`).
 
 ### Output
 
 | Propriedade | Valor |
 |-------------|-------|
-| Formato | CommonJS |
+| Formato | ESM |
 | Target | ES2022 |
 | Diretório | `dist/` |
 | Declarations | `.d.ts` com declaration maps |
-| Source maps | Habilitados |
+| Source maps | Desabilitados (produção) |

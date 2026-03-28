@@ -149,11 +149,11 @@ export class TypeGuard {
     max = Number.MAX_SAFE_INTEGER,
     decimalPrecision = Infinity,
   ): Result<true, ExceptionValidation> {
-    if (typeof value !== "number" || isNaN(value)) {
+    if (typeof value !== "number" || isNaN(value) || !Number.isFinite(value)) {
       return err(
         ExceptionValidation.create(
           fieldPath,
-          "O valor deve ser um número válido.",
+          "Value must be a valid finite number.",
         ),
       );
     }
@@ -394,6 +394,9 @@ export class TypeGuard {
   static extractNumber(value: unknown, fieldPath: string, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER): Result<number, ExceptionValidation> {
     if (typeof value !== "number" || isNaN(value)) {
       return err(ExceptionValidation.create(fieldPath, "O valor deve ser um número válido."));
+    }
+    if (!Number.isFinite(value)) {
+      return err(ExceptionValidation.create(fieldPath, "O valor deve ser um número finito."));
     }
     if (value < min) {
       return err(ExceptionValidation.create(fieldPath, `O valor deve ser no mínimo ${min}.`));

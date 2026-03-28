@@ -1,7 +1,9 @@
 import { parentPort } from "node:worker_threads";
 import { SchemaBuilder } from "./schema-build";
 import type { ISchema, IFieldConfig } from "./schema-types";
-import { TypeGuard } from "@tyforge/tools/type_guard";
+import { TypeGuard } from "../tools/type_guard";
+import { isFailure } from "@tyforge/result/result";
+import * as typeFields from "@tyforge/type-fields";
 
 function isFieldType(value: unknown): value is IFieldConfig["type"] {
   if (TypeGuard.isRecord(value)) return true;
@@ -16,8 +18,6 @@ function buildFieldEntry(serialized: Record<string, unknown>, fieldType: IFieldC
   if (isArr === true || isArr === false) entry.isArray = isArr;
   return entry;
 }
-import { isFailure } from "@tyforge/result/result";
-import * as typeFields from "@tyforge/type-fields";
 
 const FIELD_REGISTRY: Record<string, unknown> = typeFields;
 
@@ -42,10 +42,13 @@ interface IWorkerResult {
   failures: IWorkerFailure[];
 }
 
+const DANGEROUS_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
 function deserializeSchema(raw: Record<string, unknown>): ISchema {
   const schema: ISchema = {};
 
   for (const [key, value] of Object.entries(raw)) {
+    if (DANGEROUS_KEYS.has(key)) continue;
     if (TypeGuard.isRecord(value) && "type" in value) {
       const typeName = value["type"];
       const nameCheck = TypeGuard.isString(typeName, key);
@@ -95,6 +98,11 @@ if (parentPort) {
     const indexCheck = TypeGuard.isNumber(msg.startIndex, "startIndex");
     if (isFailure(indexCheck)) { postError(port, "Invalid worker message: startIndex must be a number"); return; }
 
+    if (msg.items.length > 100000) {
+      port.postMessage({ successes: [], failures: [{ index: 0, error: { detail: "Chunk exceeds maximum size of 100000 items" } }] });
+      return;
+    }
+
     const schema = deserializeSchema(msg.schema);
     const compiled = SchemaBuilder.compile(schema);
 
@@ -107,7 +115,7 @@ if (parentPort) {
         failures.push({ index: msg.startIndex + i, error: { detail: "Expected object" } });
         continue;
       }
-      const result = compiled.createUnknown(item);
+      const result = compiled.create<unknown>(item);
       if (result.success) {
         successes.push({ index: msg.startIndex + i, value: item });
       } else {

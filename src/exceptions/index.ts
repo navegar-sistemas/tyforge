@@ -1,5 +1,6 @@
 export { ExceptionAuth } from "./auth.exception";
-export { Exceptions, IExceptionDetails } from "./base.exceptions";
+export { Exceptions } from "./base.exceptions";
+export type { IExceptionDetails } from "./base.exceptions";
 export { ExceptionBooleanInvalid } from "./boolean.exception";
 export { ExceptionBusiness } from "./business.exception";
 export { ExceptionDate } from "./date.exception";

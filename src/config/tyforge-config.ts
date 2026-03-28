@@ -44,6 +44,8 @@ function validateAndBuildConfig(raw: unknown, filePath: string): ITyForgeConfig 
 
   const flat = ToolObjectTransform.flatten(raw);
 
+  const lint = raw["lint"];
+
   return {
     schema: {
       validate: {
@@ -51,6 +53,7 @@ function validateAndBuildConfig(raw: unknown, filePath: string): ITyForgeConfig 
         assign: validateLevel(flat, "schema.validate.assign", "type"),
       },
     },
+    lint: TypeGuard.isRecord(lint) ? lint : undefined,
   };
 }
 
@@ -70,5 +73,3 @@ export function loadTyForgeConfig(configPath?: string): ITyForgeConfig {
   }
   return validateAndBuildConfig(parsed, filePath);
 }
-
-export const tyforgeConfig = loadTyForgeConfig();

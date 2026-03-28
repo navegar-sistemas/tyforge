@@ -3,7 +3,7 @@ import { TypeGuard } from "@tyforge/tools/type_guard";
 import { ExceptionValidation } from "@tyforge/exceptions";
 import { ITypeFieldConfig } from "./type-field.config";
 
-export { TJsonSchemaType } from "./type-field.config";
+export type { TJsonSchemaType } from "./type-field.config";
 
 export type TValidationLevel = "full" | "type" | "none";
 export type TLocaleDisplay = "us" | "br";

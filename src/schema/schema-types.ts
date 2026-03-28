@@ -12,14 +12,14 @@ export type TExposeLevel = typeof OExposeLevel[keyof typeof OExposeLevel];
 // Used by batch-parallel.ts (Node.js) and batch-parallel.browser.ts (stub).
 // schema-build.ts consumes via createParallelProcessor() factory.
 
-export type TAssignUnknown<TSchema extends ISchema> = (data: unknown) => Result<InferProps<TSchema>, Exceptions>;
+export type TAssignFn<TSchema extends ISchema> = (data: unknown) => Result<InferProps<TSchema>, Exceptions>;
 
 export interface IParallelProcessor {
   process<TSchema extends ISchema>(
     schema: TSchema,
     items: unknown[],
     options: { concurrency: number; chunkSize: number; workerTimeout?: number },
-    assignUnknown: TAssignUnknown<TSchema>,
+    assignFn: TAssignFn<TSchema>,
   ): Promise<IBatchCreateResult<TSchema>>;
 }
 
