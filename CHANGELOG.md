@@ -9,7 +9,11 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 ## [0.2.1] - 2026-03-30
 
 ### Added
-- README.md em todos os pacotes (`packages/tyforge`, `packages/http`, `packages/graphql`, `packages/websocket`) para exibição no npm
+- README.md em todos os pacotes (`packages/tyforge`, `packages/http`, `packages/graphql`, `packages/websocket`)
+
+### Changed
+- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.1`
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.1`
 
 ## [0.2.0] - 2026-03-29
 
