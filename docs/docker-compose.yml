@@ -35,9 +35,9 @@ services:
         max-size: "5m"
         max-file: "3"
     tmpfs:
-      - /tmp:size=32M
-      - /var/cache/nginx:size=16M
-      - /var/run:size=1M
+      - /tmp:size=32M,uid=101,gid=101
+      - /var/cache/nginx:size=16M,uid=101,gid=101
+      - /var/run:size=1M,uid=101,gid=101
     networks:
       - tyforge-network
 

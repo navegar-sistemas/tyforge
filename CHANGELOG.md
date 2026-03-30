@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.2.2] - 2026-03-30
+
+### Fixed
+- Nginx container restart loop: `mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)` — diretórios temp criados no Dockerfile com `chown nginx:nginx` e tmpfs montado com `uid=101,gid=101`
+
+### Changed
+- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.2`
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.2`
+
 ## [0.2.1] - 2026-03-30
 
 ### Added
@@ -233,17 +242,6 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 - Dockerfile.dev: added `COPY . .` for standalone builds
 - Dockerfile: added `rm -rf node_modules` after build to reduce cache
 - Sidebar: added Changelog and new TypeField categories (Moeda, Documentos, Bancário, PIX, Segurança, Enums)
-
-## [0.1.23] - 2026-03-27
-
-### Added
-- `applyMask()` shared utility (`mask.util.ts`) for progressive document masking
-
-### Fixed
-- Portuguese error messages translated to English in `FInt`, `FPageNumber`, `FPageSize`
-- `formatted()` return type aliases fixed in `FInt`, `FBoolean`, `FPageNumber`, `FPageSize`
-- `applyMask` deduplicated — extracted from 3 document files to shared `mask.util.ts`
-- Documentation: corrected Portuguese accents across all Docusaurus pages
 
 
 

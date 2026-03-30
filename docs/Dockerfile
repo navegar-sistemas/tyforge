@@ -24,6 +24,13 @@ RUN nginx -t && test -f /usr/share/nginx/html/index.html
 
 EXPOSE 4200
 
+RUN mkdir -p /var/cache/nginx/client_temp \
+             /var/cache/nginx/proxy_temp \
+             /var/cache/nginx/fastcgi_temp \
+             /var/cache/nginx/uwsgi_temp \
+             /var/cache/nginx/scgi_temp \
+    && chown -R nginx:nginx /var/cache/nginx
+
 USER nginx
 
 CMD ["nginx", "-g", "daemon off;"]

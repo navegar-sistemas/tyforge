@@ -10,6 +10,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.2] - 2026-03-30
+
+### Fixed
+- Nginx container restart loop: `mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)` — diretórios temp criados no Dockerfile com `chown nginx:nginx` e tmpfs montado com `uid=101,gid=101`
+
+### Changed
+- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.2`
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.2`
+
 ## [0.2.1] - 2026-03-30
 
 ### Added
