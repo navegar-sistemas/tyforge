@@ -1,18 +1,15 @@
 {
-  "name": "@tyforge/http",
-  "version": "0.1.4",
-  "description": "Type-safe HTTP client with Result pattern, security hardening, and exception mapping for TyForge",
+  "name": "@tyforge/guard",
+  "version": "0.1.0",
+  "description": "Static analysis for TyForge conventions, architecture rules, and DSL enforcement",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+  "bin": {
+    "tyforge-guard": "./dist/index.js"
   },
   "peerDependencies": {
-    "tyforge": "0.2.4"
+    "typescript": ">=5.0.0"
   },
   "devDependencies": {
     "@types/node": "25.5.0",
@@ -25,7 +22,7 @@
     "build": "tsdown",
     "prepublishOnly": "npm run build",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test src/**/*.test.ts"
+    "test": "tsx --test src/__tests__/*.test.ts"
   },
   "files": [
     "dist",
@@ -40,7 +37,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/navegar-sistemas/tyforge",
-    "directory": "packages/http"
+    "directory": "packages/guard"
   },
   "engines": {
     "node": ">=24"

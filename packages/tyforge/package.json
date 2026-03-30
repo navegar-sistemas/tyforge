@@ -1,6 +1,6 @@
 {
   "name": "tyforge",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Type-safe schema validation, Result pattern, and DDD building blocks for TypeScript",
   "keywords": [
     "typescript",
@@ -70,16 +70,7 @@
       "types": "./dist/infrastructure/service.base.d.ts"
     }
   },
-  "bin": {
-    "tyforge-lint": "./dist/lint/index.js"
-  },
   "browser": {
-    "./dist/schema/batch-parallel.js": "./dist/schema/batch-parallel.browser.js",
-    "./dist/config/tyforge-config.js": "./dist/config/tyforge-config.browser.js",
-    "./dist/tools/network-security.tool.js": "./dist/tools/network-security.browser.js",
-    "./dist/infrastructure/service.base.js": "./dist/infrastructure/service.base.browser.js"
-  },
-  "react-native": {
     "./dist/schema/batch-parallel.js": "./dist/schema/batch-parallel.browser.js",
     "./dist/config/tyforge-config.js": "./dist/config/tyforge-config.browser.js",
     "./dist/tools/network-security.tool.js": "./dist/tools/network-security.browser.js",

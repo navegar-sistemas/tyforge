@@ -10,6 +10,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.4] - 2026-03-30
+
+### Fixed
+- Runtime crash em React Native/Hermes: `react-native` field no formato objeto corrompia resolução de módulos no Metro — removido
+
+### Added
+- Pacote `@tyforge/guard` — análise estática separada do core com regras classificadas em typescript, convention, architecture e dsl
+
+### Changed
+- Lint movido de `packages/tyforge/src/lint` para `packages/guard` (`@tyforge/guard`)
+- CLI renomeado de `tyforge-lint` para `tyforge-guard`
+- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.4`
+
 ## [0.2.3] - 2026-03-30
 
 ### Added

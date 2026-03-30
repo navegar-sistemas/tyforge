@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.2.4] - 2026-03-30
+
+### Fixed
+- Runtime crash em React Native/Hermes: `react-native` field no formato objeto corrompia resolução de módulos no Metro — removido
+
+### Added
+- Pacote `@tyforge/guard` — análise estática separada do core com regras classificadas em typescript, convention, architecture e dsl
+
+### Changed
+- Lint movido de `packages/tyforge/src/lint` para `packages/guard` (`@tyforge/guard`)
+- CLI renomeado de `tyforge-lint` para `tyforge-guard`
+- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.4`
+
 ## [0.2.3] - 2026-03-30
 
 ### Added
@@ -217,31 +230,6 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
 ### Fixed
 - Adding a new locale to `TLocaleDisplay` or `TLocaleRules` now causes TypeScript compile errors at every location that needs locale-specific handling
-
-## [0.1.25] - 2026-03-27
-
-### Added
-- Husky pre-commit hooks — shared across all contributors via `.husky/pre-commit`
-- Pre-commit runs 5 checks: typecheck, tests, tyforge-lint, docs build (local), docs Docker build (production)
-- `"prepare": "husky"` in package.json — hooks install automatically on `npm install`
-- `SchemaBuilder.maxDepth` — configurable maximum schema nesting depth (default: 50, validated via getter/setter)
-- CPF/CNPJ check digit validation (mod 11 algorithm) in `FDocumentCpf`, `FDocumentCnpj`, `FDocumentCpfOrCnpj`
-- `FCurrency.formCreate()` and `FCurrency.formAssign()` — form input normalization for decimal currency
-- `seguranca.md` — documentation page for security TypeFields
-
-### Changed
-- Replaced native `.git/hooks/pre-commit` with Husky (committed to git, shared across team)
-- Worker timeout now configurable via `IBatchCreateOptions.workerTimeout` (default: 30s)
-- PIX key validation: stricter email (`user@domain.tld`) and phone (`+digits 10-15`) format checks
-- `FPassword` complexity documented as ASCII-only per NIST SP 800-63B
-- `FTotpSecret` base32 regex fixed to reject scattered padding
-
-### Fixed
-- `batch-parallel.ts`: clearTimeout moved to finally block (prevents timer memory leak on rejection)
-- `batch-parallel.ts`: worker results collected via indexed Map (prevents race condition)
-- `batch-parallel.ts`: worker termination now properly awaited on error
-- `TypeGuard.isEnumKey`: type guard added before `.toString()` — rejects non-string/non-number input (prevents type coercion bypass)
-- User input removed from all ExceptionValidation error messages (prevents XSS when messages are rendered in HTML)
 
 
 

@@ -1,14 +1,19 @@
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 import { Check } from "../check.base";
 
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../../..");
+const GUARD_BIN = path.join(ROOT, "packages", "guard", "dist", "index.js");
+
 export class CheckLint extends Check {
   constructor() {
-    super("tyforge-lint", "blocking");
+    super("tyforge-guard", "blocking");
   }
 
   async run() {
     try {
-      execFileSync("npx", ["tsx", "src/lint/index.ts", "--all"], { stdio: "pipe", encoding: "utf-8", timeout: 60000 });
+      execFileSync("node", [GUARD_BIN], { cwd: ROOT, stdio: "pipe", encoding: "utf-8", timeout: 60000 });
       return this.pass();
     } catch (e) {
       return this.fail(this.extractError(e, { stream: "stdout" }));

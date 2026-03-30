@@ -4,10 +4,10 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "cd packages/tyforge && npm run build && cd ../http && npm run build && cd ../graphql && npm run build && cd ../websocket && npm run build",
+    "build": "cd packages/tyforge && npm run build && cd ../http && npm run build && cd ../graphql && npm run build && cd ../websocket && npm run build && cd ../guard && npm run build",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "lint": "npm run lint --workspace=packages/tyforge",
+    "guard": "npx tyforge-guard",
     "prepare": "husky"
   },
   "devDependencies": {
