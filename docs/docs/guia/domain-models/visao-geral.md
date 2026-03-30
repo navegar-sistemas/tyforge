@@ -7,7 +7,7 @@ import MermaidDiagram from '@site/src/components/MermaidDiagram';
 
 # Domain Models
 
-O TyForge fornece blocos de construcao para Domain-Driven Design (DDD) com suporte a serializacao automatica de TypeFields, comparacao por identidade ou estrutura, e emissao de eventos de dominio.
+O TyForge fornece blocos de construção para Domain-Driven Design (DDD) com suporte a serialização automática de TypeFields, comparação por identidade ou estrutura, e emissão de eventos de domínio.
 
 ## Hierarquia de classes
 
@@ -47,28 +47,28 @@ type TClassInfo = {
 
 ## `ClassDomainModels<TProps, TPropsJson>`
 
-Classe intermediaria que adiciona os metodos de serializacao:
+Classe intermediária que adiciona os métodos de serialização:
 
 ### `toJSON(config?)`
 
-Converte todas as propriedades da instancia para seus valores primitivos. TypeFields sao automaticamente desembrulhados via `getValue()`. Objetos aninhados com `toJSON()` sao recursivamente convertidos.
+Converte todas as propriedades da instância para seus valores primitivos. TypeFields são automaticamente desembrulhados via `getValue()`. Objetos aninhados com `toJSON()` são recursivamente convertidos.
 
 ```typescript
 const json = entidade.toJSON();
-// Todas as propriedades TypeField sao convertidas para primitivos
+// Todas as propriedades TypeField são convertidas para primitivos
 
-// Com configuracao de data
+// Com configuração de data
 const jsonDateStr = entidade.toJSON({ date: "string" });
-// Campos FDate sao serializados como string no formato especifico
+// Campos FDate são serializados como string no formato específico
 ```
 
-**Configuracao de data:**
-- `{ date: "string" }` (padrao) — campos `FDate` sao convertidos via `toString()` no formato da subclasse
+**Configuração de data:**
+- `{ date: "string" }` (padrão) — campos `FDate` são convertidos via `toString()` no formato da subclasse
 - `{ date: "date" }` — campos `FDate` retornam o objeto `Date` nativo
 
 ### `toPrimitives<TInput, TOutput>(input)`
 
-Metodo estatico utilitario para converter qualquer objeto com TypeFields para primitivos:
+Método estático utilitário para converter qualquer objeto com TypeFields para primitivos:
 
 ```typescript
 const primitivos = ClassDomainModels.toPrimitives<TProps, TPropsJson>(props);
@@ -76,19 +76,19 @@ const primitivos = ClassDomainModels.toPrimitives<TProps, TPropsJson>(props);
 
 ### `deepUnwrap(input, config?)`
 
-Metodo privado que realiza o unwrap recursivo:
-1. Arrays — cada item e processado recursivamente
-2. Objetos com `toJSON()` — delegam para seu proprio `toJSON()`
+Método privado que realiza o unwrap recursivo:
+1. Arrays — cada item é processado recursivamente
+2. Objetos com `toJSON()` — delegam para seu próprio `toJSON()`
 3. Objetos com `getValue()` (TypeFields) — retornam o valor primitivo
 4. Campos `FDate` com `config.date === "string"` — retornam `toString()`
-5. Campos `undefined` — sao omitidos do resultado
-6. Outros valores — retornados sem modificacao
+5. Campos `undefined` — são omitidos do resultado
+6. Outros valores — retornados sem modificação
 
-## Exposicao e redacao de campos
+## Exposição e redação de campos
 
-O `toJSON()` suporta controle de visibilidade por campo via a propriedade `expose` do schema. Isso permite omitir ou redactar campos sensiveis na serializacao, sem necessidade de logica manual.
+O `toJSON()` suporta controle de visibilidade por campo via a propriedade `expose` do schema. Isso permite omitir ou redactar campos sensíveis na serialização, sem necessidade de lógica manual.
 
-### Configuracao no schema
+### Configuração no schema
 
 Cada campo do schema aceita a propriedade `expose` com tres niveis:
 
@@ -103,36 +103,36 @@ const userSchema = {
 } satisfies ISchema;
 ```
 
-### Niveis de visibilidade
+### Níveis de visibilidade
 
-| Nivel | Valor numerico | Descricao |
+| Nível | Valor numérico | Descrição |
 |-------|---------------|-----------|
-| `"public"` | 1 | Visivel em todas as serializacoes |
-| `"private"` | 2 | Visivel apenas quando solicitado explicitamente |
-| `"redacted"` | 3 | Substituido por `"[REDACTED]"` na maioria dos contextos |
+| `"public"` | 1 | Visível em todas as serializações |
+| `"private"` | 2 | Visível apenas quando solicitado explicitamente |
+| `"redacted"` | 3 | Substituído por `"[REDACTED]"` na maioria dos contextos |
 
-A hierarquia segue a ordem: `public` < `private` < `redacted`. Um campo so e incluido no JSON se seu nivel de visibilidade for **menor ou igual** ao nivel solicitado.
+A hierarquia segue a ordem: `public` < `private` < `redacted`. Um campo só é incluído no JSON se seu nível de visibilidade for **menor ou igual** ao nível solicitado.
 
 ### Uso do `toJSON` com exposeLevel
 
-O metodo `toJSON` aceita um segundo parametro opcional `exposeLevel`:
+O método `toJSON` aceita um segundo parâmetro opcional `exposeLevel`:
 
 ```typescript
-// Serializacao publica — campos private e redacted ficam como "[REDACTED]"
+// Serialização pública — campos private e redacted ficam como "[REDACTED]"
 const publicJson = entity.toJSON({ date: "string" }, "public");
 
-// Serializacao privada — campos redacted ficam como "[REDACTED]"
+// Serialização privada — campos redacted ficam como "[REDACTED]"
 const privateJson = entity.toJSON({ date: "string" }, "private");
 
-// Serializacao completa — todos os campos visiveis
+// Serialização completa — todos os campos visíveis
 const fullJson = entity.toJSON({ date: "string" }, "redacted");
 ```
 
-Se `exposeLevel` nao for informado, o padrao e `"public"`.
+Se `exposeLevel` não for informado, o padrão é `"public"`.
 
 ### Campo `_schema`
 
-Para que a redacao funcione, o domain model deve definir o campo protegido `_schema` apontando para o schema utilizado:
+Para que a redação funcione, o domain model deve definir o campo protegido `_schema` apontando para o schema utilizado:
 
 ```typescript
 class User extends Aggregate<TUserProps, TUserJson> {
@@ -141,11 +141,11 @@ class User extends Aggregate<TUserProps, TUserJson> {
 }
 ```
 
-Se `_schema` nao estiver definido, o `toJSON()` inclui todos os campos sem redacao.
+Se `_schema` não estiver definido, o `toJSON()` inclui todos os campos sem redação.
 
-### Funcao `getVisibilityLevel`
+### Função `getVisibilityLevel`
 
-A funcao utilitaria `getVisibilityLevel` converte um `TExposeLevel` para seu valor numerico:
+A função utilitária `getVisibilityLevel` converte um `TExposeLevel` para seu valor numérico:
 
 ```typescript
 import { getVisibilityLevel } from "tyforge";
@@ -155,9 +155,9 @@ getVisibilityLevel("private");  // 2
 getVisibilityLevel("redacted"); // 3
 ```
 
-## Proximos passos
+## Próximos passos
 
-- [Entity](/guia/domain-models/entity) — identidade e comparacao por ID
-- [Value Object](/guia/domain-models/value-object) — comparacao estrutural
+- [Entity](/guia/domain-models/entity) — identidade e comparação por ID
+- [Value Object](/guia/domain-models/value-object) — comparação estrutural
 - [Aggregate](/guia/domain-models/aggregate) — domain events
 - [Dto](/guia/domain-models/dto) — Data Transfer Objects com TypeFields

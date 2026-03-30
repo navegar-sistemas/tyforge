@@ -20,7 +20,7 @@ O TyForge fornece uma classe base abstrata `ServiceHttp` para construir clientes
 
 ## Criando um cliente HTTP
 
-Para usar, crie uma classe concreta que estenda `ServiceHttp` e implemente `baseUrl` e `getAuthHeaders()`:
+Para usar, crie uma classe concreta que estenda `ServiceHttp` e implemente `endpoint` e `getAuthHeaders()`:
 
 ```typescript
 import { ServiceHttp, ExceptionHttp } from "tyforge/http";
@@ -30,7 +30,7 @@ import type { Result } from "tyforge/result";
 import type { Exceptions } from "tyforge/exceptions";
 
 class PaymentGatewayClient extends ServiceHttp {
-  readonly baseUrl = "https://api.gateway.com/v1";
+  readonly endpoint = FUrlOrigin.createOrThrow("https://api.gateway.com/v1");
 
   protected async getAuthHeaders(): Promise<Result<Record<string, string>, Exceptions>> {
     const token = await this.fetchToken();
@@ -79,7 +79,7 @@ Parâmetros completos para uma requisição:
 
 ```typescript
 interface IRequestParams<TData = unknown> {
-  endpoint: string;            // caminho relativo à baseUrl
+  endpoint: FUrlPath;          // caminho relativo ao endpoint base
   method: THttpMethod;         // "GET" | "POST" | "PUT" | "DELETE" | "PATCH"
   data?: TData;                // body (POST/PUT/PATCH) ou query params (GET)
   format?: THttpFormat;        // "json" (default) ou "form"
@@ -176,7 +176,7 @@ const result = await client.get("/users", { page: 1, limit: 10 });
 |--------|-----------|-----------|
 | `isValidRelativePath` | `(path: string) => boolean` | Valida se o path é relativo e seguro |
 | `sanitizeHeaders` | `(headers: Record<string, string>) => Record<string, string>` | Remove caracteres perigosos de headers |
-| `buildUrl` | `(baseUrl: string, endpoint: string) => Result<string, Exceptions>` | Constrói URL segura a partir de base + endpoint |
+| `buildUrl` | `(endpoint: string, endpoint: string) => Result<string, Exceptions>` | Constrói URL segura a partir de base + endpoint |
 
 ### Exemplo de rejeição
 
@@ -257,7 +257,7 @@ if (isFailure(result)) {
 
 ## Pontos de extensão
 
-A classe `ServiceHttp` foi projetada para ser estendida. Além de `baseUrl` e `getAuthHeaders()`, o código consumidor pode:
+A classe `ServiceHttp` foi projetada para ser estendida. Além de `endpoint` e `getAuthHeaders()`, o código consumidor pode:
 
 - Sobrescrever `request()` para adicionar retry, circuit breaker ou logging
 - Combinar com `IRetryPolicy` e `ICircuitBreaker` da camada de infraestrutura
@@ -265,7 +265,7 @@ A classe `ServiceHttp` foi projetada para ser estendida. Além de `baseUrl` e `g
 
 ```typescript
 class ResilientClient extends ServiceHttp {
-  readonly baseUrl = "https://api.example.com";
+  readonly endpoint = FUrlOrigin.createOrThrow("https://api.example.com");
 
   protected async getAuthHeaders() {
     return ok({ "X-Api-Key": "secret" });

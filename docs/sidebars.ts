@@ -201,6 +201,30 @@ export default {
     },
     {
       type: "category",
+      label: "GraphQL Client",
+      collapsed: true,
+      items: [
+        {
+          type: "doc",
+          id: "graphql/visao-geral",
+          label: "Visão Geral",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "WebSocket Client",
+      collapsed: true,
+      items: [
+        {
+          type: "doc",
+          id: "websocket/visao-geral",
+          label: "Visão Geral",
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "Application",
       collapsed: true,
       items: [
@@ -237,6 +261,35 @@ export default {
           type: "doc",
           id: "config/configuracao-global",
           label: "Configuração Global",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Migrações",
+      collapsed: true,
+      items: [
+        {
+          type: "doc",
+          id: "migracoes/visao-geral",
+          label: "Visão Geral",
+        },
+        {
+          type: "doc",
+          id: "migracoes/nextjs",
+          label: "Next.js",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Contribuindo",
+      collapsed: true,
+      items: [
+        {
+          type: "doc",
+          id: "contribuindo/versionamento",
+          label: "Versionamento",
         },
       ],
     },

@@ -19,7 +19,7 @@ TyForge elimina um dos maiores custos ocultos em times de software: decidir como
 
 Todo projeto que adota TyForge fala a mesma língua — mesmos prefixos, mesmas convenções, mesmo fluxo de validação e tratamento de erros. Um desenvolvedor familiarizado com TyForge consegue abrir qualquer projeto baseado nele e entender rapidamente toda a estrutura.
 
-Isso vai além de estética. Quando validação, nomenclatura, regras de domínio e tratamento de erros já estão embutidos na biblioteca, desenvolvedores deixam de escrever código repetitivo e passam a focar exclusivamente na lógica de negócio.
+Isso vai além de estética. Quando validação, nomenclatura, regras de domínio e tratamento de erros já estão embutidos no framework, desenvolvedores deixam de escrever código repetitivo e passam a focar exclusivamente na lógica de negócio.
 
 O ganho é cumulativo:
 
@@ -353,9 +353,11 @@ npx tyforge-lint --init       # configura pre-commit hooks (Husky/Lefthook/nativ
 | **Domain Models** | Entity, ValueObject, Aggregate (com domain events), Dto, DtoReq, DtoRes — building blocks DDD completos |
 | **Exceptions** | Tipos RFC 7807 com stack trace lazy e constantes `OHttpStatus` |
 | **Application** | UseCase, IMapper, Saga, DomainEventDispatcher, interfaces CQRS |
-| **Infrastructure** | IRepositoryBase, IRepositoryRead, Paginated, IUnitOfWork, IOutbox |
+| **Infrastructure** | Repository, RepositoryRead, RepositoryWrite, RepositoryCrud, Paginated, ServiceBase, IUnitOfWork, IOutbox |
 | **HTTP Client** | Classe base abstrata `ServiceHttp` — cliente HTTP seguro com Result pattern, proteção contra SSRF/CRLF/path traversal, timeout, `ExceptionHttp` |
-| **Tools** | TypeGuard, ToolObjectTransform (flatten/unflatten), ToolCliParser, ToolFileDiscovery, ToolGit |
+| **GraphQL Client** | Classe base abstrata `ServiceGraphQL` — cliente GraphQL seguro com Result pattern, bloqueio de introspection, proteção contra prototype pollution, detecção de UNAUTHENTICATED, `ExceptionGraphQL` |
+| **WebSocket Client** | Classe base abstrata `ServiceWebSocket` — cliente WebSocket com connect/disconnect/send/subscribe, reconnect com jitter e delay cap, proteção contra DNS rebinding, `ExceptionWebSocket` |
+| **Tools** | TypeGuard, ToolObjectTransform (flatten/unflatten), ToolCliParser, ToolFileDiscovery, ToolGit, ToolNetworkSecurity |
 | **Linter** | `npx tyforge-lint` — 10 regras com `--init` / `--fix` / `--format json` para CI |
 | **Config** | `tyforge.config.json` — níveis de validação global (`full`, `type`, `none`) e configurações do linter |
 
@@ -364,7 +366,8 @@ npx tyforge-lint --init       # configura pre-commit hooks (Husky/Lefthook/nativ
 | Categoria | Campos |
 |-----------|--------|
 | **Strings** | FString, FText, FDescription, FFullName, FBusinessName, FEmail |
-| **Numéricos** | FInt, FFloat, FPageNumber, FPageSize |
+| **Numéricos** | FInt, FFloat |
+| **Paginação** | FPageNumber, FPageSize, FSortOrder |
 | **Moeda** | FMoney (centavos inteiros), FCurrency (conveniência decimal) — aritmética, comparações, `fromDecimal()` |
 | **Datas** | FDate, FDateISODate, FDateTimeISOZ, FDateTimeISOZMillis, FDateISOCompact, FDateTimeISOCompact, FDateTimeISOFullCompact |
 | **Identificadores** | FId, FIdReq, FTransactionId, FDeviceId, FCorrelationId, FReconciliationId, FIdempotencyKey, FCertificateThumbprint |
@@ -372,7 +375,10 @@ npx tyforge-lint --init       # configura pre-commit hooks (Husky/Lefthook/nativ
 | **Bancário** | FBankCode, FBankBranch, FBankAccountNumber, FBankNsu, FBankE2eId, FEmvQrCodePayload |
 | **PIX** | FPixKey, FPixKeyType |
 | **Segurança** | FApiKey, FBearer, FPassword, FSignature, FPublicKeyPem, FTotpCode, FTotpSecret, FHashAlgorithm |
-| **Enums** | FAppStatus, FHttpStatus, FBoolInt, FPersonType, FGender, FMaritalStatus, FTransactionStatus, FStateCode |
+| **HTTP** | FHttpMethod, FHttpFormat, FHttpStatus |
+| **GraphQL** | FGraphQLDocument, FGraphQLOperationName, FFetchPolicy |
+| **URL** | FUrlOrigin, FUrlFull, FUrlPath, FUrlDns, FUrlQuery |
+| **Enums** | FAppStatus, FBoolInt, FPersonType, FGender, FMaritalStatus, FTransactionStatus, FStateCode |
 | **Outros** | FBoolean, FJson, FTraceId |
 
 ### Subpath Exports
@@ -384,6 +390,7 @@ import { ExceptionValidation } from "tyforge/exceptions";
 import { SchemaBuilder } from "tyforge/schema";
 import { TypeGuard } from "tyforge/tools";
 import { ServiceHttp, ExceptionHttp } from "tyforge/http";
+import { ServiceGraphQL, ExceptionGraphQL } from "tyforge/graphql";
 ```
 
 ## Documentação

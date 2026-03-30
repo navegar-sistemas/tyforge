@@ -10,6 +10,73 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.0] - 2026-03-29
+
+### Added
+- Monorepo com npm workspaces: `packages/tyforge`, `packages/http`, `packages/graphql`, `packages/websocket`
+- Pacote `@tyforge/websocket`: `ServiceWebSocket` com connect/disconnect/send/subscribe/unsubscribe, reconnect com jitter e delay cap, `ExceptionWebSocket` com 8 factory methods, `ServiceWebSocketSecurity` com sanitização recursiva
+- `ServiceBase` — classe abstrata base para todos os serviços (HTTP, GraphQL, WebSocket) com `endpoint`, `getAuthHeaders` e `validateEndpointDns`
+- `ToolNetworkSecurity` — resolução DNS e validação contra ranges privados (SSRF protection)
+- `ICreatableStatic<TInstance>` no schema type system — permite ValueObjects como tipo de campo no schema
+- `Paginated` — ValueObject com schema, `create`/`assign` schema-compatible, getter/setter para `totalItems`, `totalPages` derivado
+- `FSortOrder` — TypeField enum para ordenação (`asc`/`desc`)
+- `IRepositoryCore` → `Repository` (classe abstrata base), `RepositoryRead`, `RepositoryWrite`, `RepositoryCrud`
+- `IRepositoryWrite` — interface segregada para operações de escrita
+- Lint rule AST `no-invalid-factory-signature` — valida que classes schema-compatible têm `create/assign(raw, fieldPath)` com nomes e tipos corretos
+- Lint rule AST `no-public-constructor-domain` — valida constructor private/protected e `new` somente em `create`/`assign`
+- `AstAnalyzer` e `AstRule` — infraestrutura AST no linter via TypeScript compiler API com resolução completa de herança
+- `TyForgeConfig` — classe com Result pattern para carregamento de configuração
+- `OValidateLevel`, `ORuleSeverity`, `TRuleSeverity` — const enums para configuração
+- `OBackoffStrategy`, `TBackoffStrategy` — const enum para estratégia de retry
+- `OCircuitBreakerState`, `TCircuitBreakerState` — const enum para estado do circuit breaker
+- `DomainEventDispatcher` — tipagem forte com `FString`, `FInt`, `Result`, `Exceptions`
+
+### Changed
+- `ServiceHttp`, `ServiceGraphQL`, `ServiceWebSocket` agora extendem `ServiceBase`
+- `ServiceHttp.baseUrl` renomeado para `endpoint` (contrato de `ServiceBase`)
+- Sanitização recursiva (GraphQL/WebSocket) retorna `Result` — profundidade excedida gera erro explícito
+- `Paginated` extende `ValueObject` (não `ClassDomainModels` direto)
+- `Paginated.create` e `assign` são schema-compatible `(raw: T, fieldPath: string)`
+- Repositórios migrados de interfaces para classes abstratas (`Repository`, `RepositoryRead`, `RepositoryWrite`, `RepositoryCrud`)
+- `IRepositoryOptions` removido — transações gerenciadas por `IUnitOfWork`
+- `IAuditEntry`, `IOutboxEntry` — primitivos substituídos por TypeFields
+- `ICircuitBreakerConfig`, `IRetryPolicyConfig` — primitivos substituídos por TypeFields, union literals por const enums
+- `ExceptionUnexpected.log` agora non-enumerable
+- `DomainEvent` e `IntegrationEvent` — removidos `assertQueueName`/`assertSource` redundantes e `toJSON` override desnecessário
+- `TQueueName` type alias removido (queueName agora é `FString`)
+- `IPaginationParams.sortOrder` agora usa `FSortOrder` em vez de union literal
+- `Paginated.totalItems` renomeado de `total` (ambíguo)
+
+### Security
+- SSRF: bloqueio de IPs privados em `FUrlOrigin` (10.x, 172.16-31.x, 192.168.x, 169.254.x, 127.x, CGNAT, IPv6)
+- SSRF: DNS rebinding protection via `validateEndpointDns()` em todos os serviços
+- SSRF: `redirect: "error"` em fetch HTTP e GraphQL
+- DoS: limite de 10MB em respostas HTTP/GraphQL
+- DoS: profundidade máxima 50 na sanitização recursiva (GraphQL/WebSocket)
+- DoS: WebSocket reconnect com jitter (50-100%) e delay cap 30s
+- DoS: timeout GraphQL validado 1-300000ms
+- DoS: limite 1MB no config loader do linter
+- Filesystem: symlink check via `lstatSync` antes de write em hook setup
+- Filesystem: path traversal validation no lint config writer
+- Info disclosure: `ExceptionUnexpected.log` non-enumerable
+- ReDoS: regex ancorada com `^$` em `matchGlob`
+- Prototype pollution: `DANGEROUS_KEYS` filtering em `MapCreatableHandler` (SchemaBuilder isMap)
+- SSRF: IPv4-mapped IPv6 (`::ffff:10.0.0.1`) detection em `ToolNetworkSecurity`
+- DoS: limite de 10MB em mensagens WebSocket antes do `JSON.parse`
+
+## [0.1.30] - 2026-03-29
+
+### Added
+- Módulo GraphQL (`tyforge/graphql`): abstração de GraphQL client com `ServiceGraphQL`, `ServiceGraphQLSecurity` e `ExceptionGraphQL`
+- `ServiceGraphQL`: classe abstrata base com `fetch()` nativo, Result pattern e métodos `query()` e `mutation()`
+- `ServiceGraphQLSecurity`: bloqueio de introspection queries, sanitização recursiva de variables contra prototype pollution, validação HTTPS
+- `ExceptionGraphQL`: exceções GraphQL com factory methods (`queryFailed`, `mutationFailed`, `networkError`, `unauthorized`, `timeout`, `invalidResponse`, `unsafeQuery`)
+- Detecção automática de `UNAUTHENTICATED` via `extensions.code` ou `message` nos erros GraphQL
+- Extração automática de `operationName` do document GraphQL
+- Subpath export `tyforge/graphql` no `package.json`
+- Testes para `ServiceGraphQL`, `ServiceGraphQLSecurity` e `ExceptionGraphQL`
+- Documentação do módulo GraphQL
+
 ## [0.1.29] - 2026-03-28
 
 ### Added

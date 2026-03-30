@@ -5,11 +5,11 @@ sidebar_position: 5
 
 # Linter (`tyforge-lint`)
 
-O TyForge inclui um linter de padrões que verifica código TypeScript contra as convenções do projeto. Ele opera por análise de texto linha-a-linha — não depende de AST nem do compilador TypeScript — garantindo execução rápida mesmo em projetos grandes.
+O TyForge inclui um linter de padrões que verifica código TypeScript contra as convenções do projeto. A maioria das regras opera por análise de texto linha-a-linha, garantindo execução rápida. Regras que exigem análise semântica mais profunda utilizam a infraestrutura AST baseada na TypeScript Compiler API.
 
 ## Arquitetura
 
-O linter é composto por cinco componentes principais:
+O linter é composto por componentes principais divididos em duas camadas: análise textual e análise AST.
 
 ### RuleRegistry
 
@@ -22,7 +22,7 @@ registry.applyConfig({ "no-any": "error", "no-cast": "warning" });
 ```
 
 Métodos estáticos utilitários:
-- `RuleRegistry.createDefault()` — retorna array com as 10 regras padrão instanciadas
+- `RuleRegistry.createDefault()` — retorna array com as 12 regras padrão instanciadas (10 textuais + 2 AST)
 - `RuleRegistry.getDefaultRuleNames()` — retorna nomes das regras padrão
 - `RuleRegistry.getDefaultRuleCount()` — retorna quantidade de regras padrão
 
@@ -56,9 +56,9 @@ Interface e implementações de saída:
 | `TextReporter` | Saída legível para terminal com cores e agrupamento por arquivo |
 | `JsonReporter` | Saída JSON para integração com CI/CD |
 
-### Rule (classe base)
+### Rule (classe base — regras textuais)
 
-Cada regra estende a classe abstrata `Rule`:
+Cada regra textual estende a classe abstrata `Rule`:
 
 ```typescript
 abstract class Rule {
@@ -80,6 +80,24 @@ Métodos utilitários disponibilizados pela classe base:
 - `stripLiterals(line)` — remove strings literais, template literals e regex da linha para evitar falsos positivos
 - `violation(line, filePath, message?)` — cria um `IRuleViolation` com os dados da regra
 
+### AstRule e AstAnalyzer (infraestrutura AST)
+
+Regras que exigem análise semântica (ex: verificar hierarquia de classes, assinaturas de métodos, visibilidade de construtores) estendem `AstRule` em vez de `Rule`. O `AstAnalyzer` utiliza a TypeScript Compiler API para parsear o código-fonte e construir a árvore sintática, permitindo inspeção de nós como `ClassDeclaration`, `ConstructorDeclaration` e `MethodDeclaration`.
+
+```typescript
+abstract class AstRule {
+  constructor(
+    readonly name: string,
+    readonly description: string,
+    readonly severity: "error" | "warning",
+  ) {}
+
+  abstract analyze(sourceFile: ts.SourceFile, filePath: string): IRuleViolation[];
+}
+```
+
+O `AstAnalyzer` coordena a execução das `AstRule` registradas, parseando cada arquivo uma única vez e distribuindo o `SourceFile` para todas as regras AST ativas.
+
 ## Regras disponíveis
 
 | Regra | Severidade padrão | Fixável | Descrição |
@@ -94,8 +112,12 @@ Métodos utilitários disponibilizados pela classe base:
 | `no-magic-http-status` | warning | Não | Proíbe números mágicos de HTTP status — usar `OHttpStatus` |
 | `no-declare` | error | Não | Proíbe `declare` em classes — usar `readonly` + constructor |
 | `no-satisfies-without-prefix` | error | Não | Proíbe `satisfies` sem prefixo `I` — usar `satisfies ISchema`, não `satisfies Schema` |
+| `no-invalid-factory-signature` | error | Não | Valida assinaturas `create(raw, fieldPath)` e `assign(raw, fieldPath)` em descendentes de `ClassDomainModels` e `TypeField` (regra AST) |
+| `no-public-constructor-domain` | error | Não | Valida que construtores de domain models são `private` ou `protected`, e que `new` só ocorre dentro de `create`/`assign` (regra AST) |
 
 Regras com severidade `error` no modo `strict` (padrão) causam falha no exit code. No modo não-strict, apenas regras com severidade `error` causam falha — warnings são reportados mas não impedem o sucesso.
+
+As duas últimas regras (`no-invalid-factory-signature` e `no-public-constructor-domain`) utilizam a infraestrutura AST descrita acima, analisando a árvore sintática do TypeScript em vez de texto linha-a-linha.
 
 ## Comandos CLI
 
@@ -177,20 +199,24 @@ Remove hooks e configuração do linter.
 
 ```json
 {
-  "root": "src",
-  "strict": true,
-  "exclude": ["**/__tests__/**", "**/benchmark/**"],
-  "rules": {
-    "no-any": "error",
-    "no-cast": "error",
-    "no-non-null": "error",
-    "no-ts-ignore": "error",
-    "no-export-default": "error",
-    "no-to-json-lowercase": "error",
-    "no-new-type-field": "error",
-    "no-magic-http-status": "warning",
-    "no-declare": "error",
-    "no-satisfies-without-prefix": "error"
+  "lint": {
+    "root": "src",
+    "strict": true,
+    "exclude": ["**/__tests__/**", "**/benchmark/**"],
+    "rules": {
+      "no-any": "error",
+      "no-cast": "error",
+      "no-non-null": "error",
+      "no-ts-ignore": "error",
+      "no-export-default": "error",
+      "no-to-json-lowercase": "error",
+      "no-new-type-field": "error",
+      "no-magic-http-status": "warning",
+      "no-declare": "error",
+      "no-satisfies-without-prefix": "error",
+      "no-invalid-factory-signature": "error",
+      "no-public-constructor-domain": "error"
+    }
   }
 }
 ```
@@ -199,7 +225,7 @@ Remove hooks e configuração do linter.
 
 ```json
 {
-  "schema": { ... },
+  "schema": { "..." : "..." },
   "lint": {
     "root": "src",
     "strict": true,

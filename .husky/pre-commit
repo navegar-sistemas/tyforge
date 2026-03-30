@@ -1,2 +1,2 @@
 #!/bin/sh
-npx tsx src/pre-commit/index.ts
+cd packages/tyforge && npx tsx src/pre-commit/index.ts

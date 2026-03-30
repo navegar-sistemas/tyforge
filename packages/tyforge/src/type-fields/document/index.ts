@@ -1,0 +1,16 @@
+export { FDocumentCpf } from "./document-cpf.typefield";
+export type { TDocumentCpf, TDocumentCpfFormatted } from "./document-cpf.typefield";
+export { FDocumentCnpj } from "./document-cnpj.typefield";
+export type { TDocumentCnpj, TDocumentCnpjFormatted } from "./document-cnpj.typefield";
+export { FDocumentCpfOrCnpj } from "./document-cpf-or-cnpj.typefield";
+export type { TDocumentCpfOrCnpj, TDocumentCpfOrCnpjFormatted } from "./document-cpf-or-cnpj.typefield";
+export { FDocumentId } from "./document-id.typefield";
+export type { TDocumentId, TDocumentIdFormatted } from "./document-id.typefield";
+export { FDocumentRg } from "./document-rg.typefield";
+export type { TDocumentRg, TDocumentRgFormatted } from "./document-rg.typefield";
+export { FDocumentStateRegistration } from "./document-state-registration.typefield";
+export type { TDocumentStateRegistration, TDocumentStateRegistrationFormatted } from "./document-state-registration.typefield";
+export { FDocumentMunicipalRegistration } from "./document-municipal-registration.typefield";
+export type { TDocumentMunicipalRegistration, TDocumentMunicipalRegistrationFormatted } from "./document-municipal-registration.typefield";
+export { FDocumentType, ODocumentType } from "./document-type.typefield";
+export type { TDocumentType, TDocumentTypeFormatted, TKeyDocumentType } from "./document-type.typefield";

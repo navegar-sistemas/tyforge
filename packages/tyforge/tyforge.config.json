@@ -1,0 +1,13 @@
+{
+  "schema": {
+    "validate": {
+      "create": "full",
+      "assign": "type"
+    }
+  },
+  "lint": {
+    "root": "src",
+    "strict": true,
+    "exclude": []
+  }
+}

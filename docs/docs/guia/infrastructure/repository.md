@@ -5,62 +5,71 @@ sidebar_position: 1
 
 # Repository
 
-O TyForge define interfaces de repositorio para a camada de persistencia, seguindo o padrao Repository do DDD. A interface `IRepositoryBase<T>` fornece um contrato completo para operacoes CRUD com suporte a paginacao.
+O TyForge define classes abstratas de repositório para a camada de persistência, seguindo o padrão Repository do DDD. A hierarquia de classes fornece contratos completos para operações de leitura e CRUD com suporte a paginação.
 
-## Interfaces
+## Hierarquia de classes
 
-### IRepositoryRead
+```
+Repository (base abstrata)
+├── RepositoryRead<TOutput>    — somente leitura
+├── RepositoryWrite<TInput>    — somente escrita
+└── RepositoryCrud<T>          — leitura + escrita (extends RepositoryRead + RepositoryWrite)
+```
 
-Interface base somente-leitura, herdada por `IRepositoryBase`:
+## Classes
+
+### RepositoryRead
+
+Classe abstrata somente-leitura:
 
 ```typescript
-interface IRepositoryRead<TOutput> {
-  findById(id: FId): ResultPromise<TOutput | null, Exceptions>;
-  findAll(params?: IPaginationParams): ResultPromise<Paginated<TOutput>, Exceptions>;
-  count(filter?: Record<string, unknown>): ResultPromise<number, Exceptions>;
+abstract class RepositoryRead<TOutput> {
+  abstract findById(id: FId): ResultPromise<TOutput | null, Exceptions>;
+  abstract findAll(params?: IPaginationParams): ResultPromise<Paginated<TOutput>, Exceptions>;
+  abstract count(filter?: Record<string, unknown>): ResultPromise<number, Exceptions>;
 }
 ```
 
-### IRepositoryBase
+### RepositoryCrud
 
-Interface completa para repositorios com leitura e escrita:
+Classe abstrata completa para repositórios com leitura e escrita:
 
 ```typescript
-interface IRepositoryBase<T> extends IRepositoryRead<T> {
-  create(entity: T): ResultPromise<T, Exceptions>;
-  createMany(entities: T[]): ResultPromise<T[], Exceptions>;
-  update(entity: T): ResultPromise<T, Exceptions>;
-  updateMany(entities: T[]): ResultPromise<T[], Exceptions>;
-  delete(id: FId): ResultPromise<void, Exceptions>;
-  deleteMany(ids: FId[]): ResultPromise<void, Exceptions>;
-  exists(id: FId): ResultPromise<boolean, Exceptions>;
-  existsMany(ids: FId[]): ResultPromise<Map<string, boolean>, Exceptions>;
+abstract class RepositoryCrud<T> extends RepositoryRead<T> {
+  abstract create(entity: T): ResultPromise<T, Exceptions>;
+  abstract createMany(entities: T[]): ResultPromise<T[], Exceptions>;
+  abstract update(entity: T): ResultPromise<T, Exceptions>;
+  abstract updateMany(entities: T[]): ResultPromise<T[], Exceptions>;
+  abstract delete(id: FId): ResultPromise<void, Exceptions>;
+  abstract deleteMany(ids: FId[]): ResultPromise<void, Exceptions>;
+  abstract exists(id: FId): ResultPromise<boolean, Exceptions>;
+  abstract existsMany(ids: FId[]): ResultPromise<Map<string, boolean>, Exceptions>;
 }
 ```
 
-## Metodos
+## Métodos
 
-| Metodo | Retorno | Descricao |
+| Método | Retorno | Descrição |
 |--------|---------|-----------|
-| `findById(id)` | `ResultPromise<T \| null>` | Busca por ID. Retorna `null` se nao encontrado |
-| `findAll(params?)` | `ResultPromise<Paginated<T>>` | Lista com paginacao opcional |
+| `findById(id)` | `ResultPromise<T \| null>` | Busca por ID. Retorna `null` se não encontrado |
+| `findAll(params?)` | `ResultPromise<Paginated<T>>` | Lista com paginação opcional |
 | `count(filter?)` | `ResultPromise<number>` | Contagem total de registros |
 | `create(entity)` | `ResultPromise<T>` | Cria um registro |
-| `createMany(entities)` | `ResultPromise<T[]>` | Cria multiplos registros |
+| `createMany(entities)` | `ResultPromise<T[]>` | Cria múltiplos registros |
 | `update(entity)` | `ResultPromise<T>` | Atualiza um registro |
-| `updateMany(entities)` | `ResultPromise<T[]>` | Atualiza multiplos registros |
+| `updateMany(entities)` | `ResultPromise<T[]>` | Atualiza múltiplos registros |
 | `delete(id)` | `ResultPromise<void>` | Remove um registro por ID |
-| `deleteMany(ids)` | `ResultPromise<void>` | Remove multiplos registros por IDs |
-| `exists(id)` | `ResultPromise<boolean>` | Verifica existencia de um registro |
-| `existsMany(ids)` | `ResultPromise<Map<string, boolean>>` | Verifica existencia de multiplos registros |
+| `deleteMany(ids)` | `ResultPromise<void>` | Remove múltiplos registros por IDs |
+| `exists(id)` | `ResultPromise<boolean>` | Verifica existência de um registro |
+| `existsMany(ids)` | `ResultPromise<Map<string, boolean>>` | Verifica existência de múltiplos registros |
 
-Todos os metodos retornam `ResultPromise<T, Exceptions>`, que e um alias para `Promise<Result<T, Exceptions>>`.
+Todos os métodos retornam `ResultPromise<T, Exceptions>`, que é um alias para `Promise<Result<T, Exceptions>>`.
 
-## Paginacao
+## Paginação
 
 ### IPaginationParams
 
-Parametros de paginacao aceitos pelo `findAll`:
+Parâmetros de paginação aceitos pelo `findAll`:
 
 ```typescript
 interface IPaginationParams {
@@ -73,28 +82,40 @@ interface IPaginationParams {
 
 ### Paginated
 
-Classe que encapsula o resultado paginado:
+`Paginated<T>` é um ValueObject que encapsula o resultado paginado. Possui factory methods `create` e `assign` compatíveis com o schema do TyForge. A propriedade `totalPages` é derivada automaticamente a partir de `totalItems` e `pageSize`.
 
 ```typescript
-class Paginated<T> {
-  constructor(
-    readonly items: T[],
-    readonly total: number,
-    readonly page: number,
-    readonly pageSize: number,
-  ) {}
+class Paginated<T> extends ValueObject {
+  readonly items: T[];
+  readonly totalItems: number;
+  readonly page: number;
+  readonly pageSize: number;
 
   get totalPages(): number {
-    return Math.ceil(this.total / this.pageSize);
+    return Math.ceil(this.totalItems / this.pageSize);
   }
+
+  static create<T>(props: {
+    items: T[];
+    totalItems: number;
+    page: number;
+    pageSize: number;
+  }): Result<Paginated<T>, Exceptions>;
+
+  static assign<T>(props: {
+    items: T[];
+    totalItems: number;
+    page: number;
+    pageSize: number;
+  }): Result<Paginated<T>, Exceptions>;
 }
 ```
 
-## Convencao de nomenclatura
+## Convenção de nomenclatura
 
-Repositorios usam o prefixo `Repository` seguido do nome do agregado:
+Repositórios usam o prefixo `Repository` seguido do nome do agregado:
 
-| Repositorio | Agregado |
+| Repositório | Agregado |
 |-------------|----------|
 | `RepositoryUser` | `User` |
 | `RepositoryOrder` | `Order` |
@@ -104,15 +125,15 @@ Repositorios usam o prefixo `Repository` seguido do nome do agregado:
 
 ```typescript
 import {
-  FId, FString, FEmail, FInt, Paginated,
+  FId, FString, FEmail, FInt, Paginated, RepositoryCrud,
   isSuccess, isFailure, ok, err,
   Exceptions, ExceptionBusiness,
 } from "tyforge";
-import type { IRepositoryBase, ResultPromise, IPaginationParams } from "tyforge";
+import type { ResultPromise, IPaginationParams } from "tyforge";
 import { User } from "./user.aggregate";
 import type { TUserJson } from "./user.aggregate";
 
-class RepositoryUser implements IRepositoryBase<User> {
+class RepositoryUser extends RepositoryCrud<User> {
   private readonly storage = new Map<string, TUserJson>();
 
   async findById(id: FId): ResultPromise<User | null, Exceptions> {
@@ -137,7 +158,7 @@ class RepositoryUser implements IRepositoryBase<User> {
       users.push(result.value);
     }
 
-    return ok(new Paginated(users, total, page, pageSize));
+    return Paginated.create({ items: users, totalItems: total, page, pageSize });
   }
 
   async create(entity: User): ResultPromise<User, Exceptions> {
@@ -211,28 +232,28 @@ class RepositoryUser implements IRepositoryBase<User> {
 }
 ```
 
-## Uso com paginacao
+## Uso com paginação
 
 ```typescript
 const repo = new RepositoryUser();
 
-// Sem paginacao — retorna todos
+// Sem paginação — retorna todos
 const all = await repo.findAll();
 if (isSuccess(all)) {
-  console.log(all.value.items.length);  // todos os itens
-  console.log(all.value.total);         // total de registros
+  console.log(all.value.items.length);      // todos os itens
+  console.log(all.value.totalItems);        // total de registros
 }
 
-// Com paginacao — 10 itens por pagina, pagina 2
+// Com paginação — 10 itens por página, página 2
 const page2 = await repo.findAll({ page: 2, pageSize: 10 });
 if (isSuccess(page2)) {
-  console.log(page2.value.items.length);  // ate 10 itens
-  console.log(page2.value.page);          // 2
-  console.log(page2.value.totalPages);    // Math.ceil(total / 10)
+  console.log(page2.value.items.length);    // até 10 itens
+  console.log(page2.value.page);            // 2
+  console.log(page2.value.totalPages);      // Math.ceil(totalItems / 10)
 }
 ```
 
-## Proximos passos
+## Próximos passos
 
 - [Mapper](/guia/application/mapper) — conversao Domain e Persistence usada pelo Repository
 - [UseCase](/guia/application/use-case) — orquestracao que utiliza o Repository

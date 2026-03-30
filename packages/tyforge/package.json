@@ -1,0 +1,97 @@
+{
+  "name": "tyforge",
+  "version": "0.2.0",
+  "description": "Type-safe schema validation, Result pattern, and DDD building blocks for TypeScript",
+  "keywords": [
+    "typescript",
+    "validation",
+    "schema",
+    "ddd",
+    "result-pattern",
+    "type-fields",
+    "domain-driven-design",
+    "value-objects",
+    "entity",
+    "aggregate",
+    "type-safe",
+    "clean-architecture",
+    "exceptions",
+    "rfc7807"
+  ],
+  "author": "Navegar Sistemas",
+  "license": "MIT",
+  "homepage": "https://navegarsistemas.com.br/opensource/tyforge/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/navegar-sistemas/tyforge",
+    "directory": "packages/tyforge"
+  },
+  "bugs": {
+    "url": "https://github.com/navegar-sistemas/tyforge/issues"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./result": {
+      "import": "./dist/result/index.js",
+      "types": "./dist/result/index.d.ts"
+    },
+    "./type-fields": {
+      "import": "./dist/type-fields/index.js",
+      "types": "./dist/type-fields/index.d.ts"
+    },
+    "./exceptions": {
+      "import": "./dist/exceptions/index.js",
+      "types": "./dist/exceptions/index.d.ts"
+    },
+    "./schema": {
+      "import": "./dist/schema/index.js",
+      "types": "./dist/schema/index.d.ts"
+    },
+    "./tools": {
+      "import": "./dist/tools/index.js",
+      "types": "./dist/tools/index.d.ts"
+    }
+  },
+  "bin": {
+    "tyforge-lint": "./dist/lint/index.js"
+  },
+  "browser": {
+    "./dist/schema/batch-parallel.js": "./dist/schema/batch-parallel.browser.js"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "!dist/**/*.js.map",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "prepublishOnly": "npm run build",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test src/**/*.test.ts",
+    "lint": "node dist/lint/index.js",
+    "postinstall": "node dist/lint/hooks/postinstall.js || true"
+  },
+  "dependencies": {
+    "uuid": "13.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "25.5.0",
+    "tsdown": "0.21.6",
+    "tsx": "4.21.0",
+    "typescript": "6.0.2"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

@@ -19,7 +19,7 @@ TyForge eliminates one of the biggest hidden costs in software teams: deciding h
 
 Every project that adopts TyForge speaks the same language — same prefixes, same conventions, same validation flow and error handling. A developer familiar with TyForge can open any project based on it and quickly understand the entire structure.
 
-This goes beyond aesthetics. When validation, naming, domain rules, and error handling are already built into the library, developers stop writing repetitive code and focus exclusively on business logic.
+This goes beyond aesthetics. When validation, naming, domain rules, and error handling are already built into the framework, developers stop writing repetitive code and focus exclusively on business logic.
 
 The gain is cumulative:
 
@@ -353,9 +353,11 @@ npx tyforge-lint --init       # setup pre-commit hooks (Husky/Lefthook/native)
 | **Domain Models** | Entity, ValueObject, Aggregate (with domain events), Dto, DtoReq, DtoRes — full DDD building blocks |
 | **Exceptions** | RFC 7807 exception types with lazy stack trace and `OHttpStatus` constants |
 | **Application** | UseCase, IMapper, Saga, DomainEventDispatcher, CQRS interfaces |
-| **Infrastructure** | IRepositoryBase, IRepositoryRead, Paginated, IUnitOfWork, IOutbox |
+| **Infrastructure** | Repository, RepositoryRead, RepositoryWrite, RepositoryCrud, Paginated, ServiceBase, IUnitOfWork, IOutbox |
 | **HTTP Client** | `ServiceHttp` abstract base class — secure HTTP client with Result pattern, SSRF/CRLF/path traversal protection, timeout, `ExceptionHttp` |
-| **Tools** | TypeGuard, ToolObjectTransform (flatten/unflatten), ToolCliParser, ToolFileDiscovery, ToolGit |
+| **GraphQL Client** | `ServiceGraphQL` abstract base class — secure GraphQL client with Result pattern, introspection blocking, prototype pollution protection, UNAUTHENTICATED detection, `ExceptionGraphQL` |
+| **WebSocket Client** | `ServiceWebSocket` abstract base class — WebSocket client with connect/disconnect/send/subscribe, reconnect with jitter and delay cap, DNS rebinding protection, `ExceptionWebSocket` |
+| **Tools** | TypeGuard, ToolObjectTransform (flatten/unflatten), ToolCliParser, ToolFileDiscovery, ToolGit, ToolNetworkSecurity |
 | **Linter** | `npx tyforge-lint` — 10 rules with `--init` / `--fix` / `--format json` for CI |
 | **Config** | `tyforge.config.json` — global validation levels (`full`, `type`, `none`) and linter settings |
 
@@ -364,7 +366,8 @@ npx tyforge-lint --init       # setup pre-commit hooks (Husky/Lefthook/native)
 | Category | Fields |
 |----------|--------|
 | **Strings** | FString, FText, FDescription, FFullName, FBusinessName, FEmail |
-| **Numeric** | FInt, FFloat, FPageNumber, FPageSize |
+| **Numeric** | FInt, FFloat |
+| **Pagination** | FPageNumber, FPageSize, FSortOrder |
 | **Currency** | FMoney (integer cents), FCurrency (decimal convenience) — arithmetic, comparisons, `fromDecimal()` |
 | **Dates** | FDate, FDateISODate, FDateTimeISOZ, FDateTimeISOZMillis, FDateISOCompact, FDateTimeISOCompact, FDateTimeISOFullCompact |
 | **Identifiers** | FId, FIdReq, FTransactionId, FDeviceId, FCorrelationId, FReconciliationId, FIdempotencyKey, FCertificateThumbprint |
@@ -372,7 +375,10 @@ npx tyforge-lint --init       # setup pre-commit hooks (Husky/Lefthook/native)
 | **Banking** | FBankCode, FBankBranch, FBankAccountNumber, FBankNsu, FBankE2eId, FEmvQrCodePayload |
 | **PIX** | FPixKey, FPixKeyType |
 | **Security** | FApiKey, FBearer, FPassword, FSignature, FPublicKeyPem, FTotpCode, FTotpSecret, FHashAlgorithm |
-| **Enums** | FAppStatus, FHttpStatus, FBoolInt, FPersonType, FGender, FMaritalStatus, FTransactionStatus, FStateCode |
+| **HTTP** | FHttpMethod, FHttpFormat, FHttpStatus |
+| **GraphQL** | FGraphQLDocument, FGraphQLOperationName, FFetchPolicy |
+| **URL** | FUrlOrigin, FUrlFull, FUrlPath, FUrlDns, FUrlQuery |
+| **Enums** | FAppStatus, FBoolInt, FPersonType, FGender, FMaritalStatus, FTransactionStatus, FStateCode |
 | **Other** | FBoolean, FJson, FTraceId |
 
 ### Subpath Exports
@@ -384,6 +390,7 @@ import { ExceptionValidation } from "tyforge/exceptions";
 import { SchemaBuilder } from "tyforge/schema";
 import { TypeGuard } from "tyforge/tools";
 import { ServiceHttp, ExceptionHttp } from "tyforge/http";
+import { ServiceGraphQL, ExceptionGraphQL } from "tyforge/graphql";
 ```
 
 ## Documentation

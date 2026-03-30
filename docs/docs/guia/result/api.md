@@ -5,7 +5,7 @@ sidebar_position: 2
 
 # API Completa do Result
 
-Referencia completa de todas as funcoes do modulo Result. O pattern Result encapsula o sucesso ou a falha de uma operacao sem lancar excecoes, garantindo seguranca de tipos em toda a cadeia de chamadas.
+Referência completa de todas as funções do módulo Result. O pattern Result encapsula o sucesso ou a falha de uma operação sem lançar exceções, garantindo segurança de tipos em toda a cadeia de chamadas.
 
 ## Tipos Fundamentais
 
@@ -36,8 +36,8 @@ import { ok } from 'tyforge';
 const resultado = ok(42);
 // resultado: { success: true, value: 42 }
 
-const mensagem = ok('Operacao concluida');
-// mensagem: { success: true, value: 'Operacao concluida' }
+const mensagem = ok('Operação concluída');
+// mensagem: { success: true, value: 'Operação concluída' }
 ```
 
 ---
@@ -55,18 +55,18 @@ function err<E>(error: E): Result<never, E>
 ```typescript
 import { err } from 'tyforge';
 
-const falha = err('Campo obrigatorio ausente');
-// falha: { success: false, error: 'Campo obrigatorio ausente' }
+const falha = err('Campo obrigatório ausente');
+// falha: { success: false, error: 'Campo obrigatório ausente' }
 
-const excecao = err(new ExceptionValidation('email', 'E-mail invalido'));
-// falha tipada com a excecao
+const excecao = err(new ExceptionValidation('email', 'E-mail inválido'));
+// falha tipada com a exceção
 ```
 
 ---
 
 ### `OK_TRUE`
 
-Singleton imutavel (`Object.freeze`) que representa um sucesso com valor `true`. Ideal para validacoes que apenas confirmam sucesso, sem alocar um novo objeto a cada chamada — zero alocacao no hot path.
+Singleton imutável (`Object.freeze`) que representa um sucesso com valor `true`. Ideal para validações que apenas confirmam sucesso, sem alocar um novo objeto a cada chamada — zero alocação no hot path.
 
 ```typescript
 const OK_TRUE: Result<true, never>
@@ -78,8 +78,8 @@ const OK_TRUE: Result<true, never>
 import { OK_TRUE } from 'tyforge';
 
 function validarAtivo(ativo: boolean): Result<true, string> {
-  if (!ativo) return err('Usuario inativo');
-  return OK_TRUE; // reutiliza o mesmo objeto, sem alocacao
+  if (!ativo) return err('Usuário inativo');
+  return OK_TRUE; // reutiliza o mesmo objeto, sem alocação
 }
 ```
 
@@ -89,7 +89,7 @@ function validarAtivo(ativo: boolean): Result<true, string> {
 
 ### `isSuccess`
 
-Type guard que verifica se o Result e um sucesso. Apos a verificacao, o TypeScript estreita o tipo para `Success<T>`, permitindo acessar `.value` com seguranca.
+Type guard que verifica se o Result é um sucesso. Após a verificação, o TypeScript estreita o tipo para `Success<T>`, permitindo acessar `.value` com segurança.
 
 ```typescript
 function isSuccess<T, E>(result: Result<T, E>): result is Success<T>
@@ -100,10 +100,10 @@ function isSuccess<T, E>(result: Result<T, E>): result is Success<T>
 ```typescript
 import { ok, err, isSuccess } from 'tyforge';
 
-const resultado = ok('Joao');
+const resultado = ok('João');
 
 if (isSuccess(resultado)) {
-  console.log(resultado.value); // 'Joao' — TypeScript sabe que .value existe
+  console.log(resultado.value); // 'João' — TypeScript sabe que .value existe
 }
 ```
 
@@ -111,7 +111,7 @@ if (isSuccess(resultado)) {
 
 ### `isFailure`
 
-Type guard que verifica se o Result e uma falha. Apos a verificacao, o TypeScript estreita o tipo para `Failure<E>`, permitindo acessar `.error` com seguranca.
+Type guard que verifica se o Result é uma falha. Após a verificação, o TypeScript estreita o tipo para `Failure<E>`, permitindo acessar `.error` com segurança.
 
 ```typescript
 function isFailure<T, E>(result: Result<T, E>): result is Failure<E>
@@ -122,20 +122,20 @@ function isFailure<T, E>(result: Result<T, E>): result is Failure<E>
 ```typescript
 import { err, isFailure } from 'tyforge';
 
-const resultado = err('Dados invalidos');
+const resultado = err('Dados inválidos');
 
 if (isFailure(resultado)) {
-  console.log(resultado.error); // 'Dados invalidos'
+  console.log(resultado.error); // 'Dados inválidos'
 }
 ```
 
 ---
 
-## Transformacoes
+## Transformações
 
 ### `map`
 
-Transforma o valor de sucesso aplicando uma funcao. Se o Result for uma falha, retorna a falha inalterada.
+Transforma o valor de sucesso aplicando uma função. Se o Result for uma falha, retorna a falha inalterada.
 
 ```typescript
 function map<T, U, E>(result: Result<T, E>, fn: (value: T) => U): Result<U, E>
@@ -152,14 +152,14 @@ const dobro = map(numero, (n) => n * 2);
 
 const falha = err('erro');
 const tentativa = map(falha, (n: number) => n * 2);
-// tentativa: { success: false, error: 'erro' } — funcao nao executada
+// tentativa: { success: false, error: 'erro' } — função não executada
 ```
 
 ---
 
 ### `flatMap`
 
-Encadeia operacoes que retornam Result, evitando `Result<Result<U, E>, E>` aninhados. Se o Result inicial for falha, retorna a falha sem executar a funcao.
+Encadeia operações que retornam Result, evitando `Result<Result<U, E>, E>` aninhados. Se o Result inicial for falha, retorna a falha sem executar a função.
 
 ```typescript
 function flatMap<T, U, E>(
@@ -175,7 +175,7 @@ import { ok, err, flatMap } from 'tyforge';
 
 function parsearIdade(valor: string): Result<number, string> {
   const num = Number(valor);
-  return isNaN(num) ? err('Idade invalida') : ok(num);
+  return isNaN(num) ? err('Idade inválida') : ok(num);
 }
 
 function validarMaiorIdade(idade: number): Result<number, string> {
@@ -186,16 +186,16 @@ const resultado = flatMap(parsearIdade('25'), validarMaiorIdade);
 // resultado: { success: true, value: 25 }
 
 const falha = flatMap(parsearIdade('abc'), validarMaiorIdade);
-// falha: { success: false, error: 'Idade invalida' } — segunda funcao nao executa
+// falha: { success: false, error: 'Idade inválida' } — segunda função não executa
 ```
 
 ---
 
-## Reducao e Pattern Matching
+## Redução e Pattern Matching
 
 ### `fold`
 
-Reduz o Result a um unico valor, aplicando uma funcao para o caso de sucesso e outra para o caso de falha. Sempre retorna um valor — nunca retorna um Result.
+Reduz o Result a um único valor, aplicando uma função para o caso de sucesso e outra para o caso de falha. Sempre retorna um valor — nunca retorna um Result.
 
 ```typescript
 function fold<T, E, R>(
@@ -219,13 +219,13 @@ const mensagem = fold(
 );
 // mensagem: 'Bem-vinda, Maria!'
 
-const falha = err('nao encontrado');
+const falha = err('não encontrado');
 const resposta = fold(
   falha,
   (val) => ({ status: 200, body: val }),
   (erro) => ({ status: 400, body: erro }),
 );
-// resposta: { status: 400, body: 'nao encontrado' }
+// resposta: { status: 400, body: 'não encontrado' }
 ```
 
 ---
@@ -268,7 +268,7 @@ const respostaFalha = match(falha, {
 
 ### `getOrElse`
 
-Extrai o valor de sucesso ou retorna um valor padrao caso seja falha. Aceita tanto um valor direto quanto uma funcao lazy (avaliada apenas se necessario).
+Extrai o valor de sucesso ou retorna um valor padrão caso seja falha. Aceita tanto um valor direto quanto uma função lazy (avaliada apenas se necessário).
 
 ```typescript
 function getOrElse<T, E>(
@@ -282,16 +282,16 @@ function getOrElse<T, E>(
 ```typescript
 import { ok, err, getOrElse } from 'tyforge';
 
-const resultado = ok('Joao');
-const nome = getOrElse(resultado, 'Anonimo');
-// nome: 'Joao'
+const resultado = ok('João');
+const nome = getOrElse(resultado, 'Anônimo');
+// nome: 'João'
 
-const falha = err('nao encontrado');
-const nomeFallback = getOrElse(falha, 'Anonimo');
-// nomeFallback: 'Anonimo'
+const falha = err('não encontrado');
+const nomeFallback = getOrElse(falha, 'Anônimo');
+// nomeFallback: 'Anônimo'
 
-// Com funcao lazy — util quando o fallback e custoso
-const comLazy = getOrElse(falha, () => buscarNomePadrao());
+// Com função lazy — útil quando o fallback é custoso
+const comLazy = getOrElse(falha, () => buscarNomePadrão());
 ```
 
 ---
@@ -325,11 +325,11 @@ const resultado = orElse(sucesso, secundario);
 
 ---
 
-## Combinacao
+## Combinação
 
 ### `all`
 
-Combina um array de Results em um unico Result contendo um array de valores. Utiliza short-circuit: retorna imediatamente na primeira falha encontrada, sem processar os demais.
+Combina um array de Results em um único Result contendo um array de valores. Utiliza short-circuit: retorna imediatamente na primeira falha encontrada, sem processar os demais.
 
 ```typescript
 function all<T, E>(results: Result<T, E>[]): Result<T[], E>
@@ -344,29 +344,29 @@ const resultados = [ok(1), ok(2), ok(3)];
 const combinado = all(resultados);
 // combinado: { success: true, value: [1, 2, 3] }
 
-const comFalha = [ok(1), err('invalido'), ok(3)];
+const comFalha = [ok(1), err('inválido'), ok(3)];
 const falha = all(comFalha);
-// falha: { success: false, error: 'invalido' } — para no segundo item
+// falha: { success: false, error: 'inválido' } — para no segundo item
 
-// Uso pratico: validar multiplos campos
+// Uso prático: validar múltiplos campos
 const campos = [
   FString.create(dados.nome, 'nome'),
   FEmail.create(dados.email, 'email'),
   FInt.create(dados.idade, 'idade'),
 ];
-const validacao = all(campos);
-if (isSuccess(validacao)) {
-  const [nome, email, idade] = validacao.value;
+const validação = all(campos);
+if (isSuccess(validação)) {
+  const [nome, email, idade] = validação.value;
 }
 ```
 
 ---
 
-## Conversao
+## Conversão
 
 ### `toPromise`
 
-Converte um Result para uma Promise. Sucesso vira `Promise.resolve(value)` e falha vira `Promise.reject(error)`. Se o erro nao for uma instancia de `Error`, ele sera convertido automaticamente.
+Converte um Result para uma Promise. Sucesso vira `Promise.resolve(value)` e falha vira `Promise.reject(error)`. Se o erro não for uma instância de `Error`, ele será convertido automaticamente.
 
 ```typescript
 function toPromise<T, E>(result: Result<T, E>): Promise<T>
@@ -383,12 +383,12 @@ const valor = await promessa; // 42
 
 // Falha → reject
 try {
-  await toPromise(err('operacao falhou'));
+  await toPromise(err('operação falhou'));
 } catch (e) {
-  console.log(e.message); // 'operacao falhou'
+  console.log(e.message); // 'operação falhou'
 }
 
-// Integracao com async/await
+// Integração com async/await
 async function buscarUsuario(id: string): Promise<Usuario> {
   const resultado = repositorio.findById(id);
   return toPromise(resultado); // converte Result para Promise

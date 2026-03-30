@@ -1,23 +1,23 @@
 ---
-title: Inferencia de Tipos
+title: Inferência de Tipos
 sidebar_position: 3
 ---
 
-# Inferencia de Tipos
+# Inferência de Tipos
 
-O sistema de tipos do TyForge infere automaticamente os tipos de entrada (JSON) e saida (Props) a partir da definicao do schema. Isso elimina a necessidade de declarar interfaces manualmente e garante que a validacao esta alinhada com os tipos do TypeScript.
+O sistema de tipos do TyForge infere automaticamente os tipos de entrada (JSON) e saída (Props) a partir da definição do schema. Isso elimina a necessidade de declarar interfaces manualmente e garante que a validação está alinhada com os tipos do TypeScript.
 
 ## IFieldConfig
 
-Interface que define a configuracao de um campo individual no schema:
+Interface que define a configuração de um campo individual no schema:
 
 ```typescript
 interface IFieldConfig {
   type: IValueObjectStatic<unknown, TypeField<unknown>>
       | IEntityStatic<Entity<IEntityProps, unknown>>
       | ISchema;
-  required?: boolean;       // padrao: true
-  isArray?: boolean;        // padrao: false
+  required?: boolean;       // padrão: true
+  isArray?: boolean;        // padrão: false
   expose?: TExposeLevel;
   label?: string;
   description?: string;
@@ -28,19 +28,19 @@ interface IFieldConfig {
 }
 ```
 
-| Propriedade | Tipo | Descricao |
+| Propriedade | Tipo | Descrição |
 |---|---|---|
-| `type` | TypeField, Entity ou objeto inline | O tipo do campo — define como ele sera validado |
-| `required` | `boolean` | Se o campo e obrigatorio. Padrao: `true` |
-| `isArray` | `boolean` | Se o campo aceita um array de valores. Padrao: `false` |
-| `expose` | `TExposeLevel` | Nivel de exposicao do campo para serializacao (veja abaixo) |
-| `label` | `string` | Rotulo legivel para o campo (ex: para documentacao de API) |
-| `description` | `string` | Descricao detalhada do campo |
-| `validate` | `object` | Sobrescrita do nivel de validacao por campo (opcoes: `create` e `assign`) |
+| `type` | TypeField, Entity ou objeto inline | O tipo do campo — define como ele será validado |
+| `required` | `boolean` | Se o campo é obrigatório. Padrão: `true` |
+| `isArray` | `boolean` | Se o campo aceita um array de valores. Padrão: `false` |
+| `expose` | `TExposeLevel` | Nível de exposição do campo para serialização (veja abaixo) |
+| `label` | `string` | Rótulo legível para o campo (ex: para documentação de API) |
+| `description` | `string` | Descrição detalhada do campo |
+| `validate` | `object` | Sobrescrita do nível de validação por campo (opções: `create` e `assign`) |
 
 ### TExposeLevel
 
-Tipo que define os niveis de exposicao de campos na serializacao:
+Tipo que define os níveis de exposição de campos na serialização:
 
 ```typescript
 const OExposeLevel = { PUBLIC: "public", PRIVATE: "private", REDACTED: "redacted" } as const;
@@ -48,37 +48,37 @@ type TExposeLevel = typeof OExposeLevel[keyof typeof OExposeLevel];
 // "public" | "private" | "redacted"
 ```
 
-O `OExposeLevel` e um objeto `as const` que segue a convencao de prefixo `O` para enums do TyForge.
+O `OExposeLevel` é um objeto `as const` que segue a convenção de prefixo `O` para enums do TyForge.
 
 ### getVisibilityLevel
 
-Funcao utilitaria que converte um `TExposeLevel` para um valor numerico, usada internamente pelo `toJSON()` para decidir quais campos incluir:
+Função utilitária que converte um `TExposeLevel` para um valor numérico, usada internamente pelo `toJSON()` para decidir quais campos incluir:
 
 ```typescript
 function getVisibilityLevel(expose: TExposeLevel | undefined): number
 ```
 
-| Nivel | Valor numerico |
+| Nível | Valor numérico |
 |-------|---------------|
 | `"public"` | 1 |
 | `"private"` | 2 |
 | `"redacted"` | 3 |
 
-Um campo e incluido no JSON se seu `getVisibilityLevel(campo.expose)` for **menor ou igual** ao `getVisibilityLevel(exposeLevel)` solicitado no `toJSON()`. Campos que excedem o nivel solicitado sao substituidos por `"[REDACTED]"`.
+Um campo é incluído no JSON se seu `getVisibilityLevel(campo.expose)` for **menor ou igual** ao `getVisibilityLevel(exposeLevel)` solicitado no `toJSON()`. Campos que excedem o nível solicitado são substituídos por `"[REDACTED]"`.
 
 ### Propriedade validate por campo
 
-A propriedade `validate` permite sobrescrever o nivel de validacao global para um campo especifico:
+A propriedade `validate` permite sobrescrever o nível de validação global para um campo específico:
 
 ```typescript
 const schema = {
-  name: { type: FString },                                      // usa nivel global
+  name: { type: FString },                                      // usa nível global
   email: { type: FEmail, validate: { create: "full" } },        // sempre full no create
-  legacyField: { type: FString, validate: { assign: "none" } }, // sem validacao no assign
+  legacyField: { type: FString, validate: { assign: "none" } }, // sem validação no assign
 } satisfies ISchema;
 ```
 
-Os niveis possiveis sao `"full"`, `"type"` e `"none"`, conforme documentado na [configuracao global](/guia/config/configuracao-global).
+Os níveis possíveis são `"full"`, `"type"` e `"none"`, conforme documentado na [configuração global](/guia/config/configuracao-global).
 
 ## ISchema
 
@@ -96,7 +96,7 @@ interface ISchema {
 import { FString } from 'tyforge';
 import type { ISchema } from 'tyforge';
 
-// 'address' e um Schema — nao possui { type: ... }
+// 'address' é um Schema — não possui { type: ... }
 const schema = {
   name: { type: FString, required: true },     // ISchemaFieldConfig
   address: {                                     // Schema
@@ -114,15 +114,15 @@ Infere o tipo da entrada JSON (dados brutos com primitivos) a partir do schema. 
 type InferJson<TSchema extends ISchema>
 ```
 
-### Regras de Inferencia para JSON
+### Regras de Inferência para JSON
 
-| Definicao no Schema | Tipo Inferido |
+| Definição no Schema | Tipo Inferido |
 |---|---|
-| `{ type: FString, required: true }` | `string` (obrigatorio) |
+| `{ type: FString, required: true }` | `string` (obrigatório) |
 | `{ type: FInt, required: false }` | `number?` (opcional) |
-| `{ type: FEmail, required: true, isArray: true }` | `string[]` (obrigatorio) |
+| `{ type: FEmail, required: true, isArray: true }` | `string[]` (obrigatório) |
 | `{ type: FBoolean, required: false, isArray: true }` | `boolean[]?` (opcional) |
-| Objeto inline | Recursao para sub-tipo |
+| Objeto inline | Recursão para sub-tipo |
 | `{ type: MinhaEntity, required: true }` | `unknown` (Entities usam unknown) |
 
 **Exemplo:**
@@ -150,21 +150,21 @@ type UserJson = InferJson<typeof userSchema>;
 
 ## InferProps
 
-Infere o tipo da saida validada (instancias de TypeField) a partir do schema. Campos com `required: false` tornam-se propriedades opcionais.
+Infere o tipo da saída validada (instâncias de TypeField) a partir do schema. Campos com `required: false` tornam-se propriedades opcionais.
 
 ```typescript
 type InferProps<TSchema extends ISchema>
 ```
 
-### Regras de Inferencia para Props
+### Regras de Inferência para Props
 
-| Definicao no Schema | Tipo Inferido |
+| Definição no Schema | Tipo Inferido |
 |---|---|
-| `{ type: FString, required: true }` | `FString` (obrigatorio) |
+| `{ type: FString, required: true }` | `FString` (obrigatório) |
 | `{ type: FInt, required: false }` | `FInt?` (opcional) |
-| `{ type: FEmail, required: true, isArray: true }` | `FEmail[]` (obrigatorio) |
-| Objeto inline | Recursao para sub-tipo com instancias |
-| `{ type: MinhaEntity, required: true }` | `MinhaEntity` (instancia da entidade) |
+| `{ type: FEmail, required: true, isArray: true }` | `FEmail[]` (obrigatório) |
+| Objeto inline | Recursão para sub-tipo com instâncias |
+| `{ type: MinhaEntity, required: true }` | `MinhaEntity` (instância da entidade) |
 
 **Exemplo:**
 
@@ -189,9 +189,9 @@ type UserProps = InferProps<typeof userSchema>;
 // }
 ```
 
-## Inferencia com Arrays
+## Inferência com Arrays
 
-Quando `isArray: true` esta presente, tanto `InferJson` quanto `InferProps` produzem arrays:
+Quando `isArray: true` está presente, tanto `InferJson` quanto `InferProps` produzem arrays:
 
 ```typescript
 import { FString, FInt } from 'tyforge';
@@ -215,7 +215,7 @@ type PropsType = InferProps<typeof schema>;
 // }
 ```
 
-## Inferencia com Objetos Aninhados
+## Inferência com Objetos Aninhados
 
 Objetos inline (sem wrapper `{ type: ... }`) sao tratados recursivamente. O tipo inferido reflete a estrutura aninhada:
 
@@ -261,7 +261,7 @@ type PropsType = InferProps<typeof schema>;
 
 ## Entidades no Schema
 
-Entidades que implementam a interface `EntityStatic` podem ser usadas diretamente como tipo de campo. A interface requer um metodo estatico `create`:
+Entidades que implementam a interface `EntityStatic` podem ser usadas diretamente como tipo de campo. A interface requer um método estático `create`:
 
 ```typescript
 interface EntityStatic<TInstance extends Entity<IEntityPropsBase, unknown>> {
@@ -275,7 +275,7 @@ interface EntityStatic<TInstance extends Entity<IEntityPropsBase, unknown>> {
 import { SchemaBuilder, FString, FInt, isSuccess } from 'tyforge';
 import type { InferProps, ISchema } from 'tyforge';
 
-// Supondo que Produto e uma Entity com create() estatico
+// Supondo que Produto é uma Entity com create() estático
 const pedidoSchema = {
   numero: { type: FInt, required: true },
   cliente: { type: FString, required: true },
@@ -286,25 +286,25 @@ type PedidoProps = InferProps<typeof pedidoSchema>;
 // {
 //   numero: FInt;
 //   cliente: FString;
-//   produto: Produto;   // instancia da entidade
+//   produto: Produto;   // instância da entidade
 // }
 
 const validator = SchemaBuilder.compile(pedidoSchema);
 const result = validator.create({
   numero: 1001,
-  cliente: 'Joao Silva',
+  cliente: 'João Silva',
   produto: { id: 'abc-123', nome: 'Notebook', preco: 4500 },
 });
 
 if (isSuccess(result)) {
   const props = result.value;
-  // props.produto e uma instancia de Produto, validada pelo Produto.create()
+  // props.produto é uma instância de Produto, validada pelo Produto.create()
 }
 ```
 
 ## Exemplo Completo
 
-O exemplo abaixo demonstra todas as capacidades de inferencia em um unico schema:
+O exemplo abaixo demonstra todas as capacidades de inferência em um único schema:
 
 ```typescript
 import {
@@ -340,7 +340,7 @@ type CadastroJson = InferJson<typeof cadastroSchema>;
 //   };
 // }
 
-// Tipo da saida validada
+// Tipo da saída validada
 type CadastroProps = InferProps<typeof cadastroSchema>;
 // {
 //   nome: FString;
@@ -365,16 +365,16 @@ const result = validator.create({
   tags: ['admin', 'gerente'],
   endereco: {
     rua: 'Av. Paulista, 1000',
-    cidade: 'Sao Paulo',
+    cidade: 'São Paulo',
   },
 });
 
 if (isSuccess(result)) {
   const props = result.value;
-  // Todos os campos sao instancias tipadas de TypeField
+  // Todos os campos são instâncias tipadas de TypeField
   // props.nome.getValue()     -> 'Ana Costa'
   // props.email.getValue()    -> 'ana@empresa.com'
-  // props.idade               -> undefined (campo opcional nao enviado)
+  // props.idade               -> undefined (campo opcional não enviado)
   // props.ativo.getValue()    -> true
   // props.tags![0].getValue() -> 'admin'
   // props.endereco.rua.getValue() -> 'Av. Paulista, 1000'

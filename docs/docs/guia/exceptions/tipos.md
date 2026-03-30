@@ -1,38 +1,38 @@
 ---
-title: Tipos de Excecao
+title: Tipos de Exceção
 sidebar_position: 2
 ---
 
-# Tipos de Excecao
+# Tipos de Exceção
 
-O TyForge fornece seis classes de excecao especializadas, cada uma com factory methods estaticos que encapsulam os metadados RFC 7807 apropriados.
+O TyForge fornece seis classes de exceção especializadas, cada uma com factory methods estáticos que encapsulam os metadados RFC 7807 apropriados.
 
-## Catalogo
+## Catálogo
 
-| Classe | Status HTTP | Descricao |
+| Classe | Status HTTP | Descrição |
 |--------|-------------|-----------|
-| `ExceptionValidation` | 400 | Erros de validacao de dados de entrada |
-| `ExceptionBusiness` | 422, 409, 403, 404, 500 | Violacoes de regras de negocio |
-| `ExceptionNotFound` | 404 | Recurso nao encontrado |
-| `ExceptionAuth` | 401, 403, 400, 404, 409, 429 | Erros de autenticacao e autorizacao |
+| `ExceptionValidation` | 400 | Erros de validação de dados de entrada |
+| `ExceptionBusiness` | 422, 409, 403, 404, 500 | Violações de regras de negócio |
+| `ExceptionNotFound` | 404 | Recurso não encontrado |
+| `ExceptionAuth` | 401, 403, 400, 404, 409, 429 | Erros de autenticação e autorização |
 | `ExceptionDb` | 400, 404, 409, 422, 500, 503 | Erros de banco de dados |
-| `ExceptionUnexpected` | 500 | Erros inesperados e nao tratados |
+| `ExceptionUnexpected` | 500 | Erros inesperados e não tratados |
 
 ---
 
 ## ExceptionValidation
 
-Erros de validacao de dados de entrada. Status HTTP 400 (Bad Request).
+Erros de validação de dados de entrada. Status HTTP 400 (Bad Request).
 
 ```typescript
 import { ExceptionValidation } from "tyforge";
 
-const erro = ExceptionValidation.create("email", "Email deve ter formato valido");
+const erro = ExceptionValidation.create("email", "Email deve ter formato válido");
 // ExceptionValidation {
 //   type: "ExceptionValidation",
-//   title: "Erro de Validacao",
+//   title: "Erro de Validação",
 //   status: 400,
-//   detail: "Email deve ter formato valido",
+//   detail: "Email deve ter formato válido",
 //   field: "email",
 //   code: "VALIDATION_ERROR"
 // }
@@ -40,37 +40,37 @@ const erro = ExceptionValidation.create("email", "Email deve ter formato valido"
 
 **Factory methods:**
 
-| Metodo | Descricao |
+| Método | Descrição |
 |--------|-----------|
-| `create(field?, detail?)` | Cria excecao de validacao. Padrao: field `"UNKNOWN_FIELD"`, detail `"Valor invalido"` |
+| `create(field?, detail?)` | Cria exceção de validação. Padrão: field `"UNKNOWN_FIELD"`, detail `"Valor inválido"` |
 
-Esta e a excecao mais utilizada no TyForge — todos os TypeFields retornam `ExceptionValidation` quando a validacao falha via `create()`.
+Esta é a exceção mais utilizada no TyForge — todos os TypeFields retornam `ExceptionValidation` quando a validação falha via `create()`.
 
 ---
 
 ## ExceptionBusiness
 
-Violacoes de regras de negocio. O status HTTP varia conforme o tipo de violacao.
+Violações de regras de negócio. O status HTTP varia conforme o tipo de violação.
 
 ```typescript
 import { ExceptionBusiness } from "tyforge";
 
-// Regra de negocio invalida
+// Regra de negócio inválida
 const regra = ExceptionBusiness.invalidBusinessRule("Saldo deve ser positivo");
 // status: 422, code: "BUSINESS_INVALID_RULE"
 
 // Entrada duplicada
 const duplicado = ExceptionBusiness.duplicateEntry("email");
-// status: 409, detail: "Ja existe um registro com email informado"
+// status: 409, detail: "Já existe um registro com email informado"
 
-// Recurso nao encontrado (via business)
+// Recurso não encontrado (via business)
 const naoEncontrado = ExceptionBusiness.notFound("Conta");
-// status: 404, detail: "Conta nao encontrado(a)"
+// status: 404, detail: "Conta não encontrado(a)"
 ```
 
 **Factory methods:**
 
-| Metodo | Status | Code |
+| Método | Status | Code |
 |--------|--------|------|
 | `invalidBusinessRule(debug)` | 422 | `BUSINESS_INVALID_RULE` |
 | `operationNotAllowed()` | 403 | `BUSINESS_OPERATION_NOT_ALLOWED` |
@@ -85,13 +85,13 @@ const naoEncontrado = ExceptionBusiness.notFound("Conta");
 
 ## ExceptionNotFound
 
-Recurso nao encontrado. Status HTTP 404.
+Recurso não encontrado. Status HTTP 404.
 
 ```typescript
 import { ExceptionNotFound } from "tyforge";
 
 const generico = ExceptionNotFound.generic();
-// detail: "O recurso solicitado nao foi encontrado."
+// detail: "O recurso solicitado não foi encontrado."
 
 const registro = ExceptionNotFound.registro();
 // detail: "Nenhum registro encontrado."
@@ -102,9 +102,9 @@ const externo = ExceptionNotFound.externalService();
 
 **Factory methods:**
 
-| Metodo | Code | Descricao |
+| Método | Code | Descrição |
 |--------|------|-----------|
-| `generic()` | `NOT_FOUND_GENERIC` | Recurso generico nao encontrado |
+| `generic()` | `NOT_FOUND_GENERIC` | Recurso genérico não encontrado |
 | `registro()` | `NOT_FOUND_REGISTRO` | Nenhum registro encontrado |
 | `externalService()` | `NOT_FOUND_EXTERNAL_SERVICE` | Falha ao acessar recurso externo |
 
@@ -112,7 +112,7 @@ const externo = ExceptionNotFound.externalService();
 
 ## ExceptionAuth
 
-Erros de autenticacao e autorizacao. O status HTTP varia conforme o cenario.
+Erros de autenticação e autorização. O status HTTP varia conforme o cenário.
 
 ```typescript
 import { ExceptionAuth } from "tyforge";
@@ -129,7 +129,7 @@ const acesso = ExceptionAuth.accessDenied();
 
 **Factory methods (principais):**
 
-| Metodo | Status | Code |
+| Método | Status | Code |
 |--------|--------|------|
 | `invalidCredentials()` | 401 | `AUTH_INVALID_CREDENTIALS` |
 | `invalidToken()` | 401 | `AUTH_INVALID_TOKEN` |
@@ -157,7 +157,7 @@ const acesso = ExceptionAuth.accessDenied();
 | `invalidInviteToken()` | 400 | `AUTH_INVALID_INVITE_TOKEN` |
 | `invalidBackupCode()` | 401 | `AUTH_INVALID_BACKUP_CODE` |
 
-Metodos como `mfaLockout()` e `rateLimited()` aceitam `retryAfterSeconds` em `additionalFields`. O metodo `stepUpRequired(scope)` adiciona `required_scope` em `additionalFields`.
+Métodos como `mfaLockout()` e `rateLimited()` aceitam `retryAfterSeconds` em `additionalFields`. O método `stepUpRequired(scope)` adiciona `required_scope` em `additionalFields`.
 
 ---
 
@@ -171,16 +171,16 @@ import { ExceptionDb } from "tyforge";
 const naoEncontrado = ExceptionDb.recordNotFound();
 // status: 404, code: "DB_RECORD_NOT_FOUND"
 
-const conexao = ExceptionDb.connectionError();
+const conexão = ExceptionDb.connectionError();
 // status: 503, code: "DB_CONNECTION_ERROR"
 
 const fk = ExceptionDb.foreignKeyConstraintViolation("cliente_id");
-// status: 400, detail: "O cliente_id informado nao existe no sistema"
+// status: 400, detail: "O cliente_id informado não existe no sistema"
 ```
 
 **Factory methods:**
 
-| Metodo | Status | Code |
+| Método | Status | Code |
 |--------|--------|------|
 | `recordNotFound()` | 404 | `DB_RECORD_NOT_FOUND` |
 | `duplicateEntry()` | 409 | `DB_DUPLICATE_ENTRY` |
@@ -195,32 +195,32 @@ const fk = ExceptionDb.foreignKeyConstraintViolation("cliente_id");
 
 ## ExceptionUnexpected
 
-Erros inesperados e nao tratados. Status HTTP 500 (Internal Server Error).
+Erros inesperados e não tratados. Status HTTP 500 (Internal Server Error).
 
 ```typescript
 import ExceptionUnexpected from "tyforge";
 
 const erro = ExceptionUnexpected.create({
-  message: "Conexao recusada pelo servidor remoto",
+  message: "Conexão recusada pelo servidor remoto",
   stack: error.stack,
-  context: { servico: "api-pagamentos", tentativa: 3 },
+  context: { serviço: "api-pagamentos", tentativa: 3 },
 });
 // status: 500, code: "UNEXPECTED_ERROR"
 
 const externo = ExceptionUnexpected.externalService({
   message: "Timeout na API de terceiros",
 });
-// status: 500, detail: "Erro ao acessar servico externo"
+// status: 500, detail: "Erro ao acessar serviço externo"
 ```
 
 **Factory methods:**
 
-| Metodo | Descricao |
+| Método | Descrição |
 |--------|-----------|
-| `create(log?)` | Cria excecao inesperada com log opcional (`message`, `stack`, `context`) |
-| `externalService(log?)` | Cria excecao para falha em servico externo |
+| `create(log?)` | Cria exceção inesperada com log opcional (`message`, `stack`, `context`) |
+| `externalService(log?)` | Cria exceção para falha em serviço externo |
 
-A propriedade `log` (tipo `ExceptionLog`) permite anexar informacoes de diagnostico sem expor ao cliente:
+A propriedade `log` (tipo `ExceptionLog`) permite anexar informações de diagnóstico sem expor ao cliente:
 
 ```typescript
 interface ExceptionLog {
@@ -234,7 +234,7 @@ interface ExceptionLog {
 
 ## Uso com Result pattern
 
-As excecoes sao tipicamente encapsuladas em `Result` via o helper `err()`:
+As exceções são tipicamente encapsuladas em `Result` via o helper `err()`:
 
 ```typescript
 import { err, ok, Result } from "tyforge";
@@ -248,11 +248,11 @@ function sacar(valor: number, saldo: number): Result<number, ExceptionBusiness> 
 }
 ```
 
-Para TypeFields, a excecao e retornada automaticamente pelo `create()`:
+Para TypeFields, a exceção é retornada automaticamente pelo `create()`:
 
 ```typescript
-const result = FEmail.create("invalido");
+const result = FEmail.create("inválido");
 // Result<FEmail, ExceptionValidation>
 // result.error.field === "Email"
-// result.error.detail === "Email deve ter formato valido"
+// result.error.detail === "Email deve ter formato válido"
 ```

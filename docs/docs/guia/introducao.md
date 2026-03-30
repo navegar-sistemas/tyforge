@@ -6,9 +6,9 @@ sidebar_position: 1
 
 import MermaidDiagram from '@site/src/components/MermaidDiagram';
 
-# TyForge — Type-safe Validation Library
+# TyForge — Type-safe Validation Framework
 
-**TyForge** é uma biblioteca TypeScript para validação de schemas com segurança de tipos, Result pattern e blocos de construção para Domain-Driven Design, desenvolvida pela [Navegar Sistemas](https://github.com/navegar-sistemas).
+**TyForge** é um framework TypeScript para validação de schemas com segurança de tipos, Result pattern e blocos de construção para Domain-Driven Design, desenvolvida pela [Navegar Sistemas](https://github.com/navegar-sistemas).
 
 Toda operação de validação retorna um `Result<T, E>` em vez de lançar exceções, garantindo tratamento de erros explícito e composicional em todo o fluxo da aplicação.
 
@@ -85,7 +85,7 @@ graph TD
   TypeFields --> DomainModels
 `} />
 
-O módulo **Result** é a base de toda a biblioteca — todos os demais módulos retornam `Result<T, E>` em suas operações de criação e validação. Os **Type Fields** consomem Result e Exceptions para validar valores primitivos, e são utilizados tanto pelo **Schema Builder** (composição de schemas) quanto pelos **Domain Models** (entidades e agregados).
+O módulo **Result** é a base de todo o framework — todos os demais módulos retornam `Result<T, E>` em suas operações de criação e validação. Os **Type Fields** consomem Result e Exceptions para validar valores primitivos, e são utilizados tanto pelo **Schema Builder** (composição de schemas) quanto pelos **Domain Models** (entidades e agregados).
 
 ## Stack técnica
 

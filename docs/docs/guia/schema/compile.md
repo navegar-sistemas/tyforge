@@ -1,11 +1,11 @@
 ---
-title: Compilacao e Modos
+title: Compilação e Modos
 sidebar_position: 2
 ---
 
-# Compilacao e Modos
+# Compilação e Modos
 
-O metodo `SchemaBuilder.compile()` e a forma recomendada de usar o SchemaBuilder. Ele pre-analisa o schema uma unica vez e retorna um objeto `ICompiledSchema<T>` com dois metodos de validacao.
+O método `SchemaBuilder.compile()` é a forma recomendada de usar o SchemaBuilder. Ele pré-analisa o schema uma única vez e retorna um objeto `ICompiledSchema<T>` com dois métodos de validação.
 
 ## ICompiledSchema
 
@@ -18,13 +18,13 @@ interface ICompiledSchema<TSchema> {
 
 ### `create(data, path?)`
 
-Modo de **validacao completa**. Todos os campos marcados como `required: true` (ou sem `required`, pois o padrao e `true`) devem estar presentes nos dados de entrada. Cada campo e validado pelo metodo `create()` do TypeField correspondente.
+Modo de **validação completa**. Todos os campos marcados como `required: true` (ou sem `required`, pois o padrão é `true`) devem estar presentes nos dados de entrada. Cada campo é validado pelo método `create()` do TypeField correspondente.
 
 Use este modo ao **criar novas entidades ou objetos de valor** a partir de dados externos.
 
 ### `assign(data, path?)`
 
-Modo de **validacao parcial**. Tambem exige campos obrigatorios, mas utiliza o metodo `assign()` do TypeField quando disponivel. O metodo `assign()` pode aplicar regras de validacao diferentes — por exemplo, aceitar um ID ja existente sem revalida-lo do zero.
+Modo de **validação parcial**. Também exige campos obrigatórios, mas utiliza o método `assign()` do TypeField quando disponível. O método `assign()` pode aplicar regras de validação diferentes — por exemplo, aceitar um ID já existente sem revalidá-lo do zero.
 
 Use este modo ao **atualizar entidades existentes** com dados parciais.
 
@@ -42,14 +42,14 @@ const userSchema = {
 
 const validator = SchemaBuilder.compile(userSchema);
 
-// create — validacao completa, ideal para criacao
+// create — validação completa, ideal para criação
 const novoUsuario = validator.create({
   id: crypto.randomUUID(),
   name: 'Maria Silva',
   email: 'maria@email.com',
 });
 
-// assign — validacao parcial, ideal para atualizacao
+// assign — validação parcial, ideal para atualização
 const atualizacao = validator.assign({
   id: idExistente,
   name: 'Maria Santos',
@@ -57,7 +57,7 @@ const atualizacao = validator.assign({
 });
 ```
 
-## Performance: Compilacao Interna
+## Performance: Compilação Interna
 
 Ao chamar `SchemaBuilder.compile(schema)`, o TyForge converte cada campo do schema em uma estrutura `CompiledField`:
 
@@ -65,28 +65,28 @@ Ao chamar `SchemaBuilder.compile(schema)`, o TyForge converte cada campo do sche
 interface CompiledField {
   key: string;          // nome do campo
   path: string;         // caminho completo (ex: 'user.address.city')
-  required: boolean;    // se o campo e obrigatorio
+  required: boolean;    // se o campo é obrigatório
   kind: FieldKind;      // tipo de processamento
-  creatable: object;    // referencia ao TypeField (se aplicavel)
-  hasAssign: boolean;   // se possui metodo assign()
-  nestedValidator: object; // validador aninhado (se aplicavel)
+  creatable: object;    // referência ao TypeField (se aplicável)
+  hasAssign: boolean;   // se possui método assign()
+  nestedValidator: object; // validador aninhado (se aplicável)
 }
 ```
 
 O enum `FieldKind` determina o tipo de processamento de cada campo:
 
-| FieldKind | Descricao |
+| FieldKind | Descrição |
 |---|---|
 | `Creatable` | Campo simples com TypeField (ex: `FString`, `FEmail`) |
 | `NestedSchema` | Objeto aninhado — recursa para sub-schema |
 | `ArrayCreatable` | Array de TypeFields (ex: `FString[]`) |
 | `ArrayNestedSchema` | Array de objetos aninhados |
 
-Essa pre-analise elimina verificacoes de tipo (`typeof creatable.create === 'function'`) em cada execucao, tornando a validacao mais rapida em cenarios de uso repetido.
+Essa pré-análise elimina verificações de tipo (`typeof creatable.create === 'function'`) em cada execução, tornando a validação mais rápida em cenários de uso repetido.
 
-## Relatorio de Erros
+## Relatório de Erros
 
-Ambos os metodos retornam `Result<InferProps<TSchema>, Exceptions>`. O erro inclui o **field path** completo, permitindo localizar exatamente qual campo falhou:
+Ambos os métodos retornam `Result<InferProps<TSchema>, Exceptions>`. O erro inclui o **field path** completo, permitindo localizar exatamente qual campo falhou:
 
 ```typescript
 import { SchemaBuilder, FString, FEmail, isFailure } from 'tyforge';
@@ -100,7 +100,7 @@ const schema = {
 } satisfies ISchema;
 
 const validator = SchemaBuilder.compile(schema);
-const result = validator.create({ user: { name: 'Ana', email: 'invalido' } });
+const result = validator.create({ user: { name: 'Ana', email: 'inválido' } });
 
 if (isFailure(result)) {
   // result.error contem ExceptionValidation com path 'user.email'
@@ -108,7 +108,7 @@ if (isFailure(result)) {
 }
 ```
 
-Para campos ausentes obrigatorios, o erro e `"Campo obrigatorio ausente."` com o path do campo. Para arrays, o path inclui o indice (ex: `tags[2]`).
+Para campos ausentes obrigatórios, o erro é `"Campo obrigatório ausente."` com o path do campo. Para arrays, o path inclui o índice (ex: `tags[2]`).
 
 ## Objetos Aninhados
 
@@ -134,17 +134,17 @@ const result = validator.create({
     name: 'Carlos',
     address: {
       street: 'Rua das Flores, 123',
-      city: 'Sao Paulo',
+      city: 'São Paulo',
     },
   },
 });
 ```
 
-Objetos aninhados inline sao sempre **obrigatorios**. O field path e composto automaticamente: `user.address.street`.
+Objetos aninhados inline são sempre **obrigatórios**. O field path é composto automaticamente: `user.address.street`.
 
 ## Arrays
 
-Ha duas sintaxes para definir campos do tipo array:
+Há duas sintaxes para definir campos do tipo array:
 
 ### Sintaxe com `isArray`
 
@@ -170,18 +170,18 @@ const schema = {
 } satisfies ISchema;
 ```
 
-Ambas produzem o mesmo resultado. Na entrada JSON, o campo deve ser um array. Cada item do array e validado individualmente, e o erro inclui o indice:
+Ambas produzem o mesmo resultado. Na entrada JSON, o campo deve ser um array. Cada item do array é validado individualmente, e o erro inclui o índice:
 
 ```typescript
 const validator = SchemaBuilder.compile(schema);
 const result = validator.create({ tags: ['node', '', 'tyforge'], scores: [10, 20] });
 
-// Se 'tags[1]' for invalido (string vazia), o erro tera path 'tags[1]'
+// Se 'tags[1]' for inválido (string vazia), o erro terá path 'tags[1]'
 ```
 
 ### Arrays de Objetos Aninhados
 
-Tambem e possivel definir arrays de objetos complexos:
+Também é possível definir arrays de objetos complexos:
 
 ```typescript
 import { SchemaBuilder, FString, FInt } from 'tyforge';
