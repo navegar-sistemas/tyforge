@@ -10,6 +10,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.1] - 2026-03-30
+
+### Added
+- README.md em todos os pacotes (`packages/tyforge`, `packages/http`, `packages/graphql`, `packages/websocket`) para exibição no npm
+
 ## [0.2.0] - 2026-03-29
 
 ### Added

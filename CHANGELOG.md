@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.2.1] - 2026-03-30
+
+### Added
+- README.md em todos os pacotes (`packages/tyforge`, `packages/http`, `packages/graphql`, `packages/websocket`) para exibição no npm
+
 ## [0.2.0] - 2026-03-29
 
 ### Added
@@ -235,30 +240,6 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 - `formatted()` return type aliases fixed in `FInt`, `FBoolean`, `FPageNumber`, `FPageSize`
 - `applyMask` deduplicated — extracted from 3 document files to shared `mask.util.ts`
 - Documentation: corrected Portuguese accents across all Docusaurus pages
-
-## [0.1.22] - 2026-03-27
-
-### Added
-- `FMoney` TypeField — monetary values stored as integer cents (zero floating point)
-- `FCurrency` TypeField — decimal convenience layer extending FMoney (accepts 10.50, stores 1050)
-- `FIdentifier` TypeField — UUID base class for all ID types
-- Money arithmetic: `add()`, `subtract()` (integer-safe, inherited by FCurrency)
-- Money comparisons: `isZero()`, `isPositive()`, `isNegative()`, `isGreaterThan()`, `isLessThan()`, `isEqualTo()`
-- Money factory: `FMoney.zero()`, `FMoney.fromDecimal()`, `toDecimal()`
-- Banking TypeFields: `FBankCode`, `FBankBranch`, `FBankAccountNumber`, `FBankNsu`, `FBankE2eId`, `FEmvQrCodePayload`
-- Identifier TypeFields: `FTransactionId`, `FDeviceId`, `FCorrelationId`, `FReconciliationId`, `FIdempotencyKey`, `FCertificateThumbprint` (extend FIdentifier)
-- Document TypeFields: `FDocumentCpf`, `FDocumentCnpj`, `FDocumentCpfOrCnpj`, `FDocumentRg`, `FDocumentId`, `FDocumentType`, `FDocumentStateRegistration`, `FDocumentMunicipalRegistration`
-- Security TypeFields: `FTotpCode`, `FTotpSecret`
-- PIX TypeFields: `FPixKey`, `FPixKeyType` (with `OPixKeyType`)
-- Enum TypeFields: `FPersonType`, `FGender`, `FMaritalStatus`, `FTransactionStatus`
-- Other TypeFields: `FStateCode`, `FFloat`, `FBusinessName`
-- TypeField locale system: `TypeField.configure({ locale: "br" })` for locale-aware validation
-- Subpath exports in package.json: `tyforge/result`, `tyforge/type-fields`, `tyforge/exceptions`, `tyforge/schema`, `tyforge/tools`
-- Dynamic `import()` for batch-parallel — fixes Metro bundler crash on React Native
-
-### Fixed
-- Metro/React Native: `node:worker_threads` no longer loaded at top level in any import chain
-- `batchCreate()` with `concurrency > 1` silently falls back to sequential on browser/React Native
 
 
 
