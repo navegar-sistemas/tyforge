@@ -2,7 +2,7 @@ import {
   Exceptions, ExceptionValidation, ExceptionBusiness,
   ExceptionNotFound, ExceptionAuth,
   ExceptionOptimisticLock,
-} from "@tyforge/index";
+} from "tyforge";
 
 console.log("=== Exceptions (RFC 7807) ===\n");
 

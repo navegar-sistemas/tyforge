@@ -1,6 +1,6 @@
 import { Result, ok, err, isFailure } from "tyforge/result";
 import { Exceptions } from "tyforge/exceptions";
-import { ServiceBase } from "tyforge";
+import { ServiceBase } from "tyforge/infrastructure/service-base";
 import { TypeGuard } from "tyforge/tools";
 import { FString, FInt, FHttpMethod, FHttpFormat, FUrlPath } from "tyforge/type-fields";
 import { ServiceHttpSecurity } from "./service-http.security";

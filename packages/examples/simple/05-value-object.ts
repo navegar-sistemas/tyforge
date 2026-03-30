@@ -1,8 +1,8 @@
 import {
   ValueObject, SchemaBuilder, FString, FInt,
   isSuccess, isFailure, ok, Result, Exceptions,
-} from "@tyforge/index";
-import type { ISchema, InferProps, InferJson } from "@tyforge/index";
+} from "tyforge";
+import type { ISchema, InferProps, InferJson } from "tyforge";
 import { DtoCreateAddress } from "./11-dto";
 
 console.log("=== ValueObject ===\n");

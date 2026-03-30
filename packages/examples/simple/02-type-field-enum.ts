@@ -1,4 +1,4 @@
-import { FAppStatus, FHttpStatus, OHttpStatus, isSuccess, isFailure } from "@tyforge/index";
+import { FAppStatus, FHttpStatus, OHttpStatus, isSuccess, isFailure } from "tyforge";
 
 console.log("=== TypeField Enum ===\n");
 

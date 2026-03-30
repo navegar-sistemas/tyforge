@@ -1,5 +1,4 @@
-// ── Config ──────────────────────────────────────────────────────
-export { TyForgeConfig, loadTyForgeConfig, getTyForgeConfig, clearConfigCache, OValidateLevel, ORuleSeverity } from "./config/tyforge-config";
+// ── Config (types only — runtime via "tyforge/config" subpath) ──
 export type { ITyForgeConfig, IResolvedTyForgeConfig, ILintConfigSection, TRuleSeverity } from "./config/tyforge-config";
 
 // ── Result Pattern ──────────────────────────────────────────────
@@ -86,7 +85,7 @@ export type { IPort } from "./application/port";
 export type { IPipelineBehavior } from "./application/pipeline-behavior";
 
 // ── Infrastructure ─────────────────────────────────────────────
-export { ServiceBase } from "./infrastructure/service.base";
+// ServiceBase available via "tyforge/infrastructure/service-base" subpath (Node.js only)
 export type { IUnitOfWork } from "./infrastructure/unit-of-work";
 export type { IOutbox } from "./infrastructure/outbox";
 export type { IOutboxEntry } from "./infrastructure/outbox-entry";
@@ -113,5 +112,5 @@ export { ToolParse } from "./tools/parse/parse.tool";
 export { ToolFormattingDateISO8601 } from "./tools/formatting/date/date-formatting.tool";
 export { ToolObjectTransform } from "./tools/object-transform.tool";
 export { ToolHeaderSecurity } from "./tools/header-security.tool";
-export { ToolNetworkSecurity } from "./tools/network-security.tool";
+// ToolNetworkSecurity available via "tyforge/tools/network-security" subpath (Node.js only)
 

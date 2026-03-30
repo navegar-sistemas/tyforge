@@ -2,9 +2,9 @@ import {
   FId, FString, FEmail, FInt, FBoolean, FPageNumber, FPageSize, Paginated,
   isSuccess, isFailure, ok, err,
   Exceptions, ExceptionBusiness,
-} from "@tyforge/index";
-import { RepositoryCrud } from "@tyforge/index";
-import type { ResultPromise, IPaginationParams } from "@tyforge/index";
+} from "tyforge";
+import { RepositoryCrud } from "tyforge";
+import type { ResultPromise, IPaginationParams } from "tyforge";
 import { User } from "./12-aggregates";
 import type { TUserJson } from "./12-aggregates";
 

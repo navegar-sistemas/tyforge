@@ -3,8 +3,8 @@ import {
   map, flatMap, fold, match, getOrElse, orElse, all, toPromise,
   OK_TRUE, OK_FALSE,
   FEmail,
-} from "@tyforge/index";
-import type { Result } from "@tyforge/index";
+} from "tyforge";
+import type { Result } from "tyforge";
 
 console.log("=== Result Pattern ===\n");
 

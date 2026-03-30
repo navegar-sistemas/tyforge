@@ -1,8 +1,8 @@
 import {
   Aggregate, SchemaBuilder, FString, FEmail, FId, FInt, FAppStatus, OAppStatus,
   isSuccess, isFailure, ok, err, Result, Exceptions, ExceptionBusiness,
-} from "@tyforge/index";
-import type { ISchema, InferProps, InferJson } from "@tyforge/index";
+} from "tyforge";
+import type { ISchema, InferProps, InferJson } from "tyforge";
 import { DtoCreateOrder } from "./11-dto";
 import { EventOrderCreated } from "./13-events";
 

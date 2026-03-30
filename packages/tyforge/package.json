@@ -1,6 +1,6 @@
 {
   "name": "tyforge",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Type-safe schema validation, Result pattern, and DDD building blocks for TypeScript",
   "keywords": [
     "typescript",
@@ -56,13 +56,34 @@
     "./tools": {
       "import": "./dist/tools/index.js",
       "types": "./dist/tools/index.d.ts"
+    },
+    "./config": {
+      "import": "./dist/config/tyforge-config.js",
+      "types": "./dist/config/tyforge-config.d.ts"
+    },
+    "./tools/network-security": {
+      "import": "./dist/tools/network-security.tool.js",
+      "types": "./dist/tools/network-security.tool.d.ts"
+    },
+    "./infrastructure/service-base": {
+      "import": "./dist/infrastructure/service.base.js",
+      "types": "./dist/infrastructure/service.base.d.ts"
     }
   },
   "bin": {
     "tyforge-lint": "./dist/lint/index.js"
   },
   "browser": {
-    "./dist/schema/batch-parallel.js": "./dist/schema/batch-parallel.browser.js"
+    "./dist/schema/batch-parallel.js": "./dist/schema/batch-parallel.browser.js",
+    "./dist/config/tyforge-config.js": "./dist/config/tyforge-config.browser.js",
+    "./dist/tools/network-security.tool.js": "./dist/tools/network-security.browser.js",
+    "./dist/infrastructure/service.base.js": "./dist/infrastructure/service.base.browser.js"
+  },
+  "react-native": {
+    "./dist/schema/batch-parallel.js": "./dist/schema/batch-parallel.browser.js",
+    "./dist/config/tyforge-config.js": "./dist/config/tyforge-config.browser.js",
+    "./dist/tools/network-security.tool.js": "./dist/tools/network-security.browser.js",
+    "./dist/infrastructure/service.base.js": "./dist/infrastructure/service.base.browser.js"
   },
   "sideEffects": false,
   "files": [

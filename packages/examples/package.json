@@ -1,0 +1,20 @@
+{
+  "name": "@tyforge/examples",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TyForge usage examples — simple TypeScript patterns and React Native compatibility",
+  "type": "module",
+  "scripts": {
+    "test": "tsx --test simple/__tests__/*.test.ts",
+    "test:rn": "cd react-native && node test.js"
+  },
+  "devDependencies": {
+    "@types/node": "25.5.0",
+    "tsx": "4.21.0",
+    "typescript": "6.0.2",
+    "tyforge": "0.2.2"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

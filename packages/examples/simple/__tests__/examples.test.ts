@@ -7,12 +7,12 @@ import {
   ok, err, isSuccess, isFailure, map, flatMap, fold, match, getOrElse, orElse, all, OK_TRUE, OK_FALSE,
   Exceptions, ExceptionValidation, ExceptionBusiness, ExceptionOptimisticLock,
   ValueObject, Entity, Aggregate, DtoReq, DtoRes, DomainEvent, UseCase, Paginated, RepositoryCrud,
-} from "@tyforge/index";
+} from "tyforge";
 import type {
   ISchema, InferProps, InferJson, Result,
   TDtoReqProps, TDtoReqPropsJson, TDtoResProps, TDtoResPropsJson,
   ResultPromise, IPaginationParams,
-} from "@tyforge/index";
+} from "tyforge";
 
 // ── Helpers ─────────────────────────────────────────────────────
 

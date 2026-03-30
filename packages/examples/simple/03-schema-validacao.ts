@@ -1,5 +1,5 @@
-import { SchemaBuilder, FString, FEmail, FInt, FId, isSuccess, isFailure } from "@tyforge/index";
-import type { ISchema, InferProps, InferJson } from "@tyforge/index";
+import { SchemaBuilder, FString, FEmail, FInt, FId, isSuccess, isFailure } from "tyforge";
+import type { ISchema, InferProps, InferJson } from "tyforge";
 
 console.log("=== SchemaBuilder — Validacao ===\n");
 

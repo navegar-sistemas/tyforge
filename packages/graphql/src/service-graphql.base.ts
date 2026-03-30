@@ -1,5 +1,5 @@
 import { ok, err, isFailure } from "tyforge/result";
-import { ServiceBase } from "tyforge";
+import { ServiceBase } from "tyforge/infrastructure/service-base";
 import { TypeGuard, ToolHeaderSecurity } from "tyforge/tools";
 import { FString, FGraphQLOperationName } from "tyforge/type-fields";
 import { ServiceGraphQLSecurity } from "./service-graphql.security";

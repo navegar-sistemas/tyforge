@@ -1,4 +1,4 @@
-import { FString, FEmail, FInt, FBoolean, FId, isSuccess, isFailure } from "@tyforge/index";
+import { FString, FEmail, FInt, FBoolean, FId, isSuccess, isFailure } from "tyforge";
 
 console.log("=== TypeFields Basicos ===\n");
 

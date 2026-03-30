@@ -1,4 +1,4 @@
-import { DomainEvent, FString } from "@tyforge/index";
+import { DomainEvent, FString } from "tyforge";
 
 // ═══════════════════════════════════════════════════════════════════
 // Reusable Domain Events — imported by other examples

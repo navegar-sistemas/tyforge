@@ -1,8 +1,8 @@
 import {
   DtoReq, SchemaBuilder, FString, FEmail, FInt,
   isSuccess, isFailure, ok, Result, Exceptions,
-} from "@tyforge/index";
-import type { ISchema, InferProps, InferJson, TDtoReqProps, TDtoReqPropsJson } from "@tyforge/index";
+} from "tyforge";
+import type { ISchema, InferProps, InferJson, TDtoReqProps, TDtoReqPropsJson } from "tyforge";
 
 const createAddressDtoSchema = {
   street: { type: FString },

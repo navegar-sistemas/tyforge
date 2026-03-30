@@ -1,8 +1,8 @@
 import {
   Entity, SchemaBuilder, FString, FEmail, FId,
   isSuccess, isFailure, ok, err, Result, Exceptions, ExceptionBusiness,
-} from "@tyforge/index";
-import type { ISchema, InferProps, InferJson } from "@tyforge/index";
+} from "tyforge";
+import type { ISchema, InferProps, InferJson } from "tyforge";
 import { DtoCreateUser } from "./11-dto";
 
 console.log("=== Entity ===\n");

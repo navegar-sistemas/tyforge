@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.2.3] - 2026-03-30
+
+### Added
+- Browser/React Native stubs para `TyForgeConfig`, `ToolNetworkSecurity` e `ServiceBase` via `browser` e `react-native` fields no package.json
+- Exemplo React Native com Expo para teste de compatibilidade
+- Pacote `@tyforge/examples` com exemplos simples e React Native
+
+### Changed
+- Exemplos movidos de `packages/tyforge/src/examples` para `packages/examples/simple`
+- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.3`
+
 ## [0.2.2] - 2026-03-30
 
 ### Fixed
@@ -231,17 +242,6 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 - `batch-parallel.ts`: worker termination now properly awaited on error
 - `TypeGuard.isEnumKey`: type guard added before `.toString()` — rejects non-string/non-number input (prevents type coercion bypass)
 - User input removed from all ExceptionValidation error messages (prevents XSS when messages are rendered in HTML)
-
-## [0.1.24] - 2026-03-27
-
-### Changed
-- `TypeField.applyMask()` changed to `protected static` — only accessible by subclasses via `formatted()`
-- Document TypeFields now call `applyMask` via own class name instead of `TypeField.applyMask()`
-- Removed standalone `mask.util.ts` — moved to base class
-- nginx.conf: removed duplicate security headers (handled by host reverse proxy)
-- Dockerfile.dev: added `COPY . .` for standalone builds
-- Dockerfile: added `rm -rf node_modules` after build to reduce cache
-- Sidebar: added Changelog and new TypeField categories (Moeda, Documentos, Bancário, PIX, Segurança, Enums)
 
 
 

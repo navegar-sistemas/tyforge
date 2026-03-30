@@ -2,8 +2,8 @@ import {
   isFailure, isSuccess, ok, all,
   DtoRes, SchemaBuilder, FString, FEmail, FBoolean,
   Result, Exceptions, Paginated,
-} from "@tyforge/index";
-import type { IMapper, ISchema, InferProps, InferJson, TDtoResProps, TDtoResPropsJson } from "@tyforge/index";
+} from "tyforge";
+import type { IMapper, ISchema, InferProps, InferJson, TDtoResProps, TDtoResPropsJson } from "tyforge";
 import { User } from "./12-aggregates";
 import type { TUserJson } from "./12-aggregates";
 

@@ -1,4 +1,4 @@
-import { UseCase, isSuccess, isFailure, Exceptions } from "@tyforge/index";
+import { UseCase, isSuccess, isFailure, Exceptions } from "tyforge";
 import { DtoCreateUser } from "./11-dto";
 import { User } from "./12-aggregates";
 
