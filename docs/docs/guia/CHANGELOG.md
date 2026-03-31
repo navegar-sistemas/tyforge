@@ -10,6 +10,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.17] - 2026-03-31
+
+### Added
+- `FPassword.getStrength(value)`: método estático que retorna `IPasswordStrength` com resultado individual de cada regra (length, uppercase, lowercase, digit, special) — permite indicador de força de senha em UI
+- `FPassword.isWeak(value)`: método estático que detecta senhas previsíveis (caracteres repetidos, dígitos sequenciais, padrões de teclado como qwerty/azerty)
+- `IPasswordStrength`: interface exportada com os 5 campos booleanos de força
+
+### Changed
+- `FPassword.validateRules()`: usa `getStrength()` internamente e rejeita senhas detectadas por `isWeak()` com `ExceptionValidation` descritiva
+- Prettier integrado ao projeto (printWidth: 80, `.prettierrc.json`, `.editorconfig`)
+- Nova regra guard `max-line-length` (80 colunas)
+- Novo pre-commit check `CheckFormat` (prettier --check)
+- `@tyforge/graphql` (`0.2.2`), `@tyforge/http` (`0.1.13`), `@tyforge/websocket` (`0.1.13`), `@tyforge/guard` (`0.1.8`): bump de versão para publicação
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.17`
+
 ## [0.2.16] - 2026-03-31
 
 ### Fixed

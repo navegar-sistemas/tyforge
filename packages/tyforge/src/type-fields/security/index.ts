@@ -28,4 +28,8 @@ export type {
   TTotpSecretFormatted,
 } from "./totp-secret.typefield";
 export { FPassword } from "./password.typefield";
-export type { TPassword, TPasswordFormatted } from "./password.typefield";
+export type {
+  TPassword,
+  TPasswordFormatted,
+  IPasswordStrength,
+} from "./password.typefield";

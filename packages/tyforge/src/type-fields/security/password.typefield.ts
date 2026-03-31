@@ -10,6 +10,14 @@ import { TypeGuard } from "@tyforge/tools/type_guard";
 export type TPassword = string;
 export type TPasswordFormatted = string;
 
+export interface IPasswordStrength {
+  readonly length: boolean;
+  readonly uppercase: boolean;
+  readonly lowercase: boolean;
+  readonly digit: boolean;
+  readonly special: boolean;
+}
+
 export class FPassword extends TypeField<TPassword, TPasswordFormatted> {
   override readonly typeInference = "FPassword";
 
@@ -20,18 +28,68 @@ export class FPassword extends TypeField<TPassword, TPasswordFormatted> {
     serializeAsString: false,
   };
 
+  private static readonly MIN_LENGTH = 8;
+
   // Password complexity is enforced on ASCII
   // characters only. Unicode characters
-  // are accepted in the password value but do not count toward complexity
-  // requirements. This follows the NIST SP 800-63B recommendation of accepting
-  // all Unicode while checking complexity against the ASCII subset.
+  // are accepted in the password value but do not count toward
+  // complexity requirements. This follows the NIST SP 800-63B
+  // recommendation of accepting all Unicode while checking
+  // complexity against the ASCII subset.
   private static readonly UPPERCASE_REGEX = /[A-Z]/;
   private static readonly LOWERCASE_REGEX = /[a-z]/;
   private static readonly DIGIT_REGEX = /[0-9]/;
   private static readonly SPECIAL_REGEX = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
 
+  private static readonly SEQ_ASC = "0123456789";
+  private static readonly SEQ_DESC = "9876543210";
+
+  private static readonly KEYBOARD_PATTERNS = [
+    "qwerty",
+    "qwertz",
+    "azerty",
+    "asdfgh",
+    "zxcvbn",
+    "!@#$%^",
+    "1qaz2wsx",
+    "qazwsx",
+  ];
+
   private constructor(value: TPassword, fieldPath: string) {
     super(value, fieldPath);
+  }
+
+  static getStrength(value: string): IPasswordStrength {
+    return {
+      length: value.length >= FPassword.MIN_LENGTH,
+      uppercase: FPassword.UPPERCASE_REGEX.test(value),
+      lowercase: FPassword.LOWERCASE_REGEX.test(value),
+      digit: FPassword.DIGIT_REGEX.test(value),
+      special: FPassword.SPECIAL_REGEX.test(value),
+    };
+  }
+
+  static isWeak(value: string): boolean {
+    const lower = value.toLowerCase();
+
+    const unique = new Set(lower);
+    if (unique.size <= 2) return true;
+
+    const digits = value.replace(/\D/g, "");
+    if (digits.length >= 4) {
+      if (
+        FPassword.SEQ_ASC.includes(digits) ||
+        FPassword.SEQ_DESC.includes(digits)
+      ) {
+        return true;
+      }
+    }
+
+    for (const pattern of FPassword.KEYBOARD_PATTERNS) {
+      if (lower.includes(pattern)) return true;
+    }
+
+    return false;
   }
 
   protected override validateRules(
@@ -42,13 +100,16 @@ export class FPassword extends TypeField<TPassword, TPasswordFormatted> {
     const base = super.validateRules(value, fieldPath, validateLevel);
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
+
     const v = this.getValue();
+    const strength = FPassword.getStrength(v);
+
     if (
-      v.length < 8 ||
-      !FPassword.UPPERCASE_REGEX.test(v) ||
-      !FPassword.LOWERCASE_REGEX.test(v) ||
-      !FPassword.DIGIT_REGEX.test(v) ||
-      !FPassword.SPECIAL_REGEX.test(v)
+      !strength.length ||
+      !strength.uppercase ||
+      !strength.lowercase ||
+      !strength.digit ||
+      !strength.special
     ) {
       return err(
         ExceptionValidation.create(
@@ -60,6 +121,18 @@ export class FPassword extends TypeField<TPassword, TPasswordFormatted> {
         ),
       );
     }
+
+    if (FPassword.isWeak(v)) {
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Password contains predictable patterns" +
+            " (sequential digits, keyboard patterns," +
+            " or repeated characters)",
+        ),
+      );
+    }
+
     return OK_TRUE;
   }
 
