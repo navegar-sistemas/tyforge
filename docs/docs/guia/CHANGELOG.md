@@ -10,6 +10,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.5] - 2026-03-30
+
+### Added
+- Conditional exports com condição `react-native` — subpaths universais resolvem normalmente, subpaths Node.js-only (`./config`, `./tools/network-security`, `./infrastructure/service-base`) retornam `PackagePathNotExportedError` em build-time no Metro
+
+### Changed
+- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.5`
+- `@tyforge/guard` atualizado para `0.1.1`
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.5`
+
 ## [0.2.4] - 2026-03-30
 
 ### Fixed

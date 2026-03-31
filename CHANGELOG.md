@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.2.5] - 2026-03-30
+
+### Added
+- Conditional exports com condição `react-native` — subpaths universais resolvem normalmente, subpaths Node.js-only (`./config`, `./tools/network-security`, `./infrastructure/service-base`) retornam `PackagePathNotExportedError` em build-time no Metro
+
+### Changed
+- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.5`
+- `@tyforge/guard` atualizado para `0.1.1`
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.5`
+
 ## [0.2.4] - 2026-03-30
 
 ### Fixed
@@ -197,39 +207,6 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 - `formatNumber()` unified with `target` parameter — replaces separate `formatDataNumber()` method
 - Documentation: all `dataFormatted()` references replaced with `formatted("data")`
 - Documentation: all `localeRules` references replaced with `localeRegion`
-
-## [0.1.26] - 2026-03-27
-
-### Added
-- `TLocaleDisplay` type — strict union (`"us" | "br"`) for formatting locale (controls `formatted()`, `formatNumber()`)
-- `TLocaleRules` type — strict union (`"us" | "br"`) for validation locale (controls business rules in `validateRules()`)
-- `LOCALE_INTL: Record<TLocaleDisplay, string>` — exhaustive map from locale to BCP 47 Intl codes
-- `TypeField.assertNeverLocale()` — compile-time exhaustiveness guard for locale switches
-- `TypeField.formatNumber()` — locale-aware number formatting in base class (used by FMoney, FCurrency, FInt, FFloat)
-- Locale-aware `formatted()` in `FMoney`, `FCurrency`, `FFloat`, `FInt` — respects `localeDisplay`
-- Contributing docs: `convencoes.md` — naming conventions, coding standards, prohibitions
-- Contributing docs: `criando-type-fields.md` — complete guide for creating new TypeFields
-- Contributing docs: `testes.md` — test runner, patterns, controlled exceptions
-- `Intl.NumberFormat` cache in `formatNumber()` — ~50x faster than uncached `toLocaleString`
-
-### Changed
-- **BREAKING:** `TypeField.locale: string` replaced by `TypeField.localeDisplay: TLocaleDisplay` and `TypeField.localeRules: TLocaleRules`
-- **BREAKING:** `TypeField.configure({ locale })` replaced by `TypeField.configure({ localeDisplay, localeRules })`
-- **BREAKING:** Default locale changed from `"international"` to `"us"`
-- `configure()` now uses `!== undefined` checks instead of truthy checks (prevents silent swallowing of falsy values)
-- 5 locale-aware TypeFields (FBankCode, FBankBranch, FBankAccountNumber, FStateCode, FDocumentId) refactored to exhaustive switch on `TypeField.localeRules` with `assertNeverLocale()` default
-- `FInt` descriptions translated from Portuguese to English
-- Contributing docs: `desenvolvimento.md` rewritten with updated prerequisites, all commands, Docker, Husky hooks
-- Contributing docs: `arquitetura.md` updated with 50+ TypeFields, current tool names, Application/Infrastructure in diagram
-- Contributing docs: Portuguese accents fixed across all 5 existing files (~100+ corrections)
-- `FFloat.formatted()` now respects `decimalPrecision` config (was truncating to 3 decimals)
-- `FDocumentId` generic alphanumeric validation moved before locale switch (consistent with other TypeFields)
-- README.md and README.pt-BR.md rewritten with 12 code examples, commercial sections (humans, AI, full-stack), and complete TypeField catalog
-- Sidebar labels: Portuguese accents fixed, all categories default to collapsed
-- Sidebar: added 3 new contributing pages (Convenções, Criando TypeFields, Testes)
-
-### Fixed
-- Adding a new locale to `TLocaleDisplay` or `TLocaleRules` now causes TypeScript compile errors at every location that needs locale-specific handling
 
 
 

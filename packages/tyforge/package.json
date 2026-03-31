@@ -1,6 +1,6 @@
 {
   "name": "tyforge",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Type-safe schema validation, Result pattern, and DDD building blocks for TypeScript",
   "keywords": [
     "typescript",
@@ -34,38 +34,47 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "react-native": "./dist/index.js",
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
     "./result": {
+      "react-native": "./dist/result/index.js",
       "import": "./dist/result/index.js",
       "types": "./dist/result/index.d.ts"
     },
     "./type-fields": {
+      "react-native": "./dist/type-fields/index.js",
       "import": "./dist/type-fields/index.js",
       "types": "./dist/type-fields/index.d.ts"
     },
     "./exceptions": {
+      "react-native": "./dist/exceptions/index.js",
       "import": "./dist/exceptions/index.js",
       "types": "./dist/exceptions/index.d.ts"
     },
     "./schema": {
+      "react-native": "./dist/schema/index.js",
       "import": "./dist/schema/index.js",
       "types": "./dist/schema/index.d.ts"
     },
     "./tools": {
+      "react-native": "./dist/tools/index.js",
       "import": "./dist/tools/index.js",
       "types": "./dist/tools/index.d.ts"
     },
     "./config": {
+      "react-native": null,
       "import": "./dist/config/tyforge-config.js",
       "types": "./dist/config/tyforge-config.d.ts"
     },
     "./tools/network-security": {
+      "react-native": null,
       "import": "./dist/tools/network-security.tool.js",
       "types": "./dist/tools/network-security.tool.d.ts"
     },
     "./infrastructure/service-base": {
+      "react-native": null,
       "import": "./dist/infrastructure/service.base.js",
       "types": "./dist/infrastructure/service.base.d.ts"
     }
