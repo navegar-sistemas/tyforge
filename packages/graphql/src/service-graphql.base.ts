@@ -14,13 +14,6 @@ const MAX_RESPONSE_BYTES = 10485760;
 
 export abstract class ServiceGraphQL extends ServiceBase {
 
-  protected override async validateEndpointDns(): Promise<boolean> {
-    const { ToolNetworkSecurity } = await import("tyforge/tools/network-security");
-    const parsed = new URL(this.endpoint.getValue());
-    const result = await ToolNetworkSecurity.resolveAndValidate(parsed.hostname);
-    return result.valid;
-  }
-
   protected query(dto: DtoGraphQLRequest): TGraphQLResult<unknown> {
     return this.execute("query", dto);
   }

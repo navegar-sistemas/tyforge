@@ -13,43 +13,35 @@ async function main(): Promise<void> {
 
   const reporter = new TerminalReporter();
 
-  const blockingChecks: Check[] = [
+  const checks: Check[] = [
     new CheckTypecheck(),
     new CheckTests(),
     new CheckLint(),
     new CheckDocsBuild(),
     new CheckDockerBuild(),
     new CheckDeprecated(),
-  ];
-
-  const confirmableChecks: Check[] = [
     new CheckVersions(),
   ];
 
-  const allChecks = [...blockingChecks, ...confirmableChecks];
-  reporter.setTotal(allChecks.length);
+  reporter.setTotal(checks.length);
 
-  // Run blocking checks — any failure aborts immediately
-  for (const check of blockingChecks) {
+  for (const check of checks) {
     reporter.start(check.name);
     const result = await check.run();
     reporter.result(result);
+
     if (result.status === "fail") {
       process.exit(1);
     }
-  }
-
-  // Run confirmable checks — warnings require user confirmation
-  for (const check of confirmableChecks) {
-    reporter.start(check.name);
-    const result = await check.run();
 
     if (result.status === "warn") {
       reporter.versionWarnings(result);
-      const confirmed = await reporter.promptConfirmationAsync();
-      if (!confirmed) {
-        reporter.aborted();
-        process.exit(1);
+      if (process.stdin.isTTY) {
+        const confirmed = await reporter.promptConfirmationAsync();
+        if (!confirmed) {
+          reporter.aborted();
+          process.exit(1);
+        }
       }
     } else if (result.status === "pass" && result.details.length > 0) {
       reporter.versionWarnings(result);

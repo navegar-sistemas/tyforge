@@ -20,13 +20,6 @@ interface ISubscriptionEntry {
 
 export abstract class ServiceWebSocket extends ServiceBase {
 
-  protected override async validateEndpointDns(): Promise<boolean> {
-    const { ToolNetworkSecurity } = await import("tyforge/tools/network-security");
-    const parsed = new URL(this.endpoint.getValue());
-    const result = await ToolNetworkSecurity.resolveAndValidate(parsed.hostname);
-    return result.valid;
-  }
-
   private socket: WebSocket | null = null;
   private subscriptions: Map<string, ISubscriptionEntry> = new Map();
   private subscriptionCounter = 0;

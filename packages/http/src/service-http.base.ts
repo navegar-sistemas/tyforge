@@ -12,13 +12,6 @@ const MAX_RESPONSE_BYTES = 10485760;
 
 export abstract class ServiceHttp extends ServiceBase {
 
-  protected override async validateEndpointDns(): Promise<boolean> {
-    const { ToolNetworkSecurity } = await import("tyforge/tools/network-security");
-    const parsed = new URL(this.endpoint.getValue());
-    const result = await ToolNetworkSecurity.resolveAndValidate(parsed.hostname);
-    return result.valid;
-  }
-
   protected async request<TData = unknown>(
     params: IRequestParams<TData>,
   ): THttpResult<unknown> {
