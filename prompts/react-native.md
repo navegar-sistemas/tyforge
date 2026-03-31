@@ -1,4 +1,4 @@
-# CLAUDE.md — React Native + TyForge
+# React Native + TyForge
 
 Template de prompt para projetos React Native que utilizam TyForge. Copie este arquivo para a raiz do projeto e ajuste conforme necessário.
 

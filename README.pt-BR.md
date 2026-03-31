@@ -32,7 +32,7 @@ Porque todos os projetos seguem exatamente o mesmo modelo mental.
 
 ### Para IA: menos ambiguidade, melhores resultados
 
-Assistentes de código com IA (Claude, Copilot, Cursor) funcionam melhor quando o ambiente é previsível. TyForge fornece exatamente isso: um conjunto fechado de padrões, regras e estruturas que eliminam ambiguidade.
+Assistentes de código com IA funcionam melhor quando o ambiente é previsível. TyForge fornece exatamente isso: um conjunto fechado de padrões, regras e estruturas que eliminam ambiguidade.
 
 Em vez de inferir convenções, a IA segue um sistema já definido — e validado pelo próprio código.
 

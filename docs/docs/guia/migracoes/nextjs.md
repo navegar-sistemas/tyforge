@@ -644,7 +644,7 @@ HTTP POST /api/users { name: "João", email: "joao@test.com", age: 25 }
 | Sem `!` assertion | `tyforge-lint` rule: no-non-null |
 | Sem `export default` | `tyforge-lint` rule: no-export-default |
 | Sem magic numbers HTTP | `tyforge-lint` rule: no-magic-http-status |
-| Nomes em inglês | Convenção do CLAUDE.md |
+| Nomes em inglês | Convenção do projeto |
 | Prefixos consistentes | F, T, I, O, Dto, DtoReq, DtoRes, Event, Exception, Repository, Mapper |
 
 ### Clean Architecture
@@ -843,6 +843,5 @@ export function validateForm(data: unknown) {
 
 - [TyForge README](../README.md)
 - [Exemplos canônicos](../src/examples/) (01 a 15)
-- [CLAUDE.md](../CLAUDE.md) — Convenções completas do projeto
 - [Documentação de TypeFields](./docs/guia/type-fields/visao-geral.md)
 - [Documentação de Config](./docs/guia/config/configuracao-global.md)

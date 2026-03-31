@@ -15,6 +15,35 @@ function isInternalDep(name: string): boolean {
   return name === "tyforge" || name.startsWith("@tyforge/");
 }
 
+function parseSemver(version: string): [number, number, number] | null {
+  const parts = version.split(".");
+  if (parts.length !== 3) return null;
+  const nums = parts.map(Number);
+  if (nums.some((n) => !Number.isFinite(n) || n < 0)) return null;
+  return [nums[0], nums[1], nums[2]];
+}
+
+// Validates that local is exactly one semver increment from published.
+// Valid: 1.2.3→1.2.4, 1.2.34→1.3.0, 1.2.34→2.0.0
+// Invalid: 1.2.3→1.2.5 (skipped patch), 1.2.3→1.4.0 (skipped minor)
+function isValidIncrement(published: string, local: string): boolean {
+  const pub = parseSemver(published);
+  const loc = parseSemver(local);
+  if (!pub || !loc) return true;
+
+  const [pMaj, pMin, pPat] = pub;
+  const [lMaj, lMin, lPat] = loc;
+
+  // major bump: major+1, minor=0, patch=0
+  if (lMaj === pMaj + 1 && lMin === 0 && lPat === 0) return true;
+  // minor bump: same major, minor+1, patch=0
+  if (lMaj === pMaj && lMin === pMin + 1 && lPat === 0) return true;
+  // patch bump: same major+minor, patch+1
+  if (lMaj === pMaj && lMin === pMin && lPat === pPat + 1) return true;
+
+  return false;
+}
+
 interface IInternalDep {
   readonly name: string;
   readonly version: string;
@@ -97,6 +126,10 @@ export class CheckPublishReady extends Check {
         if (npmVersion === pkg.version) {
           details.push(
             `${pkg.name}@${pkg.version} already published — increment version`,
+          );
+        } else if (!isValidIncrement(npmVersion, pkg.version)) {
+          details.push(
+            `${pkg.name} skipped version: npm has ${npmVersion}, local is ${pkg.version} — must increment by exactly 1`,
           );
         }
       } catch (e) {

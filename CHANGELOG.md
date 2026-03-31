@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.2.18] - 2026-03-31
+
+### Changed
+- Regra de versionamento por branch — versões e CHANGELOGs só são alterados na main
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.18`
+
 ## [0.2.17] - 2026-03-31
 
 ### Added
@@ -92,13 +98,6 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
 ### Fixed
 - `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` (`0.1.7`): `ToolNetworkSecurity` agora importado via `await import()` (lazy) em vez de import estático — elimina `node:dns/promises` do bundle React Native
-
-## [0.2.6] - 2026-03-31
-
-### Changed
-- `ServiceBase.validateEndpointDns()` agora retorna `true` por padrão — DNS validation movida para os pacotes de serviço (`@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket`) via override
-- `ServiceBase` re-exportado no barrel principal — zero dependências `node:`, seguro para React Native/browser
-- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.6`
 
 
 

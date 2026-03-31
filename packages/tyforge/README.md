@@ -32,7 +32,7 @@ Because every project follows the exact same mental model.
 
 ### For AI: less ambiguity, better results
 
-AI coding assistants (Claude, Copilot, Cursor) work best when the environment is predictable. TyForge provides exactly that: a closed set of patterns, rules, and structures that eliminate ambiguity.
+AI coding assistants work best when the environment is predictable. TyForge provides exactly that: a closed set of patterns, rules, and structures that eliminate ambiguity.
 
 Instead of inferring conventions, the AI follows a system already defined — and validated by the code itself.
 

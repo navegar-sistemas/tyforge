@@ -1,4 +1,4 @@
-# CLAUDE.md — Security Audit & Hardening com TyForge
+# Security Audit & Hardening com TyForge
 
 Template de prompt para projetos que utilizam TyForge com foco em segurança. Copie este arquivo para a raiz do projeto e ajuste conforme necessário.
 

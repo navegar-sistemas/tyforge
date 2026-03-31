@@ -58,8 +58,8 @@ TyForge é um framework TypeScript que fornece validação de schemas type-safe,
 
 ### Arquivos novos (não tracked)
 
-- **`prompts/react-native.md`** — template CLAUDE.md para projetos React Native + TyForge
-- **`prompts/security.md`** — template CLAUDE.md para security audit/hardening com TyForge
+- **`prompts/react-native.md`** — template de prompt para projetos React Native + TyForge
+- **`prompts/security.md`** — template de prompt para security audit/hardening com TyForge
 - **`prompts/context.md`** — este arquivo
 
 ## Verificações realizadas
@@ -134,7 +134,7 @@ Metro não suporta `exports` nativamente — `metro.config.js` com `resolveReque
 
 ## Convenções críticas do projeto
 
-- **Conventional Commits** em português, sem Co-Authored-By/Claude/IA
+- **Conventional Commits** em português, sem Co-Authored-By ou atribuição de IA
 - **Dependências pinadas** — versão exata, sem `^`, `~`, `*`
 - **Zero `any`, `as`, `!`, `@ts-ignore`, `export default`**
 - **Prefixos**: F (TypeFields), T (types), I (interfaces), O (const objects), E (const enums), Dto, DtoReq, DtoRes, Exception, Event, Repository, Mapper
