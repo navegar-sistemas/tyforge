@@ -1,7 +1,6 @@
 import { Result, ok, err, isFailure } from "tyforge/result";
 import { Exceptions } from "tyforge/exceptions";
 import { ServiceBase } from "tyforge/infrastructure/service-base";
-import { ToolNetworkSecurity } from "tyforge/tools/network-security";
 import { TypeGuard } from "tyforge/tools";
 import { FString, FInt } from "tyforge/type-fields";
 import { ServiceWebSocketSecurity } from "./service-websocket.security";
@@ -22,6 +21,7 @@ interface ISubscriptionEntry {
 export abstract class ServiceWebSocket extends ServiceBase {
 
   protected override async validateEndpointDns(): Promise<boolean> {
+    const { ToolNetworkSecurity } = await import("tyforge/tools/network-security");
     const parsed = new URL(this.endpoint.getValue());
     const result = await ToolNetworkSecurity.resolveAndValidate(parsed.hostname);
     return result.valid;

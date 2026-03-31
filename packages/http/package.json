@@ -1,6 +1,6 @@
 {
   "name": "@tyforge/http",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Type-safe HTTP client with Result pattern, security hardening, and exception mapping for TyForge",
   "type": "module",
   "main": "dist/index.js",

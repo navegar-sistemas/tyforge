@@ -1,6 +1,5 @@
 import { ok, err, isFailure } from "tyforge/result";
 import { ServiceBase } from "tyforge/infrastructure/service-base";
-import { ToolNetworkSecurity } from "tyforge/tools/network-security";
 import { TypeGuard, ToolHeaderSecurity } from "tyforge/tools";
 import { FString, FGraphQLOperationName } from "tyforge/type-fields";
 import { ServiceGraphQLSecurity } from "./service-graphql.security";
@@ -16,6 +15,7 @@ const MAX_RESPONSE_BYTES = 10485760;
 export abstract class ServiceGraphQL extends ServiceBase {
 
   protected override async validateEndpointDns(): Promise<boolean> {
+    const { ToolNetworkSecurity } = await import("tyforge/tools/network-security");
     const parsed = new URL(this.endpoint.getValue());
     const result = await ToolNetworkSecurity.resolveAndValidate(parsed.hostname);
     return result.valid;
