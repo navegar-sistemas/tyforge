@@ -6,17 +6,15 @@ import { Check } from "../check.base";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../../..");
-const RANGE_REGEX = /^[\^~>=<*x|]|[\s-]\d/;
-const INTERNAL_PREFIXES = ["tyforge", "@tyforge/"];
+const RANGE_REGEX = /^[\^~>=<*x|]/;
 
 function isInternalDep(name: string): boolean {
-  return INTERNAL_PREFIXES.some((prefix) => name === prefix.replace(/\/$/, "") || name.startsWith(prefix));
+  return name === "tyforge" || name.startsWith("@tyforge/");
 }
 
 interface IInternalDep {
   readonly name: string;
   readonly version: string;
-  readonly section: string;
 }
 
 export class CheckPublishReady extends Check {
@@ -52,7 +50,7 @@ export class CheckPublishReady extends Check {
             if (!vResult.success) continue;
             const alreadyTracked = internalDeps.some((d) => d.name === depName && d.version === vResult.value);
             if (!alreadyTracked) {
-              internalDeps.push({ name: depName, version: vResult.value, section: depKey });
+              internalDeps.push({ name: depName, version: vResult.value });
             }
           }
         }

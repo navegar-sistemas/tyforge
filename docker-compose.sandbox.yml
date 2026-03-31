@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile.sandbox
     volumes:
       - .:/workspace
+      - sandbox_deps:/workspace/node_modules
     stdin_open: true
     tty: true
     deploy:
@@ -23,3 +24,6 @@ services:
     cap_drop:
       - ALL
     network_mode: bridge
+
+volumes:
+  sandbox_deps:

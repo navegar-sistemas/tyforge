@@ -6,12 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.2.16] - 2026-03-31
+
+### Fixed
+- `isInternalDep`: lógica corrigida — `startsWith("tyforge")` dava falso positivo em pacotes externos como `tyforge-xyz`; substituído por match exato `tyforge` + prefix `@tyforge/`
+- `RANGE_REGEX`: removida segunda alternativa `[\s-]\d` que flagrava pre-releases numéricos (`1.0.0-1`) como versão não pinada
+- `IInternalDep.section`: campo removido — era coletado mas nunca lido (dead code)
+- CHANGELOG: adicionada entry retroativa para `0.2.14` (publicada no npm sem entry)
+- CHANGELOG: acentos corrigidos na entry `0.2.14`
+
+### Changed
+- `@tyforge/graphql` (`0.2.1`), `@tyforge/http` (`0.1.12`), `@tyforge/websocket` (`0.1.12`), `@tyforge/guard` (`0.1.7`): bump de versão para publicação
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.16`
+
 ## [0.2.15] - 2026-03-31
 
 ### Changed
-- `CheckPublishReady`: validacao expandida para todos os pacotes internos do monorepo — verifica consistencia de versao e pinagem de qualquer dependencia `tyforge` ou `@tyforge/*` entre pacotes (antes verificava apenas `tyforge` core)
-- `CheckPublishReady`: removido `as` cast no catch — usa `extractError()` da classe base
 - `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.15`
+
+## [0.2.14] - 2026-03-31
+
+### Changed
+- `CheckPublishReady`: validação expandida para todos os pacotes internos do monorepo — verifica consistência de versão e pinagem de qualquer dependência `tyforge` ou `@tyforge/*` entre pacotes (antes verificava apenas `tyforge` core)
+- `CheckPublishReady`: removido `as` cast no catch — usa `extractError()` da classe base
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.14`
 
 ## [0.2.13] - 2026-03-31
 
@@ -77,29 +95,6 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 - `@tyforge/guard` atualizado para `0.1.1`
 - `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.5`
 
-## [0.2.4] - 2026-03-30
-
-### Fixed
-- Runtime crash em React Native/Hermes: `react-native` field no formato objeto corrompia resolução de módulos no Metro — removido
-
-### Added
-- Pacote `@tyforge/guard` — análise estática separada do core com regras classificadas em typescript, convention, architecture e dsl
-
-### Changed
-- Lint movido de `packages/tyforge/src/lint` para `packages/guard` (`@tyforge/guard`)
-- CLI renomeado de `tyforge-lint` para `tyforge-guard`
-- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.4`
-
-## [0.2.3] - 2026-03-30
-
-### Added
-- Browser/React Native stubs para `TyForgeConfig`, `ToolNetworkSecurity` e `ServiceBase` via `browser` e `react-native` fields no package.json
-- Exemplo React Native com Expo para teste de compatibilidade
-- Pacote `@tyforge/examples` com exemplos simples e React Native
-
-### Changed
-- Exemplos movidos de `packages/tyforge/src/examples` para `packages/examples/simple`
-- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.3`
 
 
 
