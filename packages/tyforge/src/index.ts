@@ -85,7 +85,7 @@ export type { IPort } from "./application/port";
 export type { IPipelineBehavior } from "./application/pipeline-behavior";
 
 // ── Infrastructure ─────────────────────────────────────────────
-// ServiceBase available via "tyforge/infrastructure/service-base" subpath (Node.js only)
+export { ServiceBase } from "./infrastructure/service.base";
 export type { IUnitOfWork } from "./infrastructure/unit-of-work";
 export type { IOutbox } from "./infrastructure/outbox";
 export type { IOutboxEntry } from "./infrastructure/outbox-entry";

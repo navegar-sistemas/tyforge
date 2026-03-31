@@ -1,6 +1,7 @@
 import { Result, ok, err, isFailure } from "tyforge/result";
 import { Exceptions } from "tyforge/exceptions";
 import { ServiceBase } from "tyforge/infrastructure/service-base";
+import { ToolNetworkSecurity } from "tyforge/tools/network-security";
 import { TypeGuard } from "tyforge/tools";
 import { FString, FInt, FHttpMethod, FHttpFormat, FUrlPath } from "tyforge/type-fields";
 import { ServiceHttpSecurity } from "./service-http.security";
@@ -11,6 +12,12 @@ const MAX_TIMEOUT_MS = 300000;
 const MAX_RESPONSE_BYTES = 10485760;
 
 export abstract class ServiceHttp extends ServiceBase {
+
+  protected override async validateEndpointDns(): Promise<boolean> {
+    const parsed = new URL(this.endpoint.getValue());
+    const result = await ToolNetworkSecurity.resolveAndValidate(parsed.hostname);
+    return result.valid;
+  }
 
   protected async request<TData = unknown>(
     params: IRequestParams<TData>,
