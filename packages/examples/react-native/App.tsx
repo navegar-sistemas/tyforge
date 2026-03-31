@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, ScrollView } from "react-native";
 import { useState, useEffect } from "react";
 import {
   ok, err, isSuccess, isFailure,
-  FString, FEmail, FInt, FId,
+  FString, FEmail, FInt, FId, FUrlOrigin,
   Entity, SchemaBuilder, ServiceBase,
 } from "tyforge";
 import type { ISchema, InferProps, InferJson, IEntityProps, Result } from "tyforge";
@@ -53,7 +53,7 @@ class UserEntity extends Entity<TUserProps & IEntityProps, TUserJson> implements
 // ServiceHttp test — verifies class hierarchy resolves in Hermes
 class TestApi extends ServiceHttp {
   protected readonly _classInfo = { name: "TestApi", version: "1.0.0", description: "Test API" };
-  readonly endpoint = FString.createOrThrow("https://api.test.com") as any;
+  readonly endpoint = FUrlOrigin.createOrThrow("https://api.test.com");
 
   protected async getAuthHeaders() {
     return ok({} as Record<string, FString>);

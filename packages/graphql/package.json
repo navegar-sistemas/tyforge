@@ -8,13 +8,13 @@
   "exports": {
     ".": { "import": "./dist/index.js", "types": "./dist/index.d.ts" }
   },
-  "peerDependencies": { "tyforge": "0.2.7" },
+  "peerDependencies": { "tyforge": "0.2.8" },
   "devDependencies": {
     "@types/node": "25.5.0",
     "tsdown": "0.21.6",
     "tsx": "4.21.0",
     "typescript": "6.0.2",
-    "tyforge": "0.2.7"
+    "tyforge": "0.2.8"
   },
   "scripts": {
     "build": "tsdown",

@@ -16,7 +16,7 @@
     "tsdown": "0.21.6",
     "tsx": "4.21.0",
     "typescript": "6.0.2",
-    "tyforge": "0.2.7"
+    "tyforge": "0.2.8"
   },
   "scripts": {
     "build": "tsdown",

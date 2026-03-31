@@ -52,8 +52,15 @@ export class CheckPublishReady extends Check {
         if (npmVersion === pkg.version) {
           details.push(`${pkg.name}@${pkg.version} already published — increment version`);
         }
-      } catch {
-        // not published yet, OK
+      } catch (e) {
+        // npm view returns exit code 1 for unpublished packages (E404)
+        // Network/auth errors should not be silently ignored
+        if (e && typeof e === "object" && "stderr" in e) {
+          const stderr = String((e as Record<string, unknown>)["stderr"] ?? "");
+          if (!stderr.includes("E404") && !stderr.includes("is not in this registry")) {
+            details.push(`${pkg.name}: npm registry unreachable — cannot verify version`);
+          }
+        }
       }
     }
 

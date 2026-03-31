@@ -143,7 +143,7 @@ const result = await ToolNetworkSecurity.resolveAndValidate("api.example.com");
 // { valid: true, ip: "203.0.113.1" }
 ```
 
-Usado internamente por `ServiceBase.validateEndpointDns()` em todos os serviços (HTTP, GraphQL, WebSocket).
+Disponível via subpath `tyforge/tools/network-security` (Node.js only). Consumidores podem usar em override de `validateEndpointDns()` para adicionar proteção contra DNS rebinding.
 
 ## Próximos passos
 

@@ -1,3 +1,4 @@
+import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
@@ -12,6 +13,9 @@ export class CheckLint extends Check {
   }
 
   async run() {
+    if (!fs.existsSync(GUARD_BIN)) {
+      return this.fail(["Guard binary not found — run npm run build first"]);
+    }
     try {
       execFileSync("node", [GUARD_BIN], { cwd: ROOT, stdio: "pipe", encoding: "utf-8", timeout: 60000 });
       return this.pass();

@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.2.8] - 2026-03-31
+
+### Fixed
+- `CheckPublishReady`: distingue npm offline (erro) de pacote não publicado (OK)
+- `CheckLint`: verifica se guard binary existe antes de executar
+- Guard: `no-console.rule.ts` referenciava path antigo `"lint/"` — corrigido para `"guard/"`
+
+### Removed
+- 3 browser stubs redundantes (`tyforge-config.browser`, `network-security.browser`, `service.base.browser`) — barrel principal já não importa `node:`
+- 3 entries mortos do `browser` field no `package.json` — mantém apenas `batch-parallel`
+
+### Changed
+- Documentação de `ToolNetworkSecurity` corrigida — não é chamado automaticamente, disponível via subpath para override
+
 ## [0.2.7] - 2026-03-31
 
 ### Fixed
@@ -131,19 +145,6 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 - Prototype pollution: `DANGEROUS_KEYS` filtering em `MapCreatableHandler` (SchemaBuilder isMap)
 - SSRF: IPv4-mapped IPv6 (`::ffff:10.0.0.1`) detection em `ToolNetworkSecurity`
 - DoS: limite de 10MB em mensagens WebSocket antes do `JSON.parse`
-
-## [0.1.30] - 2026-03-29
-
-### Added
-- Módulo GraphQL (`tyforge/graphql`): abstração de GraphQL client com `ServiceGraphQL`, `ServiceGraphQLSecurity` e `ExceptionGraphQL`
-- `ServiceGraphQL`: classe abstrata base com `fetch()` nativo, Result pattern e métodos `query()` e `mutation()`
-- `ServiceGraphQLSecurity`: bloqueio de introspection queries, sanitização recursiva de variables contra prototype pollution, validação HTTPS
-- `ExceptionGraphQL`: exceções GraphQL com factory methods (`queryFailed`, `mutationFailed`, `networkError`, `unauthorized`, `timeout`, `invalidResponse`, `unsafeQuery`)
-- Detecção automática de `UNAUTHENTICATED` via `extensions.code` ou `message` nos erros GraphQL
-- Extração automática de `operationName` do document GraphQL
-- Subpath export `tyforge/graphql` no `package.json`
-- Testes para `ServiceGraphQL`, `ServiceGraphQLSecurity` e `ExceptionGraphQL`
-- Documentação do módulo GraphQL
 
 
 

@@ -5,7 +5,7 @@ export class NoConsoleRule extends Rule {
   private readonly pattern = /\bconsole\.(log|warn|error|debug|info)\s*\(/;
 
   private readonly ignoredPaths = [
-    "lint/",
+    "guard/",
     "pre-commit/",
     "reporters/",
   ];

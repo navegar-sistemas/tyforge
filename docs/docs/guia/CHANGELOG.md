@@ -10,6 +10,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.8] - 2026-03-31
+
+### Fixed
+- `CheckPublishReady`: distingue npm offline (erro) de pacote não publicado (OK)
+- `CheckLint`: verifica se guard binary existe antes de executar
+- Guard: `no-console.rule.ts` referenciava path antigo `"lint/"` — corrigido para `"guard/"`
+
+### Removed
+- 3 browser stubs redundantes (`tyforge-config.browser`, `network-security.browser`, `service.base.browser`) — barrel principal já não importa `node:`
+- 3 entries mortos do `browser` field no `package.json` — mantém apenas `batch-parallel`
+
+### Changed
+- Documentação de `ToolNetworkSecurity` corrigida — não é chamado automaticamente, disponível via subpath para override
+
 ## [0.2.7] - 2026-03-31
 
 ### Fixed

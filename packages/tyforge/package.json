@@ -1,6 +1,6 @@
 {
   "name": "tyforge",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Type-safe schema validation, Result pattern, and DDD building blocks for TypeScript",
   "keywords": [
     "typescript",
@@ -80,10 +80,7 @@
     }
   },
   "browser": {
-    "./dist/schema/batch-parallel.js": "./dist/schema/batch-parallel.browser.js",
-    "./dist/config/tyforge-config.js": "./dist/config/tyforge-config.browser.js",
-    "./dist/tools/network-security.tool.js": "./dist/tools/network-security.browser.js",
-    "./dist/infrastructure/service.base.js": "./dist/infrastructure/service.base.browser.js"
+    "./dist/schema/batch-parallel.js": "./dist/schema/batch-parallel.browser.js"
   },
   "sideEffects": false,
   "files": [
