@@ -10,6 +10,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.9] - 2026-03-31
+
+### Fixed
+- `CheckPublishReady` agora verifica TODOS os pacotes do monorepo (antes verificava apenas o core porque `find .` rodava do cwd `packages/tyforge`)
+
 ## [0.2.8] - 2026-03-31
 
 ### Fixed

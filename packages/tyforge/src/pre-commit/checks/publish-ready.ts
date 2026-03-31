@@ -1,7 +1,11 @@
 import { execFileSync } from "node:child_process";
 import * as fs from "node:fs";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import { Check } from "../check.base";
 import { TypeGuard } from "@tyforge/tools/type_guard";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../../..");
 
 export class CheckPublishReady extends Check {
   constructor() {
@@ -10,7 +14,7 @@ export class CheckPublishReady extends Check {
 
   async run() {
     const details: string[] = [];
-    const packageFiles = this.findPackageJsonFiles();
+    const packageFiles = this.findAllWorkspacePackageJsons();
 
     const packages: { name: string; version: string; isPrivate: boolean; tyforgeVersions: string[] }[] = [];
 
@@ -53,8 +57,6 @@ export class CheckPublishReady extends Check {
           details.push(`${pkg.name}@${pkg.version} already published — increment version`);
         }
       } catch (e) {
-        // npm view returns exit code 1 for unpublished packages (E404)
-        // Network/auth errors should not be silently ignored
         if (e && typeof e === "object" && "stderr" in e) {
           const stderr = String((e as Record<string, unknown>)["stderr"] ?? "");
           if (!stderr.includes("E404") && !stderr.includes("is not in this registry")) {
@@ -78,5 +80,22 @@ export class CheckPublishReady extends Check {
 
     if (details.length > 0) return this.fail(details);
     return this.pass();
+  }
+
+  private findAllWorkspacePackageJsons(): string[] {
+    const packagesDir = path.join(ROOT, "packages");
+    const results: string[] = [];
+    try {
+      const entries = fs.readdirSync(packagesDir);
+      for (const entry of entries) {
+        const pkgPath = path.join(packagesDir, entry, "package.json");
+        if (fs.existsSync(pkgPath)) {
+          results.push(pkgPath);
+        }
+      }
+    } catch {
+      // fallback to cwd if packages dir not found
+    }
+    return results;
   }
 }

@@ -13,8 +13,8 @@
     "expo-status-bar": "3.0.9",
     "react": "19.1.0",
     "react-native": "0.81.5",
-    "tyforge": "0.2.8",
-    "@tyforge/http": "0.1.8",
+    "tyforge": "0.2.9",
+    "@tyforge/http": "0.1.9",
     "zustand": "5.0.5"
   },
   "devDependencies": {
