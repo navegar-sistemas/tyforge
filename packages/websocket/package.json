@@ -1,6 +1,6 @@
 {
   "name": "@tyforge/websocket",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Type-safe WebSocket client with Result pattern, reconnection, security hardening, and exception mapping for TyForge",
   "type": "module",
   "main": "dist/index.js",
@@ -12,14 +12,14 @@
     }
   },
   "peerDependencies": {
-    "tyforge": "0.2.12"
+    "tyforge": "0.2.13"
   },
   "devDependencies": {
     "@types/node": "25.5.0",
     "tsdown": "0.21.6",
     "tsx": "4.21.0",
     "typescript": "6.0.2",
-    "tyforge": "0.2.12"
+    "tyforge": "0.2.13"
   },
   "scripts": {
     "build": "tsdown",

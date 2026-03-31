@@ -2,12 +2,12 @@ import { SchemaBuilder } from "tyforge/schema";
 import { Dto, ok, isFailure } from "tyforge";
 import type { Result, Exceptions } from "tyforge";
 import type { ISchema, InferProps, InferJson } from "tyforge/schema";
-import { FGraphQLDocument, FGraphQLOperationName, FString, FInt, FBoolean, FFetchPolicy } from "tyforge/type-fields";
+import { FGraphQLDocument, FGraphQLOperationName, FString, FInt, FBoolean, FFetchPolicy, FJson } from "tyforge/type-fields";
 
 const graphqlRequestSchema = {
   query: { type: FGraphQLDocument },
   operationName: { type: FGraphQLOperationName, required: false },
-  variables: { type: FString, keyType: FString, isMap: true, required: false },
+  variables: { type: FJson, required: false },
   headers: { type: FString, keyType: FString, isMap: true, required: false },
   authenticated: { type: FBoolean, required: false },
   timeout: { type: FInt, required: false },
@@ -25,7 +25,7 @@ export class DtoGraphQLRequest extends Dto<TDtoGraphQLRequestProps, TDtoGraphQLR
 
   readonly query: FGraphQLDocument;
   readonly operationName: FGraphQLOperationName | undefined;
-  readonly variables: Record<string, FString> | undefined;
+  readonly variables: FJson | undefined;
   readonly headers: Record<string, FString> | undefined;
   readonly authenticated: FBoolean | undefined;
   readonly timeout: FInt | undefined;

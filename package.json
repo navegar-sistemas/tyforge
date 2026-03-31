@@ -1,4 +1,5 @@
 {
+  "name": "@tyforge/monorepo",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -7,6 +8,7 @@
     "build": "cd packages/tyforge && npm run build && cd ../http && npm run build && cd ../graphql && npm run build && cd ../websocket && npm run build && cd ../guard && npm run build",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
+    "precommit": "cd packages/tyforge && tsx src/pre-commit/index.ts",
     "guard": "npx tyforge-guard",
     "sandbox:build": "docker compose -f docker-compose.sandbox.yml build --no-cache && docker compose -f docker-compose.sandbox.yml -f docker-compose.override.yml build --no-cache",
     "sandbox": "script -q /dev/null docker compose -f docker-compose.sandbox.yml -f docker-compose.override.yml run --rm sandbox",

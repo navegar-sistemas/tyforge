@@ -17,11 +17,11 @@ async function main(): Promise<void> {
   const blockingChecks: Check[] = [
     new CheckTypecheck(),
     new CheckTests(),
+    new CheckPublishReady(),
     new CheckLint(),
     new CheckDocsBuild(),
     new CheckDockerBuild(),
     new CheckDeprecated(),
-    new CheckPublishReady(),
   ];
 
   const confirmableChecks: Check[] = [

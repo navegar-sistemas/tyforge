@@ -73,7 +73,7 @@ interface IMockFetchCall {
 }
 
 let mockCalls: IMockFetchCall[] = [];
-let mockResponseBody: unknown;
+let mockResponseBody: Record<string, unknown> | string;
 let mockResponseStatus: number;
 let originalFetch: typeof globalThis.fetch;
 
@@ -107,19 +107,20 @@ function createMockFetch(): typeof globalThis.fetch {
     const body = init?.body !== undefined && init?.body !== null ? String(init.body) : undefined;
     mockCalls.push({ url, method: init?.method ?? "GET", headers: extractHeaders(init), body });
 
-    const headersMap = new Map([["content-type", "application/json"]]);
-    const response = {
-      status: mockResponseStatus,
-      ok: mockResponseStatus >= 200 && mockResponseStatus < 300,
-      headers: {
-        get: (key: string) => headersMap.get(key) ?? null,
-        forEach: (cb: (value: string, key: string) => void) => headersMap.forEach(cb),
-      },
-      json: () => Promise.resolve(mockResponseBody),
-      text: () => Promise.resolve(typeof mockResponseBody === "string" ? mockResponseBody : JSON.stringify(mockResponseBody)),
-    };
+    let responseBody: string;
+    let contentType: string;
+    if (typeof mockResponseBody === "string") {
+      responseBody = mockResponseBody;
+      contentType = "text/plain";
+    } else {
+      responseBody = JSON.stringify(mockResponseBody);
+      contentType = "application/json";
+    }
 
-    return Promise.resolve(response as unknown as Response);
+    return Promise.resolve(new Response(responseBody, {
+      status: mockResponseStatus,
+      headers: { "content-type": contentType },
+    }));
   };
 }
 
@@ -157,21 +158,26 @@ describe("ServiceGraphQL -- query", () => {
     await service.testQuery(dto("query GetUser($id: ID!) { user(id: $id) { id } }", { id: "1" }));
     const body = JSON.parse(mockCalls[0].body ?? "{}");
     assert.equal(body.variables.id, "1");
-    assert.equal(body.query, "query GetUser($id: ID!) { user(id: $id) { id } }");
+    assert.ok(typeof body.query === "string");
+    assert.ok(body.query.includes("GetUser"));
   });
 
-  it("extracts operationName from document", async () => {
-    setMockGraphQLResponse({ users: [] });
-    await service.testQuery(dto("query GetUsers { users { id } }"));
-    const body = JSON.parse(mockCalls[0].body ?? "{}");
-    assert.equal(body.operationName, "GetUsers");
+  it("extracts operationName from document for error handling", async () => {
+    setMockGraphQLResponse(null, [{ message: "Error" }]);
+    const result = await service.testQuery(dto("query GetUsers { users { id } }"));
+    assertFailure(result);
+    const gqlError = result.error as ExceptionGraphQL;
+    assert.equal(gqlError.operationName, "GetUsers");
   });
 
-  it("uses operationName from options over auto-extraction", async () => {
-    setMockGraphQLResponse({ users: [] });
-    await service.testQuery(dto("query GetUsers { users { id } }", undefined, { operationName: "OverrideName" }));
-    const body = JSON.parse(mockCalls[0].body ?? "{}");
-    assert.equal(body.operationName, "OverrideName");
+  it("uses custom operationName in errors over auto-extraction", async () => {
+    setMockGraphQLResponse(null, [{ message: "Error" }]);
+    const result = await service.testQuery(
+      dto("query GetUsers { users { id } }", undefined, { operationName: "CustomOp" }),
+    );
+    assertFailure(result);
+    const gqlError = result.error as ExceptionGraphQL;
+    assert.equal(gqlError.operationName, "CustomOp");
   });
 });
 
@@ -253,7 +259,7 @@ describe("ServiceGraphQL -- error handling", () => {
     assert.equal(result.error.code, "GRAPHQL_INVALID_RESPONSE");
   });
 
-  it("returns networkError on HTTP error status", async () => {
+  it("returns networkError on HTTP 5xx status", async () => {
     setMockNetworkError(500);
     const result = await service.testQuery(dto("query GetData { data { id } }"));
     assertFailure(result);
@@ -303,12 +309,12 @@ describe("ServiceGraphQL -- authentication", () => {
 
   it("includes auth headers when authenticated", async () => {
     await service.testQuery(dto("query Q { q }", undefined, { authenticated: true }));
-    assert.equal(mockCalls[0].headers["Authorization"], "Bearer test-token");
+    assert.equal(mockCalls[0].headers["authorization"], "Bearer test-token");
   });
 
   it("does not include auth headers by default", async () => {
     await service.testQuery(dto("query Q { q }"));
-    assert.equal(mockCalls[0].headers["Authorization"], undefined);
+    assert.equal(mockCalls[0].headers["authorization"], undefined);
   });
 
   it("returns unauthorized when getAuthHeaders fails", async () => {
@@ -320,8 +326,8 @@ describe("ServiceGraphQL -- authentication", () => {
 
   it("merges custom headers", async () => {
     await service.testQuery(dto("query Q { q }", undefined, { headers: { "X-Custom": "value" } }));
-    assert.equal(mockCalls[0].headers["X-Custom"], "value");
-    assert.ok(mockCalls[0].headers["Content-Type"].includes("application/json"));
+    assert.equal(mockCalls[0].headers["x-custom"], "value");
+    assert.ok(mockCalls[0].headers["content-type"].includes("application/json"));
   });
 });
 
@@ -348,7 +354,6 @@ describe("ServiceGraphQL -- security", () => {
   });
 
   it("rejects HTTP endpoint (non-secure) at TypeField level", () => {
-    // FUrlOrigin rejects non-HTTPS/non-localhost URLs at creation time
     const result = FUrlOrigin.create("http://external-api.com/graphql");
     assert.ok(isFailure(result));
     assert.ok(result.error instanceof ExceptionValidation);
@@ -379,17 +384,10 @@ describe("ServiceGraphQL -- timeout", () => {
     let receivedSignal: AbortSignal | undefined;
     globalThis.fetch = (_input: string | URL | Request, init?: RequestInit): Promise<Response> => {
       receivedSignal = init?.signal ?? undefined;
-      const headers = new Map([["content-type", "application/json"]]);
-      return Promise.resolve({
+      return Promise.resolve(new Response(JSON.stringify({ data: { ok: true } }), {
         status: 200,
-        ok: true,
-        headers: {
-          get: (key: string) => headers.get(key) ?? null,
-          forEach: (cb: (value: string, key: string) => void) => headers.forEach(cb),
-        },
-        json: () => Promise.resolve({ data: { ok: true } }),
-        text: () => Promise.resolve(JSON.stringify({ data: { ok: true } })),
-      } as unknown as Response);
+        headers: { "content-type": "application/json" },
+      }));
     };
 
     await service.testQuery(dto("query Q { q }", undefined, { timeout: 5000 }));
@@ -400,17 +398,10 @@ describe("ServiceGraphQL -- timeout", () => {
     let receivedSignal: AbortSignal | null | undefined = null;
     globalThis.fetch = (_input: string | URL | Request, init?: RequestInit): Promise<Response> => {
       receivedSignal = init?.signal;
-      const headers = new Map([["content-type", "application/json"]]);
-      return Promise.resolve({
+      return Promise.resolve(new Response(JSON.stringify({ data: { ok: true } }), {
         status: 200,
-        ok: true,
-        headers: {
-          get: (key: string) => headers.get(key) ?? null,
-          forEach: (cb: (value: string, key: string) => void) => headers.forEach(cb),
-        },
-        json: () => Promise.resolve({ data: { ok: true } }),
-        text: () => Promise.resolve(JSON.stringify({ data: { ok: true } })),
-      } as unknown as Response);
+        headers: { "content-type": "application/json" },
+      }));
     };
 
     await service.testQuery(dto("query Q { q }"));

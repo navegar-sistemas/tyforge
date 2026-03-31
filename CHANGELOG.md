@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.2.13] - 2026-03-31
+
+### Changed
+- `@tyforge/graphql` (`0.2.0`): transport layer migrado para `graphql-request` (v7.4.0) — substitui implementação manual com fetch
+- `@tyforge/graphql` (`0.2.0`): `DtoGraphQLRequest.variables` alterado de `Record<string, FString>` para `FJson` — corrige double-serialization de variáveis complexas
+- `@tyforge/graphql` (`0.2.0`): null-data guard — retorna `invalidResponse` quando `data` é `null`/`undefined` sem erros GraphQL
+- `@tyforge/graphql` (`0.2.0`): HTTP 5xx em `ClientError` mapeado para `networkError` (antes era `invalidResponse`)
+- `@tyforge/graphql` (`0.2.0`): erro GraphQL `IGraphQLError` mapeado via `.map()` em vez de type predicate — compatível com `GraphQLError` do pacote `graphql`
+- Pre-commit: `CheckPublishReady` movido para posição 3 (após typecheck e tests, antes de lint)
+- `@tyforge/http` (`0.1.11`), `@tyforge/websocket` (`0.1.11`), `@tyforge/guard` (`0.1.6`): bump de versão para publicação
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.13`
+
+### Fixed
+- `@tyforge/graphql`: double-serialization de variáveis — objetos complexos eram stringificados duas vezes via `Record<string, FString>` + `unwrapStringMap()`
+
 ## [0.2.9] - 2026-03-31
 
 ### Fixed
@@ -87,15 +102,6 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 ### Changed
 - `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.2`
 - `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.2`
-
-## [0.2.1] - 2026-03-30
-
-### Added
-- README.md em todos os pacotes (`packages/tyforge`, `packages/http`, `packages/graphql`, `packages/websocket`)
-
-### Changed
-- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.1`
-- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.1`
 
 
 
