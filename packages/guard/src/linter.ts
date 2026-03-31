@@ -24,9 +24,10 @@ export class Linter {
     const endsWithNewline = content.endsWith("\n");
     const allLines = content.split("\n");
     // Remove trailing empty element produced by split so rules do not act on it
-    const lines = endsWithNewline && allLines[allLines.length - 1] === ""
-      ? allLines.slice(0, -1)
-      : allLines;
+    const lines =
+      endsWithNewline && allLines[allLines.length - 1] === ""
+        ? allLines.slice(0, -1)
+        : allLines;
     const disableState = this.disableParser.parse(lines);
     const rules = this.registry.getActive();
     const violations: IRuleViolation[] = [];
@@ -39,7 +40,10 @@ export class Linter {
         if (disableState.isDisabled(i, rule.name)) continue;
         const violation = rule.check(line, i + 1, absolutePath);
         if (!violation) continue;
-        violation.severity = this.registry.getSeverity(rule.name, violation.severity);
+        violation.severity = this.registry.getSeverity(
+          rule.name,
+          violation.severity,
+        );
         if (fixMode && rule.fix) {
           const fixed = rule.fix(line);
           if (fixed !== line) {
@@ -54,7 +58,11 @@ export class Linter {
     }
 
     if (fixMode && hasFixes) {
-      fs.writeFileSync(absolutePath, fixedLines.join("\n") + (endsWithNewline ? "\n" : ""), "utf-8");
+      fs.writeFileSync(
+        absolutePath,
+        fixedLines.join("\n") + (endsWithNewline ? "\n" : ""),
+        "utf-8",
+      );
     }
 
     return violations;

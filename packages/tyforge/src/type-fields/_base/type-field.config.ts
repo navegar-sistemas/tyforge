@@ -65,5 +65,4 @@ export type ITypeFieldConfig<TPrimitive> = TPrimitive extends string
           ? DateConfig
           : TPrimitive extends object
             ? ObjectConfig
-            :
-  BaseConfig;
+            : BaseConfig;

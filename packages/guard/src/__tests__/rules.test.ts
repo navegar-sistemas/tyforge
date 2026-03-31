@@ -11,6 +11,7 @@ import { NoNewTypeFieldRule } from "../rules/convention/no-new-type-field.rule";
 import { NoMagicHttpStatusRule } from "../rules/convention/no-magic-http-status.rule";
 import { NoDeclareRule } from "../rules/convention/no-declare.rule";
 import { NoSatisfiesWithoutPrefixRule } from "../rules/convention/no-satisfies-without-prefix.rule";
+import { MaxLineLengthRule } from "../rules/convention/max-line-length.rule";
 import { Linter } from "../linter";
 import type { IRuleViolation } from "../rule";
 
@@ -27,7 +28,10 @@ describe("no-any", () => {
   });
 
   it("detecta Record<string, any>", () => {
-    assert.notEqual(rule.check("  type T = Record<string, any>;", 1, FILE), null);
+    assert.notEqual(
+      rule.check("  type T = Record<string, any>;", 1, FILE),
+      null,
+    );
   });
 
   it("detecta any[]", () => {
@@ -69,11 +73,17 @@ describe("no-cast", () => {
   });
 
   it("permite import as alias", () => {
-    assert.equal(rule.check("import { foo as bar } from './mod';", 1, FILE), null);
+    assert.equal(
+      rule.check("import { foo as bar } from './mod';", 1, FILE),
+      null,
+    );
   });
 
   it("permite export as rename", () => {
-    assert.equal(rule.check("export { Foo as Bar } from './mod';", 1, FILE), null);
+    assert.equal(
+      rule.check("export { Foo as Bar } from './mod';", 1, FILE),
+      null,
+    );
   });
 });
 
@@ -147,7 +157,10 @@ describe("no-export-default", () => {
   });
 
   it("detecta export default function", () => {
-    assert.notEqual(rule.check("export default function main() {}", 1, FILE), null);
+    assert.notEqual(
+      rule.check("export default function main() {}", 1, FILE),
+      null,
+    );
   });
 
   it("detecta export { X as default }", () => {
@@ -177,7 +190,10 @@ describe("no-to-json-lowercase", () => {
   });
 
   it("detecta obj.toJson()", () => {
-    assert.notEqual(rule.check("  const data = entity.toJson();", 1, FILE), null);
+    assert.notEqual(
+      rule.check("  const data = entity.toJson();", 1, FILE),
+      null,
+    );
   });
 
   it("detecta .toJson sem parenteses", () => {
@@ -189,7 +205,10 @@ describe("no-to-json-lowercase", () => {
   });
 
   it("permite codigo sem toJson", () => {
-    assert.equal(rule.check("  const x = JSON.stringify(data);", 1, FILE), null);
+    assert.equal(
+      rule.check("  const x = JSON.stringify(data);", 1, FILE),
+      null,
+    );
   });
 
   it("permite toString", () => {
@@ -203,11 +222,17 @@ describe("no-new-type-field", () => {
   const rule = new NoNewTypeFieldRule();
 
   it("detecta new FString()", () => {
-    assert.notEqual(rule.check("  const x = new FString('hello');", 1, FILE), null);
+    assert.notEqual(
+      rule.check("  const x = new FString('hello');", 1, FILE),
+      null,
+    );
   });
 
   it("detecta new FEmail()", () => {
-    assert.notEqual(rule.check("  const email = new FEmail('a@b.com');", 1, FILE), null);
+    assert.notEqual(
+      rule.check("  const email = new FEmail('a@b.com');", 1, FILE),
+      null,
+    );
   });
 
   it("detecta new FId()", () => {
@@ -215,11 +240,25 @@ describe("no-new-type-field", () => {
   });
 
   it("permite dentro de format_vo.ts", () => {
-    assert.equal(rule.check("  return new FString(value, fieldPath);", 1, "src/type-fields/string.format_vo.ts"), null);
+    assert.equal(
+      rule.check(
+        "  return new FString(value, fieldPath);",
+        1,
+        "src/type-fields/string.format_vo.ts",
+      ),
+      null,
+    );
   });
 
   it("permite dentro de type-field directory", () => {
-    assert.equal(rule.check("  return new FString(value, fieldPath);", 1, "src/type-fields/type-field.base.ts"), null);
+    assert.equal(
+      rule.check(
+        "  return new FString(value, fieldPath);",
+        1,
+        "src/type-fields/type-field.base.ts",
+      ),
+      null,
+    );
   });
 
   it("permite new de classe normal", () => {
@@ -237,11 +276,17 @@ describe("no-magic-http-status", () => {
   });
 
   it("detecta status: 404 em contexto HTTP", () => {
-    assert.notEqual(rule.check("  if (response.status === 404) {}", 1, FILE), null);
+    assert.notEqual(
+      rule.check("  if (response.status === 404) {}", 1, FILE),
+      null,
+    );
   });
 
   it("detecta status: 500 em contexto HTTP", () => {
-    assert.notEqual(rule.check("  reply.status(500).send(err);", 1, FILE), null);
+    assert.notEqual(
+      rule.check("  reply.status(500).send(err);", 1, FILE),
+      null,
+    );
   });
 
   it("ignora numeros fora de contexto HTTP", () => {
@@ -249,7 +294,10 @@ describe("no-magic-http-status", () => {
   });
 
   it("ignora arquivos de teste", () => {
-    assert.equal(rule.check("  expect(res.status).toBe(200);", 1, TEST_FILE), null);
+    assert.equal(
+      rule.check("  expect(res.status).toBe(200);", 1, TEST_FILE),
+      null,
+    );
   });
 
   it("ignora arquivos de definicao HTTP", () => {
@@ -267,11 +315,17 @@ describe("no-declare", () => {
   });
 
   it("detecta declare com readonly", () => {
-    assert.notEqual(rule.check("  declare readonly id: number;", 1, FILE), null);
+    assert.notEqual(
+      rule.check("  declare readonly id: number;", 1, FILE),
+      null,
+    );
   });
 
   it("detecta declare com tipo complexo", () => {
-    assert.notEqual(rule.check("  declare items: Map<string, number>;", 1, FILE), null);
+    assert.notEqual(
+      rule.check("  declare items: Map<string, number>;", 1, FILE),
+      null,
+    );
   });
 
   it("permite declare module", () => {
@@ -283,7 +337,10 @@ describe("no-declare", () => {
   });
 
   it("permite em arquivo .d.ts", () => {
-    assert.equal(rule.check("  declare name: string;", 1, "src/types/globals.d.ts"), null);
+    assert.equal(
+      rule.check("  declare name: string;", 1, "src/types/globals.d.ts"),
+      null,
+    );
   });
 });
 
@@ -293,23 +350,38 @@ describe("no-satisfies-without-prefix", () => {
   const rule = new NoSatisfiesWithoutPrefixRule();
 
   it("detecta satisfies Schema", () => {
-    assert.notEqual(rule.check("  const x = {} satisfies Schema;", 1, FILE), null);
+    assert.notEqual(
+      rule.check("  const x = {} satisfies Schema;", 1, FILE),
+      null,
+    );
   });
 
   it("detecta satisfies Config", () => {
-    assert.notEqual(rule.check("  const cfg = {} satisfies Config;", 1, FILE), null);
+    assert.notEqual(
+      rule.check("  const cfg = {} satisfies Config;", 1, FILE),
+      null,
+    );
   });
 
   it("detecta satisfies Record", () => {
-    assert.notEqual(rule.check("  const map = {} satisfies Record;", 1, FILE), null);
+    assert.notEqual(
+      rule.check("  const map = {} satisfies Record;", 1, FILE),
+      null,
+    );
   });
 
   it("permite satisfies ISchema", () => {
-    assert.equal(rule.check("  const x = {} satisfies ISchema;", 1, FILE), null);
+    assert.equal(
+      rule.check("  const x = {} satisfies ISchema;", 1, FILE),
+      null,
+    );
   });
 
   it("permite satisfies IConfig", () => {
-    assert.equal(rule.check("  const cfg = {} satisfies IConfig;", 1, FILE), null);
+    assert.equal(
+      rule.check("  const cfg = {} satisfies IConfig;", 1, FILE),
+      null,
+    );
   });
 
   it("permite linhas sem satisfies", () => {
@@ -337,27 +409,39 @@ describe("Linter inline disable comments", () => {
   }
 
   after(() => {
-    try { fs.unlinkSync(tmpFile); } catch { /* ignore */ }
+    try {
+      fs.unlinkSync(tmpFile);
+    } catch {
+      /* ignore */
+    }
   });
 
   it("disable-next-line disables all rules", () => {
-    const violations = lintContent("// tyforge-guard-disable-next-line\nconst x: any = value as string;");
+    const violations = lintContent(
+      "// tyforge-guard-disable-next-line\nconst x: any = value as string;",
+    );
     assert.equal(violations.length, 0);
   });
 
   it("disable-next-line with rule name disables only that rule", () => {
-    const violations = lintContent("// tyforge-guard-disable-next-line no-any\nconst x: any = value as string;");
+    const violations = lintContent(
+      "// tyforge-guard-disable-next-line no-any\nconst x: any = value as string;",
+    );
     assert.equal(violations.length, 1);
     assert.equal(violations[0].rule, "no-cast");
   });
 
   it("disable-line disables all rules on the same line", () => {
-    const violations = lintContent("const x: any = value as string; // tyforge-guard-disable-line");
+    const violations = lintContent(
+      "const x: any = value as string; // tyforge-guard-disable-line",
+    );
     assert.equal(violations.length, 0);
   });
 
   it("disable-line with rule name disables only that rule", () => {
-    const violations = lintContent("const x: any = value as string; // tyforge-guard-disable-line no-cast");
+    const violations = lintContent(
+      "const x: any = value as string; // tyforge-guard-disable-line no-cast",
+    );
     assert.equal(violations.length, 1);
     assert.equal(violations[0].rule, "no-any");
   });
@@ -365,5 +449,57 @@ describe("Linter inline disable comments", () => {
   it("without disable comment, both rules fire", () => {
     const violations = lintContent("const x: any = value as string;");
     assert.equal(violations.length, 2);
+  });
+});
+
+// ── max-line-length ────────────────────────────────────────────
+
+describe("max-line-length", () => {
+  const rule = new MaxLineLengthRule(80);
+
+  it("permite linha com 80 caracteres", () => {
+    const line = "a".repeat(80);
+    assert.equal(rule.check(line, 1, FILE), null);
+  });
+
+  it("detecta linha com 81 caracteres", () => {
+    const line = "a".repeat(81);
+    assert.notEqual(rule.check(line, 1, FILE), null);
+  });
+
+  it("ignora imports longos", () => {
+    const line =
+      'import { Something, AnotherThing, YetAnother } from "@tyforge/very/long/deep/module/path";';
+    assert.equal(rule.check(line, 1, FILE), null);
+  });
+
+  it("ignora export * from longos", () => {
+    const line =
+      'export * from "./some/very/deeply/nested/module/that/exceeds/eighty/columns/easily";';
+    assert.equal(rule.check(line, 1, FILE), null);
+  });
+
+  it("ignora comentarios com URL", () => {
+    const line =
+      "  // See https://github.com/navegar-sistemas/tyforge/issues/123456789/very-long-url";
+    assert.equal(rule.check(line, 1, FILE), null);
+  });
+
+  it("ignora string literals sozinhas na linha", () => {
+    const line =
+      '  "this is a very long string literal that exceeds eighty characters by quite a lot here";';
+    assert.equal(rule.check(line, 1, FILE), null);
+  });
+
+  it("detecta codigo longo que nao e import/string/url", () => {
+    const line =
+      "  const result = someFunction(parameterOne, parameterTwo, parameterThree, parameterFour);";
+    assert.notEqual(rule.check(line, 1, FILE), null);
+  });
+
+  it("default severity e warning", () => {
+    const line = "a".repeat(81);
+    const violation = rule.check(line, 1, FILE);
+    assert.equal(violation?.severity, "warning");
   });
 });

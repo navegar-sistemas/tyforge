@@ -1,9 +1,30 @@
 // ── Config (types only — runtime via "tyforge/config" subpath) ──
-export type { ITyForgeConfig, IResolvedTyForgeConfig, ILintConfigSection, TRuleSeverity } from "./config/tyforge-config";
+export type {
+  ITyForgeConfig,
+  IResolvedTyForgeConfig,
+  ILintConfigSection,
+  TRuleSeverity,
+} from "./config/tyforge-config";
 
 // ── Result Pattern ──────────────────────────────────────────────
 export type { Result, ResultPromise } from "./result/result";
-export { ok, err, isSuccess, isFailure, map, flatMap, fold, match, getOrElse, orElse, all, allSettled, toPromise, OK_TRUE, OK_FALSE } from "./result/result";
+export {
+  ok,
+  err,
+  isSuccess,
+  isFailure,
+  map,
+  flatMap,
+  fold,
+  match,
+  getOrElse,
+  orElse,
+  all,
+  allSettled,
+  toPromise,
+  OK_TRUE,
+  OK_FALSE,
+} from "./result/result";
 
 // ── Exceptions ──────────────────────────────────────────────────
 export { Exceptions } from "./exceptions/base.exceptions";
@@ -28,7 +49,12 @@ export { ExceptionText } from "./exceptions/text.exception";
 
 // ── Schema ──────────────────────────────────────────────────────
 export { SchemaBuilder } from "./schema/schema-build";
-export type { ICompiledSchema, IBatchCreateError, IBatchCreateOptions, IBatchCreateResult } from "./schema/schema-build";
+export type {
+  ICompiledSchema,
+  IBatchCreateError,
+  IBatchCreateOptions,
+  IBatchCreateResult,
+} from "./schema/schema-build";
 export type {
   IFieldConfig,
   ISchema,
@@ -52,13 +78,23 @@ export type { IEntityProps } from "./domain-models/entity.base";
 export { ValueObject } from "./domain-models/value-object.base";
 export { Dto } from "./domain-models/dto.base";
 export { DtoReq } from "./domain-models/dto-req.base";
-export type { TDtoReqProps, TDtoReqPropsJson } from "./domain-models/dto-req.base";
+export type {
+  TDtoReqProps,
+  TDtoReqPropsJson,
+} from "./domain-models/dto-req.base";
 export { DtoRes } from "./domain-models/dto-res.base";
-export type { TDtoResProps, TDtoResPropsJson } from "./domain-models/dto-res.base";
+export type {
+  TDtoResProps,
+  TDtoResPropsJson,
+} from "./domain-models/dto-res.base";
 export { DomainEvent } from "./domain-models/domain-event.base";
 export { RepositoryCrud } from "./domain-models/base-repository.interface";
 export { DomainEventDispatcher } from "./domain-models/domain-event-dispatcher";
-export type { DomainEventHandler, IDispatchOptions, IDispatchResult } from "./domain-models/domain-event-dispatcher";
+export type {
+  DomainEventHandler,
+  IDispatchOptions,
+  IDispatchResult,
+} from "./domain-models/domain-event-dispatcher";
 
 // ── Domain ─────────────────────────────────────────────────────
 export { Specification } from "./domain/specification";
@@ -74,7 +110,14 @@ export type { IVersioned } from "./domain/versioned";
 // ── Application ────────────────────────────────────────────────
 export { UseCase } from "./application/use-case";
 export type { IMapper } from "./application/mapper";
-export type { ICommand, IQuery, ICommandHandler, IQueryHandler, ICommandBus, IQueryBus } from "./application/cqrs";
+export type {
+  ICommand,
+  IQuery,
+  ICommandHandler,
+  IQueryHandler,
+  ICommandBus,
+  IQueryBus,
+} from "./application/cqrs";
 export { IntegrationEvent } from "./application/integration-event";
 export { Saga, SagaContext } from "./application/saga";
 export type { ISagaStep, ISagaContext } from "./application/saga";
@@ -91,9 +134,17 @@ export type { IOutbox } from "./infrastructure/outbox";
 export type { IOutboxEntry } from "./infrastructure/outbox-entry";
 export type { IIdempotencyKey } from "./infrastructure/idempotency-key";
 export { OBackoffStrategy } from "./infrastructure/retry-policy";
-export type { IRetryPolicy, IRetryPolicyConfig, TBackoffStrategy } from "./infrastructure/retry-policy";
+export type {
+  IRetryPolicy,
+  IRetryPolicyConfig,
+  TBackoffStrategy,
+} from "./infrastructure/retry-policy";
 export { OCircuitBreakerState } from "./infrastructure/circuit-breaker";
-export type { ICircuitBreaker, ICircuitBreakerConfig, TCircuitBreakerState } from "./infrastructure/circuit-breaker";
+export type {
+  ICircuitBreaker,
+  ICircuitBreakerConfig,
+  TCircuitBreakerState,
+} from "./infrastructure/circuit-breaker";
 export type { IAuditLog, IAuditFilter } from "./infrastructure/audit-log";
 export type { IAuditEntry } from "./infrastructure/audit-entry";
 export type { ICorrelationContext } from "./infrastructure/correlation-context";
@@ -112,5 +163,5 @@ export { ToolParse } from "./tools/parse/parse.tool";
 export { ToolFormattingDateISO8601 } from "./tools/formatting/date/date-formatting.tool";
 export { ToolObjectTransform } from "./tools/object-transform.tool";
 export { ToolHeaderSecurity } from "./tools/header-security.tool";
-// ToolNetworkSecurity available via "tyforge/tools/network-security" subpath (Node.js only)
-
+// ToolNetworkSecurity available via
+// "tyforge/tools/network-security" subpath (Node.js only)

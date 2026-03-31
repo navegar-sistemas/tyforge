@@ -2,7 +2,14 @@ import { SchemaBuilder } from "tyforge/schema";
 import { Dto, ok, isFailure } from "tyforge";
 import type { Result, Exceptions } from "tyforge";
 import type { ISchema, InferProps, InferJson } from "tyforge/schema";
-import { FGraphQLDocument, FGraphQLOperationName, FString, FInt, FBoolean, FFetchPolicy } from "tyforge/type-fields";
+import {
+  FGraphQLDocument,
+  FGraphQLOperationName,
+  FString,
+  FInt,
+  FBoolean,
+  FFetchPolicy,
+} from "tyforge/type-fields";
 
 const graphqlRequestSchema = {
   query: { type: FGraphQLDocument },
@@ -19,8 +26,15 @@ type TDtoGraphQLRequestJson = InferJson<typeof graphqlRequestSchema>;
 
 const graphqlRequestValidator = SchemaBuilder.compile(graphqlRequestSchema);
 
-export class DtoGraphQLRequest extends Dto<TDtoGraphQLRequestProps, TDtoGraphQLRequestJson> implements TDtoGraphQLRequestProps {
-  protected readonly _classInfo = { name: "DtoGraphQLRequest", version: "1.0.0", description: "Validated GraphQL request parameters" };
+export class DtoGraphQLRequest
+  extends Dto<TDtoGraphQLRequestProps, TDtoGraphQLRequestJson>
+  implements TDtoGraphQLRequestProps
+{
+  protected readonly _classInfo = {
+    name: "DtoGraphQLRequest",
+    version: "1.0.0",
+    description: "Validated GraphQL request parameters",
+  };
   protected readonly _schema = graphqlRequestSchema;
 
   readonly query: FGraphQLDocument;
@@ -42,13 +56,17 @@ export class DtoGraphQLRequest extends Dto<TDtoGraphQLRequestProps, TDtoGraphQLR
     this.fetchPolicy = props.fetchPolicy;
   }
 
-  static create(data: TDtoGraphQLRequestJson): Result<DtoGraphQLRequest, Exceptions> {
+  static create(
+    data: TDtoGraphQLRequestJson,
+  ): Result<DtoGraphQLRequest, Exceptions> {
     const result = graphqlRequestValidator.create(data);
     if (isFailure(result)) return result;
     return ok(new DtoGraphQLRequest(result.value));
   }
 
-  static assign(data: TDtoGraphQLRequestJson): Result<DtoGraphQLRequest, Exceptions> {
+  static assign(
+    data: TDtoGraphQLRequestJson,
+  ): Result<DtoGraphQLRequest, Exceptions> {
     const result = graphqlRequestValidator.assign(data);
     if (isFailure(result)) return result;
     return ok(new DtoGraphQLRequest(result.value));

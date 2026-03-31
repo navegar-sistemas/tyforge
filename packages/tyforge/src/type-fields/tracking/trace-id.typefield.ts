@@ -32,16 +32,28 @@ export class FTraceId extends FIdentifier {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!uuidValidate(value) || uuidVersion(value) !== 7) {
-      return err(ExceptionValidation.create(fieldPath, "TraceId must be a valid UUID v7"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "TraceId must be a valid UUID v7",
+        ),
+      );
     }
     return OK_TRUE;
   }
 
-  static create<T = TTraceId>(raw: T, fieldPath = "TraceId"): Result<FTraceId, ExceptionValidation> {
+  static create<T = TTraceId>(
+    raw: T,
+    fieldPath = "TraceId",
+  ): Result<FTraceId, ExceptionValidation> {
     const typed = FIdentifier.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FTraceId(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -52,11 +64,18 @@ export class FTraceId extends FIdentifier {
     return result.value;
   }
 
-  static assign<T = TTraceId>(value: T, fieldPath = "TraceId"): Result<FTraceId, ExceptionValidation> {
+  static assign<T = TTraceId>(
+    value: T,
+    fieldPath = "TraceId",
+  ): Result<FTraceId, ExceptionValidation> {
     const typed = FIdentifier.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FTraceId(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -66,7 +85,11 @@ export class FTraceId extends FIdentifier {
   }
 
   override getDescription(): string {
-    return "Trace identifier (UUID v7 required). Used for distributed tracing with embedded timestamp.";
+    return (
+      "Trace identifier (UUID v7 required)." +
+      " Used for distributed tracing" +
+      " with embedded timestamp."
+    );
   }
 
   override getShortDescription(): string {

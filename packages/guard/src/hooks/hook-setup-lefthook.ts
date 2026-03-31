@@ -77,7 +77,11 @@ export class HookSetupLefthook implements IHookManager {
       const cleaned = this.removeTyforgeLintBlock(content);
       const trimmed = cleaned.trim();
 
-      if (trimmed === "" || trimmed === "pre-commit:" || trimmed === "pre-commit:\n  commands:") {
+      if (
+        trimmed === "" ||
+        trimmed === "pre-commit:" ||
+        trimmed === "pre-commit:\n  commands:"
+      ) {
         fs.unlinkSync(hookPath);
       } else {
         fs.writeFileSync(hookPath, cleaned, "utf-8");
@@ -116,19 +120,13 @@ export class HookSetupLefthook implements IHookManager {
   }
 
   private buildBlock(command: string): string {
-    return [
-      "    tyforge-guard:",
-      `      run: ${command}`,
-    ].join("\n");
+    return ["    tyforge-guard:", `      run: ${command}`].join("\n");
   }
 
   private buildFullConfig(command: string): string {
-    return [
-      "pre-commit:",
-      "  commands:",
-      this.buildBlock(command),
-      "",
-    ].join("\n");
+    return ["pre-commit:", "  commands:", this.buildBlock(command), ""].join(
+      "\n",
+    );
   }
 
   private appendToPreCommit(existing: string, block: string): string {

@@ -32,16 +32,25 @@ export class FDeviceId extends FIdentifier {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!uuidValidate(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Device ID must be a valid UUID"));
+      return err(
+        ExceptionValidation.create(fieldPath, "Device ID must be a valid UUID"),
+      );
     }
     return OK_TRUE;
   }
 
-  static create<T = TDeviceId>(raw: T, fieldPath = "DeviceId"): Result<FDeviceId, ExceptionValidation> {
+  static create<T = TDeviceId>(
+    raw: T,
+    fieldPath = "DeviceId",
+  ): Result<FDeviceId, ExceptionValidation> {
     const typed = FIdentifier.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDeviceId(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -52,11 +61,18 @@ export class FDeviceId extends FIdentifier {
     return result.value;
   }
 
-  static assign<T = TDeviceId>(value: T, fieldPath = "DeviceId"): Result<FDeviceId, ExceptionValidation> {
+  static assign<T = TDeviceId>(
+    value: T,
+    fieldPath = "DeviceId",
+  ): Result<FDeviceId, ExceptionValidation> {
     const typed = FIdentifier.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDeviceId(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

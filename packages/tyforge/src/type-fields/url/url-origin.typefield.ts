@@ -42,7 +42,10 @@ export class FUrlOrigin extends TypeField<TUrlOrigin, TUrlOriginFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath = "UrlOrigin"): Result<TUrlOrigin, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath = "UrlOrigin",
+  ): Result<TUrlOrigin, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath, 10, 2048);
   }
 
@@ -56,31 +59,53 @@ export class FUrlOrigin extends TypeField<TUrlOrigin, TUrlOriginFormatted> {
     if (validateLevel === "none") return ok(true);
     const isLocalhost = LOCALHOST_REGEX.test(value);
     if (!HTTPS_REGEX.test(value) && !isLocalhost) {
-      return err(ExceptionValidation.create(fieldPath, "Origin must use HTTPS (or HTTP for localhost/127.0.0.1 in development)."));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Origin must use HTTPS" +
+            " (or HTTP for localhost/127.0.0.1" +
+            " in development).",
+        ),
+      );
     }
     let parsed: URL;
     try {
       parsed = new URL(value);
     } catch {
-      return err(ExceptionValidation.create(fieldPath, "Invalid origin URL format."));
+      return err(
+        ExceptionValidation.create(fieldPath, "Invalid origin URL format."),
+      );
     }
-    // Block private/internal IPs to prevent SSRF — localhost exempted for development
+    // Block private/internal IPs to prevent
+    // SSRF — localhost exempted for development
     if (!isLocalhost) {
       const hostname = parsed.hostname.replace(/^\[|\]$/g, "");
       for (const pattern of PRIVATE_IP_PATTERNS) {
         if (pattern.test(hostname)) {
-          return err(ExceptionValidation.create(fieldPath, "Private or internal IP addresses are not allowed."));
+          return err(
+            ExceptionValidation.create(
+              fieldPath,
+              "Private or internal IP addresses are not allowed.",
+            ),
+          );
         }
       }
     }
     return ok(true);
   }
 
-  static create<T = TUrlOrigin>(raw: T, fieldPath = "UrlOrigin"): Result<FUrlOrigin, ExceptionValidation> {
+  static create<T = TUrlOrigin>(
+    raw: T,
+    fieldPath = "UrlOrigin",
+  ): Result<FUrlOrigin, ExceptionValidation> {
     const typed = FUrlOrigin.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FUrlOrigin(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -91,17 +116,36 @@ export class FUrlOrigin extends TypeField<TUrlOrigin, TUrlOriginFormatted> {
     return result.value;
   }
 
-  static assign<T = TUrlOrigin>(value: T, fieldPath = "UrlOrigin"): Result<FUrlOrigin, ExceptionValidation> {
+  static assign<T = TUrlOrigin>(
+    value: T,
+    fieldPath = "UrlOrigin",
+  ): Result<FUrlOrigin, ExceptionValidation> {
     const typed = FUrlOrigin.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FUrlOrigin(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  override formatted(): TUrlOriginFormatted { return this.getValue(); }
-  override toString(): string { return this.getValue(); }
-  override getDescription(): string { return "URL origin (protocol + host + port). HTTPS required, HTTP allowed only for localhost."; }
-  override getShortDescription(): string { return "Origin"; }
+  override formatted(): TUrlOriginFormatted {
+    return this.getValue();
+  }
+  override toString(): string {
+    return this.getValue();
+  }
+  override getDescription(): string {
+    return (
+      "URL origin (protocol + host + port)." +
+      " HTTPS required," +
+      " HTTP allowed only for localhost."
+    );
+  }
+  override getShortDescription(): string {
+    return "Origin";
+  }
 }

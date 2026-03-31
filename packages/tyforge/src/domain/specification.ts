@@ -15,21 +15,37 @@ export abstract class Specification<T> {
 }
 
 class AndSpecification<T> extends Specification<T> {
-  constructor(private left: Specification<T>, private right: Specification<T>) { super(); }
+  constructor(
+    private left: Specification<T>,
+    private right: Specification<T>,
+  ) {
+    super();
+  }
   isSatisfiedBy(candidate: T): boolean {
-    return this.left.isSatisfiedBy(candidate) && this.right.isSatisfiedBy(candidate);
+    return (
+      this.left.isSatisfiedBy(candidate) && this.right.isSatisfiedBy(candidate)
+    );
   }
 }
 
 class OrSpecification<T> extends Specification<T> {
-  constructor(private left: Specification<T>, private right: Specification<T>) { super(); }
+  constructor(
+    private left: Specification<T>,
+    private right: Specification<T>,
+  ) {
+    super();
+  }
   isSatisfiedBy(candidate: T): boolean {
-    return this.left.isSatisfiedBy(candidate) || this.right.isSatisfiedBy(candidate);
+    return (
+      this.left.isSatisfiedBy(candidate) || this.right.isSatisfiedBy(candidate)
+    );
   }
 }
 
 class NotSpecification<T> extends Specification<T> {
-  constructor(private spec: Specification<T>) { super(); }
+  constructor(private spec: Specification<T>) {
+    super();
+  }
   isSatisfiedBy(candidate: T): boolean {
     return !this.spec.isSatisfiedBy(candidate);
   }

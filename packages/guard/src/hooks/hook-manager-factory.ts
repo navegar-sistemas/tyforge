@@ -7,9 +7,12 @@ import { HookSetupLefthook } from "./hook-setup-lefthook";
 export class HookManagerFactory {
   static create(manager: THookManager): IHookManager {
     switch (manager) {
-      case "husky": return new HookSetupHusky();
-      case "lefthook": return new HookSetupLefthook();
-      case "native": return new HookSetupNative();
+      case "husky":
+        return new HookSetupHusky();
+      case "lefthook":
+        return new HookSetupLefthook();
+      case "native":
+        return new HookSetupNative();
     }
   }
 }

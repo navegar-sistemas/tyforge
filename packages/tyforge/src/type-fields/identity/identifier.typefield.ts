@@ -8,17 +8,25 @@ export type TIdentifier = string;
 export type TIdentifierFormatted = string;
 
 // Abstract base for all identifier TypeFields.
-// Does NOT impose any format — subclasses define their own config (min/max length)
-// and override validateRules for format-specific validation (UUID, alphanumeric, hex, etc).
+// Does NOT impose any format — subclasses define
+// their own config (min/max length) and override
+// validateRules for format-specific validation
+// (UUID, alphanumeric, hex, etc).
 
-export abstract class FIdentifier extends TypeField<TIdentifier, TIdentifierFormatted> {
+export abstract class FIdentifier extends TypeField<
+  TIdentifier,
+  TIdentifierFormatted
+> {
   override readonly typeInference: string = "FIdentifier";
 
   protected constructor(value: TIdentifier, fieldPath: string) {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TIdentifier, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TIdentifier, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 

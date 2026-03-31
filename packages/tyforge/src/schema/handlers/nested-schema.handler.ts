@@ -7,7 +7,11 @@ import { requiredError } from "./handler-utils";
 
 export class NestedSchemaHandler implements IFieldHandler {
   execute(
-    field: ICompiledField, value: unknown, _useAssign: boolean, mode: "create" | "assign", props: Record<string, unknown>,
+    field: ICompiledField,
+    value: unknown,
+    _useAssign: boolean,
+    mode: "create" | "assign",
+    props: Record<string, unknown>,
   ): Result<true, Exceptions> | null {
     if (TypeGuard.isNullish(value)) {
       if (field.required) return err(requiredError(field.path));

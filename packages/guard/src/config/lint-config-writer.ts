@@ -29,7 +29,9 @@ export class ConfigWriter {
     fs.writeFileSync(resolved, content, "utf-8");
   }
 
-  private static sortKeys(config: ILintConfigExtended): Record<string, unknown> {
+  private static sortKeys(
+    config: ILintConfigExtended,
+  ): Record<string, unknown> {
     const result: Record<string, unknown> = {};
 
     for (const key of CANONICAL_KEY_ORDER) {

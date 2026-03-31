@@ -1,4 +1,8 @@
-import { TypeField, TValidationLevel, TFormatTarget } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+  TFormatTarget,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -32,29 +36,54 @@ export class FMoney extends TypeField<TMoney, TMoneyFormatted> {
     if (validateLevel !== "full") return OK_TRUE;
     if (!Number.isInteger(value)) {
       return err(
-        ExceptionValidation.create(fieldPath, "Value must be an integer (cents)"),
+        ExceptionValidation.create(
+          fieldPath,
+          "Value must be an integer (cents)",
+        ),
       );
     }
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TMoney, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TMoney, ExceptionValidation> {
     return TypeGuard.extractNumber(value, fieldPath);
   }
 
-  static formCreate(raw: unknown, fieldPath = "Money"): Result<FMoney, ExceptionValidation> {
-    return FMoney.create(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  static formCreate(
+    raw: unknown,
+    fieldPath = "Money",
+  ): Result<FMoney, ExceptionValidation> {
+    return FMoney.create(
+      TypeField.normalizeFormInput(raw, "number"),
+      fieldPath,
+    );
   }
 
-  static formAssign(raw: unknown, fieldPath = "Money"): Result<FMoney, ExceptionValidation> {
-    return FMoney.assign(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  static formAssign(
+    raw: unknown,
+    fieldPath = "Money",
+  ): Result<FMoney, ExceptionValidation> {
+    return FMoney.assign(
+      TypeField.normalizeFormInput(raw, "number"),
+      fieldPath,
+    );
   }
 
-  static create<T = TMoney>(raw: T, fieldPath = "Money"): Result<FMoney, ExceptionValidation> {
+  static create<T = TMoney>(
+    raw: T,
+    fieldPath = "Money",
+  ): Result<FMoney, ExceptionValidation> {
     const typed = FMoney.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FMoney(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -65,19 +94,30 @@ export class FMoney extends TypeField<TMoney, TMoneyFormatted> {
     return result.value;
   }
 
-  static assign<T = TMoney>(value: T, fieldPath = "Money"): Result<FMoney, ExceptionValidation> {
+  static assign<T = TMoney>(
+    value: T,
+    fieldPath = "Money",
+  ): Result<FMoney, ExceptionValidation> {
     const typed = FMoney.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FMoney(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
   /**
-   * Converts a decimal amount (e.g. 10.50) to integer cents and returns an FMoney instance.
+   * Converts a decimal amount (e.g. 10.50) to
+   * integer cents and returns an FMoney instance.
    */
-  static fromDecimal(value: number, fieldPath = "Money"): Result<FMoney, ExceptionValidation> {
+  static fromDecimal(
+    value: number,
+    fieldPath = "Money",
+  ): Result<FMoney, ExceptionValidation> {
     return FMoney.create(Math.round(value * 100), fieldPath);
   }
 
@@ -96,7 +136,8 @@ export class FMoney extends TypeField<TMoney, TMoneyFormatted> {
   }
 
   /**
-   * Subtracts the cents of another FMoney from this one and returns a new FMoney.
+   * Subtracts the cents of another FMoney from
+   * this one and returns a new FMoney.
    */
   subtract(other: FMoney): Result<FMoney, ExceptionValidation> {
     return FMoney.create(this.getValue() - other.getValue(), this.fieldPath);
@@ -156,11 +197,20 @@ export class FMoney extends TypeField<TMoney, TMoneyFormatted> {
   }
 
   override formatted(target: TFormatTarget = "display"): TMoneyFormatted {
-    return TypeField.formatNumber(this.toDecimal(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }, target);
+    return TypeField.formatNumber(
+      this.toDecimal(),
+      { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+      target,
+    );
   }
 
   override getDescription(): string {
-    return "Monetary value stored as integer cents. Avoids floating point precision issues by representing all amounts in the smallest currency unit.";
+    return (
+      "Monetary value stored as integer cents. " +
+      "Avoids floating point precision issues by " +
+      "representing all amounts in the smallest " +
+      "currency unit."
+    );
   }
 
   override getShortDescription(): string {

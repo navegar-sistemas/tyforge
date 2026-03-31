@@ -5,13 +5,23 @@ import { ToolObjectTransform } from "tyforge/tools";
 import type { ILintConfigExtended, THookManager } from "./lint-config-schema";
 import { OHookManager } from "./lint-config-schema";
 
-const OLintSeverity = { ERROR: "error", WARNING: "warning", OFF: "off" } as const;
+const OLintSeverity = {
+  ERROR: "error",
+  WARNING: "warning",
+  OFF: "off",
+} as const;
 
 function isHookManager(value: string): value is THookManager {
-  return value === OHookManager.HUSKY || value === OHookManager.LEFTHOOK || value === OHookManager.NATIVE;
+  return (
+    value === OHookManager.HUSKY ||
+    value === OHookManager.LEFTHOOK ||
+    value === OHookManager.NATIVE
+  );
 }
 
-export function loadLintConfigExtended(configPath?: string): ILintConfigExtended | null {
+export function loadLintConfigExtended(
+  configPath?: string,
+): ILintConfigExtended | null {
   const paths = configPath
     ? [path.resolve(configPath)]
     : [
@@ -23,10 +33,15 @@ export function loadLintConfigExtended(configPath?: string): ILintConfigExtended
     let content: string;
     try {
       const stat = fs.statSync(filePath);
-      if (stat.size > 1048576) throw new Error("Config file exceeds 1MB limit.");
+      if (stat.size > 1048576)
+        throw new Error("Config file exceeds 1MB limit.");
       content = fs.readFileSync(filePath, "utf-8");
     } catch (err) {
-      if (err instanceof Error && err.message === "Config file exceeds 1MB limit.") throw err;
+      if (
+        err instanceof Error &&
+        err.message === "Config file exceeds 1MB limit."
+      )
+        throw err;
       continue;
     }
     let parsed: unknown;
@@ -37,9 +52,11 @@ export function loadLintConfigExtended(configPath?: string): ILintConfigExtended
     }
     if (!TypeGuard.isRecord(parsed)) continue;
 
-    const source = filePath.endsWith("tyforge.config.json") && TypeGuard.isRecord(parsed["lint"])
-      ? parsed["lint"]
-      : parsed;
+    const source =
+      filePath.endsWith("tyforge.config.json") &&
+      TypeGuard.isRecord(parsed["lint"])
+        ? parsed["lint"]
+        : parsed;
 
     if (!TypeGuard.isRecord(source)) continue;
     return buildExtendedConfig(source);
@@ -48,7 +65,9 @@ export function loadLintConfigExtended(configPath?: string): ILintConfigExtended
   return null;
 }
 
-function buildExtendedConfig(source: Record<string, unknown>): ILintConfigExtended {
+function buildExtendedConfig(
+  source: Record<string, unknown>,
+): ILintConfigExtended {
   const defaults = { root: "src", strict: true, exclude: [], version: "1.0" };
   const merged = { ...defaults, ...source };
   const flat = ToolObjectTransform.flatten(merged);
@@ -78,7 +97,11 @@ function buildExtendedConfig(source: Record<string, unknown>): ILintConfigExtend
     if (!str.success) continue;
     const enumCheck = TypeGuard.isEnumValue(OLintSeverity, str.value, key);
     if (!enumCheck.success) continue;
-    if (str.value === "error" || str.value === "warning" || str.value === "off") {
+    if (
+      str.value === "error" ||
+      str.value === "warning" ||
+      str.value === "off"
+    ) {
       rules[key.slice(6)] = str.value;
     }
   }
@@ -100,11 +123,24 @@ function buildExtendedConfig(source: Record<string, unknown>): ILintConfigExtend
 
   const meta = source["_meta"];
   if (TypeGuard.isRecord(meta)) {
-    const configuredAt = TypeGuard.isString(meta["configuredAt"], "_meta.configuredAt");
-    const tyforgeVersion = TypeGuard.isString(meta["tyforgeVersion"], "_meta.tyforgeVersion");
-    const lastRulesCount = TypeGuard.extractNumber(meta["lastRulesCount"], "_meta.lastRulesCount");
+    const configuredAt = TypeGuard.isString(
+      meta["configuredAt"],
+      "_meta.configuredAt",
+    );
+    const tyforgeVersion = TypeGuard.isString(
+      meta["tyforgeVersion"],
+      "_meta.tyforgeVersion",
+    );
+    const lastRulesCount = TypeGuard.extractNumber(
+      meta["lastRulesCount"],
+      "_meta.lastRulesCount",
+    );
 
-    if (configuredAt.success && tyforgeVersion.success && lastRulesCount.success) {
+    if (
+      configuredAt.success &&
+      tyforgeVersion.success &&
+      lastRulesCount.success
+    ) {
       return {
         ...config,
         ...(hookManager ? { hookManager } : {}),

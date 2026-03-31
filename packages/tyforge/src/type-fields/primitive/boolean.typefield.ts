@@ -19,23 +19,45 @@ export class FBoolean extends TypeField<TBoolean, TBooleanFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TBoolean, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TBoolean, ExceptionValidation> {
     return TypeGuard.extractBoolean(value, fieldPath);
   }
 
-  static formCreate(raw: unknown, fieldPath = "Boolean"): Result<FBoolean, ExceptionValidation> {
-    return FBoolean.create(TypeField.normalizeFormInput(raw, "boolean"), fieldPath);
+  static formCreate(
+    raw: unknown,
+    fieldPath = "Boolean",
+  ): Result<FBoolean, ExceptionValidation> {
+    return FBoolean.create(
+      TypeField.normalizeFormInput(raw, "boolean"),
+      fieldPath,
+    );
   }
 
-  static formAssign(raw: unknown, fieldPath = "Boolean"): Result<FBoolean, ExceptionValidation> {
-    return FBoolean.assign(TypeField.normalizeFormInput(raw, "boolean"), fieldPath);
+  static formAssign(
+    raw: unknown,
+    fieldPath = "Boolean",
+  ): Result<FBoolean, ExceptionValidation> {
+    return FBoolean.assign(
+      TypeField.normalizeFormInput(raw, "boolean"),
+      fieldPath,
+    );
   }
 
-  static create<T = TBoolean>(raw: T, fieldPath = "Boolean"): Result<FBoolean, ExceptionValidation> {
+  static create<T = TBoolean>(
+    raw: T,
+    fieldPath = "Boolean",
+  ): Result<FBoolean, ExceptionValidation> {
     const typed = FBoolean.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBoolean(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -46,11 +68,18 @@ export class FBoolean extends TypeField<TBoolean, TBooleanFormatted> {
     return result.value;
   }
 
-  static assign<T = TBoolean>(value: T, fieldPath = "Boolean"): Result<FBoolean, ExceptionValidation> {
+  static assign<T = TBoolean>(
+    value: T,
+    fieldPath = "Boolean",
+  ): Result<FBoolean, ExceptionValidation> {
     const typed = FBoolean.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBoolean(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -64,7 +93,13 @@ export class FBoolean extends TypeField<TBoolean, TBooleanFormatted> {
   }
 
   override getDescription(): string {
-    return "Valor booleano verdadeiro ou falso. Representa um estado lógico que pode ser verdadeiro (true) ou falso (false). Utilizado para flags, status simples e condições lógicas no sistema.";
+    return (
+      "Valor booleano verdadeiro ou falso." +
+      " Representa um estado lógico que pode" +
+      " ser verdadeiro (true) ou falso (false)." +
+      " Utilizado para flags, status simples" +
+      " e condições lógicas no sistema."
+    );
   }
 
   override getShortDescription(): string {

@@ -11,7 +11,10 @@ const DEEP_MOCK = {
     debug: false,
     port: 3000,
     tags: ["api", "ddd"],
-    features: [{ name: "schema", enabled: true }, { name: "lint", enabled: false }],
+    features: [
+      { name: "schema", enabled: true },
+      { name: "lint", enabled: false },
+    ],
   },
   database: {
     primary: {
@@ -25,7 +28,10 @@ const DEEP_MOCK = {
         options: {
           timeout: 30000,
           retries: 3,
-          hooks: [{ event: "connect", handler: "onConnect" }, { event: "error", handler: "onError" }],
+          hooks: [
+            { event: "connect", handler: "onConnect" },
+            { event: "error", handler: "onError" },
+          ],
           pool: {
             min: 2,
             max: 10,
@@ -62,7 +68,12 @@ const DEEP_MOCK = {
       },
     },
     replicas: [
-      { host: "replica-1", port: 5433, readonly: true, zones: ["us-east", "us-west"] },
+      {
+        host: "replica-1",
+        port: 5433,
+        readonly: true,
+        zones: ["us-east", "us-west"],
+      },
       { host: "replica-2", port: 5434, readonly: true, zones: ["eu-central"] },
     ],
   },
@@ -94,7 +105,11 @@ const DEEP_MOCK = {
     targets: ["stdout", "file"],
     formatters: [
       { type: "json", pretty: false },
-      { type: "text", template: "[{level}] {msg}", colors: { error: "red", warn: "yellow" } },
+      {
+        type: "text",
+        template: "[{level}] {msg}",
+        colors: { error: "red", warn: "yellow" },
+      },
     ],
     file: {
       path: "/var/log/app.log",
@@ -110,8 +125,14 @@ const DEEP_MOCK = {
       name: "ingest",
       steps: [
         { action: "parse", config: { format: "json", strict: true } },
-        { action: "validate", config: { schema: "v2", rules: ["no-null", "no-empty"] } },
-        { action: "transform", config: { mapping: { input: "raw", output: "processed" } } },
+        {
+          action: "validate",
+          config: { schema: "v2", rules: ["no-null", "no-empty"] },
+        },
+        {
+          action: "transform",
+          config: { mapping: { input: "raw", output: "processed" } },
+        },
       ],
     },
   ],
@@ -158,7 +179,10 @@ describe("ToolObjectTransform.flatten", () => {
 
     // Arrays of primitives remain as arrays
     assert.deepStrictEqual(flat.get("app.tags"), ["api", "ddd"]);
-    assert.deepStrictEqual(flat.get("database.primary.credentials.roles"), ["read", "write"]);
+    assert.deepStrictEqual(flat.get("database.primary.credentials.roles"), [
+      "read",
+      "write",
+    ]);
     assert.deepStrictEqual(flat.get("logging.targets"), ["stdout", "file"]);
 
     // Arrays of objects remain as arrays (not expanded)
@@ -168,7 +192,10 @@ describe("ToolObjectTransform.flatten", () => {
   });
 
   it("4 — mixed primitives and nested objects", () => {
-    const input = { name: "x", address: { city: "SP", geo: { lat: -23, lng: -46 } } };
+    const input = {
+      name: "x",
+      address: { city: "SP", geo: { lat: -23, lng: -46 } },
+    };
     const flat = ToolObjectTransform.flatten(input);
 
     assert.strictEqual(flat.size, 4);
@@ -216,10 +243,14 @@ describe("ToolObjectTransform.flatten", () => {
 
     for (const key of arrayKeys) {
       const val = flat.get(key);
-      assert.ok(Array.isArray(val), `Expected "${key}" to be an array, got ${typeof val}`);
+      assert.ok(
+        Array.isArray(val),
+        `Expected "${key}" to be an array, got ${typeof val}`,
+      );
     }
 
-    // Verify no key starts with these array paths + "." (arrays are not expanded)
+    // Verify no key starts with these array paths + "."
+    // (arrays are not expanded)
     for (const key of arrayKeys) {
       for (const flatKey of flat.keys()) {
         assert.ok(
@@ -234,11 +265,15 @@ describe("ToolObjectTransform.flatten", () => {
     const flat = ToolObjectTransform.flatten(DEEP_MOCK);
 
     assert.strictEqual(
-      flat.get("database.primary.credentials.options.pool.idle.check.strategy.limits.jitter.seed.entropy"),
+      flat.get(
+        "database.primary.credentials.options.pool.idle.check.strategy.limits.jitter.seed.entropy",
+      ),
       256,
     );
     assert.strictEqual(
-      flat.get("database.primary.credentials.options.pool.idle.check.strategy.limits.jitter.seed.algorithm"),
+      flat.get(
+        "database.primary.credentials.options.pool.idle.check.strategy.limits.jitter.seed.algorithm",
+      ),
       "random",
     );
   });
@@ -290,7 +325,11 @@ describe("ToolObjectTransform round-trip", () => {
     assert.strictEqual(reFlattened.size, originalFlat.size);
     for (const [key, value] of originalFlat) {
       assert.ok(reFlattened.has(key), `Missing key after re-flatten: "${key}"`);
-      assert.deepStrictEqual(reFlattened.get(key), value, `Value mismatch for key: "${key}"`);
+      assert.deepStrictEqual(
+        reFlattened.get(key),
+        value,
+        `Value mismatch for key: "${key}"`,
+      );
     }
   });
 
@@ -316,17 +355,23 @@ describe("ToolObjectTransform round-trip", () => {
     assert.deepStrictEqual(restored, mixed);
   });
 
-  it("15 — arrays of objects with nested objects preserved after round-trip", () => {
+  it("15 — arrays of objects with nested objects preserved", () => {
     const flat = ToolObjectTransform.flatten(DEEP_MOCK);
     const restored = ToolObjectTransform.unflatten(flat);
 
-    // formatters[1].colors preserved with nested object inside array
+    // formatters[1].colors preserved with nested object
     const formatters = (restored as typeof DEEP_MOCK).logging.formatters;
-    assert.deepStrictEqual(formatters[1].colors, { error: "red", warn: "yellow" });
+    assert.deepStrictEqual(formatters[1].colors, {
+      error: "red",
+      warn: "yellow",
+    });
 
-    // pipelines[0].steps[2].config.mapping preserved with nested object inside array
+    // pipelines[0].steps[2].config.mapping preserved
     const pipelines = (restored as typeof DEEP_MOCK).pipelines;
-    assert.deepStrictEqual(pipelines[0].steps[2].config.mapping, { input: "raw", output: "processed" });
+    assert.deepStrictEqual(pipelines[0].steps[2].config.mapping, {
+      input: "raw",
+      output: "processed",
+    });
   });
 });
 
@@ -341,7 +386,10 @@ describe("ToolObjectTransform security", () => {
     const result = ToolObjectTransform.unflatten(flat);
     assert.equal(result["name"], "safe");
     assert.equal("polluted" in Object.prototype, false);
-    assert.equal(Object.prototype.hasOwnProperty.call(result, "__proto__"), false);
+    assert.equal(
+      Object.prototype.hasOwnProperty.call(result, "__proto__"),
+      false,
+    );
   });
 
   it("unflatten skips constructor keys", () => {
@@ -351,7 +399,10 @@ describe("ToolObjectTransform security", () => {
     ]);
     const result = ToolObjectTransform.unflatten(flat);
     assert.equal(result["name"], "safe");
-    assert.equal(Object.prototype.hasOwnProperty.call(result, "constructor"), false);
+    assert.equal(
+      Object.prototype.hasOwnProperty.call(result, "constructor"),
+      false,
+    );
   });
 
   it("unflatten skips prototype keys", () => {

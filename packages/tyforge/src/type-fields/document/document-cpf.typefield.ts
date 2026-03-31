@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -7,7 +10,10 @@ import { TypeGuard } from "@tyforge/tools/type_guard";
 export type TDocumentCpf = string;
 export type TDocumentCpfFormatted = string;
 
-export class FDocumentCpf extends TypeField<TDocumentCpf, TDocumentCpfFormatted> {
+export class FDocumentCpf extends TypeField<
+  TDocumentCpf,
+  TDocumentCpfFormatted
+> {
   private static readonly CPF_REGEX = /^\d{11}$/;
 
   private static isValidCheckDigits(cpf: string): boolean {
@@ -47,40 +53,67 @@ export class FDocumentCpf extends TypeField<TDocumentCpf, TDocumentCpfFormatted>
     if (validateLevel !== "full") return OK_TRUE;
 
     if (!FDocumentCpf.CPF_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "CPF must contain exactly 11 numeric digits."));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "CPF must contain exactly 11 numeric digits.",
+        ),
+      );
     }
 
     if (!FDocumentCpf.isValidCheckDigits(value)) {
-      return err(ExceptionValidation.create(fieldPath, "CPF has invalid check digits."));
+      return err(
+        ExceptionValidation.create(fieldPath, "CPF has invalid check digits."),
+      );
     }
 
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TDocumentCpf, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TDocumentCpf, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TDocumentCpf>(raw: T, fieldPath = "DocumentCpf"): Result<FDocumentCpf, ExceptionValidation> {
+  static create<T = TDocumentCpf>(
+    raw: T,
+    fieldPath = "DocumentCpf",
+  ): Result<FDocumentCpf, ExceptionValidation> {
     const typed = FDocumentCpf.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentCpf(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TDocumentCpf, fieldPath = "DocumentCpf"): FDocumentCpf {
+  static createOrThrow(
+    raw: TDocumentCpf,
+    fieldPath = "DocumentCpf",
+  ): FDocumentCpf {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDocumentCpf>(value: T, fieldPath = "DocumentCpf"): Result<FDocumentCpf, ExceptionValidation> {
+  static assign<T = TDocumentCpf>(
+    value: T,
+    fieldPath = "DocumentCpf",
+  ): Result<FDocumentCpf, ExceptionValidation> {
     const typed = FDocumentCpf.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentCpf(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

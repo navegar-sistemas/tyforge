@@ -24,7 +24,10 @@ export class FUrlFull extends TypeField<TUrlFull, TUrlFullFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath = "UrlFull"): Result<TUrlFull, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath = "UrlFull",
+  ): Result<TUrlFull, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath, 10, 2048);
   }
 
@@ -37,7 +40,12 @@ export class FUrlFull extends TypeField<TUrlFull, TUrlFullFormatted> {
     if (!base.success) return base;
     if (validateLevel === "none") return ok(true);
     if (!URL_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "URL must start with http:// or https://."));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "URL must start with http:// or https://.",
+        ),
+      );
     }
     try {
       new URL(value);
@@ -47,11 +55,18 @@ export class FUrlFull extends TypeField<TUrlFull, TUrlFullFormatted> {
     return ok(true);
   }
 
-  static create<T = TUrlFull>(raw: T, fieldPath = "UrlFull"): Result<FUrlFull, ExceptionValidation> {
+  static create<T = TUrlFull>(
+    raw: T,
+    fieldPath = "UrlFull",
+  ): Result<FUrlFull, ExceptionValidation> {
     const typed = FUrlFull.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FUrlFull(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -62,17 +77,32 @@ export class FUrlFull extends TypeField<TUrlFull, TUrlFullFormatted> {
     return result.value;
   }
 
-  static assign<T = TUrlFull>(value: T, fieldPath = "UrlFull"): Result<FUrlFull, ExceptionValidation> {
+  static assign<T = TUrlFull>(
+    value: T,
+    fieldPath = "UrlFull",
+  ): Result<FUrlFull, ExceptionValidation> {
     const typed = FUrlFull.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FUrlFull(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  override formatted(): TUrlFullFormatted { return this.getValue(); }
-  override toString(): string { return this.getValue(); }
-  override getDescription(): string { return "Complete URL with protocol, host, and optional path/query"; }
-  override getShortDescription(): string { return "URL"; }
+  override formatted(): TUrlFullFormatted {
+    return this.getValue();
+  }
+  override toString(): string {
+    return this.getValue();
+  }
+  override getDescription(): string {
+    return "Complete URL with protocol, host, and optional path/query";
+  }
+  override getShortDescription(): string {
+    return "URL";
+  }
 }

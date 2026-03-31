@@ -159,7 +159,9 @@ export class ExceptionAuth extends Exceptions {
       instance: "",
       uri: "",
       code: "AUTH_MFA_LOCKOUT",
-      additionalFields: retryAfterSeconds ? { retry_after_seconds: retryAfterSeconds } : undefined,
+      additionalFields: retryAfterSeconds
+        ? { retry_after_seconds: retryAfterSeconds }
+        : undefined,
     });
   }
 
@@ -220,7 +222,9 @@ export class ExceptionAuth extends Exceptions {
       instance: "",
       uri: "",
       code: "AUTH_RATE_LIMITED",
-      additionalFields: retryAfterSeconds ? { retry_after_seconds: retryAfterSeconds } : undefined,
+      additionalFields: retryAfterSeconds
+        ? { retry_after_seconds: retryAfterSeconds }
+        : undefined,
     });
   }
 
@@ -301,7 +305,8 @@ export class ExceptionAuth extends Exceptions {
     return new ExceptionAuth({
       type: "auth/mfa-required",
       title: "MFA Necessário",
-      detail: "É necessário pelo menos um método MFA habilitado para gerar códigos de backup",
+      detail:
+        "É necessário pelo menos um método MFA habilitado para gerar códigos de backup",
       status: OHttpStatus.BAD_REQUEST,
       instance: "",
       uri: "",

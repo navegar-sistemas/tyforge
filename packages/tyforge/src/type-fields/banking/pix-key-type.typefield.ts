@@ -31,32 +31,52 @@ export class FPixKeyType extends TypeField<TPixKeyType, TPixKeyTypeFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TPixKeyType, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TPixKeyType, ExceptionValidation> {
     const str = TypeGuard.isString(value, fieldPath);
     if (isFailure(str)) return err(str.error);
     return TypeField.resolveEnum(OPixKeyType, str.value, fieldPath);
   }
 
-  static create<T = TPixKeyType>(raw: T, fieldPath = "PixKeyType"): Result<FPixKeyType, ExceptionValidation> {
+  static create<T = TPixKeyType>(
+    raw: T,
+    fieldPath = "PixKeyType",
+  ): Result<FPixKeyType, ExceptionValidation> {
     const typed = FPixKeyType.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FPixKeyType(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TPixKeyType, fieldPath = "PixKeyType"): FPixKeyType {
+  static createOrThrow(
+    raw: TPixKeyType,
+    fieldPath = "PixKeyType",
+  ): FPixKeyType {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TPixKeyType>(value: T, fieldPath = "PixKeyType"): Result<FPixKeyType, ExceptionValidation> {
+  static assign<T = TPixKeyType>(
+    value: T,
+    fieldPath = "PixKeyType",
+  ): Result<FPixKeyType, ExceptionValidation> {
     const typed = FPixKeyType.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FPixKeyType(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

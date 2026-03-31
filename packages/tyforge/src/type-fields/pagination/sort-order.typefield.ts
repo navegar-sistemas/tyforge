@@ -1,11 +1,14 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 export const OSortOrder = { ASC: "asc", DESC: "desc" } as const;
-export type TSortOrder = typeof OSortOrder[keyof typeof OSortOrder];
+export type TSortOrder = (typeof OSortOrder)[keyof typeof OSortOrder];
 export type TSortOrderFormatted = string;
 
 export class FSortOrder extends TypeField<TSortOrder, TSortOrderFormatted> {
@@ -33,24 +36,44 @@ export class FSortOrder extends TypeField<TSortOrder, TSortOrderFormatted> {
     if (validateLevel !== "full") return OK_TRUE;
     const valid = Object.values(OSortOrder);
     if (!valid.includes(value)) {
-      return err(ExceptionValidation.create(fieldPath, `Sort order must be one of: ${valid.join(", ")}`));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          `Sort order must be one of: ${valid.join(", ")}`,
+        ),
+      );
     }
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath = "SortOrder"): Result<TSortOrder, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath = "SortOrder",
+  ): Result<TSortOrder, ExceptionValidation> {
     const result = TypeGuard.isString(value, fieldPath, 3, 4);
     if (!result.success) return result;
     if (result.value === OSortOrder.ASC) return ok(OSortOrder.ASC);
     if (result.value === OSortOrder.DESC) return ok(OSortOrder.DESC);
-    return err(ExceptionValidation.create(fieldPath, `Sort order must be one of: ${Object.values(OSortOrder).join(", ")}`));
+    return err(
+      ExceptionValidation.create(
+        fieldPath,
+        `Sort order must be one of: ${Object.values(OSortOrder).join(", ")}`,
+      ),
+    );
   }
 
-  static create<T = TSortOrder>(raw: T, fieldPath = "SortOrder"): Result<FSortOrder, ExceptionValidation> {
+  static create<T = TSortOrder>(
+    raw: T,
+    fieldPath = "SortOrder",
+  ): Result<FSortOrder, ExceptionValidation> {
     const typed = FSortOrder.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FSortOrder(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -61,17 +84,32 @@ export class FSortOrder extends TypeField<TSortOrder, TSortOrderFormatted> {
     return result.value;
   }
 
-  static assign<T = TSortOrder>(value: T, fieldPath = "SortOrder"): Result<FSortOrder, ExceptionValidation> {
+  static assign<T = TSortOrder>(
+    value: T,
+    fieldPath = "SortOrder",
+  ): Result<FSortOrder, ExceptionValidation> {
     const typed = FSortOrder.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FSortOrder(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  override formatted(): TSortOrderFormatted { return this.getValue(); }
-  override toString(): string { return this.getValue(); }
-  override getDescription(): string { return "Sort direction for pagination results. Values: asc, desc."; }
-  override getShortDescription(): string { return "Sort order"; }
+  override formatted(): TSortOrderFormatted {
+    return this.getValue();
+  }
+  override toString(): string {
+    return this.getValue();
+  }
+  override getDescription(): string {
+    return "Sort direction for pagination results. Values: asc, desc.";
+  }
+  override getShortDescription(): string {
+    return "Sort order";
+  }
 }

@@ -5,7 +5,10 @@ import { fileURLToPath } from "node:url";
 import { Check } from "../check.base";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../../..");
+const ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../../../../..",
+);
 
 export class CheckPublishReady extends Check {
   constructor() {
@@ -16,7 +19,12 @@ export class CheckPublishReady extends Check {
     const details: string[] = [];
     const packageFiles = this.findAllWorkspacePackageJsons();
 
-    const packages: { name: string; version: string; isPrivate: boolean; tyforgeVersions: string[] }[] = [];
+    const packages: {
+      name: string;
+      version: string;
+      isPrivate: boolean;
+      tyforgeVersions: string[];
+    }[] = [];
 
     for (const pkg of packageFiles) {
       try {
@@ -25,7 +33,10 @@ export class CheckPublishReady extends Check {
         if (!TypeGuard.isRecord(parsed)) continue;
 
         const nameResult = TypeGuard.extractString(parsed["name"], "name");
-        const versionResult = TypeGuard.extractString(parsed["version"], "version");
+        const versionResult = TypeGuard.extractString(
+          parsed["version"],
+          "version",
+        );
         if (!nameResult.success || !versionResult.success) continue;
 
         const isPrivate = parsed["private"] === true;
@@ -41,7 +52,12 @@ export class CheckPublishReady extends Check {
           }
         }
 
-        packages.push({ name: nameResult.value, version: versionResult.value, isPrivate, tyforgeVersions });
+        packages.push({
+          name: nameResult.value,
+          version: versionResult.value,
+          isPrivate,
+          tyforgeVersions,
+        });
       } catch {
         continue;
       }
@@ -51,16 +67,25 @@ export class CheckPublishReady extends Check {
       if (pkg.isPrivate) continue;
       try {
         const npmVersion = execFileSync("npm", ["view", pkg.name, "version"], {
-          encoding: "utf-8", timeout: 15000, stdio: "pipe",
+          encoding: "utf-8",
+          timeout: 15000,
+          stdio: "pipe",
         }).trim();
         if (npmVersion === pkg.version) {
-          details.push(`${pkg.name}@${pkg.version} already published — increment version`);
+          details.push(
+            `${pkg.name}@${pkg.version} already published — increment version`,
+          );
         }
       } catch (e) {
         if (e && typeof e === "object" && "stderr" in e) {
-          const stderr = String((e as Record<string, unknown>)["stderr"] ?? "");
-          if (!stderr.includes("E404") && !stderr.includes("is not in this registry")) {
-            details.push(`${pkg.name}: npm registry unreachable — cannot verify version`);
+          const stderr = String(e.stderr ?? "");
+          if (
+            !stderr.includes("E404") &&
+            !stderr.includes("is not in this registry")
+          ) {
+            details.push(
+              `${pkg.name}: npm registry unreachable — cannot verify version`,
+            );
           }
         }
       }
@@ -72,7 +97,9 @@ export class CheckPublishReady extends Check {
         if (pkg.name === "tyforge" || pkg.isPrivate) continue;
         for (const depVersion of pkg.tyforgeVersions) {
           if (depVersion !== core.version) {
-            details.push(`${pkg.name} depends on tyforge@${depVersion} but core is ${core.version}`);
+            details.push(
+              `${pkg.name} depends on tyforge@${depVersion} but core is ${core.version}`,
+            );
           }
         }
       }

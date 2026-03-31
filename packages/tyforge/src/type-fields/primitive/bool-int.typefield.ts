@@ -29,17 +29,27 @@ export class FBoolInt extends TypeField<TBoolInt, TBoolIntFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TBoolInt, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TBoolInt, ExceptionValidation> {
     const num = TypeGuard.extractNumber(value, fieldPath);
     if (isFailure(num)) return err(num.error);
     return TypeField.resolveEnum(OBoolInt, num.value, fieldPath);
   }
 
-  static create<T = TBoolInt>(raw: T, fieldPath = "BoolInt"): Result<FBoolInt, ExceptionValidation> {
+  static create<T = TBoolInt>(
+    raw: T,
+    fieldPath = "BoolInt",
+  ): Result<FBoolInt, ExceptionValidation> {
     const typed = FBoolInt.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBoolInt(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -50,11 +60,18 @@ export class FBoolInt extends TypeField<TBoolInt, TBoolIntFormatted> {
     return result.value;
   }
 
-  static assign<T = TBoolInt>(value: T, fieldPath = "BoolInt"): Result<FBoolInt, ExceptionValidation> {
+  static assign<T = TBoolInt>(
+    value: T,
+    fieldPath = "BoolInt",
+  ): Result<FBoolInt, ExceptionValidation> {
     const typed = FBoolInt.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBoolInt(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -68,7 +85,14 @@ export class FBoolInt extends TypeField<TBoolInt, TBoolIntFormatted> {
   }
 
   override getDescription(): string {
-    return "Validação dos dados do recebedor. Representa um valor booleano codificado como inteiro, onde 0 indica inválido e 1 indica válido. Utilizado para validação de dados e controle de status.";
+    return (
+      "Validação dos dados do recebedor." +
+      " Representa um valor booleano codificado" +
+      " como inteiro, onde 0 indica inválido" +
+      " e 1 indica válido." +
+      " Utilizado para validação de dados" +
+      " e controle de status."
+    );
   }
 
   override getShortDescription(): string {

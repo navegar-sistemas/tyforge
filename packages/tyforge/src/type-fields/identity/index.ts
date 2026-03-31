@@ -9,4 +9,7 @@ export type { TEmail, TEmailFormatted } from "./email.typefield";
 export { FFullName } from "./full-name.typefield";
 export type { TFullName, TFullNameFormatted } from "./full-name.typefield";
 export { FBusinessName } from "./business-name.typefield";
-export type { TBusinessName, TBusinessNameFormatted } from "./business-name.typefield";
+export type {
+  TBusinessName,
+  TBusinessNameFormatted,
+} from "./business-name.typefield";

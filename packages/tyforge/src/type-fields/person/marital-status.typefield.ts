@@ -16,7 +16,10 @@ export type TKeyMaritalStatus = keyof typeof OMaritalStatus;
 export type TMaritalStatus = (typeof OMaritalStatus)[TKeyMaritalStatus];
 export type TMaritalStatusFormatted = string;
 
-export class FMaritalStatus extends TypeField<TMaritalStatus, TMaritalStatusFormatted> {
+export class FMaritalStatus extends TypeField<
+  TMaritalStatus,
+  TMaritalStatusFormatted
+> {
   override readonly typeInference = "FMaritalStatus";
 
   override readonly config: ITypeFieldConfig<TMaritalStatus> = {
@@ -31,32 +34,52 @@ export class FMaritalStatus extends TypeField<TMaritalStatus, TMaritalStatusForm
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TMaritalStatus, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TMaritalStatus, ExceptionValidation> {
     const str = TypeGuard.isString(value, fieldPath);
     if (isFailure(str)) return err(str.error);
     return TypeField.resolveEnum(OMaritalStatus, str.value, fieldPath);
   }
 
-  static create<T = TMaritalStatus>(raw: T, fieldPath = "MaritalStatus"): Result<FMaritalStatus, ExceptionValidation> {
+  static create<T = TMaritalStatus>(
+    raw: T,
+    fieldPath = "MaritalStatus",
+  ): Result<FMaritalStatus, ExceptionValidation> {
     const typed = FMaritalStatus.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FMaritalStatus(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TMaritalStatus, fieldPath = "MaritalStatus"): FMaritalStatus {
+  static createOrThrow(
+    raw: TMaritalStatus,
+    fieldPath = "MaritalStatus",
+  ): FMaritalStatus {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TMaritalStatus>(value: T, fieldPath = "MaritalStatus"): Result<FMaritalStatus, ExceptionValidation> {
+  static assign<T = TMaritalStatus>(
+    value: T,
+    fieldPath = "MaritalStatus",
+  ): Result<FMaritalStatus, ExceptionValidation> {
     const typed = FMaritalStatus.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FMaritalStatus(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

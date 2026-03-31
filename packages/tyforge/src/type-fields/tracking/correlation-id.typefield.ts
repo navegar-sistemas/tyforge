@@ -32,31 +32,53 @@ export class FCorrelationId extends FIdentifier {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!uuidValidate(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Correlation ID must be a valid UUID"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Correlation ID must be a valid UUID",
+        ),
+      );
     }
     return OK_TRUE;
   }
 
-  static create<T = TCorrelationId>(raw: T, fieldPath = "CorrelationId"): Result<FCorrelationId, ExceptionValidation> {
+  static create<T = TCorrelationId>(
+    raw: T,
+    fieldPath = "CorrelationId",
+  ): Result<FCorrelationId, ExceptionValidation> {
     const typed = FIdentifier.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FCorrelationId(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TCorrelationId, fieldPath = "CorrelationId"): FCorrelationId {
+  static createOrThrow(
+    raw: TCorrelationId,
+    fieldPath = "CorrelationId",
+  ): FCorrelationId {
     const result = FCorrelationId.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TCorrelationId>(value: T, fieldPath = "CorrelationId"): Result<FCorrelationId, ExceptionValidation> {
+  static assign<T = TCorrelationId>(
+    value: T,
+    fieldPath = "CorrelationId",
+  ): Result<FCorrelationId, ExceptionValidation> {
     const typed = FIdentifier.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FCorrelationId(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

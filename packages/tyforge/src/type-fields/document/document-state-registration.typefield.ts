@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -7,7 +10,10 @@ import { TypeGuard } from "@tyforge/tools/type_guard";
 export type TDocumentStateRegistration = string;
 export type TDocumentStateRegistrationFormatted = string;
 
-export class FDocumentStateRegistration extends TypeField<TDocumentStateRegistration, TDocumentStateRegistrationFormatted> {
+export class FDocumentStateRegistration extends TypeField<
+  TDocumentStateRegistration,
+  TDocumentStateRegistrationFormatted
+> {
   private static readonly NUMERIC_REGEX = /^\d+$/;
   override readonly typeInference = "FDocumentStateRegistration";
 
@@ -31,35 +37,60 @@ export class FDocumentStateRegistration extends TypeField<TDocumentStateRegistra
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!FDocumentStateRegistration.NUMERIC_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "State registration must contain only numeric characters"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "State registration must contain only numeric characters",
+        ),
+      );
     }
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TDocumentStateRegistration, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TDocumentStateRegistration, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TDocumentStateRegistration>(raw: T, fieldPath = "StateRegistration"): Result<FDocumentStateRegistration, ExceptionValidation> {
+  static create<T = TDocumentStateRegistration>(
+    raw: T,
+    fieldPath = "StateRegistration",
+  ): Result<FDocumentStateRegistration, ExceptionValidation> {
     const typed = FDocumentStateRegistration.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentStateRegistration(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TDocumentStateRegistration, fieldPath = "StateRegistration"): FDocumentStateRegistration {
+  static createOrThrow(
+    raw: TDocumentStateRegistration,
+    fieldPath = "StateRegistration",
+  ): FDocumentStateRegistration {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDocumentStateRegistration>(value: T, fieldPath = "StateRegistration"): Result<FDocumentStateRegistration, ExceptionValidation> {
+  static assign<T = TDocumentStateRegistration>(
+    value: T,
+    fieldPath = "StateRegistration",
+  ): Result<FDocumentStateRegistration, ExceptionValidation> {
     const typed = FDocumentStateRegistration.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentStateRegistration(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

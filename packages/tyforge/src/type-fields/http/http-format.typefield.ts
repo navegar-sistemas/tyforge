@@ -28,38 +28,66 @@ export class FHttpFormat extends TypeField<THttpFormat, THttpFormatFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath = "HttpFormat"): Result<THttpFormat, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath = "HttpFormat",
+  ): Result<THttpFormat, ExceptionValidation> {
     const str = TypeGuard.isString(value, fieldPath);
     if (isFailure(str)) return err(str.error);
     return TypeField.resolveEnum(OHttpFormat, str.value, fieldPath);
   }
 
-  static create<T = THttpFormat>(raw: T, fieldPath = "HttpFormat"): Result<FHttpFormat, ExceptionValidation> {
+  static create<T = THttpFormat>(
+    raw: T,
+    fieldPath = "HttpFormat",
+  ): Result<FHttpFormat, ExceptionValidation> {
     const typed = FHttpFormat.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FHttpFormat(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(value: THttpFormat, fieldPath = "HttpFormat"): FHttpFormat {
+  static createOrThrow(
+    value: THttpFormat,
+    fieldPath = "HttpFormat",
+  ): FHttpFormat {
     const result = FHttpFormat.create(value, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = THttpFormat>(value: T, fieldPath = "HttpFormat"): Result<FHttpFormat, ExceptionValidation> {
+  static assign<T = THttpFormat>(
+    value: T,
+    fieldPath = "HttpFormat",
+  ): Result<FHttpFormat, ExceptionValidation> {
     const typed = FHttpFormat.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FHttpFormat(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  override formatted(): THttpFormatFormatted { return this.getValue(); }
-  override toString(): string { return this.getValue(); }
-  override getDescription(): string { return "HTTP body format (json, form)"; }
-  override getShortDescription(): string { return "HTTP Format"; }
+  override formatted(): THttpFormatFormatted {
+    return this.getValue();
+  }
+  override toString(): string {
+    return this.getValue();
+  }
+  override getDescription(): string {
+    return "HTTP body format (json, form)";
+  }
+  override getShortDescription(): string {
+    return "HTTP Format";
+  }
 }

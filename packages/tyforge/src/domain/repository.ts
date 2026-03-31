@@ -5,5 +5,7 @@ import type { FBoolean } from "@tyforge/type-fields/primitive/boolean.typefield"
 
 export abstract class Repository {
   abstract exists(id: FId): ResultPromise<FBoolean, Exceptions>;
-  abstract existsMany(ids: FId[]): ResultPromise<Map<string, FBoolean>, Exceptions>;
+  abstract existsMany(
+    ids: FId[],
+  ): ResultPromise<Map<string, FBoolean>, Exceptions>;
 }

@@ -3,19 +3,32 @@ import { strict as assert } from "node:assert";
 import { ServiceHttp } from "../service-http.base";
 import { isSuccess, isFailure, ok, err, Result } from "tyforge/result";
 import { Exceptions } from "tyforge/exceptions";
-import { FString, FInt, FHttpFormat, FBoolean, FUrlOrigin, FUrlPath } from "tyforge/type-fields";
+import {
+  FString,
+  FInt,
+  FHttpFormat,
+  FBoolean,
+  FUrlOrigin,
+  FUrlPath,
+} from "tyforge/type-fields";
 import { ExceptionHttp } from "../exception-http";
 import type { TRequestOptions } from "../service-http.types";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
-function assertSuccess<T, E>(result: Result<T, E>): asserts result is { success: true; value: T } {
+function assertSuccess<T, E>(
+  result: Result<T, E>,
+): asserts result is { success: true; value: T } {
   if (!isSuccess(result)) {
-    assert.fail(`Expected success but got failure: ${JSON.stringify(result.error)}`);
+    assert.fail(
+      `Expected success but got failure: ${JSON.stringify(result.error)}`,
+    );
   }
 }
 
-function assertFailure<T, E>(result: Result<T, E>): asserts result is { success: false; error: E } {
+function assertFailure<T, E>(
+  result: Result<T, E>,
+): asserts result is { success: false; error: E } {
   if (!isFailure(result)) {
     assert.fail(`Expected failure but got success`);
   }
@@ -40,11 +53,21 @@ function fbool(value: boolean): FBoolean {
 // ── Concrete test subclass ──────────────────────────────────────
 
 class TestServiceHttp extends ServiceHttp {
-  protected readonly _classInfo = { name: "TestServiceHttp", version: "1.0.0", description: "Test HTTP service" };
-  override readonly endpoint: FUrlOrigin = FUrlOrigin.createOrThrow("https://api.test.com");
-  authResult: Result<Record<string, FString>, Exceptions> = ok({ "Authorization": FString.createOrThrow("Bearer test-token") });
+  protected readonly _classInfo = {
+    name: "TestServiceHttp",
+    version: "1.0.0",
+    description: "Test HTTP service",
+  };
+  override readonly endpoint: FUrlOrigin = FUrlOrigin.createOrThrow(
+    "https://api.test.com",
+  );
+  authResult: Result<Record<string, FString>, Exceptions> = ok({
+    Authorization: FString.createOrThrow("Bearer test-token"),
+  });
 
-  protected override async getAuthHeaders(): Promise<Result<Record<string, FString>, Exceptions>> {
+  protected override async getAuthHeaders(): Promise<
+    Result<Record<string, FString>, Exceptions>
+  > {
     return this.authResult;
   }
 
@@ -52,11 +75,19 @@ class TestServiceHttp extends ServiceHttp {
     return true;
   }
 
-  testPost<D = unknown>(endpoint: FUrlPath, data: D, options?: TRequestOptions) {
+  testPost<D = unknown>(
+    endpoint: FUrlPath,
+    data: D,
+    options?: TRequestOptions,
+  ) {
     return this.post(endpoint, data, options);
   }
 
-  testGet<D = unknown>(endpoint: FUrlPath, data?: D, options?: TRequestOptions) {
+  testGet<D = unknown>(
+    endpoint: FUrlPath,
+    data?: D,
+    options?: TRequestOptions,
+  ) {
     return this.get(endpoint, data, options);
   }
 
@@ -64,11 +95,19 @@ class TestServiceHttp extends ServiceHttp {
     return this.put(endpoint, data, options);
   }
 
-  testDelete<D = unknown>(endpoint: FUrlPath, data?: D, options?: TRequestOptions) {
+  testDelete<D = unknown>(
+    endpoint: FUrlPath,
+    data?: D,
+    options?: TRequestOptions,
+  ) {
     return this.delete(endpoint, data, options);
   }
 
-  testPatch<D = unknown>(endpoint: FUrlPath, data: D, options?: TRequestOptions) {
+  testPatch<D = unknown>(
+    endpoint: FUrlPath,
+    data: D,
+    options?: TRequestOptions,
+  ) {
     return this.patch(endpoint, data, options);
   }
 }
@@ -83,15 +122,27 @@ interface IMockFetchCall {
 }
 
 let mockCalls: IMockFetchCall[] = [];
-let mockResponse: { status: number; headers: Record<string, string>; body: unknown; ok: boolean };
+let mockResponse: {
+  status: number;
+  headers: Record<string, string>;
+  body: unknown;
+  ok: boolean;
+};
 let originalFetch: typeof globalThis.fetch;
 
-function setMockResponse(status: number, body: unknown, headers: Record<string, string> = {}) {
+function setMockResponse(
+  status: number,
+  body: unknown,
+  headers: Record<string, string> = {},
+) {
   const isJson = typeof body === "object" && body !== null;
   mockResponse = {
     status,
     ok: status >= 200 && status < 300,
-    headers: { "content-type": isJson ? "application/json" : "text/plain", ...headers },
+    headers: {
+      "content-type": isJson ? "application/json" : "text/plain",
+      ...headers,
+    },
     body,
   };
 }
@@ -101,9 +152,13 @@ function extractHeaders(init?: RequestInit): Record<string, string> {
   if (raw === undefined || raw === null) return {};
   const result: Record<string, string> = {};
   if (raw instanceof Headers) {
-    raw.forEach((v, k) => { result[k] = v; });
+    raw.forEach((v, k) => {
+      result[k] = v;
+    });
   } else if (Array.isArray(raw)) {
-    for (const pair of raw) { result[pair[0]] = pair[1]; }
+    for (const pair of raw) {
+      result[pair[0]] = pair[1];
+    }
   } else {
     Object.assign(result, raw);
   }
@@ -111,15 +166,27 @@ function extractHeaders(init?: RequestInit): Record<string, string> {
 }
 
 function createMockFetch(): typeof globalThis.fetch {
-  return (input: string | URL | Request, init?: RequestInit): Promise<Response> => {
+  return (
+    input: string | URL | Request,
+    init?: RequestInit,
+  ): Promise<Response> => {
     const url = typeof input === "string" ? input : input.toString();
-    const body = init?.body !== undefined && init?.body !== null ? String(init.body) : undefined;
-    mockCalls.push({ url, method: init?.method ?? "GET", headers: extractHeaders(init), body });
+    const body =
+      init?.body !== undefined && init?.body !== null
+        ? String(init.body)
+        : undefined;
+    mockCalls.push({
+      url,
+      method: init?.method ?? "GET",
+      headers: extractHeaders(init),
+      body,
+    });
 
     const headersMap = new Map(Object.entries(mockResponse.headers));
     const responseHeaders = {
       get: (key: string) => headersMap.get(key) ?? null,
-      forEach: (cb: (value: string, key: string) => void) => headersMap.forEach(cb),
+      forEach: (cb: (value: string, key: string) => void) =>
+        headersMap.forEach(cb),
     };
 
     const responseBody = mockResponse.body;
@@ -128,7 +195,12 @@ function createMockFetch(): typeof globalThis.fetch {
       ok: mockResponse.ok,
       headers: responseHeaders,
       json: () => Promise.resolve(responseBody),
-      text: () => Promise.resolve(typeof responseBody === "string" ? responseBody : JSON.stringify(responseBody)),
+      text: () =>
+        Promise.resolve(
+          typeof responseBody === "string"
+            ? responseBody
+            : JSON.stringify(responseBody),
+        ),
     };
 
     return Promise.resolve(response as unknown as Response);
@@ -163,7 +235,10 @@ describe("ServiceHttp — request execution", () => {
   });
 
   it("GET constructs query params from data", async () => {
-    const result = await service.testGet(fpath("users"), { page: 1, limit: 10 });
+    const result = await service.testGet(fpath("users"), {
+      page: 1,
+      limit: 10,
+    });
     assertSuccess(result);
     assert.equal(mockCalls.length, 1);
     const url = new URL(mockCalls[0].url);
@@ -180,7 +255,11 @@ describe("ServiceHttp — request execution", () => {
   });
 
   it("GET filters null and undefined from query params", async () => {
-    const result = await service.testGet(fpath("users"), { name: "test", age: null, city: undefined });
+    const result = await service.testGet(fpath("users"), {
+      name: "test",
+      age: null,
+      city: undefined,
+    });
     assertSuccess(result);
     const url = new URL(mockCalls[0].url);
     assert.equal(url.searchParams.get("name"), "test");
@@ -203,13 +282,17 @@ describe("ServiceHttp — request execution", () => {
   });
 
   it("DELETE sends body when data provided", async () => {
-    const result = await service.testDelete(fpath("users/1"), { reason: "inactive" });
+    const result = await service.testDelete(fpath("users/1"), {
+      reason: "inactive",
+    });
     assertSuccess(result);
     assert.equal(mockCalls[0].body, JSON.stringify({ reason: "inactive" }));
   });
 
   it("PATCH sends JSON body", async () => {
-    const result = await service.testPatch(fpath("users/1"), { name: "Patched" });
+    const result = await service.testPatch(fpath("users/1"), {
+      name: "Patched",
+    });
     assertSuccess(result);
     assert.equal(mockCalls[0].method, "PATCH");
     assert.equal(mockCalls[0].body, JSON.stringify({ name: "Patched" }));
@@ -235,11 +318,16 @@ describe("ServiceHttp — response parsing", () => {
     const result = await service.testGet(fpath("users/1"));
     assertSuccess(result);
     assert.deepEqual(result.value.data, { id: 1, name: "Test" });
-    assert.equal(result.value.headers["content-type"].getValue(), "application/json");
+    assert.equal(
+      result.value.headers["content-type"].getValue(),
+      "application/json",
+    );
   });
 
   it("parses text response with non-json content-type", async () => {
-    setMockResponse(200, "plain text response", { "content-type": "text/plain" });
+    setMockResponse(200, "plain text response", {
+      "content-type": "text/plain",
+    });
     const result = await service.testGet(fpath("health"));
     assertSuccess(result);
     assert.equal(result.value.data, "plain text response");
@@ -253,7 +341,9 @@ describe("ServiceHttp — response parsing", () => {
     const httpError = result.error;
     assert.ok(httpError instanceof ExceptionHttp);
     assert.equal(httpError.externalError?.status, 422);
-    assert.deepEqual(httpError.externalError?.data, { error: "Validation failed" });
+    assert.deepEqual(httpError.externalError?.data, {
+      error: "Validation failed",
+    });
   });
 
   it("returns error for 500 status", async () => {
@@ -280,7 +370,9 @@ describe("ServiceHttp — authentication", () => {
   });
 
   it("includes auth headers when authenticated is true", async () => {
-    const result = await service.testGet(fpath("protected"), undefined, { authenticated: fbool(true) });
+    const result = await service.testGet(fpath("protected"), undefined, {
+      authenticated: fbool(true),
+    });
     assertSuccess(result);
     assert.equal(mockCalls[0].headers["Authorization"], "Bearer test-token");
   });
@@ -293,7 +385,9 @@ describe("ServiceHttp — authentication", () => {
 
   it("returns AUTH_FAILED when getAuthHeaders fails", async () => {
     service.authResult = err(ExceptionHttp.authFailed());
-    const result = await service.testGet(fpath("protected"), undefined, { authenticated: fbool(true) });
+    const result = await service.testGet(fpath("protected"), undefined, {
+      authenticated: fbool(true),
+    });
     assertFailure(result);
     assert.equal(result.error.code, "AUTH_FAILED");
   });
@@ -301,7 +395,9 @@ describe("ServiceHttp — authentication", () => {
   it("AUTH_FAILED preserves original error as cause", async () => {
     const originalError = ExceptionHttp.timeout();
     service.authResult = err(originalError);
-    const result = await service.testGet(fpath("protected"), undefined, { authenticated: fbool(true) });
+    const result = await service.testGet(fpath("protected"), undefined, {
+      authenticated: fbool(true),
+    });
     assertFailure(result);
     assert.equal(result.error.code, "AUTH_FAILED");
     assert.equal(result.error.cause, originalError);
@@ -325,25 +421,41 @@ describe("ServiceHttp — format", () => {
 
   it("sends JSON content-type by default", async () => {
     await service.testPost(fpath("users"), { name: "Test" });
-    assert.ok(mockCalls[0].headers["Content-Type"].includes("application/json"));
+    assert.ok(
+      mockCalls[0].headers["Content-Type"].includes("application/json"),
+    );
   });
 
   it("sends form content-type when format is form", async () => {
-    await service.testPost(fpath("auth/token"), { username: "admin", password: "secret" }, { format: fformat("form") });
-    assert.ok(mockCalls[0].headers["Content-Type"].includes("application/x-www-form-urlencoded"));
+    await service.testPost(
+      fpath("auth/token"),
+      { username: "admin", password: "secret" },
+      { format: fformat("form") },
+    );
+    assert.ok(
+      mockCalls[0].headers["Content-Type"].includes(
+        "application/x-www-form-urlencoded",
+      ),
+    );
     const body = mockCalls[0].body ?? "";
     assert.ok(body.includes("username=admin"));
     assert.ok(body.includes("password=secret"));
   });
 
   it("returns FAILED_SERIALIZATION for non-record form data", async () => {
-    const result = await service.testPost(fpath("auth/token"), "invalid", { format: fformat("form") });
+    const result = await service.testPost(fpath("auth/token"), "invalid", {
+      format: fformat("form"),
+    });
     assertFailure(result);
     assert.equal(result.error.code, "FAILED_SERIALIZATION");
   });
 
   it("form body filters null and undefined values", async () => {
-    await service.testPost(fpath("data"), { name: "test", age: null, city: undefined }, { format: fformat("form") });
+    await service.testPost(
+      fpath("data"),
+      { name: "test", age: null, city: undefined },
+      { format: fformat("form") },
+    );
     const body = mockCalls[0].body ?? "";
     assert.ok(body.includes("name=test"));
     assert.equal(body.includes("age"), false);
@@ -351,9 +463,15 @@ describe("ServiceHttp — format", () => {
   });
 
   it("merges custom headers with defaults", async () => {
-    await service.testPost(fpath("users"), { name: "Test" }, { headers: { "X-Custom": FString.createOrThrow("value123") } });
+    await service.testPost(
+      fpath("users"),
+      { name: "Test" },
+      { headers: { "X-Custom": FString.createOrThrow("value123") } },
+    );
     assert.equal(mockCalls[0].headers["X-Custom"], "value123");
-    assert.ok(mockCalls[0].headers["Content-Type"].includes("application/json"));
+    assert.ok(
+      mockCalls[0].headers["Content-Type"].includes("application/json"),
+    );
   });
 });
 
@@ -385,7 +503,9 @@ describe("ServiceHttp — security", () => {
   });
 
   it("rejects non-primitive values in GET query params", async () => {
-    const result = await service.testGet(fpath("users"), { filter: { nested: "object" } });
+    const result = await service.testGet(fpath("users"), {
+      filter: { nested: "object" },
+    });
     assertFailure(result);
     assert.equal(result.error.code, "FAILED_SERIALIZATION");
     assert.equal(mockCalls.length, 0);
@@ -399,7 +519,11 @@ describe("ServiceHttp — security", () => {
   });
 
   it("rejects non-primitive values in form body", async () => {
-    const result = await service.testPost(fpath("data"), { nested: { key: "val" } }, { format: fformat("form") });
+    const result = await service.testPost(
+      fpath("data"),
+      { nested: { key: "val" } },
+      { format: fformat("form") },
+    );
     assertFailure(result);
     assert.equal(result.error.code, "FAILED_SERIALIZATION");
   });
@@ -433,9 +557,11 @@ describe("ServiceHttp — network errors", () => {
         ok: true,
         headers: {
           get: (key: string) => headers.get(key) ?? null,
-          forEach: (cb: (value: string, key: string) => void) => headers.forEach(cb),
+          forEach: (cb: (value: string, key: string) => void) =>
+            headers.forEach(cb),
         },
-        json: () => Promise.reject(new SyntaxError("Unexpected token < in JSON")),
+        json: () =>
+          Promise.reject(new SyntaxError("Unexpected token < in JSON")),
       } as unknown as Response);
     };
     const result = await service.testGet(fpath("proxy-502"));
@@ -445,7 +571,10 @@ describe("ServiceHttp — network errors", () => {
 
   it("returns REQUEST_TIMEOUT on AbortError", async () => {
     globalThis.fetch = () => {
-      const abortError = new DOMException("The operation was aborted", "AbortError");
+      const abortError = new DOMException(
+        "The operation was aborted",
+        "AbortError",
+      );
       return Promise.reject(abortError);
     };
     const result = await service.testGet(fpath("users"));
@@ -469,7 +598,10 @@ describe("ServiceHttp — timeout", () => {
 
   it("passes AbortController signal to fetch when timeout is set", async () => {
     let receivedSignal: AbortSignal | undefined;
-    globalThis.fetch = (_input: string | URL | Request, init?: RequestInit): Promise<Response> => {
+    globalThis.fetch = (
+      _input: string | URL | Request,
+      init?: RequestInit,
+    ): Promise<Response> => {
       receivedSignal = init?.signal ?? undefined;
       const headers = new Map([["content-type", "application/json"]]);
       return Promise.resolve({
@@ -477,7 +609,8 @@ describe("ServiceHttp — timeout", () => {
         ok: true,
         headers: {
           get: (key: string) => headers.get(key) ?? null,
-          forEach: (cb: (value: string, key: string) => void) => headers.forEach(cb),
+          forEach: (cb: (value: string, key: string) => void) =>
+            headers.forEach(cb),
         },
         json: () => Promise.resolve({ ok: true }),
       } as unknown as Response);
@@ -489,7 +622,10 @@ describe("ServiceHttp — timeout", () => {
 
   it("does not pass signal when timeout is not set", async () => {
     let receivedSignal: AbortSignal | null | undefined = null;
-    globalThis.fetch = (_input: string | URL | Request, init?: RequestInit): Promise<Response> => {
+    globalThis.fetch = (
+      _input: string | URL | Request,
+      init?: RequestInit,
+    ): Promise<Response> => {
       receivedSignal = init?.signal;
       const headers = new Map([["content-type", "application/json"]]);
       return Promise.resolve({
@@ -497,7 +633,8 @@ describe("ServiceHttp — timeout", () => {
         ok: true,
         headers: {
           get: (key: string) => headers.get(key) ?? null,
-          forEach: (cb: (value: string, key: string) => void) => headers.forEach(cb),
+          forEach: (cb: (value: string, key: string) => void) =>
+            headers.forEach(cb),
         },
         json: () => Promise.resolve({ ok: true }),
       } as unknown as Response);
@@ -508,7 +645,10 @@ describe("ServiceHttp — timeout", () => {
   });
 
   it("aborts request when timeout expires", async () => {
-    globalThis.fetch = (_input: string | URL | Request, init?: RequestInit): Promise<Response> => {
+    globalThis.fetch = (
+      _input: string | URL | Request,
+      init?: RequestInit,
+    ): Promise<Response> => {
       return new Promise((_resolve, reject) => {
         if (init?.signal) {
           init.signal.addEventListener("abort", () => {
@@ -518,25 +658,33 @@ describe("ServiceHttp — timeout", () => {
       });
     };
 
-    const result = await service.testGet(fpath("slow-endpoint"), undefined, { timeout: fint(50) });
+    const result = await service.testGet(fpath("slow-endpoint"), undefined, {
+      timeout: fint(50),
+    });
     assertFailure(result);
     assert.equal(result.error.code, "REQUEST_TIMEOUT");
   });
 
   it("rejects timeout exceeding MAX_TIMEOUT_MS (300000)", async () => {
-    const result = await service.testGet(fpath("users"), undefined, { timeout: fint(999999) });
+    const result = await service.testGet(fpath("users"), undefined, {
+      timeout: fint(999999),
+    });
     assertFailure(result);
     assert.equal(result.error.code, "INVALID_PARAMS");
   });
 
   it("rejects zero timeout", async () => {
-    const result = await service.testGet(fpath("users"), undefined, { timeout: fint(0) });
+    const result = await service.testGet(fpath("users"), undefined, {
+      timeout: fint(0),
+    });
     assertFailure(result);
     assert.equal(result.error.code, "INVALID_PARAMS");
   });
 
   it("rejects negative timeout", async () => {
-    const result = await service.testGet(fpath("users"), undefined, { timeout: fint(-100) });
+    const result = await service.testGet(fpath("users"), undefined, {
+      timeout: fint(-100),
+    });
     assertFailure(result);
     assert.equal(result.error.code, "INVALID_PARAMS");
   });

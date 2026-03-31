@@ -15,7 +15,8 @@ export class Optional<T> {
     return this._value !== null;
   }
 
-  // Throws by design — use isPresent() before calling, or use orElse() for safe access
+  // Throws by design — use isPresent() before calling,
+  // or use orElse() for safe access
   get(): T {
     if (this._value === null) throw new Error("Value not present");
     return this._value;
@@ -34,6 +35,8 @@ export class Optional<T> {
   }
 
   map<U>(fn: (value: T) => U): Optional<U> {
-    return this._value !== null ? Optional.of(fn(this._value)) : Optional.empty<U>();
+    return this._value !== null
+      ? Optional.of(fn(this._value))
+      : Optional.empty<U>();
   }
 }

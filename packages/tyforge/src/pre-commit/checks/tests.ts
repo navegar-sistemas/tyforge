@@ -3,7 +3,10 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { Check } from "../check.base";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../../..");
+const ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../../../../..",
+);
 
 export class CheckTests extends Check {
   constructor() {
@@ -23,9 +26,13 @@ export class CheckTests extends Check {
       return this.pass([]);
     }
 
-    const lines = (result.stdout ?? "").split("\n").filter(
-      (l) => l.includes("✖") || l.includes("FAIL") || l.startsWith("ℹ fail"),
+    const lines = (result.stdout ?? "")
+      .split("\n")
+      .filter(
+        (l) => l.includes("✖") || l.includes("FAIL") || l.startsWith("ℹ fail"),
+      );
+    return this.fail(
+      lines.length > 0 ? lines : [`exit code: ${result.status}`],
     );
-    return this.fail(lines.length > 0 ? lines : [`exit code: ${result.status}`]);
   }
 }

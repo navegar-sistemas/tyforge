@@ -14,13 +14,19 @@ import { InferProps, InferJson, ISchema } from "@tyforge/schema/schema-types";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
-function assertSuccess<T, E>(result: Result<T, E>): asserts result is { success: true; value: T } {
+function assertSuccess<T, E>(
+  result: Result<T, E>,
+): asserts result is { success: true; value: T } {
   if (!isSuccess(result)) {
-    assert.fail(`Expected success but got failure: ${JSON.stringify(result.error)}`);
+    assert.fail(
+      `Expected success but got failure: ${JSON.stringify(result.error)}`,
+    );
   }
 }
 
-function assertFailure<T, E>(result: Result<T, E>): asserts result is { success: false; error: E } {
+function assertFailure<T, E>(
+  result: Result<T, E>,
+): asserts result is { success: false; error: E } {
   if (!isFailure(result)) {
     assert.fail(`Expected failure but got success`);
   }
@@ -52,11 +58,18 @@ const userValidator = SchemaBuilder.compile(userSchema);
 
 // ── Domain Models ───────────────────────────────────────────────
 
-class Address extends ValueObject<TAddressProps, TAddressJson> implements TAddressProps {
+class Address
+  extends ValueObject<TAddressProps, TAddressJson>
+  implements TAddressProps
+{
   readonly street: FString;
   readonly city: FString;
 
-  protected readonly _classInfo = { name: "Address", version: "1.0.0", description: "Endereço" };
+  protected readonly _classInfo = {
+    name: "Address",
+    version: "1.0.0",
+    description: "Endereço",
+  };
 
   private constructor(props: TAddressProps) {
     super();
@@ -71,10 +84,17 @@ class Address extends ValueObject<TAddressProps, TAddressJson> implements TAddre
   }
 }
 
-interface TEventUserCreatedPayload extends Record<string, unknown> { userId: string; email: string }
+interface TEventUserCreatedPayload extends Record<string, unknown> {
+  userId: string;
+  email: string;
+}
 
 class EventUserCreated extends DomainEvent<TEventUserCreatedPayload> {
-  protected readonly _classInfo = { name: "EventUserCreated", version: "1.0.0", description: "User created event" };
+  protected readonly _classInfo = {
+    name: "EventUserCreated",
+    version: "1.0.0",
+    description: "User created event",
+  };
   readonly queueName = FString.createOrThrow("user-events");
 
   static create(payload: TEventUserCreatedPayload): EventUserCreated {
@@ -88,7 +108,11 @@ class User extends Aggregate<TUserProps, TUserJson> implements TUserProps {
   readonly email: FEmail;
   readonly age: FInt | undefined;
 
-  protected readonly _classInfo = { name: "User", version: "1.0.0", description: "Aggregate de usuário" };
+  protected readonly _classInfo = {
+    name: "User",
+    version: "1.0.0",
+    description: "Aggregate de usuário",
+  };
 
   private constructor(props: TUserProps) {
     super();
@@ -110,10 +134,12 @@ class User extends Aggregate<TUserProps, TUserJson> implements TUserProps {
       age: result.value.age,
     });
 
-    user.addDomainEvent(EventUserCreated.create({
-      userId: id.getValue(),
-      email: result.value.email.getValue(),
-    }));
+    user.addDomainEvent(
+      EventUserCreated.create({
+        userId: id.getValue(),
+        email: result.value.email.getValue(),
+      }),
+    );
 
     return ok(user);
   }
@@ -189,7 +215,11 @@ describe("SchemaBuilder + Aggregate", () => {
   });
 
   it("toJSON() faz deep unwrap do Aggregate", () => {
-    const result = User.create({ name: "João", email: "joao@test.com", age: 30 });
+    const result = User.create({
+      name: "João",
+      email: "joao@test.com",
+      age: 30,
+    });
     assertSuccess(result);
     const json = result.value.toJSON();
     assert.equal(json.name, "João");
@@ -317,13 +347,20 @@ type TSecureJson = InferJson<typeof secureSchema>;
 
 const secureValidator = SchemaBuilder.compile(secureSchema);
 
-class SecureUser extends Aggregate<TSecureProps, TSecureJson> implements TSecureProps {
+class SecureUser
+  extends Aggregate<TSecureProps, TSecureJson>
+  implements TSecureProps
+{
   readonly id: FId | undefined;
   readonly name: FString;
   readonly email: FEmail;
   readonly password: FPassword;
 
-  protected readonly _classInfo = { name: "SecureUser", version: "1.0.0", description: "User with expose levels" };
+  protected readonly _classInfo = {
+    name: "SecureUser",
+    version: "1.0.0",
+    description: "User with expose levels",
+  };
   protected readonly _schema = secureSchema;
 
   private constructor(props: TSecureProps) {
@@ -344,7 +381,11 @@ class SecureUser extends Aggregate<TSecureProps, TSecureJson> implements TSecure
 
 describe("toJSON with expose levels", () => {
   it("default (public) redacts private and redacted fields", () => {
-    const result = SecureUser.create({ name: "Ana", email: "ana@test.com", password: "Str0ng!Pass" });
+    const result = SecureUser.create({
+      name: "Ana",
+      email: "ana@test.com",
+      password: "Str0ng!Pass",
+    });
     assertSuccess(result);
     const json = result.value.toJSON();
     assert.equal(json.name, "Ana");
@@ -353,7 +394,11 @@ describe("toJSON with expose levels", () => {
   });
 
   it("private level shows private fields, redacts redacted", () => {
-    const result = SecureUser.create({ name: "Ana", email: "ana@test.com", password: "Str0ng!Pass" });
+    const result = SecureUser.create({
+      name: "Ana",
+      email: "ana@test.com",
+      password: "Str0ng!Pass",
+    });
     assertSuccess(result);
     const json = result.value.toJSON(undefined, "private");
     assert.equal(json.name, "Ana");
@@ -362,7 +407,11 @@ describe("toJSON with expose levels", () => {
   });
 
   it("redacted level shows all fields", () => {
-    const result = SecureUser.create({ name: "Ana", email: "ana@test.com", password: "Str0ng!Pass" });
+    const result = SecureUser.create({
+      name: "Ana",
+      email: "ana@test.com",
+      password: "Str0ng!Pass",
+    });
     assertSuccess(result);
     const json = result.value.toJSON(undefined, "redacted");
     assert.equal(json.name, "Ana");
@@ -371,7 +420,11 @@ describe("toJSON with expose levels", () => {
   });
 
   it("fields without expose are always visible", () => {
-    const result = SecureUser.create({ name: "Ana", email: "ana@test.com", password: "Str0ng!Pass" });
+    const result = SecureUser.create({
+      name: "Ana",
+      email: "ana@test.com",
+      password: "Str0ng!Pass",
+    });
     assertSuccess(result);
     const json = result.value.toJSON();
     assert.equal(json.name, "Ana");
@@ -379,7 +432,11 @@ describe("toJSON with expose levels", () => {
   });
 
   it("entity without _schema works as before (backward compat)", () => {
-    const result = User.create({ name: "Maria", email: "maria@test.com", age: 30 });
+    const result = User.create({
+      name: "Maria",
+      email: "maria@test.com",
+      age: 30,
+    });
     assertSuccess(result);
     const json = result.value.toJSON();
     assert.equal(json.name, "Maria");
@@ -388,7 +445,11 @@ describe("toJSON with expose levels", () => {
   });
 
   it("mixed expose with config date format", () => {
-    const result = SecureUser.create({ name: "Ana", email: "ana@test.com", password: "Str0ng!Pass" });
+    const result = SecureUser.create({
+      name: "Ana",
+      email: "ana@test.com",
+      password: "Str0ng!Pass",
+    });
     assertSuccess(result);
     const json = result.value.toJSON({ date: "string" }, "public");
     assert.equal(json.name, "Ana");

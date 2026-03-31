@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -33,14 +36,26 @@ export class FDocumentId extends TypeField<TDocumentId, TDocumentIdFormatted> {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!ALPHANUMERIC_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Document ID must contain only alphanumeric characters"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Document ID must contain only alphanumeric characters",
+        ),
+      );
     }
     switch (TypeField.localeRegion) {
       case "us":
         break;
       case "br":
         if (!BR_DOCUMENT_REGEX.test(value)) {
-          return err(ExceptionValidation.create(fieldPath, "Brazilian document must be exactly 11 digits (CPF) or 14 digits (CNPJ)"));
+          return err(
+            ExceptionValidation.create(
+              fieldPath,
+              "Brazilian document must be exactly" +
+                " 11 digits (CPF)" +
+                " or 14 digits (CNPJ)",
+            ),
+          );
         }
         break;
       default:
@@ -49,30 +64,50 @@ export class FDocumentId extends TypeField<TDocumentId, TDocumentIdFormatted> {
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TDocumentId, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TDocumentId, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TDocumentId>(raw: T, fieldPath = "DocumentId"): Result<FDocumentId, ExceptionValidation> {
+  static create<T = TDocumentId>(
+    raw: T,
+    fieldPath = "DocumentId",
+  ): Result<FDocumentId, ExceptionValidation> {
     const typed = FDocumentId.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentId(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TDocumentId, fieldPath = "DocumentId"): FDocumentId {
+  static createOrThrow(
+    raw: TDocumentId,
+    fieldPath = "DocumentId",
+  ): FDocumentId {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDocumentId>(value: T, fieldPath = "DocumentId"): Result<FDocumentId, ExceptionValidation> {
+  static assign<T = TDocumentId>(
+    value: T,
+    fieldPath = "DocumentId",
+  ): Result<FDocumentId, ExceptionValidation> {
     const typed = FDocumentId.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentId(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -86,7 +121,12 @@ export class FDocumentId extends TypeField<TDocumentId, TDocumentIdFormatted> {
   }
 
   override getDescription(): string {
-    return "Generic document identifier (alphanumeric). Locale-aware: validates CPF (11 digits) or CNPJ (14 digits) when TypeField.localeRegion is 'br'.";
+    return (
+      "Generic document identifier (alphanumeric)." +
+      " Locale-aware: validates CPF (11 digits)" +
+      " or CNPJ (14 digits)" +
+      " when TypeField.localeRegion is 'br'."
+    );
   }
 
   override getShortDescription(): string {

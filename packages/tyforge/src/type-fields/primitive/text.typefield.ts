@@ -21,15 +21,25 @@ export class FText extends TypeField<TText, TTextFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TText, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TText, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TText>(raw: T, fieldPath = "Text"): Result<FText, ExceptionValidation> {
+  static create<T = TText>(
+    raw: T,
+    fieldPath = "Text",
+  ): Result<FText, ExceptionValidation> {
     const typed = FText.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FText(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -40,11 +50,18 @@ export class FText extends TypeField<TText, TTextFormatted> {
     return result.value;
   }
 
-  static assign<T = TText>(value: T, fieldPath = "Text"): Result<FText, ExceptionValidation> {
+  static assign<T = TText>(
+    value: T,
+    fieldPath = "Text",
+  ): Result<FText, ExceptionValidation> {
     const typed = FText.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FText(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -58,7 +75,13 @@ export class FText extends TypeField<TText, TTextFormatted> {
   }
 
   override getDescription(): string {
-    return "Texto simples sem formatação específica. Campo genérico para armazenar qualquer tipo de string, utilizado quando não há regras específicas de validação ou formatação.";
+    return (
+      "Texto simples sem formatação específica." +
+      " Campo genérico para armazenar qualquer" +
+      " tipo de string, utilizado quando não há" +
+      " regras específicas de validação" +
+      " ou formatação."
+    );
   }
 
   override getShortDescription(): string {

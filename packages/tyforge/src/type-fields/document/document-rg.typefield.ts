@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -31,35 +34,60 @@ export class FDocumentRg extends TypeField<TDocumentRg, TDocumentRgFormatted> {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!FDocumentRg.ALPHANUMERIC_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "RG must contain only alphanumeric characters"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "RG must contain only alphanumeric characters",
+        ),
+      );
     }
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TDocumentRg, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TDocumentRg, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TDocumentRg>(raw: T, fieldPath = "DocumentRg"): Result<FDocumentRg, ExceptionValidation> {
+  static create<T = TDocumentRg>(
+    raw: T,
+    fieldPath = "DocumentRg",
+  ): Result<FDocumentRg, ExceptionValidation> {
     const typed = FDocumentRg.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentRg(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TDocumentRg, fieldPath = "DocumentRg"): FDocumentRg {
+  static createOrThrow(
+    raw: TDocumentRg,
+    fieldPath = "DocumentRg",
+  ): FDocumentRg {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDocumentRg>(value: T, fieldPath = "DocumentRg"): Result<FDocumentRg, ExceptionValidation> {
+  static assign<T = TDocumentRg>(
+    value: T,
+    fieldPath = "DocumentRg",
+  ): Result<FDocumentRg, ExceptionValidation> {
     const typed = FDocumentRg.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentRg(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -73,7 +101,10 @@ export class FDocumentRg extends TypeField<TDocumentRg, TDocumentRgFormatted> {
   }
 
   override getDescription(): string {
-    return "Brazilian RG (identity document) number (7-14 alphanumeric characters).";
+    return (
+      "Brazilian RG (identity document) number" +
+      " (7-14 alphanumeric characters)."
+    );
   }
 
   override getShortDescription(): string {

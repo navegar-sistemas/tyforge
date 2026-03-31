@@ -30,14 +30,23 @@ if (cwdArg) {
 if (cli.hasFlag("--init")) {
   if (cli.hasFlag("--update")) {
     const { UpdateCommand } = await import("./cli/update-command");
-    new UpdateCommand().execute().then(() => process.exit(0)).catch(() => process.exit(1));
+    new UpdateCommand()
+      .execute()
+      .then(() => process.exit(0))
+      .catch(() => process.exit(1));
   } else {
     const { InitCommand } = await import("./cli/init-command");
-    new InitCommand().execute().then(() => process.exit(0)).catch(() => process.exit(1));
+    new InitCommand()
+      .execute()
+      .then(() => process.exit(0))
+      .catch(() => process.exit(1));
   }
 } else if (cli.hasFlag("--uninstall")) {
   const { UninstallCommand } = await import("./cli/uninstall-command");
-  new UninstallCommand().execute().then(() => process.exit(0)).catch(() => process.exit(1));
+  new UninstallCommand()
+    .execute()
+    .then(() => process.exit(0))
+    .catch(() => process.exit(1));
 } else {
   const config = loadLintConfig(cli.getFlagValue("--config"));
 
@@ -63,16 +72,20 @@ if (cli.hasFlag("--init")) {
   }
 
   const linter = new Linter(registry, new DisableCommentParser());
-  linter.registerAstRules([new NoInvalidFactorySignatureRule(), new NoPublicConstructorDomainRule()]);
+  linter.registerAstRules([
+    new NoInvalidFactorySignatureRule(),
+    new NoPublicConstructorDomainRule(),
+  ]);
   const violations = linter.checkFiles(files, cli.hasFlag("--fix"));
 
   const format = cli.getFlagValue("--format") === "json" ? "json" : "text";
-  const reporter: IReporter = format === "json" ? new JsonReporter() : new TextReporter();
+  const reporter: IReporter =
+    format === "json" ? new JsonReporter() : new TextReporter();
   reporter.report(violations);
 
   const hasErrors = config.strict
-    ? violations.some(v => v.severity === "error" || v.severity === "warning")
-    : violations.some(v => v.severity === "error");
+    ? violations.some((v) => v.severity === "error" || v.severity === "warning")
+    : violations.some((v) => v.severity === "error");
 
   process.exit(hasErrors ? 1 : 0);
 }

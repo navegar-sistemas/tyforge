@@ -8,7 +8,7 @@ import { isSuccess, isFailure } from "@tyforge/result/result";
 
 describe("FCurrency — create", () => {
   it("converts decimal to cents", () => {
-    const result = FCurrency.create(10.50);
+    const result = FCurrency.create(10.5);
     assert.ok(isSuccess(result));
     assert.equal(result.value.getValue(), 1050);
   });
@@ -76,8 +76,8 @@ describe("FCurrency — zero", () => {
 
 describe("FCurrency — toDecimalValue", () => {
   it("converts cents to decimal", () => {
-    const c = FCurrency.createOrThrow(10.50);
-    assert.equal(c.toDecimalValue(), 10.50);
+    const c = FCurrency.createOrThrow(10.5);
+    assert.equal(c.toDecimalValue(), 10.5);
   });
 
   it("negative cents to decimal", () => {
@@ -90,7 +90,7 @@ describe("FCurrency — toDecimalValue", () => {
 
 describe("FCurrency — arithmetic (inherited)", () => {
   it("add two values", () => {
-    const a = FCurrency.createOrThrow(10.50);
+    const a = FCurrency.createOrThrow(10.5);
     const b = FCurrency.createOrThrow(5.25);
     const result = a.add(b);
     assert.ok(isSuccess(result));
@@ -111,7 +111,7 @@ describe("FCurrency — arithmetic (inherited)", () => {
     const result = a.add(b);
     assert.ok(isSuccess(result));
     assert.equal(result.value.getValue(), 30);
-    assert.equal(result.value.toDecimal(), 0.30);
+    assert.equal(result.value.toDecimal(), 0.3);
   });
 });
 
@@ -147,7 +147,7 @@ describe("FCurrency — formatting", () => {
   });
 
   it("toCents via getValue", () => {
-    assert.equal(FCurrency.createOrThrow(10.50).getValue(), 1050);
+    assert.equal(FCurrency.createOrThrow(10.5).getValue(), 1050);
   });
 });
 

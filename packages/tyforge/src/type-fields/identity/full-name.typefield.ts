@@ -21,15 +21,25 @@ export class FFullName extends TypeField<TFullName, TFullNameFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TFullName, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TFullName, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TFullName>(raw: T, fieldPath = "FullName"): Result<FFullName, ExceptionValidation> {
+  static create<T = TFullName>(
+    raw: T,
+    fieldPath = "FullName",
+  ): Result<FFullName, ExceptionValidation> {
     const typed = FFullName.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FFullName(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -40,11 +50,18 @@ export class FFullName extends TypeField<TFullName, TFullNameFormatted> {
     return result.value;
   }
 
-  static assign<T = TFullName>(value: T, fieldPath = "FullName"): Result<FFullName, ExceptionValidation> {
+  static assign<T = TFullName>(
+    value: T,
+    fieldPath = "FullName",
+  ): Result<FFullName, ExceptionValidation> {
     const typed = FFullName.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FFullName(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -58,7 +75,13 @@ export class FFullName extends TypeField<TFullName, TFullNameFormatted> {
   }
 
   override getDescription(): string {
-    return "Nome completo de uma pessoa, incluindo nome e sobrenome. Deve conter pelo menos 2 caracteres e não pode exceder 100 caracteres. Utilizado para identificação pessoal.";
+    return (
+      "Nome completo de uma pessoa," +
+      " incluindo nome e sobrenome." +
+      " Deve conter pelo menos 2 caracteres" +
+      " e não pode exceder 100 caracteres." +
+      " Utilizado para identificação pessoal."
+    );
   }
 
   override getShortDescription(): string {

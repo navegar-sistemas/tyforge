@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -10,9 +13,33 @@ export type TStateCodeFormatted = string;
 const STATE_CODE_REGEX = /^[A-Z]{2}$/;
 
 const VALID_STATES_BR = new Set([
-  "AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO",
-  "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR",
-  "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO",
+  "AC",
+  "AL",
+  "AM",
+  "AP",
+  "BA",
+  "CE",
+  "DF",
+  "ES",
+  "GO",
+  "MA",
+  "MG",
+  "MS",
+  "MT",
+  "PA",
+  "PB",
+  "PE",
+  "PI",
+  "PR",
+  "RJ",
+  "RN",
+  "RO",
+  "RR",
+  "RS",
+  "SC",
+  "SE",
+  "SP",
+  "TO",
 ]);
 
 export class FStateCode extends TypeField<TStateCode, TStateCodeFormatted> {
@@ -38,14 +65,24 @@ export class FStateCode extends TypeField<TStateCode, TStateCodeFormatted> {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!STATE_CODE_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "State code must contain exactly 2 uppercase letters"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "State code must contain exactly 2 uppercase letters",
+        ),
+      );
     }
     switch (TypeField.localeRegion) {
       case "us":
         break;
       case "br":
         if (!VALID_STATES_BR.has(value)) {
-          return err(ExceptionValidation.create(fieldPath, "Invalid Brazilian state code"));
+          return err(
+            ExceptionValidation.create(
+              fieldPath,
+              "Invalid Brazilian state code",
+            ),
+          );
         }
         break;
       default:
@@ -54,15 +91,25 @@ export class FStateCode extends TypeField<TStateCode, TStateCodeFormatted> {
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TStateCode, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TStateCode, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TStateCode>(raw: T, fieldPath = "StateCode"): Result<FStateCode, ExceptionValidation> {
+  static create<T = TStateCode>(
+    raw: T,
+    fieldPath = "StateCode",
+  ): Result<FStateCode, ExceptionValidation> {
     const typed = FStateCode.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FStateCode(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -73,11 +120,18 @@ export class FStateCode extends TypeField<TStateCode, TStateCodeFormatted> {
     return result.value;
   }
 
-  static assign<T = TStateCode>(value: T, fieldPath = "StateCode"): Result<FStateCode, ExceptionValidation> {
+  static assign<T = TStateCode>(
+    value: T,
+    fieldPath = "StateCode",
+  ): Result<FStateCode, ExceptionValidation> {
     const typed = FStateCode.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FStateCode(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -91,7 +145,11 @@ export class FStateCode extends TypeField<TStateCode, TStateCodeFormatted> {
   }
 
   override getDescription(): string {
-    return "State or province code (2 uppercase letters). Locale-aware: validates against known state codes when TypeField.localeRegion is 'br'.";
+    return (
+      "State or province code (2 uppercase letters). " +
+      "Locale-aware: validates against known state " +
+      "codes when TypeField.localeRegion is 'br'."
+    );
   }
 
   override getShortDescription(): string {

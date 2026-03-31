@@ -8,19 +8,36 @@ export class NoCastRule extends Rule {
   private readonly angleBracket = /=\s*<[A-Z]\w+>/;
 
   constructor(severity: "error" | "warning" = "error") {
-    super("no-cast", "Forbids 'as' type cast and angle bracket assertion", severity);
+    super(
+      "no-cast",
+      "Forbids 'as' type cast and angle bracket assertion",
+      severity,
+    );
   }
 
-  check(line: string, lineNumber: number, filePath: string): IRuleViolation | null {
+  check(
+    line: string,
+    lineNumber: number,
+    filePath: string,
+  ): IRuleViolation | null {
     if (this.isTestFile(filePath)) return null;
 
     const trimmed = line.trim();
-    if (trimmed.startsWith("//") || trimmed.startsWith("*") || trimmed.startsWith("/*")) return null;
+    if (
+      trimmed.startsWith("//") ||
+      trimmed.startsWith("*") ||
+      trimmed.startsWith("/*")
+    )
+      return null;
 
     const code = this.stripLiterals(line);
 
     if (this.angleBracket.test(code)) {
-      return this.violation(lineNumber, filePath, "Angle bracket assertion '<Type>' is forbidden — use type guard");
+      return this.violation(
+        lineNumber,
+        filePath,
+        "Angle bracket assertion '<Type>' is forbidden — use type guard",
+      );
     }
 
     if (!this.asPattern.test(code)) return null;
@@ -30,6 +47,10 @@ export class NoCastRule extends Rule {
 
     if (/export\s*\{.*\bas\b/.test(code)) return null;
 
-    return this.violation(lineNumber, filePath, "'as' cast is forbidden — use type guard or assertType");
+    return this.violation(
+      lineNumber,
+      filePath,
+      "'as' cast is forbidden — use type guard or assertType",
+    );
   }
 }

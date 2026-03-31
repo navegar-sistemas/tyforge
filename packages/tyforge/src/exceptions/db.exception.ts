@@ -34,7 +34,8 @@ export class ExceptionDb extends Exceptions {
     return new ExceptionDb({
       type: "database/invalid-data",
       title: "Dados inválidos",
-      detail: "Os dados fornecidos estão em formato inválido para persistência.",
+      detail:
+        "Os dados fornecidos estão em formato inválido para persistência.",
       status: OHttpStatus.UNPROCESSABLE_ENTITY,
       instance: "",
       uri: "",

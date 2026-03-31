@@ -7,7 +7,9 @@ import type { FUrlOrigin } from "@tyforge/type-fields/url/url-origin.typefield";
 export abstract class ServiceBase extends Class {
   abstract readonly endpoint: FUrlOrigin;
 
-  protected abstract getAuthHeaders(): Promise<Result<Record<string, FString>, Exceptions>>;
+  protected abstract getAuthHeaders(): Promise<
+    Result<Record<string, FString>, Exceptions>
+  >;
 
   protected async validateEndpointDns(): Promise<boolean> {
     return true;

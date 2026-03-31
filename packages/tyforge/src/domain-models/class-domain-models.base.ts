@@ -1,6 +1,11 @@
 import { FDate } from "@tyforge/type-fields/primitive/date.typefield";
 import { Class } from "./class.base";
-import type { ISchema, IFieldConfig, TExposeLevel, SchemaEntry } from "@tyforge/schema/schema-types";
+import type {
+  ISchema,
+  IFieldConfig,
+  TExposeLevel,
+  SchemaEntry,
+} from "@tyforge/schema/schema-types";
 import { getVisibilityLevel } from "@tyforge/schema/schema-types";
 
 function isFieldConfig(entry: SchemaEntry): entry is IFieldConfig {
@@ -8,7 +13,13 @@ function isFieldConfig(entry: SchemaEntry): entry is IFieldConfig {
 }
 
 function assertType<T>(value: unknown): asserts value is T {
-  if (value !== null && typeof value !== "object" && typeof value !== "string" && typeof value !== "number" && typeof value !== "boolean") {
+  if (
+    value !== null &&
+    typeof value !== "object" &&
+    typeof value !== "string" &&
+    typeof value !== "number" &&
+    typeof value !== "boolean"
+  ) {
     throw new TypeError(`assertType: unexpected type ${typeof value}`);
   }
 }
@@ -35,7 +46,9 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
     visited?: WeakSet<object>,
   ): unknown {
     if (Array.isArray(input)) {
-      return input.map((item) => ClassDomainModels.deepUnwrap(item, config, visited));
+      return input.map((item) =>
+        ClassDomainModels.deepUnwrap(item, config, visited),
+      );
     }
 
     if (input && typeof input === "object") {
@@ -71,12 +84,19 @@ export abstract class ClassDomainModels<TProps, TPropsJson> extends Class {
    * Reuses the deepUnwrap logic from toJSON.
    */
   static toPrimitives<TInput, TOutput>(input: TInput): TOutput {
-    const result = ClassDomainModels.deepUnwrap(input, undefined, new WeakSet());
+    const result = ClassDomainModels.deepUnwrap(
+      input,
+      undefined,
+      new WeakSet(),
+    );
     assertType<TOutput>(result);
     return result;
   }
 
-  public toJSON(config?: { date: `string` | `date` }, exposeLevel?: TExposeLevel): TPropsJson {
+  public toJSON(
+    config?: { date: `string` | `date` },
+    exposeLevel?: TExposeLevel,
+  ): TPropsJson {
     config = config || { date: `string` };
 
     const fields: Record<string, unknown> = {};

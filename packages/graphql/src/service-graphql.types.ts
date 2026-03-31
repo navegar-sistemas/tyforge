@@ -1,6 +1,13 @@
 import type { Result } from "tyforge/result";
 import type { Exceptions } from "tyforge/exceptions";
-import type { FString, FInt, FBoolean, FFetchPolicy, FGraphQLDocument, FGraphQLOperationName } from "tyforge/type-fields";
+import type {
+  FString,
+  FInt,
+  FBoolean,
+  FFetchPolicy,
+  FGraphQLDocument,
+  FGraphQLOperationName,
+} from "tyforge/type-fields";
 
 export interface IGraphQLRequest {
   query: FGraphQLDocument;

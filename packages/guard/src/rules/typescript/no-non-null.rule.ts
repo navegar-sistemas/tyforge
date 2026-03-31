@@ -2,11 +2,7 @@ import { Rule } from "../../rule";
 import type { IRuleViolation } from "../../rule";
 
 export class NoNonNullRule extends Rule {
-  private readonly patterns = [
-    /\w!\.\w/,
-    /\w!\[/,
-    /\w!\s*[;,)\]>}]/,
-  ];
+  private readonly patterns = [/\w!\.\w/, /\w!\[/, /\w!\s*[;,)\]>}]/];
 
   private readonly falsePositives = /!==|!=/;
 
@@ -14,7 +10,11 @@ export class NoNonNullRule extends Rule {
     super("no-non-null", "Forbids '!' non-null assertion", severity);
   }
 
-  check(line: string, lineNumber: number, _filePath: string): IRuleViolation | null {
+  check(
+    line: string,
+    lineNumber: number,
+    _filePath: string,
+  ): IRuleViolation | null {
     const trimmed = line.trim();
     if (trimmed.startsWith("//") || trimmed.startsWith("*")) return null;
 
@@ -23,7 +23,11 @@ export class NoNonNullRule extends Rule {
 
     for (const pattern of this.patterns) {
       if (pattern.test(cleaned)) {
-        return this.violation(lineNumber, _filePath, "Non-null assertion '!' is forbidden — use guard or explicit check");
+        return this.violation(
+          lineNumber,
+          _filePath,
+          "Non-null assertion '!' is forbidden — use guard or explicit check",
+        );
       }
     }
 

@@ -1,4 +1,8 @@
-import { TypeField, TValidationLevel, TFormatTarget } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+  TFormatTarget,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -38,23 +42,39 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TInt, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TInt, ExceptionValidation> {
     return TypeGuard.extractNumber(value, fieldPath);
   }
 
-  static formCreate(raw: unknown, fieldPath = "Int"): Result<FInt, ExceptionValidation> {
+  static formCreate(
+    raw: unknown,
+    fieldPath = "Int",
+  ): Result<FInt, ExceptionValidation> {
     return FInt.create(TypeField.normalizeFormInput(raw, "number"), fieldPath);
   }
 
-  static formAssign(raw: unknown, fieldPath = "Int"): Result<FInt, ExceptionValidation> {
+  static formAssign(
+    raw: unknown,
+    fieldPath = "Int",
+  ): Result<FInt, ExceptionValidation> {
     return FInt.assign(TypeField.normalizeFormInput(raw, "number"), fieldPath);
   }
 
-  static create<T = TInt>(raw: T, fieldPath = "Int"): Result<FInt, ExceptionValidation> {
+  static create<T = TInt>(
+    raw: T,
+    fieldPath = "Int",
+  ): Result<FInt, ExceptionValidation> {
     const typed = FInt.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FInt(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -65,11 +85,18 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
     return result.value;
   }
 
-  static assign<T = TInt>(value: T, fieldPath = "Int"): Result<FInt, ExceptionValidation> {
+  static assign<T = TInt>(
+    value: T,
+    fieldPath = "Int",
+  ): Result<FInt, ExceptionValidation> {
     const typed = FInt.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FInt(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -79,11 +106,19 @@ export class FInt extends TypeField<TInt, TIntFormatted> {
   }
 
   override formatted(target: TFormatTarget = "display"): TIntFormatted {
-    return TypeField.formatNumber(this.getValue(), { maximumFractionDigits: 0 }, target);
+    return TypeField.formatNumber(
+      this.getValue(),
+      { maximumFractionDigits: 0 },
+      target,
+    );
   }
 
   override getDescription(): string {
-    return "Integer number with no decimal places. Generic field for storing whole numeric values.";
+    return (
+      "Integer number with no decimal places." +
+      " Generic field for storing" +
+      " whole numeric values."
+    );
   }
 
   override getShortDescription(): string {

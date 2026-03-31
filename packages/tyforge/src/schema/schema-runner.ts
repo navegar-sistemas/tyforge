@@ -25,14 +25,26 @@ export class SchemaRunner {
     ]);
   }
 
-  createExecuteFn(schema: Record<string, unknown>, compiler: SchemaCompiler): Runner {
+  createExecuteFn(
+    schema: Record<string, unknown>,
+    compiler: SchemaCompiler,
+  ): Runner {
     let compiled: ICompiledField[] | null = null;
 
-    return (data: unknown, basePath: string, mode: "create" | "assign"): Result<Record<string, unknown>, Exceptions> => {
+    return (
+      data: unknown,
+      basePath: string,
+      mode: "create" | "assign",
+    ): Result<Record<string, unknown>, Exceptions> => {
       if (!compiled) compiled = compiler.compile(schema, basePath);
 
       if (!data || !TypeGuard.isRecord(data)) {
-        return err(ExceptionValidation.create(basePath || "root", "Required data missing."));
+        return err(
+          ExceptionValidation.create(
+            basePath || "root",
+            "Required data missing.",
+          ),
+        );
       }
 
       const props: Record<string, unknown> = {};
@@ -43,7 +55,13 @@ export class SchemaRunner {
         const handler = this.handlers.get(field.kind);
         if (!handler) continue;
 
-        const result = handler.execute(field, data[field.key], useAssign, mode, props);
+        const result = handler.execute(
+          field,
+          data[field.key],
+          useAssign,
+          mode,
+          props,
+        );
         if (result !== null && !result.success) return result;
       }
 

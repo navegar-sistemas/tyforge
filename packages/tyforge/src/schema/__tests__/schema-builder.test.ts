@@ -14,25 +14,35 @@ import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 
 const validUUID = "019d0863-5d45-7246-b6d0-de5098bfd12e";
 
-function assertSuccess<T, E>(result: Result<T, E>): asserts result is { success: true; value: T } {
+function assertSuccess<T, E>(
+  result: Result<T, E>,
+): asserts result is { success: true; value: T } {
   if (!isSuccess(result)) {
-    assert.fail(`Expected success but got failure: ${JSON.stringify(result.error)}`);
+    assert.fail(
+      `Expected success but got failure: ${JSON.stringify(result.error)}`,
+    );
   }
 }
 
-function assertFailure<T, E>(result: Result<T, E>): asserts result is { success: false; error: E } {
+function assertFailure<T, E>(
+  result: Result<T, E>,
+): asserts result is { success: false; error: E } {
   if (!isFailure(result)) {
     assert.fail(`Expected failure but got success`);
   }
 }
 
 /** Testa cenários com dados intencionalmente inválidos para validação runtime */
-function createWithUntypedData<T extends ISchema>(schema: T, data: unknown): Result<Record<string, unknown>, Exceptions> {
+function createWithUntypedData<T extends ISchema>(
+  schema: T,
+  data: unknown,
+): Result<Record<string, unknown>, Exceptions> {
   const validator = SchemaBuilder.compile(schema);
-  const result = validator.create(data as Parameters<typeof validator.create>[0]);
+  const result = validator.create(
+    data as Parameters<typeof validator.create>[0],
+  );
   return result as Result<Record<string, unknown>, Exceptions>;
 }
-
 
 // ── 1. Campo simples válido ─────────────────────────────────────
 
@@ -116,7 +126,11 @@ describe("SchemaBuilder — campos simples válidos", () => {
 
   it("campos extras no input são ignorados", () => {
     const schema = { name: { type: FString } } satisfies ISchema;
-    const result = createWithUntypedData(schema, { name: "Maria", extra: "ignored", another: 123 });
+    const result = createWithUntypedData(schema, {
+      name: "Maria",
+      extra: "ignored",
+      another: 123,
+    });
     assertSuccess(result);
     assert.ok("name" in result.value);
   });
@@ -126,14 +140,18 @@ describe("SchemaBuilder — campos simples válidos", () => {
 
 describe("SchemaBuilder — required / optional", () => {
   it("campo required ausente retorna erro", () => {
-    const schema = { name: { type: FString, required: true } } satisfies ISchema;
+    const schema = {
+      name: { type: FString, required: true },
+    } satisfies ISchema;
     const result = createWithUntypedData(schema, {});
     assertFailure(result);
     assert.equal(result.error.field, "name");
   });
 
   it("campo required: false ausente é aceito", () => {
-    const schema = { name: { type: FString, required: false } } satisfies ISchema;
+    const schema = {
+      name: { type: FString, required: false },
+    } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({});
     assertSuccess(result);
@@ -230,7 +248,7 @@ describe("SchemaBuilder — validação de formato", () => {
     assertFailure(result);
   });
 
-  it("FString with only spaces fails (normalize trims before validation)", () => {
+  it("FString with only spaces fails (trims before validation)", () => {
     const schema = { name: { type: FString } } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
     const result = validator.create({ name: "   " });
@@ -249,7 +267,9 @@ describe("SchemaBuilder — nested objects", () => {
       },
     } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
-    const result = validator.create({ user: { name: "Ana", email: "ana@test.com" } });
+    const result = validator.create({
+      user: { name: "Ana", email: "ana@test.com" },
+    });
     assertSuccess(result);
   });
 
@@ -264,7 +284,9 @@ describe("SchemaBuilder — nested objects", () => {
       },
     } satisfies ISchema;
     const validator = SchemaBuilder.compile(schema);
-    const result = validator.create({ level1: { level2: { level3: { value: "deep" } } } });
+    const result = validator.create({
+      level1: { level2: { level3: { value: "deep" } } },
+    });
     assertSuccess(result);
   });
 

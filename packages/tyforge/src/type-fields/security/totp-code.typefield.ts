@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -31,20 +34,35 @@ export class FTotpCode extends TypeField<TTotpCode, TTotpCodeFormatted> {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!FTotpCode.TOTP_REGEX.test(this.getValue())) {
-      return err(ExceptionValidation.create(fieldPath, "TOTP code must contain exactly 6 numeric digits"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "TOTP code must contain exactly 6 numeric digits",
+        ),
+      );
     }
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TTotpCode, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TTotpCode, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TTotpCode>(raw: T, fieldPath = "TotpCode"): Result<FTotpCode, ExceptionValidation> {
+  static create<T = TTotpCode>(
+    raw: T,
+    fieldPath = "TotpCode",
+  ): Result<FTotpCode, ExceptionValidation> {
     const typed = FTotpCode.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FTotpCode(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -55,11 +73,18 @@ export class FTotpCode extends TypeField<TTotpCode, TTotpCodeFormatted> {
     return result.value;
   }
 
-  static assign<T = TTotpCode>(value: T, fieldPath = "TotpCode"): Result<FTotpCode, ExceptionValidation> {
+  static assign<T = TTotpCode>(
+    value: T,
+    fieldPath = "TotpCode",
+  ): Result<FTotpCode, ExceptionValidation> {
     const typed = FTotpCode.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FTotpCode(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -73,7 +98,11 @@ export class FTotpCode extends TypeField<TTotpCode, TTotpCodeFormatted> {
   }
 
   override getDescription(): string {
-    return "Time-based One-Time Password code (6 numeric digits) for two-factor authentication";
+    return (
+      "Time-based One-Time Password code" +
+      " (6 numeric digits)" +
+      " for two-factor authentication"
+    );
   }
 
   override getShortDescription(): string {

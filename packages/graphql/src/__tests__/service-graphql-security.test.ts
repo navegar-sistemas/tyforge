@@ -8,28 +8,59 @@ import { ServiceGraphQLSecurity } from "../service-graphql.security";
 
 describe("ServiceGraphQLSecurity -- isIntrospectionQuery", () => {
   it("detects __schema introspection", () => {
-    assert.equal(ServiceGraphQLSecurity.isIntrospectionQuery(FGraphQLDocument.createOrThrow("{ __schema { types { name } } }")), true);
+    assert.equal(
+      ServiceGraphQLSecurity.isIntrospectionQuery(
+        FGraphQLDocument.createOrThrow("{ __schema { types { name } } }"),
+      ),
+      true,
+    );
   });
 
   it("detects __type introspection", () => {
-    assert.equal(ServiceGraphQLSecurity.isIntrospectionQuery(FGraphQLDocument.createOrThrow("{ __type(name: \"User\") { fields { name } } }")), true);
+    assert.equal(
+      ServiceGraphQLSecurity.isIntrospectionQuery(
+        FGraphQLDocument.createOrThrow(
+          '{ __type(name: "User") { fields { name } } }',
+        ),
+      ),
+      true,
+    );
   });
 
   it("detects introspection in larger query", () => {
-    const query = FGraphQLDocument.createOrThrow(`query IntrospectionQuery { __schema { queryType { name } mutationType { name } } }`);
+    const query = FGraphQLDocument.createOrThrow(
+      `query IntrospectionQuery { __schema { queryType { name } mutationType { name } } }`,
+    );
     assert.equal(ServiceGraphQLSecurity.isIntrospectionQuery(query), true);
   });
 
   it("allows normal query without introspection", () => {
-    assert.equal(ServiceGraphQLSecurity.isIntrospectionQuery(FGraphQLDocument.createOrThrow("query GetUsers { users { id name } }")), false);
+    assert.equal(
+      ServiceGraphQLSecurity.isIntrospectionQuery(
+        FGraphQLDocument.createOrThrow("query GetUsers { users { id name } }"),
+      ),
+      false,
+    );
   });
 
   it("allows mutation without introspection", () => {
-    assert.equal(ServiceGraphQLSecurity.isIntrospectionQuery(FGraphQLDocument.createOrThrow("mutation CreateUser($input: UserInput!) { createUser(input: $input) { id } }")), false);
+    assert.equal(
+      ServiceGraphQLSecurity.isIntrospectionQuery(
+        FGraphQLDocument.createOrThrow(
+          "mutation CreateUser($input: UserInput!) { createUser(input: $input) { id } }",
+        ),
+      ),
+      false,
+    );
   });
 
   it("does not match partial words like schema_type", () => {
-    assert.equal(ServiceGraphQLSecurity.isIntrospectionQuery(FGraphQLDocument.createOrThrow("query { schema_type { name } }")), false);
+    assert.equal(
+      ServiceGraphQLSecurity.isIntrospectionQuery(
+        FGraphQLDocument.createOrThrow("query { schema_type { name } }"),
+      ),
+      false,
+    );
   });
 });
 
@@ -44,7 +75,7 @@ describe("ServiceGraphQLSecurity -- sanitizeVariables", () => {
   });
 
   it("removes __proto__ key", () => {
-    const vars = { "__proto__": "polluted", name: "safe" };
+    const vars = { __proto__: "polluted", name: "safe" };
     const result = ServiceGraphQLSecurity.sanitizeVariables(vars);
     assert.ok(isSuccess(result));
     assert.equal(Object.hasOwn(result.value, "__proto__"), false);
@@ -52,7 +83,7 @@ describe("ServiceGraphQLSecurity -- sanitizeVariables", () => {
   });
 
   it("removes constructor key", () => {
-    const vars = { "constructor": "polluted", name: "safe" };
+    const vars = { constructor: "polluted", name: "safe" };
     const result = ServiceGraphQLSecurity.sanitizeVariables(vars);
     assert.ok(isSuccess(result));
     assert.equal(Object.hasOwn(result.value, "constructor"), false);
@@ -60,7 +91,7 @@ describe("ServiceGraphQLSecurity -- sanitizeVariables", () => {
   });
 
   it("removes prototype key", () => {
-    const vars = { "prototype": "polluted", name: "safe" };
+    const vars = { prototype: "polluted", name: "safe" };
     const result = ServiceGraphQLSecurity.sanitizeVariables(vars);
     assert.ok(isSuccess(result));
     assert.equal(Object.hasOwn(result.value, "prototype"), false);
@@ -70,10 +101,10 @@ describe("ServiceGraphQLSecurity -- sanitizeVariables", () => {
     const vars = {
       input: {
         name: "Maria",
-        "__proto__": "polluted",
+        __proto__: "polluted",
         address: {
           city: "SP",
-          "constructor": "polluted",
+          constructor: "polluted",
         },
       },
     };
@@ -89,10 +120,7 @@ describe("ServiceGraphQLSecurity -- sanitizeVariables", () => {
 
   it("sanitizes objects inside arrays", () => {
     const vars = {
-      items: [
-        { name: "safe", "__proto__": "polluted" },
-        { name: "also safe" },
-      ],
+      items: [{ name: "safe", __proto__: "polluted" }, { name: "also safe" }],
     };
     const result = ServiceGraphQLSecurity.sanitizeVariables(vars);
     assert.ok(isSuccess(result));

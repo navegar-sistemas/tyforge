@@ -29,32 +29,52 @@ export class FHttpStatus extends TypeField<THttpStatus, THttpStatusFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<THttpStatus, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<THttpStatus, ExceptionValidation> {
     const num = TypeGuard.extractNumber(value, fieldPath);
     if (isFailure(num)) return err(num.error);
     return TypeField.resolveEnum(OHttpStatus, num.value, fieldPath);
   }
 
-  static create<T = THttpStatus>(raw: T, fieldPath = "HttpStatus"): Result<FHttpStatus, ExceptionValidation> {
+  static create<T = THttpStatus>(
+    raw: T,
+    fieldPath = "HttpStatus",
+  ): Result<FHttpStatus, ExceptionValidation> {
     const typed = FHttpStatus.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FHttpStatus(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: THttpStatus, fieldPath = "HttpStatus"): FHttpStatus {
+  static createOrThrow(
+    raw: THttpStatus,
+    fieldPath = "HttpStatus",
+  ): FHttpStatus {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = THttpStatus>(value: T, fieldPath = "HttpStatus"): Result<FHttpStatus, ExceptionValidation> {
+  static assign<T = THttpStatus>(
+    value: T,
+    fieldPath = "HttpStatus",
+  ): Result<FHttpStatus, ExceptionValidation> {
     const typed = FHttpStatus.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FHttpStatus(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -68,7 +88,15 @@ export class FHttpStatus extends TypeField<THttpStatus, THttpStatusFormatted> {
   }
 
   override getDescription(): string {
-    return "Código de status HTTP conforme especificação RFC 7231. Representa o resultado de uma requisição HTTP, incluindo códigos de sucesso (2xx), redirecionamento (3xx), erro do cliente (4xx) e erro do servidor (5xx).";
+    return (
+      "Código de status HTTP conforme" +
+      " especificação RFC 7231." +
+      " Representa o resultado de uma" +
+      " requisição HTTP, incluindo códigos de" +
+      " sucesso (2xx), redirecionamento (3xx)," +
+      " erro do cliente (4xx)" +
+      " e erro do servidor (5xx)."
+    );
   }
 
   override getShortDescription(): string {

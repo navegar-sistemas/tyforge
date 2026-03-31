@@ -10,7 +10,9 @@ export class TerminalReporter {
 
   start(name: string): void {
     this.checkIndex++;
-    process.stdout.write(`[${this.checkIndex}/${this.totalChecks}] ${name}...\n`);
+    process.stdout.write(
+      `[${this.checkIndex}/${this.totalChecks}] ${name}...\n`,
+    );
   }
 
   result(result: ICheckResult): void {
@@ -44,11 +46,16 @@ export class TerminalReporter {
 
   async promptConfirmationAsync(): Promise<boolean> {
     if (!process.stdin.isTTY) {
-      process.stdout.write("  ❌ Non-interactive terminal — cannot confirm. Commit blocked.\n");
+      process.stdout.write(
+        "  ❌ Non-interactive terminal — cannot confirm. Commit blocked.\n",
+      );
       return false;
     }
     const readline = await import("node:readline");
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
     return new Promise<boolean>((resolve) => {
       rl.question("  Commit with these warnings? [y/N] ", (answer: string) => {
         rl.close();

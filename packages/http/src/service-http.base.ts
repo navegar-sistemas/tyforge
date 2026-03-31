@@ -2,25 +2,50 @@ import { Result, ok, err, isFailure } from "tyforge/result";
 import { Exceptions } from "tyforge/exceptions";
 import { ServiceBase } from "tyforge/infrastructure/service-base";
 import { TypeGuard } from "tyforge/tools";
-import { FString, FInt, FHttpMethod, FHttpFormat, FUrlPath } from "tyforge/type-fields";
+import {
+  FString,
+  FInt,
+  FHttpMethod,
+  FHttpFormat,
+  FUrlPath,
+} from "tyforge/type-fields";
 import { ServiceHttpSecurity } from "./service-http.security";
 import { ExceptionHttp } from "./exception-http";
-import type { IRequestParams, IHttpResponse, THttpResult, TRequestOptions } from "./service-http.types";
+import type {
+  IRequestParams,
+  IHttpResponse,
+  THttpResult,
+  TRequestOptions,
+} from "./service-http.types";
 
 const MAX_TIMEOUT_MS = 300000;
 const MAX_RESPONSE_BYTES = 10485760;
 
 export abstract class ServiceHttp extends ServiceBase {
-
   protected async request<TData = unknown>(
     params: IRequestParams<TData>,
   ): THttpResult<unknown> {
-    const { endpoint: path, method, data, format: rawFormat, headers: rawHeaders, authenticated: rawAuthenticated, timeout } = params;
+    const {
+      endpoint: path,
+      method,
+      data,
+      format: rawFormat,
+      headers: rawHeaders,
+      authenticated: rawAuthenticated,
+      timeout,
+    } = params;
 
     const format = rawFormat ?? FHttpFormat.createOrThrow("json");
 
-    if (timeout !== undefined && (timeout.getValue() < 1 || timeout.getValue() > MAX_TIMEOUT_MS)) {
-      return err(ExceptionHttp.invalidParams(`Timeout must be between 1 and ${MAX_TIMEOUT_MS} ms.`));
+    if (
+      timeout !== undefined &&
+      (timeout.getValue() < 1 || timeout.getValue() > MAX_TIMEOUT_MS)
+    ) {
+      return err(
+        ExceptionHttp.invalidParams(
+          `Timeout must be between 1 and ${MAX_TIMEOUT_MS} ms.`,
+        ),
+      );
     }
 
     const urlResult = ServiceHttpSecurity.buildUrl(this.endpoint, path);
@@ -29,11 +54,16 @@ export abstract class ServiceHttp extends ServiceBase {
     let authHeaders: Record<string, FString> = {};
     if (rawAuthenticated?.getValue() ?? false) {
       const authResult = await this.getAuthHeaders();
-      if (isFailure(authResult)) return err(ExceptionHttp.authFailed(authResult.error));
+      if (isFailure(authResult))
+        return err(ExceptionHttp.authFailed(authResult.error));
       authHeaders = authResult.value;
     }
 
-    const mergedHeaders = this.prepareHeaders(format, authHeaders, rawHeaders ?? {});
+    const mergedHeaders = this.prepareHeaders(
+      format,
+      authHeaders,
+      rawHeaders ?? {},
+    );
 
     const fetchHeaders: Record<string, string> = {};
     for (const [key, value] of Object.entries(mergedHeaders)) {
@@ -63,10 +93,12 @@ export abstract class ServiceHttp extends ServiceBase {
     }
 
     const timeoutMs = timeout?.getValue();
-    const controller = timeoutMs !== undefined ? new AbortController() : undefined;
-    const timeoutId = controller !== undefined
-      ? setTimeout(() => controller.abort(), timeoutMs)
-      : undefined;
+    const controller =
+      timeoutMs !== undefined ? new AbortController() : undefined;
+    const timeoutId =
+      controller !== undefined
+        ? setTimeout(() => controller.abort(), timeoutMs)
+        : undefined;
 
     // DNS rebinding protection: resolve hostname and validate against private ranges
     const dnsValid = await this.validateEndpointDns();
@@ -89,13 +121,24 @@ export abstract class ServiceHttp extends ServiceBase {
       });
 
       const contentLength = response.headers.get("content-length");
-      if (contentLength !== null && parseInt(contentLength, 10) > MAX_RESPONSE_BYTES) {
-        return err(ExceptionHttp.invalidParams(`Response exceeds maximum size of ${MAX_RESPONSE_BYTES} bytes.`));
+      if (
+        contentLength !== null &&
+        parseInt(contentLength, 10) > MAX_RESPONSE_BYTES
+      ) {
+        return err(
+          ExceptionHttp.invalidParams(
+            `Response exceeds maximum size of ${MAX_RESPONSE_BYTES} bytes.`,
+          ),
+        );
       }
 
       const responseText = await response.text();
       if (responseText.length > MAX_RESPONSE_BYTES) {
-        return err(ExceptionHttp.invalidParams(`Response exceeds maximum size of ${MAX_RESPONSE_BYTES} bytes.`));
+        return err(
+          ExceptionHttp.invalidParams(
+            `Response exceeds maximum size of ${MAX_RESPONSE_BYTES} bytes.`,
+          ),
+        );
       }
 
       const contentType = response.headers.get("content-type") ?? "";
@@ -110,7 +153,12 @@ export abstract class ServiceHttp extends ServiceBase {
       };
 
       if (!response.ok) {
-        return err(ExceptionHttp.externalApiFailed({ status: response.status, data: responseData }));
+        return err(
+          ExceptionHttp.externalApiFailed({
+            status: response.status,
+            data: responseData,
+          }),
+        );
       }
 
       return ok(httpResponse);
@@ -146,7 +194,10 @@ export abstract class ServiceHttp extends ServiceBase {
     });
   }
 
-  private serializeData(data: unknown, format: FHttpFormat): Result<string, Exceptions> {
+  private serializeData(
+    data: unknown,
+    format: FHttpFormat,
+  ): Result<string, Exceptions> {
     try {
       if (format.getValue() === "form") {
         if (!TypeGuard.isRecord(data)) {
@@ -168,23 +219,68 @@ export abstract class ServiceHttp extends ServiceBase {
     }
   }
 
-  protected post<D = unknown>(endpoint: FUrlPath, data: D, options: TRequestOptions = {}): THttpResult<unknown> {
-    return this.request<D>({ endpoint, method: FHttpMethod.createOrThrow("POST"), data, ...options });
+  protected post<D = unknown>(
+    endpoint: FUrlPath,
+    data: D,
+    options: TRequestOptions = {},
+  ): THttpResult<unknown> {
+    return this.request<D>({
+      endpoint,
+      method: FHttpMethod.createOrThrow("POST"),
+      data,
+      ...options,
+    });
   }
 
-  protected put<D = unknown>(endpoint: FUrlPath, data: D, options: TRequestOptions = {}): THttpResult<unknown> {
-    return this.request<D>({ endpoint, method: FHttpMethod.createOrThrow("PUT"), data, ...options });
+  protected put<D = unknown>(
+    endpoint: FUrlPath,
+    data: D,
+    options: TRequestOptions = {},
+  ): THttpResult<unknown> {
+    return this.request<D>({
+      endpoint,
+      method: FHttpMethod.createOrThrow("PUT"),
+      data,
+      ...options,
+    });
   }
 
-  protected get<D = unknown>(endpoint: FUrlPath, data?: D, options: TRequestOptions = {}): THttpResult<unknown> {
-    return this.request<D>({ endpoint, method: FHttpMethod.createOrThrow("GET"), data, ...options });
+  protected get<D = unknown>(
+    endpoint: FUrlPath,
+    data?: D,
+    options: TRequestOptions = {},
+  ): THttpResult<unknown> {
+    return this.request<D>({
+      endpoint,
+      method: FHttpMethod.createOrThrow("GET"),
+      data,
+      ...options,
+    });
   }
 
-  protected delete<D = unknown>(endpoint: FUrlPath, data?: D, options: TRequestOptions = {}): THttpResult<unknown> {
-    return this.request<D>({ endpoint, method: FHttpMethod.createOrThrow("DELETE"), data, ...options });
+  protected delete<D = unknown>(
+    endpoint: FUrlPath,
+    data?: D,
+    options: TRequestOptions = {},
+  ): THttpResult<unknown> {
+    return this.request<D>({
+      endpoint,
+      method: FHttpMethod.createOrThrow("DELETE"),
+      data,
+      ...options,
+    });
   }
 
-  protected patch<D = unknown>(endpoint: FUrlPath, data: D, options: TRequestOptions = {}): THttpResult<unknown> {
-    return this.request<D>({ endpoint, method: FHttpMethod.createOrThrow("PATCH"), data, ...options });
+  protected patch<D = unknown>(
+    endpoint: FUrlPath,
+    data: D,
+    options: TRequestOptions = {},
+  ): THttpResult<unknown> {
+    return this.request<D>({
+      endpoint,
+      method: FHttpMethod.createOrThrow("PATCH"),
+      data,
+      ...options,
+    });
   }
 }

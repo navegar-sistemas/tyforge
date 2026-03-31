@@ -15,8 +15,14 @@ interface IFailure<E> {
 export const ok = <T>(value: T): Result<T, never> => ({ success: true, value });
 
 /** Immutable singletons — zero allocation on hot path */
-export const OK_TRUE: Result<true, never> = Object.freeze({ success: true as const, value: true });
-export const OK_FALSE: Result<false, never> = Object.freeze({ success: true as const, value: false });
+export const OK_TRUE: Result<true, never> = Object.freeze({
+  success: true as const,
+  value: true,
+});
+export const OK_FALSE: Result<false, never> = Object.freeze({
+  success: true as const,
+  value: false,
+});
 export const err = <E>(error: E): Result<never, E> => ({
   success: false,
   error,
@@ -73,7 +79,9 @@ export const toPromise = <T, E>(result: Result<T, E>): Promise<T> =>
               try {
                 return new Error(String(result.error));
               } catch {
-                return ExceptionUnexpected.create({ message: "Failed to convert error to string" });
+                return ExceptionUnexpected.create({
+                  message: "Failed to convert error to string",
+                });
               }
             })(),
       );

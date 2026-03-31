@@ -39,7 +39,10 @@ export class ExceptionGraphQL extends Exceptions {
     });
   }
 
-  static queryFailed(operationName: string, errors: IGraphQLError[]): ExceptionGraphQL {
+  static queryFailed(
+    operationName: string,
+    errors: IGraphQLError[],
+  ): ExceptionGraphQL {
     return new ExceptionGraphQL(
       {
         type: "graphql/query-failed",
@@ -54,7 +57,10 @@ export class ExceptionGraphQL extends Exceptions {
     );
   }
 
-  static mutationFailed(operationName: string, errors: IGraphQLError[]): ExceptionGraphQL {
+  static mutationFailed(
+    operationName: string,
+    errors: IGraphQLError[],
+  ): ExceptionGraphQL {
     return new ExceptionGraphQL(
       {
         type: "graphql/mutation-failed",

@@ -16,22 +16,35 @@ export class ServiceGraphQLSecurity {
     return INTROSPECTION_REGEX.test(query.getValue());
   }
 
-  static sanitizeVariables(variables: Record<string, unknown>, depth = 0): Result<Record<string, unknown>, Exceptions> {
+  static sanitizeVariables(
+    variables: Record<string, unknown>,
+    depth = 0,
+  ): Result<Record<string, unknown>, Exceptions> {
     if (depth >= MAX_SANITIZE_DEPTH) {
-      return err(ExceptionGraphQL.invalidParams("Variables exceed maximum nesting depth."));
+      return err(
+        ExceptionGraphQL.invalidParams(
+          "Variables exceed maximum nesting depth.",
+        ),
+      );
     }
     const sanitized: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(variables)) {
       if (DANGEROUS_KEYS.has(key)) continue;
       if (TypeGuard.isRecord(value)) {
-        const nested = ServiceGraphQLSecurity.sanitizeVariables(value, depth + 1);
+        const nested = ServiceGraphQLSecurity.sanitizeVariables(
+          value,
+          depth + 1,
+        );
         if (isFailure(nested)) return nested;
         sanitized[key] = nested.value;
       } else if (Array.isArray(value)) {
         const items: unknown[] = [];
         for (const item of value) {
           if (TypeGuard.isRecord(item)) {
-            const nested = ServiceGraphQLSecurity.sanitizeVariables(item, depth + 1);
+            const nested = ServiceGraphQLSecurity.sanitizeVariables(
+              item,
+              depth + 1,
+            );
             if (isFailure(nested)) return nested;
             items.push(nested.value);
           } else {

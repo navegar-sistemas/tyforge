@@ -8,19 +8,25 @@ import { requiredError } from "./handler-utils";
 
 export class ArrayNestedSchemaHandler implements IFieldHandler {
   execute(
-    field: ICompiledField, value: unknown, _useAssign: boolean, mode: "create" | "assign", props: Record<string, unknown>,
+    field: ICompiledField,
+    value: unknown,
+    _useAssign: boolean,
+    mode: "create" | "assign",
+    props: Record<string, unknown>,
   ): Result<true, Exceptions> | null {
     if (TypeGuard.isNullish(value)) {
       if (field.required) return err(requiredError(field.path));
       return null;
     }
-    if (!Array.isArray(value)) return err(ExceptionValidation.create(field.path, "Expected array."));
+    if (!Array.isArray(value))
+      return err(ExceptionValidation.create(field.path, "Expected array."));
     if (!field.nestedValidator) return null;
     const items: unknown[] = [];
     for (let index = 0; index < value.length; index++) {
       const item = value[index];
       const itemPath = `${field.path}[${index}]`;
-      if (field.required && TypeGuard.isNullish(item)) return err(requiredError(itemPath));
+      if (field.required && TypeGuard.isNullish(item))
+        return err(requiredError(itemPath));
       const result = field.nestedValidator.execute(item, itemPath, mode);
       if (!result.success) return result;
       items.push(result.value);

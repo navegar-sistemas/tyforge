@@ -40,9 +40,8 @@ export class DomainEventDispatcher {
           await handler(event);
           dispatched++;
         } catch (error: unknown) {
-          const wrapped = error instanceof Exceptions
-            ? error
-            : ExceptionUnexpected.create();
+          const wrapped =
+            error instanceof Exceptions ? error : ExceptionUnexpected.create();
           failed.push({ event, error: wrapped });
           if (options?.onError) {
             options.onError(event, wrapped);

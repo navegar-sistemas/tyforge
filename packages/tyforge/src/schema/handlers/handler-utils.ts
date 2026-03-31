@@ -7,7 +7,10 @@ export function requiredError(path: string): ExceptionValidation {
   return ExceptionValidation.create(path, "Required field missing.");
 }
 
-export function shouldUseCreateMethod(field: ICompiledField, useAssign: boolean): boolean {
+export function shouldUseCreateMethod(
+  field: ICompiledField,
+  useAssign: boolean,
+): boolean {
   return useAssign
     ? field.assignValidateLevel === "full"
     : field.createValidateLevel === "full";

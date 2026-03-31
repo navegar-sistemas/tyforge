@@ -30,17 +30,27 @@ export class FGender extends TypeField<TGender, TGenderFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TGender, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TGender, ExceptionValidation> {
     const str = TypeGuard.isString(value, fieldPath);
     if (isFailure(str)) return err(str.error);
     return TypeField.resolveEnum(OGender, str.value, fieldPath);
   }
 
-  static create<T = TGender>(raw: T, fieldPath = "Gender"): Result<FGender, ExceptionValidation> {
+  static create<T = TGender>(
+    raw: T,
+    fieldPath = "Gender",
+  ): Result<FGender, ExceptionValidation> {
     const typed = FGender.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FGender(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -51,11 +61,18 @@ export class FGender extends TypeField<TGender, TGenderFormatted> {
     return result.value;
   }
 
-  static assign<T = TGender>(value: T, fieldPath = "Gender"): Result<FGender, ExceptionValidation> {
+  static assign<T = TGender>(
+    value: T,
+    fieldPath = "Gender",
+  ): Result<FGender, ExceptionValidation> {
     const typed = FGender.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FGender(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

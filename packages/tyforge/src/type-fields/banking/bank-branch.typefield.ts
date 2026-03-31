@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -33,14 +36,24 @@ export class FBankBranch extends TypeField<TBankBranch, TBankBranchFormatted> {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!DIGITS_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Bank branch must contain only numeric digits"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Bank branch must contain only numeric digits",
+        ),
+      );
     }
     switch (TypeField.localeRegion) {
       case "us":
         break;
       case "br":
         if (!BRANCH_BR_REGEX.test(value)) {
-          return err(ExceptionValidation.create(fieldPath, "Brazilian bank branch must be exactly 4 numeric digits"));
+          return err(
+            ExceptionValidation.create(
+              fieldPath,
+              "Brazilian bank branch must be exactly 4 numeric digits",
+            ),
+          );
         }
         break;
       default:
@@ -49,30 +62,50 @@ export class FBankBranch extends TypeField<TBankBranch, TBankBranchFormatted> {
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TBankBranch, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TBankBranch, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TBankBranch>(raw: T, fieldPath = "BankBranch"): Result<FBankBranch, ExceptionValidation> {
+  static create<T = TBankBranch>(
+    raw: T,
+    fieldPath = "BankBranch",
+  ): Result<FBankBranch, ExceptionValidation> {
     const typed = FBankBranch.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBankBranch(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TBankBranch, fieldPath = "BankBranch"): FBankBranch {
+  static createOrThrow(
+    raw: TBankBranch,
+    fieldPath = "BankBranch",
+  ): FBankBranch {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TBankBranch>(value: T, fieldPath = "BankBranch"): Result<FBankBranch, ExceptionValidation> {
+  static assign<T = TBankBranch>(
+    value: T,
+    fieldPath = "BankBranch",
+  ): Result<FBankBranch, ExceptionValidation> {
     const typed = FBankBranch.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBankBranch(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -86,7 +119,11 @@ export class FBankBranch extends TypeField<TBankBranch, TBankBranchFormatted> {
   }
 
   override getDescription(): string {
-    return "Bank branch number (numeric). Locale-aware: enforces 4-digit format when TypeField.localeRegion is 'br'.";
+    return (
+      "Bank branch number (numeric). " +
+      "Locale-aware: enforces 4-digit format " +
+      "when TypeField.localeRegion is 'br'."
+    );
   }
 
   override getShortDescription(): string {

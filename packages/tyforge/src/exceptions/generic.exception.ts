@@ -5,7 +5,11 @@ export class ExceptionGeneric extends Exceptions {
   readonly typeInference = "ExceptionGeneric" as const;
   readonly data: Record<string, unknown>;
 
-  private constructor(status: THttpStatus, detail: string, data: Record<string, unknown>) {
+  private constructor(
+    status: THttpStatus,
+    detail: string,
+    data: Record<string, unknown>,
+  ) {
     super({
       type: "ExceptionGeneric",
       title: "Erro genérico.",

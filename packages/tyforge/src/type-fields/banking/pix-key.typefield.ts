@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -34,7 +37,12 @@ export class FPixKey extends TypeField<TPixKey, TPixKeyFormatted> {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!BASE_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "PIX key must contain only alphanumeric characters, @, ., +, - or _"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "PIX key must contain only alphanumeric characters, @, ., +, - or _",
+        ),
+      );
     }
     const len = value.length;
     const isCpf = len === 11 && DIGITS_ONLY_REGEX.test(value);
@@ -43,20 +51,38 @@ export class FPixKey extends TypeField<TPixKey, TPixKeyFormatted> {
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     const isEvp = EVP_REGEX.test(value);
     if (!isCpf && !isCnpj && !isPhone && !isEmail && !isEvp) {
-      return err(ExceptionValidation.create(fieldPath, "PIX key must be a valid CPF (11 digits), CNPJ (14 digits), phone (+XX...), email (contains @), or EVP (32-36 alphanumeric)"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "PIX key must be a valid " +
+            "CPF (11 digits), CNPJ (14 digits), " +
+            "phone (+XX...), email (contains @), " +
+            "or EVP (32-36 alphanumeric)",
+        ),
+      );
     }
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TPixKey, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TPixKey, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TPixKey>(raw: T, fieldPath = "PixKey"): Result<FPixKey, ExceptionValidation> {
+  static create<T = TPixKey>(
+    raw: T,
+    fieldPath = "PixKey",
+  ): Result<FPixKey, ExceptionValidation> {
     const typed = FPixKey.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FPixKey(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -67,11 +93,18 @@ export class FPixKey extends TypeField<TPixKey, TPixKeyFormatted> {
     return result.value;
   }
 
-  static assign<T = TPixKey>(value: T, fieldPath = "PixKey"): Result<FPixKey, ExceptionValidation> {
+  static assign<T = TPixKey>(
+    value: T,
+    fieldPath = "PixKey",
+  ): Result<FPixKey, ExceptionValidation> {
     const typed = FPixKey.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FPixKey(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -85,7 +118,12 @@ export class FPixKey extends TypeField<TPixKey, TPixKeyFormatted> {
   }
 
   override getDescription(): string {
-    return "PIX key — accepts CPF (11 digits), CNPJ (14 digits), phone (+XX...), email (contains @), or EVP (32-36 alphanumeric random key).";
+    return (
+      "PIX key — accepts CPF (11 digits), " +
+      "CNPJ (14 digits), phone (+XX...), " +
+      "email (contains @), or EVP " +
+      "(32-36 alphanumeric random key)."
+    );
   }
 
   override getShortDescription(): string {

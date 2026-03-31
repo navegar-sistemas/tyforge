@@ -16,7 +16,11 @@ export abstract class AstRule {
 
   abstract check(context: IAstRuleContext): IRuleViolation[];
 
-  protected violation(line: number, filePath: string, message?: string): IRuleViolation {
+  protected violation(
+    line: number,
+    filePath: string,
+    message?: string,
+  ): IRuleViolation {
     return {
       rule: this.name,
       severity: this.severity,

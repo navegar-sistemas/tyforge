@@ -1,10 +1,13 @@
 // Strips CRLF and null bytes used in HTTP header injection attacks
 const UNSAFE_HEADER_CHARS = /[\r\n\0]/g;
-// Prototype pollution vectors — prevents __proto__/constructor/prototype key injection
+// Prototype pollution vectors — prevents
+// __proto__/constructor/prototype key injection
 const DANGEROUS_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 
 export class ToolHeaderSecurity {
-  static sanitizeHeaders(headers: Record<string, string>): Record<string, string> {
+  static sanitizeHeaders(
+    headers: Record<string, string>,
+  ): Record<string, string> {
     const sanitized: Record<string, string> = {};
     for (const [key, value] of Object.entries(headers)) {
       if (DANGEROUS_KEYS.has(key)) continue;

@@ -8,6 +8,9 @@ import type { ISchema } from "./schema-types";
  * @param extension - The schema with additional or overriding fields.
  * @returns A new schema containing all fields from both schemas.
  */
-export function composeSchema<A extends ISchema, B extends ISchema>(base: A, extension: B): A & B {
+export function composeSchema<A extends ISchema, B extends ISchema>(
+  base: A,
+  extension: B,
+): A & B {
   return { ...base, ...extension };
 }

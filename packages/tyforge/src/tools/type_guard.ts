@@ -8,9 +8,16 @@ export class TypeGuard {
     fieldPath: string,
   ): Result<true, ExceptionValidation> {
     if (typeof value !== "string" && typeof value !== "number") {
-      return err(ExceptionValidation.create(fieldPath, "Enum key must be a string or number"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Enum key must be a string or number",
+        ),
+      );
     }
-    return Object.keys(enumObj).includes(typeof value === "number" ? value.toString() : value)
+    return Object.keys(enumObj).includes(
+      typeof value === "number" ? value.toString() : value,
+    )
       ? OK_TRUE
       : err(ExceptionValidation.create(fieldPath, "Invalid enum key"));
   }
@@ -22,12 +29,7 @@ export class TypeGuard {
   ): Result<true, ExceptionValidation> {
     return Object.values(enumObj).includes(value)
       ? OK_TRUE
-      : err(
-          ExceptionValidation.create(
-            fieldPath,
-            "Invalid enum value",
-          ),
-        );
+      : err(ExceptionValidation.create(fieldPath, "Invalid enum value"));
   }
 
   static isHex(
@@ -364,45 +366,97 @@ export class TypeGuard {
       : err(ExceptionValidation.create(fieldPath, "O valor deve ser um Map."));
   }
 
-  static extractBoolean(value: unknown, fieldPath: string): Result<boolean, ExceptionValidation> {
+  static extractBoolean(
+    value: unknown,
+    fieldPath: string,
+  ): Result<boolean, ExceptionValidation> {
     if (typeof value !== "boolean") {
-      return err(ExceptionValidation.create(fieldPath, "O valor deve ser um booleano."));
+      return err(
+        ExceptionValidation.create(fieldPath, "O valor deve ser um booleano."),
+      );
     }
     return ok(value);
   }
 
-  static extractArray(value: unknown, fieldPath: string, min = 0, max = Number.MAX_SAFE_INTEGER): Result<unknown[], ExceptionValidation> {
+  static extractArray(
+    value: unknown,
+    fieldPath: string,
+    min = 0,
+    max = Number.MAX_SAFE_INTEGER,
+  ): Result<unknown[], ExceptionValidation> {
     if (!Array.isArray(value)) {
-      return err(ExceptionValidation.create(fieldPath, "O valor deve ser um array."));
+      return err(
+        ExceptionValidation.create(fieldPath, "O valor deve ser um array."),
+      );
     }
     if (value.length < min) {
-      return err(ExceptionValidation.create(fieldPath, `O array deve conter no mínimo ${min} itens.`));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          `O array deve conter no mínimo ${min} itens.`,
+        ),
+      );
     }
     if (value.length > max) {
-      return err(ExceptionValidation.create(fieldPath, `O array deve conter no máximo ${max} itens.`));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          `O array deve conter no máximo ${max} itens.`,
+        ),
+      );
     }
     return ok(value);
   }
 
-  static extractString(value: unknown, fieldPath: string): Result<string, ExceptionValidation> {
+  static extractString(
+    value: unknown,
+    fieldPath: string,
+  ): Result<string, ExceptionValidation> {
     if (typeof value !== "string") {
-      return err(ExceptionValidation.create(fieldPath, "O valor deve ser uma string."));
+      return err(
+        ExceptionValidation.create(fieldPath, "O valor deve ser uma string."),
+      );
     }
     return ok(value);
   }
 
-  static extractNumber(value: unknown, fieldPath: string, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER): Result<number, ExceptionValidation> {
+  static extractNumber(
+    value: unknown,
+    fieldPath: string,
+    min = Number.MIN_SAFE_INTEGER,
+    max = Number.MAX_SAFE_INTEGER,
+  ): Result<number, ExceptionValidation> {
     if (typeof value !== "number" || isNaN(value)) {
-      return err(ExceptionValidation.create(fieldPath, "O valor deve ser um número válido."));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "O valor deve ser um número válido.",
+        ),
+      );
     }
     if (!Number.isFinite(value)) {
-      return err(ExceptionValidation.create(fieldPath, "O valor deve ser um número finito."));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "O valor deve ser um número finito.",
+        ),
+      );
     }
     if (value < min) {
-      return err(ExceptionValidation.create(fieldPath, `O valor deve ser no mínimo ${min}.`));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          `O valor deve ser no mínimo ${min}.`,
+        ),
+      );
     }
     if (value > max) {
-      return err(ExceptionValidation.create(fieldPath, `O valor deve ser no máximo ${max}.`));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          `O valor deve ser no máximo ${max}.`,
+        ),
+      );
     }
     return ok(value);
   }

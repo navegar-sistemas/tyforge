@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -7,7 +10,10 @@ import { TypeGuard } from "@tyforge/tools/type_guard";
 export type TPublicKeyPem = string;
 export type TPublicKeyPemFormatted = string;
 
-export class FPublicKeyPem extends TypeField<TPublicKeyPem, TPublicKeyPemFormatted> {
+export class FPublicKeyPem extends TypeField<
+  TPublicKeyPem,
+  TPublicKeyPemFormatted
+> {
   override readonly typeInference = "FPublicKeyPem";
 
   private static readonly PEM_BEGIN = "-----BEGIN PUBLIC KEY-----";
@@ -39,12 +45,18 @@ export class FPublicKeyPem extends TypeField<TPublicKeyPem, TPublicKeyPemFormatt
     // Validate BEGIN marker is at the start and END marker is at the end
     if (!str.startsWith(FPublicKeyPem.PEM_BEGIN)) {
       return err(
-        ExceptionValidation.create(fieldPath, "Invalid PEM: BEGIN marker must be at the start"),
+        ExceptionValidation.create(
+          fieldPath,
+          "Invalid PEM: BEGIN marker must be at the start",
+        ),
       );
     }
     if (!str.endsWith(FPublicKeyPem.PEM_END)) {
       return err(
-        ExceptionValidation.create(fieldPath, "Invalid PEM: END marker must be at the end"),
+        ExceptionValidation.create(
+          fieldPath,
+          "Invalid PEM: END marker must be at the end",
+        ),
       );
     }
 
@@ -55,44 +67,70 @@ export class FPublicKeyPem extends TypeField<TPublicKeyPem, TPublicKeyPemFormatt
 
     if (!FPublicKeyPem.BASE64_REGEX.test(base64) || base64.length < 100) {
       return err(
-        ExceptionValidation.create(fieldPath, "Invalid PEM: base64 content is malformed"),
+        ExceptionValidation.create(
+          fieldPath,
+          "Invalid PEM: base64 content is malformed",
+        ),
       );
     }
 
     // Validate base64 padding -- length must be a multiple of 4
     if (base64.length % 4 !== 0) {
       return err(
-        ExceptionValidation.create(fieldPath, "Invalid PEM: base64 padding is incorrect"),
+        ExceptionValidation.create(
+          fieldPath,
+          "Invalid PEM: base64 padding is incorrect",
+        ),
       );
     }
 
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TPublicKeyPem, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TPublicKeyPem, ExceptionValidation> {
     return TypeGuard.extractString(value, fieldPath);
   }
 
-  static create<T = TPublicKeyPem>(raw: T, fieldPath = "PublicKeyPem"): Result<FPublicKeyPem, ExceptionValidation> {
+  static create<T = TPublicKeyPem>(
+    raw: T,
+    fieldPath = "PublicKeyPem",
+  ): Result<FPublicKeyPem, ExceptionValidation> {
     const typed = FPublicKeyPem.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FPublicKeyPem(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TPublicKeyPem, fieldPath = "PublicKeyPem"): FPublicKeyPem {
+  static createOrThrow(
+    raw: TPublicKeyPem,
+    fieldPath = "PublicKeyPem",
+  ): FPublicKeyPem {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TPublicKeyPem>(value: T, fieldPath = "PublicKeyPem"): Result<FPublicKeyPem, ExceptionValidation> {
+  static assign<T = TPublicKeyPem>(
+    value: T,
+    fieldPath = "PublicKeyPem",
+  ): Result<FPublicKeyPem, ExceptionValidation> {
     const typed = FPublicKeyPem.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FPublicKeyPem(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -106,7 +144,12 @@ export class FPublicKeyPem extends TypeField<TPublicKeyPem, TPublicKeyPemFormatt
   }
 
   override getDescription(): string {
-    return "Chave pública no formato PEM para autenticação assimétrica (ECDSA P-521). Deve conter os delimitadores BEGIN/END e estar em base64.";
+    return (
+      "Chave pública no formato PEM para" +
+      " autenticação assimétrica (ECDSA P-521)." +
+      " Deve conter os delimitadores BEGIN/END" +
+      " e estar em base64."
+    );
   }
 
   override getShortDescription(): string {

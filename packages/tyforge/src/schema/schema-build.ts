@@ -1,5 +1,9 @@
 import { ISchema, InferJson, InferProps } from "./schema-types";
-import type { IBatchCreateResult, IBatchCreateOptions, IBatchCreateError } from "./schema-types";
+import type {
+  IBatchCreateResult,
+  IBatchCreateOptions,
+  IBatchCreateError,
+} from "./schema-types";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 import { Result } from "@tyforge/result";
 import type { TAssignFn } from "./schema-types";
@@ -7,12 +11,25 @@ import type { Runner } from "./schema-internal-types";
 import { SchemaCompiler } from "./schema-compiler";
 import { SchemaRunner } from "./schema-runner";
 
-export type { IBatchCreateError, IBatchCreateOptions, IBatchCreateResult } from "./schema-types";
+export type {
+  IBatchCreateError,
+  IBatchCreateOptions,
+  IBatchCreateResult,
+} from "./schema-types";
 
 export interface ICompiledSchema<TSchema extends ISchema> {
-  create<T = InferJson<TSchema>>(data: T, path?: string): Result<InferProps<TSchema>, Exceptions>;
-  assign<T = InferJson<TSchema>>(data: T, path?: string): Result<InferProps<TSchema>, Exceptions>;
-  batchCreate(items: unknown[], options?: IBatchCreateOptions): IBatchCreateResult<TSchema> | Promise<IBatchCreateResult<TSchema>>;
+  create<T = InferJson<TSchema>>(
+    data: T,
+    path?: string,
+  ): Result<InferProps<TSchema>, Exceptions>;
+  assign<T = InferJson<TSchema>>(
+    data: T,
+    path?: string,
+  ): Result<InferProps<TSchema>, Exceptions>;
+  batchCreate(
+    items: unknown[],
+    options?: IBatchCreateOptions,
+  ): IBatchCreateResult<TSchema> | Promise<IBatchCreateResult<TSchema>>;
 }
 
 export class SchemaBuilder {
@@ -29,31 +46,47 @@ export class SchemaBuilder {
     SchemaBuilder._maxDepth = value;
   }
 
-  static compile<TSchema extends ISchema>(schema: TSchema): ICompiledSchema<TSchema> {
+  static compile<TSchema extends ISchema>(
+    schema: TSchema,
+  ): ICompiledSchema<TSchema> {
     const compiler = new SchemaCompiler(SchemaBuilder._maxDepth);
     const schemaRunner = new SchemaRunner();
     const runner = schemaRunner.createExecuteFn(schema, compiler);
 
     return {
-      create<T = InferJson<TSchema>>(data: T, path = ""): Result<InferProps<TSchema>, Exceptions> {
+      create<T = InferJson<TSchema>>(
+        data: T,
+        path = "",
+      ): Result<InferProps<TSchema>, Exceptions> {
         const result = runner(data, path, "create");
         SchemaBuilder.assertResultType<InferProps<TSchema>>(result);
         return result;
       },
-      assign<T = InferJson<TSchema>>(data: T, path = ""): Result<InferProps<TSchema>, Exceptions> {
+      assign<T = InferJson<TSchema>>(
+        data: T,
+        path = "",
+      ): Result<InferProps<TSchema>, Exceptions> {
         const result = runner(data, path, "assign");
         SchemaBuilder.assertResultType<InferProps<TSchema>>(result);
         return result;
       },
-      // Dynamic import prevents Metro/bundlers from resolving node:worker_threads.
-      // In browser/React Native, import() fails or returns null — falls back to sequential.
-      batchCreate(items: unknown[], options?: IBatchCreateOptions): IBatchCreateResult<TSchema> | Promise<IBatchCreateResult<TSchema>> {
+      // Dynamic import prevents Metro/bundlers from
+      // resolving node:worker_threads.
+      // In browser/React Native, import() fails or
+      // returns null — falls back to sequential.
+      batchCreate(
+        items: unknown[],
+        options?: IBatchCreateOptions,
+      ): IBatchCreateResult<TSchema> | Promise<IBatchCreateResult<TSchema>> {
         if (items.length > 1000000) {
           throw new Error("Batch size exceeds maximum of 1000000 items");
         }
 
         const concurrency = Math.max(1, Math.floor(options?.concurrency ?? 1));
-        const chunkSize = Math.max(1, Math.min(Math.floor(options?.chunkSize ?? 10000), 100000));
+        const chunkSize = Math.max(
+          1,
+          Math.min(Math.floor(options?.chunkSize ?? 10000), 100000),
+        );
 
         if (concurrency > 1) {
           const assignFn: TAssignFn<TSchema> = (data) => {
@@ -61,12 +94,22 @@ export class SchemaBuilder {
             SchemaBuilder.assertResultType<InferProps<TSchema>>(r);
             return r;
           };
-          const sequential = (): IBatchCreateResult<TSchema> => SchemaBuilder.runSequential<TSchema>(items, runner);
+          const sequential = (): IBatchCreateResult<TSchema> =>
+            SchemaBuilder.runSequential<TSchema>(items, runner);
           return import("./batch-parallel")
             .then(({ createParallelProcessor }) => {
               const processor = createParallelProcessor();
               if (processor) {
-                return processor.process(schema, items, { concurrency, chunkSize, workerTimeout: options?.workerTimeout }, assignFn);
+                return processor.process(
+                  schema,
+                  items,
+                  {
+                    concurrency,
+                    chunkSize,
+                    workerTimeout: options?.workerTimeout,
+                  },
+                  assignFn,
+                );
               }
               return sequential();
             })
@@ -78,13 +121,18 @@ export class SchemaBuilder {
     };
   }
 
-  private static assertResultType<T>(result: Result<unknown, Exceptions>): asserts result is Result<T, Exceptions> {
+  private static assertResultType<T>(
+    result: Result<unknown, Exceptions>,
+  ): asserts result is Result<T, Exceptions> {
     if (!("success" in result)) {
       throw new TypeError("Expected a Result object");
     }
   }
 
-  private static runSequential<TSchema extends ISchema>(items: unknown[], runner: Runner): IBatchCreateResult<TSchema> {
+  private static runSequential<TSchema extends ISchema>(
+    items: unknown[],
+    runner: Runner,
+  ): IBatchCreateResult<TSchema> {
     const successes: InferProps<TSchema>[] = [];
     const failures: IBatchCreateError[] = [];
     for (let i = 0; i < items.length; i++) {

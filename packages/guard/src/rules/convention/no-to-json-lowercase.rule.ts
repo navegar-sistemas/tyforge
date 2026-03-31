@@ -3,14 +3,27 @@ import type { IRuleViolation } from "../../rule";
 
 export class NoToJsonLowercaseRule extends Rule {
   constructor(severity: "error" | "warning" = "error") {
-    super("no-to-json-lowercase", "Forbids toJson() — use toJSON() (capital JSON)", severity, true);
+    super(
+      "no-to-json-lowercase",
+      "Forbids toJson() — use toJSON() (capital JSON)",
+      severity,
+      true,
+    );
   }
 
-  check(line: string, lineNumber: number, filePath: string): IRuleViolation | null {
+  check(
+    line: string,
+    lineNumber: number,
+    filePath: string,
+  ): IRuleViolation | null {
     const code = this.stripLiterals(line);
 
     if (/\.toJson\b/.test(code)) {
-      return this.violation(lineNumber, filePath, "Use toJSON() (capital JSON), not toJson()");
+      return this.violation(
+        lineNumber,
+        filePath,
+        "Use toJSON() (capital JSON), not toJson()",
+      );
     }
     return null;
   }

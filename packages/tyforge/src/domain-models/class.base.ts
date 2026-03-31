@@ -10,7 +10,8 @@ export type TClassInfo = {
 
 /**
  * Metadata dinâmico da instância — controle de revisão e timestamps.
- * - `revision`: contador para optimistic locking (incrementado via `incrementRevision()`)
+ * - `revision`: contador para optimistic locking
+ *   (incrementado via `incrementRevision()`)
  * - `createdAt`: data de criação da instância
  * - `updatedAt`: última modificação (atualizado via `touch()`)
  */

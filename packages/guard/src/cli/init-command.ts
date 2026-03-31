@@ -4,11 +4,16 @@ import type { THookManagerDetected } from "./detect.tool";
 import { ToolPrompt, ReadlinePromptIO } from "./prompt.tool";
 import { ConfigWriter } from "../config/lint-config-writer";
 import { HookManagerFactory } from "../hooks/hook-manager-factory";
-import type { THookManager, ILintConfigExtended } from "../config/lint-config-schema";
+import type {
+  THookManager,
+  ILintConfigExtended,
+} from "../config/lint-config-schema";
 import { OHookManager } from "../config/lint-config-schema";
 import { RuleRegistry } from "../rule-registry";
 
-function detectedToHookManager(detected: THookManagerDetected): THookManager | undefined {
+function detectedToHookManager(
+  detected: THookManagerDetected,
+): THookManager | undefined {
   if (detected === OHookManagerType.HUSKY) return OHookManager.HUSKY;
   if (detected === OHookManagerType.LEFTHOOK) return OHookManager.LEFTHOOK;
   if (detected === OHookManagerType.NATIVE) return OHookManager.NATIVE;
@@ -20,7 +25,9 @@ export class InitCommand {
     const cwd = process.cwd();
 
     if (!ToolDetect.isTTY()) {
-      console.error("tyforge-guard --init requires an interactive terminal (TTY).");
+      console.error(
+        "tyforge-guard --init requires an interactive terminal (TTY).",
+      );
       return;
     }
 
@@ -50,14 +57,30 @@ export class InitCommand {
       const defaultManager = detectedToHookManager(detected);
 
       hookManager = await prompt.select<THookManager>("Select hook manager:", [
-        { label: "Husky", value: OHookManager.HUSKY, recommended: detected === OHookManagerType.HUSKY },
-        { label: "Lefthook", value: OHookManager.LEFTHOOK, recommended: detected === OHookManagerType.LEFTHOOK },
-        { label: "Native git hooks", value: OHookManager.NATIVE, recommended: defaultManager === undefined || detected === OHookManagerType.NATIVE },
+        {
+          label: "Husky",
+          value: OHookManager.HUSKY,
+          recommended: detected === OHookManagerType.HUSKY,
+        },
+        {
+          label: "Lefthook",
+          value: OHookManager.LEFTHOOK,
+          recommended: detected === OHookManagerType.LEFTHOOK,
+        },
+        {
+          label: "Native git hooks",
+          value: OHookManager.NATIVE,
+          recommended:
+            defaultManager === undefined ||
+            detected === OHookManagerType.NATIVE,
+        },
       ]);
     }
 
     const root = await prompt.input("Source root directory", "src");
-    const strict = await prompt.confirm("Enable strict mode (warnings also fail)?");
+    const strict = await prompt.confirm(
+      "Enable strict mode (warnings also fail)?",
+    );
 
     const ruleNames = RuleRegistry.getDefaultRuleNames();
     const rules: Record<string, "error" | "warning" | "off"> = {};

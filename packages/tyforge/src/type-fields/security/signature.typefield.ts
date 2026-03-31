@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -43,15 +46,25 @@ export class FSignature extends TypeField<TSignature, TSignatureFormatted> {
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TSignature, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TSignature, ExceptionValidation> {
     return TypeGuard.extractString(value, fieldPath);
   }
 
-  static create<T = TSignature>(raw: T, fieldPath = "Signature"): Result<FSignature, ExceptionValidation> {
+  static create<T = TSignature>(
+    raw: T,
+    fieldPath = "Signature",
+  ): Result<FSignature, ExceptionValidation> {
     const typed = FSignature.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FSignature(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -62,11 +75,18 @@ export class FSignature extends TypeField<TSignature, TSignatureFormatted> {
     return result.value;
   }
 
-  static assign<T = TSignature>(value: T, fieldPath = "Signature"): Result<FSignature, ExceptionValidation> {
+  static assign<T = TSignature>(
+    value: T,
+    fieldPath = "Signature",
+  ): Result<FSignature, ExceptionValidation> {
     const typed = FSignature.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FSignature(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -80,7 +100,13 @@ export class FSignature extends TypeField<TSignature, TSignatureFormatted> {
   }
 
   override getDescription(): string {
-    return "Assinatura digital no formato base64. Utilizada para verificação de autenticidade e integridade de dados em comunicações seguras e autenticação assimétrica.";
+    return (
+      "Assinatura digital no formato base64." +
+      " Utilizada para verificação de" +
+      " autenticidade e integridade de dados" +
+      " em comunicações seguras" +
+      " e autenticação assimétrica."
+    );
   }
 
   override getShortDescription(): string {

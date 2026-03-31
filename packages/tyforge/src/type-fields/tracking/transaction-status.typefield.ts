@@ -13,10 +13,14 @@ export const OTransactionStatus = {
 } as const;
 
 export type TKeyTransactionStatus = keyof typeof OTransactionStatus;
-export type TTransactionStatus = (typeof OTransactionStatus)[TKeyTransactionStatus];
+export type TTransactionStatus =
+  (typeof OTransactionStatus)[TKeyTransactionStatus];
 export type TTransactionStatusFormatted = string;
 
-export class FTransactionStatus extends TypeField<TTransactionStatus, TTransactionStatusFormatted> {
+export class FTransactionStatus extends TypeField<
+  TTransactionStatus,
+  TTransactionStatusFormatted
+> {
   override readonly typeInference = "FTransactionStatus";
 
   override readonly config: ITypeFieldConfig<TTransactionStatus> = {
@@ -31,32 +35,52 @@ export class FTransactionStatus extends TypeField<TTransactionStatus, TTransacti
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TTransactionStatus, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TTransactionStatus, ExceptionValidation> {
     const str = TypeGuard.isString(value, fieldPath);
     if (isFailure(str)) return err(str.error);
     return TypeField.resolveEnum(OTransactionStatus, str.value, fieldPath);
   }
 
-  static create<T = TTransactionStatus>(raw: T, fieldPath = "TransactionStatus"): Result<FTransactionStatus, ExceptionValidation> {
+  static create<T = TTransactionStatus>(
+    raw: T,
+    fieldPath = "TransactionStatus",
+  ): Result<FTransactionStatus, ExceptionValidation> {
     const typed = FTransactionStatus.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FTransactionStatus(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TTransactionStatus, fieldPath = "TransactionStatus"): FTransactionStatus {
+  static createOrThrow(
+    raw: TTransactionStatus,
+    fieldPath = "TransactionStatus",
+  ): FTransactionStatus {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TTransactionStatus>(value: T, fieldPath = "TransactionStatus"): Result<FTransactionStatus, ExceptionValidation> {
+  static assign<T = TTransactionStatus>(
+    value: T,
+    fieldPath = "TransactionStatus",
+  ): Result<FTransactionStatus, ExceptionValidation> {
     const typed = FTransactionStatus.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FTransactionStatus(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

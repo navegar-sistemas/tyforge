@@ -93,7 +93,10 @@ describe("ExceptionWebSocket — retriable", () => {
   });
 
   it("subscriptionFailed is not retriable", () => {
-    assert.equal(ExceptionWebSocket.subscriptionFailed("test").retriable, false);
+    assert.equal(
+      ExceptionWebSocket.subscriptionFailed("test").retriable,
+      false,
+    );
   });
 
   it("authFailed is not retriable", () => {

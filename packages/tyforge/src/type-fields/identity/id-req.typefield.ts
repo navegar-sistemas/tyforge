@@ -21,15 +21,25 @@ export class FIdReq extends TypeField<TIdReq, TIdReqFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TIdReq, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TIdReq, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TIdReq>(raw: T, fieldPath = "IdReq"): Result<FIdReq, ExceptionValidation> {
+  static create<T = TIdReq>(
+    raw: T,
+    fieldPath = "IdReq",
+  ): Result<FIdReq, ExceptionValidation> {
     const typed = FIdReq.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FIdReq(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -40,11 +50,18 @@ export class FIdReq extends TypeField<TIdReq, TIdReqFormatted> {
     return result.value;
   }
 
-  static assign<T = TIdReq>(value: T, fieldPath = "IdReq"): Result<FIdReq, ExceptionValidation> {
+  static assign<T = TIdReq>(
+    value: T,
+    fieldPath = "IdReq",
+  ): Result<FIdReq, ExceptionValidation> {
     const typed = FIdReq.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FIdReq(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -58,7 +75,13 @@ export class FIdReq extends TypeField<TIdReq, TIdReqFormatted> {
   }
 
   override getDescription(): string {
-    return "Identificador único de requisição. Utilizado para rastrear requisições externas e garantir idempotência nas operações. Aceita qualquer formato de string.";
+    return (
+      "Identificador único de requisição." +
+      " Utilizado para rastrear requisições" +
+      " externas e garantir idempotência" +
+      " nas operações." +
+      " Aceita qualquer formato de string."
+    );
   }
 
   override getShortDescription(): string {

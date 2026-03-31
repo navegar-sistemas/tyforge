@@ -7,7 +7,10 @@ import { TypeGuard } from "@tyforge/tools/type_guard";
 export type TDescription = string;
 export type TDescriptionFormatted = string;
 
-export class FDescription extends TypeField<TDescription, TDescriptionFormatted> {
+export class FDescription extends TypeField<
+  TDescription,
+  TDescriptionFormatted
+> {
   override readonly typeInference = "FDescription";
 
   override readonly config: ITypeFieldConfig<TDescription> = {
@@ -21,30 +24,50 @@ export class FDescription extends TypeField<TDescription, TDescriptionFormatted>
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TDescription, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TDescription, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TDescription>(raw: T, fieldPath = "Description"): Result<FDescription, ExceptionValidation> {
+  static create<T = TDescription>(
+    raw: T,
+    fieldPath = "Description",
+  ): Result<FDescription, ExceptionValidation> {
     const typed = FDescription.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDescription(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TDescription, fieldPath = "Description"): FDescription {
+  static createOrThrow(
+    raw: TDescription,
+    fieldPath = "Description",
+  ): FDescription {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDescription>(value: T, fieldPath = "Description"): Result<FDescription, ExceptionValidation> {
+  static assign<T = TDescription>(
+    value: T,
+    fieldPath = "Description",
+  ): Result<FDescription, ExceptionValidation> {
     const typed = FDescription.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDescription(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -58,7 +81,12 @@ export class FDescription extends TypeField<TDescription, TDescriptionFormatted>
   }
 
   override getDescription(): string {
-    return "Descrição detalhada. Deve fornecer informações suficientes para compreensão completa do objeto descrito.";
+    return (
+      "Descrição detalhada." +
+      " Deve fornecer informações suficientes" +
+      " para compreensão completa" +
+      " do objeto descrito."
+    );
   }
 
   override getShortDescription(): string {

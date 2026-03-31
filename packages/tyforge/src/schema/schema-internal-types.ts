@@ -17,7 +17,11 @@ export const enum EFieldKind {
 
 export interface ICompiledValidator {
   fields: ICompiledField[];
-  execute(data: unknown, basePath: string, mode: "create" | "assign"): Result<Record<string, unknown>, Exceptions>;
+  execute(
+    data: unknown,
+    basePath: string,
+    mode: "create" | "assign",
+  ): Result<Record<string, unknown>, Exceptions>;
 }
 
 export interface ICompiledField {
@@ -33,4 +37,8 @@ export interface ICompiledField {
   createValidateLevel: TValidationLevel;
 }
 
-export type Runner = (data: unknown, basePath: string, mode: "create" | "assign") => Result<Record<string, unknown>, Exceptions>;
+export type Runner = (
+  data: unknown,
+  basePath: string,
+  mode: "create" | "assign",
+) => Result<Record<string, unknown>, Exceptions>;

@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "host-bridge": {
+      "url": "http://host.docker.internal:3456"
+    }
+  }
+}

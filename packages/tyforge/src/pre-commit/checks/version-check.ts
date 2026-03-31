@@ -53,7 +53,7 @@ export class CheckVersions extends Check {
       details.push("");
     }
 
-    const hasWarnings = details.some(d => d.includes("⚠️"));
+    const hasWarnings = details.some((d) => d.includes("⚠️"));
     if (hasWarnings) return this.warn(details);
     if (details.length > 0) return this.pass(details);
     return this.pass();
@@ -63,13 +63,23 @@ export class CheckVersions extends Check {
     const indexPath = "docs/build/index.html";
     try {
       const html = fs.readFileSync(indexPath, "utf-8");
-      const inlineScripts = html.match(/<script(?:\s[^>]*)?>([^<]+)<\/script>/g);
-      const count = inlineScripts ? inlineScripts.filter(s => !s.includes(" src=")).length : 0;
+      const inlineScripts = html.match(
+        /<script(?:\s[^>]*)?>([^<]+)<\/script>/g,
+      );
+      const count = inlineScripts
+        ? inlineScripts.filter((s) => !s.includes(" src=")).length
+        : 0;
       if (count === 0) {
-        details.push("⚠️  Docusaurus no longer generates inline scripts — docs/generate-csp.js can be removed");
-        details.push("    Replace CSP workaround with static policy (remove 'unsafe-inline' from style-src too)");
+        details.push(
+          "⚠️  Docusaurus no longer generates inline scripts — docs/generate-csp.js can be removed",
+        );
+        details.push(
+          "    Replace CSP workaround with static policy (remove 'unsafe-inline' from style-src too)",
+        );
       } else {
-        details.push(`ℹ️  Docusaurus generates ${count} inline script(s) — CSP hash workaround (generate-csp.js) still required`);
+        details.push(
+          `ℹ️  Docusaurus generates ${count} inline script(s) — CSP hash workaround (generate-csp.js) still required`,
+        );
       }
     } catch {
       // build dir not available, skip
@@ -95,7 +105,12 @@ export class CheckVersions extends Check {
             const versionCheck = TypeGuard.extractString(version, name);
             if (!versionCheck.success) continue;
             const v = versionCheck.value;
-            if (v.startsWith("file:") || v.startsWith("link:") || v.startsWith("workspace:")) continue;
+            if (
+              v.startsWith("file:") ||
+              v.startsWith("link:") ||
+              v.startsWith("workspace:")
+            )
+              continue;
             if (CheckVersions.RANGE_REGEX.test(v)) {
               const suggested = v.replace(/^[\^~>=<]+/, "");
               unpinned.push([name, v, suggested]);
@@ -107,14 +122,20 @@ export class CheckVersions extends Check {
 
         details.push(`⚠️  ${pkg}: ${unpinned.length} unpinned:`);
 
-        const maxName = Math.max(7, ...unpinned.map(r => r[0].length));
-        const maxCurrent = Math.max(7, ...unpinned.map(r => r[1].length));
-        const maxSuggested = Math.max(9, ...unpinned.map(r => r[2].length));
+        const maxName = Math.max(7, ...unpinned.map((r) => r[0].length));
+        const maxCurrent = Math.max(7, ...unpinned.map((r) => r[1].length));
+        const maxSuggested = Math.max(9, ...unpinned.map((r) => r[2].length));
 
-        details.push(`    ${"Package".padEnd(maxName)}  ${"Current".padEnd(maxCurrent)}  ${"Suggested".padEnd(maxSuggested)}`);
-        details.push(`    ${"─".repeat(maxName)}  ${"─".repeat(maxCurrent)}  ${"─".repeat(maxSuggested)}`);
+        details.push(
+          `    ${"Package".padEnd(maxName)}  ${"Current".padEnd(maxCurrent)}  ${"Suggested".padEnd(maxSuggested)}`,
+        );
+        details.push(
+          `    ${"─".repeat(maxName)}  ${"─".repeat(maxCurrent)}  ${"─".repeat(maxSuggested)}`,
+        );
         for (const [name, current, suggested] of unpinned) {
-          details.push(`    ${name.padEnd(maxName)}  ${current.padEnd(maxCurrent)}  ${suggested.padEnd(maxSuggested)}`);
+          details.push(
+            `    ${name.padEnd(maxName)}  ${current.padEnd(maxCurrent)}  ${suggested.padEnd(maxSuggested)}`,
+          );
         }
       } catch {
         // parse error, skip
@@ -128,7 +149,12 @@ export class CheckVersions extends Check {
       if (!fs.existsSync(path.join(dir, "node_modules"))) continue;
       let jsonOutput = "";
       try {
-        jsonOutput = execFileSync("npm", ["outdated", "--json"], { cwd: dir, stdio: "pipe", encoding: "utf-8", timeout: 30000 });
+        jsonOutput = execFileSync("npm", ["outdated", "--json"], {
+          cwd: dir,
+          stdio: "pipe",
+          encoding: "utf-8",
+          timeout: 30000,
+        });
       } catch (e) {
         // npm outdated exits with code 1 when packages are outdated
         if (e instanceof Error && "stdout" in e) {
@@ -154,19 +180,29 @@ export class CheckVersions extends Check {
           rows.push([name, current, latest]);
         }
 
-        const maxName = Math.max(7, ...rows.map(r => r[0].length));
-        const maxCurrent = Math.max(7, ...rows.map(r => r[1].length));
-        const maxLatest = Math.max(6, ...rows.map(r => r[2].length));
+        const maxName = Math.max(7, ...rows.map((r) => r[0].length));
+        const maxCurrent = Math.max(7, ...rows.map((r) => r[1].length));
+        const maxLatest = Math.max(6, ...rows.map((r) => r[2].length));
 
-        const header = `    ${"Package".padEnd(maxName)}  ${"Current".padEnd(maxCurrent)}  ${"Latest".padEnd(maxLatest)}`;
-        const separator = `    ${"─".repeat(maxName)}  ${"─".repeat(maxCurrent)}  ${"─".repeat(maxLatest)}`;
+        const header =
+          `    ${"Package".padEnd(maxName)}` +
+          `  ${"Current".padEnd(maxCurrent)}` +
+          `  ${"Latest".padEnd(maxLatest)}`;
+        const separator =
+          `    ${"─".repeat(maxName)}` +
+          `  ${"─".repeat(maxCurrent)}` +
+          `  ${"─".repeat(maxLatest)}`;
         details.push(header);
         details.push(separator);
         for (const [name, current, latest] of rows) {
-          details.push(`    ${name.padEnd(maxName)}  ${current.padEnd(maxCurrent)}  ${latest.padEnd(maxLatest)}`);
+          details.push(
+            `    ${name.padEnd(maxName)}  ${current.padEnd(maxCurrent)}  ${latest.padEnd(maxLatest)}`,
+          );
         }
       } catch {
-        details.push(`⚠️  ${pkg}: outdated dependencies (could not parse details)`);
+        details.push(
+          `⚠️  ${pkg}: outdated dependencies (could not parse details)`,
+        );
       }
     }
   }
@@ -178,7 +214,12 @@ export class CheckVersions extends Check {
 
       let auditJson = "";
       try {
-        auditJson = execFileSync("npm", ["audit", "--json"], { cwd: dir, stdio: "pipe", encoding: "utf-8", timeout: 30000 });
+        auditJson = execFileSync("npm", ["audit", "--json"], {
+          cwd: dir,
+          stdio: "pipe",
+          encoding: "utf-8",
+          timeout: 30000,
+        });
       } catch (e) {
         if (e instanceof Error && "stdout" in e) {
           const stdout = Object.getOwnPropertyDescriptor(e, "stdout")?.value;
@@ -205,7 +246,9 @@ export class CheckVersions extends Check {
               if (critical > 0) parts.push(`${critical} critical`);
               if (high > 0) parts.push(`${high} high`);
               if (moderate > 0) parts.push(`${moderate} moderate`);
-              details.push(`⚠️  ${pkg}: ${total} vulnerabilities (${parts.join(", ")})`);
+              details.push(
+                `⚠️  ${pkg}: ${total} vulnerabilities (${parts.join(", ")})`,
+              );
             }
           }
         }
@@ -227,7 +270,9 @@ export class CheckVersions extends Check {
               const fixVersion = String(fixAvailable["version"] ?? "");
               if (fixVersion) fixInfo = `fix: update to ${fixVersion}`;
             }
-            crossRef.push(`    ${severity.toUpperCase().padEnd(8)}  ${name} (${range}) — ${fixInfo}`);
+            crossRef.push(
+              `    ${severity.toUpperCase().padEnd(8)}  ${name} (${range}) — ${fixInfo}`,
+            );
           }
           if (crossRef.length > 0) {
             details.push(...crossRef);
@@ -241,11 +286,16 @@ export class CheckVersions extends Check {
 
   private checkNodeEngine(details: string[]): void {
     try {
-      const parsed: unknown = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+      const parsed: unknown = JSON.parse(
+        fs.readFileSync("package.json", "utf-8"),
+      );
       if (!TypeGuard.isRecord(parsed)) return;
       const engines = parsed["engines"];
       if (!TypeGuard.isRecord(engines)) return;
-      const nodeReqResult = TypeGuard.extractString(engines["node"], "engines.node");
+      const nodeReqResult = TypeGuard.extractString(
+        engines["node"],
+        "engines.node",
+      );
       if (!nodeReqResult.success) return;
       const nodeReq = nodeReqResult.value;
       const match = nodeReq.match(/>=(\d+)/);
@@ -254,7 +304,9 @@ export class CheckVersions extends Check {
       const currentVersion = process.version.replace("v", "");
       const currentMajor = Number(currentVersion.split(".")[0]);
       if (currentMajor < requiredMajor) {
-        details.push(`⚠️  Node.js: running v${currentVersion}, requires >=${requiredMajor}`);
+        details.push(
+          `⚠️  Node.js: running v${currentVersion}, requires >=${requiredMajor}`,
+        );
       }
     } catch {
       // ignore parse errors
@@ -267,10 +319,15 @@ export class CheckVersions extends Check {
     const dockerfiles = this.findDockerfiles();
     for (const filepath of dockerfiles) {
       const content = fs.readFileSync(filepath, "utf-8");
-      const fromLines = content.split("\n").filter(l => l.trim().startsWith("FROM "));
+      const fromLines = content
+        .split("\n")
+        .filter((l) => l.trim().startsWith("FROM "));
 
       for (const line of fromLines) {
-        const image = line.trim().replace(/^FROM\s+/, "").split(/\s/)[0];
+        const image = line
+          .trim()
+          .replace(/^FROM\s+/, "")
+          .split(/\s/)[0];
         if (!image || image.startsWith("$") || image === "scratch") continue;
 
         const colonIdx = image.indexOf(":");
@@ -284,7 +341,12 @@ export class CheckVersions extends Check {
     }
   }
 
-  private checkImageVersion(filepath: string, base: string, tag: string, details: string[]): void {
+  private checkImageVersion(
+    filepath: string,
+    base: string,
+    tag: string,
+    details: string[],
+  ): void {
     const image = `${base}:${tag}`;
     const variantMatch = tag.match(/-([a-z].*)$/);
     const variant = variantMatch ? variantMatch[1] : "";
@@ -302,33 +364,47 @@ export class CheckVersions extends Check {
     const prefix = minor ? `${major}.${minor}` : major;
     const latestVersion = this.fetchLatestVersion(base, prefix, variant);
     if (!latestVersion) {
-      details.push(`ℹ️  ${filepath}: ${image} — could not fetch latest version`);
+      details.push(
+        `ℹ️  ${filepath}: ${image} — could not fetch latest version`,
+      );
       return;
     }
 
     if (latestVersion !== pinned) {
-      details.push(`⚠️  ${filepath}: ${image} pinned → latest ${prefix}.x is ${latestVersion}`);
+      details.push(
+        `⚠️  ${filepath}: ${image} pinned → latest ${prefix}.x is ${latestVersion}`,
+      );
     } else {
       details.push(`✅ ${filepath}: ${image} is up to date`);
     }
   }
 
-  private fetchLatestVersion(base: string, prefix: string, variant: string): string {
-    // Query Docker Hub registry API for tags matching prefix.x.x-variant or prefix.x-variant
+  private fetchLatestVersion(
+    base: string,
+    prefix: string,
+    variant: string,
+  ): string {
+    // Query Docker Hub registry API for tags
+    // matching prefix.x.x-variant or prefix.x-variant
     const repo = base.includes("/") ? base : `library/${base}`;
     const variantSuffix = variant ? `-${variant}` : "";
     const escapedSuffix = variantSuffix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     // prefix can be "24" (major only) or "1.28" (major.minor)
     const dots = prefix.split(".").length;
-    const versionPattern = dots >= 2
-      ? new RegExp(`^${prefix.replace(/\./g, "\\.")}\\.\\d+${escapedSuffix}$`)
-      : new RegExp(`^${prefix}\\.\\d+\\.\\d+${escapedSuffix}$`);
+    const versionPattern =
+      dots >= 2
+        ? new RegExp(`^${prefix.replace(/\./g, "\\.")}\\.\\d+${escapedSuffix}$`)
+        : new RegExp(`^${prefix}\\.\\d+\\.\\d+${escapedSuffix}$`);
 
     try {
-      // Docker Hub API: list tags sorted by last_updated, page_size 100
-      const url = `https://hub.docker.com/v2/repositories/${repo}/tags?page_size=100&ordering=last_updated`;
+      // Docker Hub API: list tags sorted by last_updated
+      const url =
+        `https://hub.docker.com/v2/repositories/` +
+        `${repo}/tags?page_size=100&ordering=last_updated`;
       const output = execFileSync("curl", ["-s", "--max-time", "15", url], {
-        stdio: "pipe", encoding: "utf-8", timeout: 20000,
+        stdio: "pipe",
+        encoding: "utf-8",
+        timeout: 20000,
       });
 
       const parsed: unknown = JSON.parse(output);
@@ -354,7 +430,9 @@ export class CheckVersions extends Check {
         if (
           parts[0] > bestParts[0] ||
           (parts[0] === bestParts[0] && parts[1] > bestParts[1]) ||
-          (parts[0] === bestParts[0] && parts[1] === bestParts[1] && parts[2] > bestParts[2])
+          (parts[0] === bestParts[0] &&
+            parts[1] === bestParts[1] &&
+            parts[2] > bestParts[2])
         ) {
           best = versionOnly;
           bestParts = parts;
@@ -366,5 +444,4 @@ export class CheckVersions extends Check {
       return "";
     }
   }
-
 }

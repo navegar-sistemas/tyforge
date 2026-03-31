@@ -1,4 +1,8 @@
-import { TypeField, TValidationLevel, TFormatTarget } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+  TFormatTarget,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -31,28 +35,52 @@ export class FFloat extends TypeField<TFloat, TFloatFormatted> {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!Number.isFinite(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Value must be a finite number"));
+      return err(
+        ExceptionValidation.create(fieldPath, "Value must be a finite number"),
+      );
     }
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TFloat, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TFloat, ExceptionValidation> {
     return TypeGuard.extractNumber(value, fieldPath);
   }
 
-  static formCreate(raw: unknown, fieldPath = "Float"): Result<FFloat, ExceptionValidation> {
-    return FFloat.create(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  static formCreate(
+    raw: unknown,
+    fieldPath = "Float",
+  ): Result<FFloat, ExceptionValidation> {
+    return FFloat.create(
+      TypeField.normalizeFormInput(raw, "number"),
+      fieldPath,
+    );
   }
 
-  static formAssign(raw: unknown, fieldPath = "Float"): Result<FFloat, ExceptionValidation> {
-    return FFloat.assign(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  static formAssign(
+    raw: unknown,
+    fieldPath = "Float",
+  ): Result<FFloat, ExceptionValidation> {
+    return FFloat.assign(
+      TypeField.normalizeFormInput(raw, "number"),
+      fieldPath,
+    );
   }
 
-  static create<T = TFloat>(raw: T, fieldPath = "Float"): Result<FFloat, ExceptionValidation> {
+  static create<T = TFloat>(
+    raw: T,
+    fieldPath = "Float",
+  ): Result<FFloat, ExceptionValidation> {
     const typed = FFloat.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FFloat(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -63,11 +91,18 @@ export class FFloat extends TypeField<TFloat, TFloatFormatted> {
     return result.value;
   }
 
-  static assign<T = TFloat>(value: T, fieldPath = "Float"): Result<FFloat, ExceptionValidation> {
+  static assign<T = TFloat>(
+    value: T,
+    fieldPath = "Float",
+  ): Result<FFloat, ExceptionValidation> {
     const typed = FFloat.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FFloat(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -77,7 +112,11 @@ export class FFloat extends TypeField<TFloat, TFloatFormatted> {
   }
 
   override formatted(target: TFormatTarget = "display"): TFloatFormatted {
-    return TypeField.formatNumber(this.getValue(), { maximumFractionDigits: this.config.decimalPrecision }, target);
+    return TypeField.formatNumber(
+      this.getValue(),
+      { maximumFractionDigits: this.config.decimalPrecision },
+      target,
+    );
   }
 
   override getDescription(): string {

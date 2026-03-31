@@ -19,7 +19,9 @@ export class UninstallCommand {
     const cwd = process.cwd();
 
     if (!ToolDetect.isTTY()) {
-      console.error("tyforge-guard --uninstall requires an interactive terminal (TTY).");
+      console.error(
+        "tyforge-guard --uninstall requires an interactive terminal (TTY).",
+      );
       return;
     }
 
@@ -37,13 +39,17 @@ export class UninstallCommand {
     prompt.printBanner();
 
     const config = loadLintConfigExtended();
-    const hookManagerType = config?.hookManager ?? detectedToHookManager(ToolDetect.detectHookManager(cwd));
+    const hookManagerType =
+      config?.hookManager ??
+      detectedToHookManager(ToolDetect.detectHookManager(cwd));
 
     if (hookManagerType) {
       const manager = HookManagerFactory.create(hookManagerType);
 
       if (manager.isInstalled(cwd)) {
-        const removeHook = await prompt.confirm(`Remove ${manager.name} pre-commit hook?`);
+        const removeHook = await prompt.confirm(
+          `Remove ${manager.name} pre-commit hook?`,
+        );
         if (removeHook) {
           const result = manager.remove(cwd);
           if (result.success) {
@@ -61,7 +67,10 @@ export class UninstallCommand {
 
     const configPath = path.resolve(cwd, "tyforge-guard.config.json");
     if (fs.existsSync(configPath)) {
-      const removeConfig = await prompt.confirm("Remove tyforge-guard.config.json?", false);
+      const removeConfig = await prompt.confirm(
+        "Remove tyforge-guard.config.json?",
+        false,
+      );
       if (removeConfig) {
         try {
           fs.unlinkSync(configPath);

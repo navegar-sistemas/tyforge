@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -32,20 +35,35 @@ export class FBankE2eId extends TypeField<TBankE2eId, TBankE2eIdFormatted> {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!ALPHANUMERIC_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Bank E2E ID must contain only alphanumeric characters"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Bank E2E ID must contain only alphanumeric characters",
+        ),
+      );
     }
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TBankE2eId, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TBankE2eId, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TBankE2eId>(raw: T, fieldPath = "BankE2eId"): Result<FBankE2eId, ExceptionValidation> {
+  static create<T = TBankE2eId>(
+    raw: T,
+    fieldPath = "BankE2eId",
+  ): Result<FBankE2eId, ExceptionValidation> {
     const typed = FBankE2eId.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBankE2eId(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -56,11 +74,18 @@ export class FBankE2eId extends TypeField<TBankE2eId, TBankE2eIdFormatted> {
     return result.value;
   }
 
-  static assign<T = TBankE2eId>(value: T, fieldPath = "BankE2eId"): Result<FBankE2eId, ExceptionValidation> {
+  static assign<T = TBankE2eId>(
+    value: T,
+    fieldPath = "BankE2eId",
+  ): Result<FBankE2eId, ExceptionValidation> {
     const typed = FBankE2eId.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBankE2eId(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -74,7 +99,11 @@ export class FBankE2eId extends TypeField<TBankE2eId, TBankE2eIdFormatted> {
   }
 
   override getDescription(): string {
-    return "End-to-end identifier for instant payment transactions (alphanumeric, up to 35 characters).";
+    return (
+      "End-to-end identifier for instant payment " +
+      "transactions (alphanumeric, up to " +
+      "35 characters)."
+    );
   }
 
   override getShortDescription(): string {

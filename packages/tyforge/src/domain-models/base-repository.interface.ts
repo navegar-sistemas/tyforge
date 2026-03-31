@@ -8,8 +8,12 @@ import { Repository } from "@tyforge/domain/repository";
 
 export abstract class RepositoryCrud<T> extends Repository {
   abstract findById(id: FId): ResultPromise<T | null, Exceptions>;
-  abstract findAll(params?: IPaginationParams): ResultPromise<Paginated<T>, Exceptions>;
-  abstract count(filter?: Record<string, unknown>): ResultPromise<FInt, Exceptions>;
+  abstract findAll(
+    params?: IPaginationParams,
+  ): ResultPromise<Paginated<T>, Exceptions>;
+  abstract count(
+    filter?: Record<string, unknown>,
+  ): ResultPromise<FInt, Exceptions>;
   abstract create(entity: T): ResultPromise<T, Exceptions>;
   abstract createMany(entities: T[]): ResultPromise<T[], Exceptions>;
   abstract update(entity: T): ResultPromise<T, Exceptions>;

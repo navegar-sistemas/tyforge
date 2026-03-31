@@ -33,32 +33,54 @@ export class FIdempotencyKey extends FIdentifier {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!IDEMPOTENCY_KEY_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Idempotency key must contain only alphanumeric characters and hyphens"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Idempotency key must contain only" +
+            " alphanumeric characters and hyphens",
+        ),
+      );
     }
     return OK_TRUE;
   }
 
-
-  static create<T = TIdempotencyKey>(raw: T, fieldPath = "IdempotencyKey"): Result<FIdempotencyKey, ExceptionValidation> {
+  static create<T = TIdempotencyKey>(
+    raw: T,
+    fieldPath = "IdempotencyKey",
+  ): Result<FIdempotencyKey, ExceptionValidation> {
     const typed = FIdentifier.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FIdempotencyKey(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TIdempotencyKey, fieldPath = "IdempotencyKey"): FIdempotencyKey {
+  static createOrThrow(
+    raw: TIdempotencyKey,
+    fieldPath = "IdempotencyKey",
+  ): FIdempotencyKey {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TIdempotencyKey>(value: T, fieldPath = "IdempotencyKey"): Result<FIdempotencyKey, ExceptionValidation> {
+  static assign<T = TIdempotencyKey>(
+    value: T,
+    fieldPath = "IdempotencyKey",
+  ): Result<FIdempotencyKey, ExceptionValidation> {
     const typed = FIdentifier.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FIdempotencyKey(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -72,7 +94,12 @@ export class FIdempotencyKey extends FIdentifier {
   }
 
   override getDescription(): string {
-    return "Idempotency key for preventing duplicate operations (32-36 alphanumeric characters with hyphens).";
+    return (
+      "Idempotency key for preventing" +
+      " duplicate operations" +
+      " (32-36 alphanumeric characters" +
+      " with hyphens)."
+    );
   }
 
   override getShortDescription(): string {

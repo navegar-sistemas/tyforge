@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -38,15 +41,25 @@ export class FApiKey extends TypeField<TApiKey, TApiKeyFormatted> {
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TApiKey, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TApiKey, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TApiKey>(raw: T, fieldPath = "ApiKey"): Result<FApiKey, ExceptionValidation> {
+  static create<T = TApiKey>(
+    raw: T,
+    fieldPath = "ApiKey",
+  ): Result<FApiKey, ExceptionValidation> {
     const typed = FApiKey.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FApiKey(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -57,11 +70,18 @@ export class FApiKey extends TypeField<TApiKey, TApiKeyFormatted> {
     return result.value;
   }
 
-  static assign<T = TApiKey>(value: T, fieldPath = "ApiKey"): Result<FApiKey, ExceptionValidation> {
+  static assign<T = TApiKey>(
+    value: T,
+    fieldPath = "ApiKey",
+  ): Result<FApiKey, ExceptionValidation> {
     const typed = FApiKey.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FApiKey(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

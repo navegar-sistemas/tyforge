@@ -24,7 +24,7 @@ describe("ServiceWebSocketSecurity — sanitizeMessage", () => {
   });
 
   it("strips constructor key from message data", () => {
-    const data = { name: "test", "constructor": { polluted: true } };
+    const data = { name: "test", constructor: { polluted: true } };
     const result = ServiceWebSocketSecurity.sanitizeMessage(data);
     assert.ok(isSuccess(result));
     assert.equal(result.value["name"], "test");
@@ -32,7 +32,7 @@ describe("ServiceWebSocketSecurity — sanitizeMessage", () => {
   });
 
   it("strips prototype key from message data", () => {
-    const data = { name: "test", "prototype": { polluted: true } };
+    const data = { name: "test", prototype: { polluted: true } };
     const result = ServiceWebSocketSecurity.sanitizeMessage(data);
     assert.ok(isSuccess(result));
     assert.equal(result.value["name"], "test");
@@ -90,7 +90,9 @@ describe("ServiceWebSocketSecurity — sanitizeMessage", () => {
     const data = { a: { b: { c: innermost } } };
     const result = ServiceWebSocketSecurity.sanitizeMessage(data);
     assert.ok(isSuccess(result));
-    const nested = (result.value["a"] as Record<string, unknown>)["b"] as Record<string, unknown>;
+    const nested = (result.value["a"] as Record<string, unknown>)[
+      "b"
+    ] as Record<string, unknown>;
     const deep = nested["c"] as Record<string, unknown>;
     assert.equal(deep["safe"], "value");
     assert.equal(Object.hasOwn(deep, "__proto__"), false);
@@ -111,7 +113,7 @@ describe("ServiceWebSocketSecurity — sanitizeMessage", () => {
 describe("ServiceWebSocketSecurity — sanitizeHeaders", () => {
   it("passes through safe headers", () => {
     const headers = {
-      "Authorization": FString.createOrThrow("Bearer token123"),
+      Authorization: FString.createOrThrow("Bearer token123"),
       "X-Custom": FString.createOrThrow("value"),
     };
     const result = ServiceWebSocketSecurity.sanitizeHeaders(headers);

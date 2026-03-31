@@ -5,16 +5,14 @@ import type { THttpStatus } from "tyforge";
 export class ExceptionWebSocket extends Exceptions {
   readonly typeInference = "ExceptionWebSocket";
 
-  protected constructor(
-    details: {
-      type: string;
-      title: string;
-      detail: string;
-      status: THttpStatus;
-      code: string;
-      retriable: boolean;
-    },
-  ) {
+  protected constructor(details: {
+    type: string;
+    title: string;
+    detail: string;
+    status: THttpStatus;
+    code: string;
+    retriable: boolean;
+  }) {
     super({
       ...details,
       instance: "ServiceWebSocket",
@@ -81,7 +79,8 @@ export class ExceptionWebSocket extends Exceptions {
     const exception = new ExceptionWebSocket({
       type: "websocket/auth-failed",
       title: "WebSocket Authentication Failed",
-      detail: "Could not obtain authentication headers for the WebSocket connection.",
+      detail:
+        "Could not obtain authentication headers for the WebSocket connection.",
       status: OHttpStatus.UNAUTHORIZED,
       code: "WS_AUTH_FAILED",
       retriable: false,

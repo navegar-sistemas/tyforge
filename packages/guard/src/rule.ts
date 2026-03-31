@@ -14,12 +14,20 @@ export abstract class Rule {
     readonly fixable: boolean = false,
   ) {}
 
-  abstract check(line: string, lineNumber: number, filePath: string): IRuleViolation | null;
+  abstract check(
+    line: string,
+    lineNumber: number,
+    filePath: string,
+  ): IRuleViolation | null;
 
   fix?(line: string): string;
 
   protected isTestFile(filePath: string): boolean {
-    return filePath.includes("__tests__") || filePath.endsWith(".test.ts") || filePath.endsWith(".spec.ts");
+    return (
+      filePath.includes("__tests__") ||
+      filePath.endsWith(".test.ts") ||
+      filePath.endsWith(".spec.ts")
+    );
   }
 
   protected stripLiterals(line: string): string {
@@ -30,7 +38,11 @@ export abstract class Rule {
       .replace(/\/(?:[^/\\]|\\.)+\/[gimsuy]*/g, '""');
   }
 
-  protected violation(line: number, filePath: string, message?: string): IRuleViolation {
+  protected violation(
+    line: number,
+    filePath: string,
+    message?: string,
+  ): IRuleViolation {
     return {
       rule: this.name,
       severity: this.severity,

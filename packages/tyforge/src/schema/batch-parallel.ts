@@ -2,7 +2,14 @@
 // process() to avoid crashing bundlers like Metro (React Native) that resolve
 // all top-level require() calls at build time — even for unused code paths.
 
-import type { ISchema, InferProps, IParallelProcessor, IBatchCreateResult, IBatchCreateError, TAssignFn } from "./schema-types";
+import type {
+  ISchema,
+  InferProps,
+  IParallelProcessor,
+  IBatchCreateResult,
+  IBatchCreateError,
+  TAssignFn,
+} from "./schema-types";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { isFailure } from "@tyforge/result/result";
 import { TypeGuard } from "@tyforge/tools/type_guard";
@@ -57,7 +64,14 @@ class ParallelBatchProcessor implements IParallelProcessor {
     // Use compiled dist/ which has .js extensions and runs as native ESM.
     let resolvedWorkerPath: string;
     if (isTs) {
-      const distWorkerPath = nodePath.resolve(currentDir, "..", "..", "dist", "schema", "batch-worker.js");
+      const distWorkerPath = nodePath.resolve(
+        currentDir,
+        "..",
+        "..",
+        "dist",
+        "schema",
+        "batch-worker.js",
+      );
       const nodeFs = await import("node:fs");
       try {
         nodeFs.accessSync(distWorkerPath);
@@ -75,27 +89,48 @@ class ParallelBatchProcessor implements IParallelProcessor {
 
     const serializedSchema = this.serializeSchema(schema);
     const chunks = this.splitChunks(items, options.chunkSize);
-    const maxConcurrency = Math.min(options.concurrency, nodeOs.cpus().length, 16);
+    const maxConcurrency = Math.min(
+      options.concurrency,
+      nodeOs.cpus().length,
+      16,
+    );
     const workerCount = Math.min(maxConcurrency, chunks.length);
-    const timeout = Math.max(1000, Math.min(options.workerTimeout ?? 30000, 300000));
+    const timeout = Math.max(
+      1000,
+      Math.min(options.workerTimeout ?? 30000, 300000),
+    );
 
-    const workerResults = await this.runWorkers(serializedSchema, chunks, workerCount, createWorker, timeout);
+    const workerResults = await this.runWorkers(
+      serializedSchema,
+      chunks,
+      workerCount,
+      createWorker,
+      timeout,
+    );
 
     return this.reconstructResults<TSchema>(workerResults, assignFn);
   }
 
-  private serializeSchema(schema: Record<string, unknown>): Record<string, unknown> {
+  private serializeSchema(
+    schema: Record<string, unknown>,
+  ): Record<string, unknown> {
     const serialized: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(schema)) {
-      if (TypeGuard.isRecord(value) && Object.prototype.hasOwnProperty.call(value, "type")) {
+      if (
+        TypeGuard.isRecord(value) &&
+        Object.prototype.hasOwnProperty.call(value, "type")
+      ) {
         const typeClass = value["type"];
         if (TypeGuard.isCallable(typeClass)) {
           serialized[key] = { ...value, type: typeClass.name };
         }
       } else if (Array.isArray(value) && value.length === 1) {
         const entry = value[0];
-        if (TypeGuard.isRecord(entry) && Object.prototype.hasOwnProperty.call(entry, "type")) {
+        if (
+          TypeGuard.isRecord(entry) &&
+          Object.prototype.hasOwnProperty.call(entry, "type")
+        ) {
           const typeClass = entry["type"];
           if (TypeGuard.isCallable(typeClass)) {
             serialized[key] = [{ ...entry, type: typeClass.name }];
@@ -109,7 +144,10 @@ class ParallelBatchProcessor implements IParallelProcessor {
     return serialized;
   }
 
-  private splitChunks(items: unknown[], chunkSize: number): { items: unknown[]; startIndex: number }[] {
+  private splitChunks(
+    items: unknown[],
+    chunkSize: number,
+  ): { items: unknown[]; startIndex: number }[] {
     const safeChunkSize = Math.max(1, Math.min(chunkSize, items.length || 1));
     const chunks: { items: unknown[]; startIndex: number }[] = [];
     for (let i = 0; i < items.length; i += safeChunkSize) {
@@ -155,7 +193,9 @@ class ParallelBatchProcessor implements IParallelProcessor {
             timer = setTimeout(() => {
               worker.removeAllListeners();
               worker.terminate();
-              reject(new Error("Worker timed out after " + workerTimeout + "ms"));
+              reject(
+                new Error("Worker timed out after " + workerTimeout + "ms"),
+              );
             }, workerTimeout);
           });
           const result = await workerDone;
@@ -178,7 +218,7 @@ class ParallelBatchProcessor implements IParallelProcessor {
     try {
       await Promise.all(workerPromises);
     } catch (err) {
-      await Promise.all(activeWorkers.map(w => w.terminate()));
+      await Promise.all(activeWorkers.map((w) => w.terminate()));
       throw err;
     }
 
@@ -199,7 +239,13 @@ class ParallelBatchProcessor implements IParallelProcessor {
     for (const result of workerResults) {
       for (const success of result.successes) {
         if (!TypeGuard.isRecord(success.value)) {
-          allFailures.push({ index: success.index, error: ExceptionValidation.create("root", "Expected object from worker") });
+          allFailures.push({
+            index: success.index,
+            error: ExceptionValidation.create(
+              "root",
+              "Expected object from worker",
+            ),
+          });
           continue;
         }
         const assigned = assignFn(success.value);
@@ -211,7 +257,10 @@ class ParallelBatchProcessor implements IParallelProcessor {
       }
 
       for (const failure of result.failures) {
-        const detailResult = TypeGuard.isString(failure.error["detail"], "detail");
+        const detailResult = TypeGuard.isString(
+          failure.error["detail"],
+          "detail",
+        );
         const fieldResult = TypeGuard.isString(failure.error["field"], "field");
         allFailures.push({
           index: failure.index,
@@ -227,7 +276,7 @@ class ParallelBatchProcessor implements IParallelProcessor {
     allFailures.sort((a, b) => a.index - b.index);
 
     return {
-      ok: allSuccesses.map(s => s.value),
+      ok: allSuccesses.map((s) => s.value),
       errors: allFailures,
     };
   }

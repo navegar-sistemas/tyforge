@@ -28,17 +28,27 @@ export class FAppStatus extends TypeField<TAppStatus, TAppStatusFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TAppStatus, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TAppStatus, ExceptionValidation> {
     const str = TypeGuard.isString(value, fieldPath);
     if (isFailure(str)) return err(str.error);
     return TypeField.resolveEnum(OAppStatus, str.value, fieldPath);
   }
 
-  static create<T = TAppStatus>(raw: T, fieldPath = "AppStatus"): Result<FAppStatus, ExceptionValidation> {
+  static create<T = TAppStatus>(
+    raw: T,
+    fieldPath = "AppStatus",
+  ): Result<FAppStatus, ExceptionValidation> {
     const typed = FAppStatus.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FAppStatus(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -49,19 +59,24 @@ export class FAppStatus extends TypeField<TAppStatus, TAppStatusFormatted> {
     return result.value;
   }
 
-  static assign<T = TAppStatus>(value: T, fieldPath = "AppStatus"): Result<FAppStatus, ExceptionValidation> {
+  static assign<T = TAppStatus>(
+    value: T,
+    fieldPath = "AppStatus",
+  ): Result<FAppStatus, ExceptionValidation> {
     const typed = FAppStatus.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FAppStatus(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
   static fromBoolean(isActive: boolean): FAppStatus {
-    const status = isActive
-      ? OAppStatus.ACTIVE
-      : OAppStatus.INACTIVE;
+    const status = isActive ? OAppStatus.ACTIVE : OAppStatus.INACTIVE;
     return FAppStatus.createOrThrow(status, "AppStatus");
   }
 
@@ -82,7 +97,11 @@ export class FAppStatus extends TypeField<TAppStatus, TAppStatusFormatted> {
   }
 
   override getDescription(): string {
-    return "Status da aplicacao no sistema. ACTIVE indica aplicacao operacional, INACTIVE indica aplicacao desativada.";
+    return (
+      "Status da aplicacao no sistema." +
+      " ACTIVE indica aplicacao operacional," +
+      " INACTIVE indica aplicacao desativada."
+    );
   }
 
   override getShortDescription(): string {

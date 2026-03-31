@@ -33,17 +33,28 @@ export class FBankNsu extends FIdentifier {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!ALPHANUMERIC_REGEX.test(this.getValue())) {
-      return err(ExceptionValidation.create(fieldPath, "Bank NSU must contain only alphanumeric characters"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Bank NSU must contain only alphanumeric characters",
+        ),
+      );
     }
     return OK_TRUE;
   }
 
-
-  static create<T = TBankNsu>(raw: T, fieldPath = "BankNsu"): Result<FBankNsu, ExceptionValidation> {
+  static create<T = TBankNsu>(
+    raw: T,
+    fieldPath = "BankNsu",
+  ): Result<FBankNsu, ExceptionValidation> {
     const typed = FIdentifier.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBankNsu(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -54,11 +65,18 @@ export class FBankNsu extends FIdentifier {
     return result.value;
   }
 
-  static assign<T = TBankNsu>(value: T, fieldPath = "BankNsu"): Result<FBankNsu, ExceptionValidation> {
+  static assign<T = TBankNsu>(
+    value: T,
+    fieldPath = "BankNsu",
+  ): Result<FBankNsu, ExceptionValidation> {
     const typed = FIdentifier.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBankNsu(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -72,7 +90,11 @@ export class FBankNsu extends FIdentifier {
   }
 
   override getDescription(): string {
-    return "Bank NSU (Unique Sequential Number) — alphanumeric receipt or transaction identifier issued by the payment processor.";
+    return (
+      "Bank NSU (Unique Sequential Number) — " +
+      "alphanumeric receipt or transaction " +
+      "identifier issued by the payment processor."
+    );
   }
 
   override getShortDescription(): string {

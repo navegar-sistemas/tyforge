@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -7,7 +10,10 @@ import { TypeGuard } from "@tyforge/tools/type_guard";
 export type TDocumentCnpj = string;
 export type TDocumentCnpjFormatted = string;
 
-export class FDocumentCnpj extends TypeField<TDocumentCnpj, TDocumentCnpjFormatted> {
+export class FDocumentCnpj extends TypeField<
+  TDocumentCnpj,
+  TDocumentCnpjFormatted
+> {
   private static readonly CNPJ_REGEX = /^\d{14}$/;
 
   private static isValidCheckDigits(cnpj: string): boolean {
@@ -49,40 +55,67 @@ export class FDocumentCnpj extends TypeField<TDocumentCnpj, TDocumentCnpjFormatt
     if (validateLevel !== "full") return OK_TRUE;
 
     if (!FDocumentCnpj.CNPJ_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "CNPJ must contain exactly 14 numeric digits."));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "CNPJ must contain exactly 14 numeric digits.",
+        ),
+      );
     }
 
     if (!FDocumentCnpj.isValidCheckDigits(value)) {
-      return err(ExceptionValidation.create(fieldPath, "CNPJ has invalid check digits."));
+      return err(
+        ExceptionValidation.create(fieldPath, "CNPJ has invalid check digits."),
+      );
     }
 
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TDocumentCnpj, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TDocumentCnpj, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TDocumentCnpj>(raw: T, fieldPath = "DocumentCnpj"): Result<FDocumentCnpj, ExceptionValidation> {
+  static create<T = TDocumentCnpj>(
+    raw: T,
+    fieldPath = "DocumentCnpj",
+  ): Result<FDocumentCnpj, ExceptionValidation> {
     const typed = FDocumentCnpj.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentCnpj(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TDocumentCnpj, fieldPath = "DocumentCnpj"): FDocumentCnpj {
+  static createOrThrow(
+    raw: TDocumentCnpj,
+    fieldPath = "DocumentCnpj",
+  ): FDocumentCnpj {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDocumentCnpj>(value: T, fieldPath = "DocumentCnpj"): Result<FDocumentCnpj, ExceptionValidation> {
+  static assign<T = TDocumentCnpj>(
+    value: T,
+    fieldPath = "DocumentCnpj",
+  ): Result<FDocumentCnpj, ExceptionValidation> {
     const typed = FDocumentCnpj.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentCnpj(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -92,7 +125,17 @@ export class FDocumentCnpj extends TypeField<TDocumentCnpj, TDocumentCnpjFormatt
   }
 
   override formatted(): TDocumentCnpjFormatted {
-    return FDocumentCnpj.applyMask(this.getValue(), [2, ".", 3, ".", 3, "/", 4, "-", 2]);
+    return FDocumentCnpj.applyMask(this.getValue(), [
+      2,
+      ".",
+      3,
+      ".",
+      3,
+      "/",
+      4,
+      "-",
+      2,
+    ]);
   }
 
   override getDescription(): string {

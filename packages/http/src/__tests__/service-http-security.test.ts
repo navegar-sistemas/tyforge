@@ -6,7 +6,9 @@ import { FString, FUrlOrigin, FUrlPath } from "tyforge/type-fields";
 
 // ── Helpers ────────────────────────────────────────────────────
 
-function headersFromRecord(record: Record<string, string>): Record<string, FString> {
+function headersFromRecord(
+  record: Record<string, string>,
+): Record<string, FString> {
   const result: Record<string, FString> = {};
   for (const [key, value] of Object.entries(record)) {
     result[key] = FString.createOrThrow(value, key);
@@ -14,7 +16,9 @@ function headersFromRecord(record: Record<string, string>): Record<string, FStri
   return result;
 }
 
-function headersToRecord(headers: Record<string, FString>): Record<string, string> {
+function headersToRecord(
+  headers: Record<string, FString>,
+): Record<string, string> {
   const result: Record<string, string> = {};
   for (const [key, value] of Object.entries(headers)) {
     result[key] = value.getValue();
@@ -79,16 +83,24 @@ describe("FUrlPath — path validation", () => {
 
 describe("ServiceHttpSecurity — sanitizeHeaders", () => {
   it("passes clean headers unchanged", () => {
-    const headers = headersFromRecord({ "Content-Type": "application/json", "Authorization": "Bearer token123" });
+    const headers = headersFromRecord({
+      "Content-Type": "application/json",
+      Authorization: "Bearer token123",
+    });
     const result = ServiceHttpSecurity.sanitizeHeaders(headers);
     assert.equal(result["Content-Type"].getValue(), "application/json");
     assert.equal(result["Authorization"].getValue(), "Bearer token123");
   });
 
   it("sanitizes CRLF in header values", () => {
-    const headers = headersFromRecord({ "X-Test": "value\r\nInjected: evil\r\nAnother: attack" });
+    const headers = headersFromRecord({
+      "X-Test": "value\r\nInjected: evil\r\nAnother: attack",
+    });
     const result = ServiceHttpSecurity.sanitizeHeaders(headers);
-    assert.equal(result["X-Test"].getValue(), "valueInjected: evilAnother: attack");
+    assert.equal(
+      result["X-Test"].getValue(),
+      "valueInjected: evilAnother: attack",
+    );
   });
 
   it("sanitizes single \\r in header values", () => {
@@ -135,21 +147,30 @@ describe("ServiceHttpSecurity — sanitizeHeaders", () => {
   });
 
   it("skips __proto__ keys (prototype pollution)", () => {
-    const headers = headersFromRecord({ "__proto__": "polluted", "X-Safe": "ok" });
+    const headers = headersFromRecord({
+      __proto__: "polluted",
+      "X-Safe": "ok",
+    });
     const result = ServiceHttpSecurity.sanitizeHeaders(headers);
     assert.equal(Object.hasOwn(result, "__proto__"), false);
     assert.equal(result["X-Safe"].getValue(), "ok");
   });
 
   it("skips constructor keys (prototype pollution)", () => {
-    const headers = headersFromRecord({ "constructor": "polluted", "X-Safe": "ok" });
+    const headers = headersFromRecord({
+      constructor: "polluted",
+      "X-Safe": "ok",
+    });
     const result = ServiceHttpSecurity.sanitizeHeaders(headers);
     assert.equal(Object.hasOwn(result, "constructor"), false);
     assert.equal(result["X-Safe"].getValue(), "ok");
   });
 
   it("skips prototype keys (prototype pollution)", () => {
-    const headers = headersFromRecord({ "prototype": "polluted", "X-Safe": "ok" });
+    const headers = headersFromRecord({
+      prototype: "polluted",
+      "X-Safe": "ok",
+    });
     const result = ServiceHttpSecurity.sanitizeHeaders(headers);
     assert.equal(Object.hasOwn(result, "prototype"), false);
     assert.equal(result["X-Safe"].getValue(), "ok");
@@ -166,33 +187,51 @@ describe("ServiceHttpSecurity — sanitizeHeaders", () => {
 
 describe("ServiceHttpSecurity — buildUrl", () => {
   it("builds URL from base and endpoint", () => {
-    const result = ServiceHttpSecurity.buildUrl(forigin("https://api.example.com"), fpath("users"));
+    const result = ServiceHttpSecurity.buildUrl(
+      forigin("https://api.example.com"),
+      fpath("users"),
+    );
     assert.ok(isSuccess(result));
     assert.equal(result.value.getValue(), "https://api.example.com/users");
   });
 
   it("handles base URL with trailing slash", () => {
-    const result = ServiceHttpSecurity.buildUrl(forigin("https://api.example.com/"), fpath("users"));
+    const result = ServiceHttpSecurity.buildUrl(
+      forigin("https://api.example.com/"),
+      fpath("users"),
+    );
     assert.ok(isSuccess(result));
     assert.equal(result.value.getValue(), "https://api.example.com/users");
   });
 
   it("handles endpoint with leading slash", () => {
-    const result = ServiceHttpSecurity.buildUrl(forigin("https://api.example.com"), fpath("/users"));
+    const result = ServiceHttpSecurity.buildUrl(
+      forigin("https://api.example.com"),
+      fpath("/users"),
+    );
     assert.ok(isSuccess(result));
     assert.equal(result.value.getValue(), "https://api.example.com/users");
   });
 
   it("handles both trailing and leading slashes", () => {
-    const result = ServiceHttpSecurity.buildUrl(forigin("https://api.example.com/"), fpath("/users"));
+    const result = ServiceHttpSecurity.buildUrl(
+      forigin("https://api.example.com/"),
+      fpath("/users"),
+    );
     assert.ok(isSuccess(result));
     assert.equal(result.value.getValue(), "https://api.example.com/users");
   });
 
   it("handles nested endpoint paths", () => {
-    const result = ServiceHttpSecurity.buildUrl(forigin("https://api.example.com/v1"), fpath("users/123/profile"));
+    const result = ServiceHttpSecurity.buildUrl(
+      forigin("https://api.example.com/v1"),
+      fpath("users/123/profile"),
+    );
     assert.ok(isSuccess(result));
-    assert.equal(result.value.getValue(), "https://api.example.com/v1/users/123/profile");
+    assert.equal(
+      result.value.getValue(),
+      "https://api.example.com/v1/users/123/profile",
+    );
   });
 
   it("rejects path traversal endpoint at TypeField level", () => {
@@ -212,8 +251,14 @@ describe("ServiceHttpSecurity — buildUrl", () => {
   });
 
   it("handles base URL with path and trailing slash", () => {
-    const result = ServiceHttpSecurity.buildUrl(forigin("https://api.example.com/v1/"), fpath("users/123"));
+    const result = ServiceHttpSecurity.buildUrl(
+      forigin("https://api.example.com/v1/"),
+      fpath("users/123"),
+    );
     assert.ok(isSuccess(result));
-    assert.equal(result.value.getValue(), "https://api.example.com/v1/users/123");
+    assert.equal(
+      result.value.getValue(),
+      "https://api.example.com/v1/users/123",
+    );
   });
 });

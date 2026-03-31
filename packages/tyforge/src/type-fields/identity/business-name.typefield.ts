@@ -7,7 +7,10 @@ import { TypeGuard } from "@tyforge/tools/type_guard";
 export type TBusinessName = string;
 export type TBusinessNameFormatted = string;
 
-export class FBusinessName extends TypeField<TBusinessName, TBusinessNameFormatted> {
+export class FBusinessName extends TypeField<
+  TBusinessName,
+  TBusinessNameFormatted
+> {
   override readonly typeInference = "FBusinessName";
 
   override readonly config: ITypeFieldConfig<TBusinessName> = {
@@ -21,30 +24,50 @@ export class FBusinessName extends TypeField<TBusinessName, TBusinessNameFormatt
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TBusinessName, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TBusinessName, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TBusinessName>(raw: T, fieldPath = "BusinessName"): Result<FBusinessName, ExceptionValidation> {
+  static create<T = TBusinessName>(
+    raw: T,
+    fieldPath = "BusinessName",
+  ): Result<FBusinessName, ExceptionValidation> {
     const typed = FBusinessName.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBusinessName(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TBusinessName, fieldPath = "BusinessName"): FBusinessName {
+  static createOrThrow(
+    raw: TBusinessName,
+    fieldPath = "BusinessName",
+  ): FBusinessName {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TBusinessName>(value: T, fieldPath = "BusinessName"): Result<FBusinessName, ExceptionValidation> {
+  static assign<T = TBusinessName>(
+    value: T,
+    fieldPath = "BusinessName",
+  ): Result<FBusinessName, ExceptionValidation> {
     const typed = FBusinessName.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBusinessName(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

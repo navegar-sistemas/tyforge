@@ -8,13 +8,19 @@ import { ExceptionWebSocket } from "../exception-websocket";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
-function assertSuccess<T, E>(result: Result<T, E>): asserts result is { success: true; value: T } {
+function assertSuccess<T, E>(
+  result: Result<T, E>,
+): asserts result is { success: true; value: T } {
   if (!isSuccess(result)) {
-    assert.fail(`Expected success but got failure: ${JSON.stringify(result.error)}`);
+    assert.fail(
+      `Expected success but got failure: ${JSON.stringify(result.error)}`,
+    );
   }
 }
 
-function assertFailure<T, E>(result: Result<T, E>): asserts result is { success: false; error: E } {
+function assertFailure<T, E>(
+  result: Result<T, E>,
+): asserts result is { success: false; error: E } {
   if (!isFailure(result)) {
     assert.fail(`Expected failure but got success`);
   }
@@ -43,7 +49,9 @@ interface IMockWebSocketInstance {
 let mockSocketInstance: IMockWebSocketInstance | null = null;
 let originalWebSocket: typeof globalThis.WebSocket;
 
-function createMockWebSocketClass(behavior: "open" | "error" | "timeout" = "open") {
+function createMockWebSocketClass(
+  behavior: "open" | "error" | "timeout" = "open",
+) {
   return class MockWebSocket {
     static readonly OPEN = 1;
     static readonly CLOSED = 3;
@@ -101,11 +109,21 @@ function createMockWebSocketClass(behavior: "open" | "error" | "timeout" = "open
 // ── Concrete test subclass ──────────────────────────────────────
 
 class TestServiceWebSocket extends ServiceWebSocket {
-  protected readonly _classInfo = { name: "TestServiceWebSocket", version: "1.0.0", description: "Test WebSocket service" };
-  override readonly endpoint: FUrlOrigin = FUrlOrigin.createOrThrow("https://ws.test.com");
-  authResult: Result<Record<string, FString>, Exceptions> = ok({ "Authorization": FString.createOrThrow("Bearer ws-token") });
+  protected readonly _classInfo = {
+    name: "TestServiceWebSocket",
+    version: "1.0.0",
+    description: "Test WebSocket service",
+  };
+  override readonly endpoint: FUrlOrigin = FUrlOrigin.createOrThrow(
+    "https://ws.test.com",
+  );
+  authResult: Result<Record<string, FString>, Exceptions> = ok({
+    Authorization: FString.createOrThrow("Bearer ws-token"),
+  });
 
-  protected override async getAuthHeaders(): Promise<Result<Record<string, FString>, Exceptions>> {
+  protected override async getAuthHeaders(): Promise<
+    Result<Record<string, FString>, Exceptions>
+  > {
     return this.authResult;
   }
 
@@ -125,7 +143,10 @@ class TestServiceWebSocket extends ServiceWebSocket {
     return this.send(event, data);
   }
 
-  testSubscribe(event: FString, handler: (data: Record<string, unknown>) => void) {
+  testSubscribe(
+    event: FString,
+    handler: (data: Record<string, unknown>) => void,
+  ) {
     return this.subscribe(event, handler);
   }
 
@@ -150,7 +171,9 @@ describe("ServiceWebSocket — connection", () => {
   });
 
   it("connects successfully and converts https to wss", async () => {
-    globalThis.WebSocket = createMockWebSocketClass("open") as unknown as typeof WebSocket;
+    globalThis.WebSocket = createMockWebSocketClass(
+      "open",
+    ) as unknown as typeof WebSocket;
     const result = await service.testConnect();
     assertSuccess(result);
     assert.equal(result.value.getValue(), "connected");
@@ -159,43 +182,65 @@ describe("ServiceWebSocket — connection", () => {
   });
 
   it("returns CONNECTION_FAILED when socket errors on connect", async () => {
-    globalThis.WebSocket = createMockWebSocketClass("error") as unknown as typeof WebSocket;
+    globalThis.WebSocket = createMockWebSocketClass(
+      "error",
+    ) as unknown as typeof WebSocket;
     const result = await service.testConnect();
     assertFailure(result);
     assert.equal(result.error.code, "WS_CONNECTION_FAILED");
   });
 
   it("returns CONNECTION_TIMEOUT when socket does not open in time", async () => {
-    globalThis.WebSocket = createMockWebSocketClass("timeout") as unknown as typeof WebSocket;
-    const result = await service.testConnect({ timeout: FInt.createOrThrow(50) });
+    globalThis.WebSocket = createMockWebSocketClass(
+      "timeout",
+    ) as unknown as typeof WebSocket;
+    const result = await service.testConnect({
+      timeout: FInt.createOrThrow(50),
+    });
     assertFailure(result);
     assert.equal(result.error.code, "WS_CONNECTION_TIMEOUT");
   });
 
   it("rejects invalid timeout (exceeds max)", async () => {
-    globalThis.WebSocket = createMockWebSocketClass("open") as unknown as typeof WebSocket;
-    const result = await service.testConnect({ timeout: FInt.createOrThrow(999999) });
+    globalThis.WebSocket = createMockWebSocketClass(
+      "open",
+    ) as unknown as typeof WebSocket;
+    const result = await service.testConnect({
+      timeout: FInt.createOrThrow(999999),
+    });
     assertFailure(result);
     assert.equal(result.error.code, "WS_INVALID_PARAMS");
   });
 
   it("rejects zero timeout", async () => {
-    globalThis.WebSocket = createMockWebSocketClass("open") as unknown as typeof WebSocket;
-    const result = await service.testConnect({ timeout: FInt.createOrThrow(0) });
+    globalThis.WebSocket = createMockWebSocketClass(
+      "open",
+    ) as unknown as typeof WebSocket;
+    const result = await service.testConnect({
+      timeout: FInt.createOrThrow(0),
+    });
     assertFailure(result);
     assert.equal(result.error.code, "WS_INVALID_PARAMS");
   });
 
   it("rejects negative timeout", async () => {
-    globalThis.WebSocket = createMockWebSocketClass("open") as unknown as typeof WebSocket;
-    const result = await service.testConnect({ timeout: FInt.createOrThrow(-100) });
+    globalThis.WebSocket = createMockWebSocketClass(
+      "open",
+    ) as unknown as typeof WebSocket;
+    const result = await service.testConnect({
+      timeout: FInt.createOrThrow(-100),
+    });
     assertFailure(result);
     assert.equal(result.error.code, "WS_INVALID_PARAMS");
   });
 
   it("rejects negative maxReconnectAttempts", async () => {
-    globalThis.WebSocket = createMockWebSocketClass("open") as unknown as typeof WebSocket;
-    const result = await service.testConnect({ maxReconnectAttempts: FInt.createOrThrow(-1) });
+    globalThis.WebSocket = createMockWebSocketClass(
+      "open",
+    ) as unknown as typeof WebSocket;
+    const result = await service.testConnect({
+      maxReconnectAttempts: FInt.createOrThrow(-1),
+    });
     assertFailure(result);
     assert.equal(result.error.code, "WS_INVALID_PARAMS");
   });
@@ -208,7 +253,9 @@ describe("ServiceWebSocket — authentication", () => {
     service = new TestServiceWebSocket();
     mockSocketInstance = null;
     originalWebSocket = globalThis.WebSocket;
-    globalThis.WebSocket = createMockWebSocketClass("open") as unknown as typeof WebSocket;
+    globalThis.WebSocket = createMockWebSocketClass(
+      "open",
+    ) as unknown as typeof WebSocket;
   });
 
   afterEach(() => {
@@ -216,14 +263,18 @@ describe("ServiceWebSocket — authentication", () => {
   });
 
   it("passes auth headers when authenticated is true", async () => {
-    const result = await service.testConnect({ authenticated: FBoolean.createOrThrow(true) });
+    const result = await service.testConnect({
+      authenticated: FBoolean.createOrThrow(true),
+    });
     assertSuccess(result);
     // Auth headers are passed to WebSocket constructor — verified via successful connection
   });
 
   it("returns AUTH_FAILED when getAuthHeaders fails", async () => {
     service.authResult = err(ExceptionWebSocket.authFailed());
-    const result = await service.testConnect({ authenticated: FBoolean.createOrThrow(true) });
+    const result = await service.testConnect({
+      authenticated: FBoolean.createOrThrow(true),
+    });
     assertFailure(result);
     assert.equal(result.error.code, "WS_AUTH_FAILED");
   });
@@ -237,7 +288,9 @@ describe("ServiceWebSocket — authentication", () => {
         return originalGetAuth;
       },
     });
-    const result = await service.testConnect({ authenticated: FBoolean.createOrThrow(false) });
+    const result = await service.testConnect({
+      authenticated: FBoolean.createOrThrow(false),
+    });
     assertSuccess(result);
     assert.equal(authCalled, false);
   });
@@ -250,7 +303,9 @@ describe("ServiceWebSocket — disconnect", () => {
     service = new TestServiceWebSocket();
     mockSocketInstance = null;
     originalWebSocket = globalThis.WebSocket;
-    globalThis.WebSocket = createMockWebSocketClass("open") as unknown as typeof WebSocket;
+    globalThis.WebSocket = createMockWebSocketClass(
+      "open",
+    ) as unknown as typeof WebSocket;
   });
 
   afterEach(() => {
@@ -276,7 +331,9 @@ describe("ServiceWebSocket — send", () => {
     service = new TestServiceWebSocket();
     mockSocketInstance = null;
     originalWebSocket = globalThis.WebSocket;
-    globalThis.WebSocket = createMockWebSocketClass("open") as unknown as typeof WebSocket;
+    globalThis.WebSocket = createMockWebSocketClass(
+      "open",
+    ) as unknown as typeof WebSocket;
   });
 
   afterEach(() => {
@@ -285,7 +342,10 @@ describe("ServiceWebSocket — send", () => {
 
   it("sends message as JSON with event and data", async () => {
     await service.testConnect();
-    const result = await service.testSend(FString.createOrThrow("chat.message"), { text: "hello" });
+    const result = await service.testSend(
+      FString.createOrThrow("chat.message"),
+      { text: "hello" },
+    );
     assertSuccess(result);
     assert.ok(mockSocketInstance !== null);
     assert.equal(mockSocketInstance.sentMessages.length, 1);
@@ -311,7 +371,9 @@ describe("ServiceWebSocket — send", () => {
   });
 
   it("returns SEND_FAILED when socket is not connected", async () => {
-    const result = await service.testSend(FString.createOrThrow("test"), { data: "value" });
+    const result = await service.testSend(FString.createOrThrow("test"), {
+      data: "value",
+    });
     assertFailure(result);
     assert.equal(result.error.code, "WS_SEND_FAILED");
   });
@@ -319,7 +381,9 @@ describe("ServiceWebSocket — send", () => {
   it("returns SEND_FAILED when socket is closed", async () => {
     await service.testConnect();
     await service.testDisconnect();
-    const result = await service.testSend(FString.createOrThrow("test"), { data: "value" });
+    const result = await service.testSend(FString.createOrThrow("test"), {
+      data: "value",
+    });
     assertFailure(result);
     assert.equal(result.error.code, "WS_SEND_FAILED");
   });
@@ -332,7 +396,9 @@ describe("ServiceWebSocket — subscribe/unsubscribe", () => {
     service = new TestServiceWebSocket();
     mockSocketInstance = null;
     originalWebSocket = globalThis.WebSocket;
-    globalThis.WebSocket = createMockWebSocketClass("open") as unknown as typeof WebSocket;
+    globalThis.WebSocket = createMockWebSocketClass(
+      "open",
+    ) as unknown as typeof WebSocket;
   });
 
   afterEach(() => {
@@ -342,7 +408,10 @@ describe("ServiceWebSocket — subscribe/unsubscribe", () => {
   it("subscribe returns a subscription ID", async () => {
     await service.testConnect();
     const received: Record<string, unknown>[] = [];
-    const result = service.testSubscribe(FString.createOrThrow("chat.message"), (data) => received.push(data));
+    const result = service.testSubscribe(
+      FString.createOrThrow("chat.message"),
+      (data) => received.push(data),
+    );
     assertSuccess(result);
     assert.ok(result.value.getValue().startsWith("sub_"));
   });
@@ -350,10 +419,14 @@ describe("ServiceWebSocket — subscribe/unsubscribe", () => {
   it("subscription receives matching messages", async () => {
     await service.testConnect();
     const received: Record<string, unknown>[] = [];
-    service.testSubscribe(FString.createOrThrow("chat.message"), (data) => received.push(data));
+    service.testSubscribe(FString.createOrThrow("chat.message"), (data) =>
+      received.push(data),
+    );
 
     assert.ok(mockSocketInstance !== null);
-    mockSocketInstance.simulateMessage(JSON.stringify({ event: "chat.message", data: { text: "hello" } }));
+    mockSocketInstance.simulateMessage(
+      JSON.stringify({ event: "chat.message", data: { text: "hello" } }),
+    );
 
     assert.equal(received.length, 1);
     assert.deepEqual(received[0], { text: "hello" });
@@ -362,10 +435,14 @@ describe("ServiceWebSocket — subscribe/unsubscribe", () => {
   it("subscription ignores non-matching events", async () => {
     await service.testConnect();
     const received: Record<string, unknown>[] = [];
-    service.testSubscribe(FString.createOrThrow("chat.message"), (data) => received.push(data));
+    service.testSubscribe(FString.createOrThrow("chat.message"), (data) =>
+      received.push(data),
+    );
 
     assert.ok(mockSocketInstance !== null);
-    mockSocketInstance.simulateMessage(JSON.stringify({ event: "user.typing", data: { userId: "123" } }));
+    mockSocketInstance.simulateMessage(
+      JSON.stringify({ event: "user.typing", data: { userId: "123" } }),
+    );
 
     assert.equal(received.length, 0);
   });
@@ -374,11 +451,17 @@ describe("ServiceWebSocket — subscribe/unsubscribe", () => {
     await service.testConnect();
     const received1: Record<string, unknown>[] = [];
     const received2: Record<string, unknown>[] = [];
-    service.testSubscribe(FString.createOrThrow("chat.message"), (data) => received1.push(data));
-    service.testSubscribe(FString.createOrThrow("chat.message"), (data) => received2.push(data));
+    service.testSubscribe(FString.createOrThrow("chat.message"), (data) =>
+      received1.push(data),
+    );
+    service.testSubscribe(FString.createOrThrow("chat.message"), (data) =>
+      received2.push(data),
+    );
 
     assert.ok(mockSocketInstance !== null);
-    mockSocketInstance.simulateMessage(JSON.stringify({ event: "chat.message", data: { text: "hello" } }));
+    mockSocketInstance.simulateMessage(
+      JSON.stringify({ event: "chat.message", data: { text: "hello" } }),
+    );
 
     assert.equal(received1.length, 1);
     assert.equal(received2.length, 1);
@@ -387,26 +470,36 @@ describe("ServiceWebSocket — subscribe/unsubscribe", () => {
   it("unsubscribe removes handler", async () => {
     await service.testConnect();
     const received: Record<string, unknown>[] = [];
-    const subResult = service.testSubscribe(FString.createOrThrow("chat.message"), (data) => received.push(data));
+    const subResult = service.testSubscribe(
+      FString.createOrThrow("chat.message"),
+      (data) => received.push(data),
+    );
     assertSuccess(subResult);
 
     const unsubResult = service.testUnsubscribe(subResult.value);
     assertSuccess(unsubResult);
 
     assert.ok(mockSocketInstance !== null);
-    mockSocketInstance.simulateMessage(JSON.stringify({ event: "chat.message", data: { text: "hello" } }));
+    mockSocketInstance.simulateMessage(
+      JSON.stringify({ event: "chat.message", data: { text: "hello" } }),
+    );
     assert.equal(received.length, 0);
   });
 
   it("unsubscribe with invalid ID returns error", async () => {
     await service.testConnect();
-    const result = service.testUnsubscribe(FString.createOrThrow("sub_nonexistent"));
+    const result = service.testUnsubscribe(
+      FString.createOrThrow("sub_nonexistent"),
+    );
     assertFailure(result);
     assert.equal(result.error.code, "WS_INVALID_PARAMS");
   });
 
   it("subscribe without connection returns SUBSCRIPTION_FAILED", () => {
-    const result = service.testSubscribe(FString.createOrThrow("test"), () => {});
+    const result = service.testSubscribe(
+      FString.createOrThrow("test"),
+      () => {},
+    );
     assertFailure(result);
     assert.equal(result.error.code, "WS_SUBSCRIPTION_FAILED");
   });
@@ -419,7 +512,9 @@ describe("ServiceWebSocket — message handling", () => {
     service = new TestServiceWebSocket();
     mockSocketInstance = null;
     originalWebSocket = globalThis.WebSocket;
-    globalThis.WebSocket = createMockWebSocketClass("open") as unknown as typeof WebSocket;
+    globalThis.WebSocket = createMockWebSocketClass(
+      "open",
+    ) as unknown as typeof WebSocket;
   });
 
   afterEach(() => {
@@ -429,11 +524,14 @@ describe("ServiceWebSocket — message handling", () => {
   it("sanitizes incoming message data against prototype pollution", async () => {
     await service.testConnect();
     const received: Record<string, unknown>[] = [];
-    service.testSubscribe(FString.createOrThrow("data"), (data) => received.push(data));
+    service.testSubscribe(FString.createOrThrow("data"), (data) =>
+      received.push(data),
+    );
 
     assert.ok(mockSocketInstance !== null);
     // Manually constructed JSON to ensure __proto__ appears as an own property after parsing
-    const rawJson = '{"event":"data","data":{"name":"test","__proto__":{"admin":true}}}';
+    const rawJson =
+      '{"event":"data","data":{"name":"test","__proto__":{"admin":true}}}';
     mockSocketInstance.simulateMessage(rawJson);
 
     assert.equal(received.length, 1);
@@ -444,7 +542,9 @@ describe("ServiceWebSocket — message handling", () => {
   it("silently drops unparseable messages", async () => {
     await service.testConnect();
     const received: Record<string, unknown>[] = [];
-    service.testSubscribe(FString.createOrThrow("data"), (data) => received.push(data));
+    service.testSubscribe(FString.createOrThrow("data"), (data) =>
+      received.push(data),
+    );
 
     assert.ok(mockSocketInstance !== null);
     mockSocketInstance.simulateMessage("not valid json{{{");
@@ -454,17 +554,23 @@ describe("ServiceWebSocket — message handling", () => {
   it("silently drops messages without event field", async () => {
     await service.testConnect();
     const received: Record<string, unknown>[] = [];
-    service.testSubscribe(FString.createOrThrow("data"), (data) => received.push(data));
+    service.testSubscribe(FString.createOrThrow("data"), (data) =>
+      received.push(data),
+    );
 
     assert.ok(mockSocketInstance !== null);
-    mockSocketInstance.simulateMessage(JSON.stringify({ data: { text: "hello" } }));
+    mockSocketInstance.simulateMessage(
+      JSON.stringify({ data: { text: "hello" } }),
+    );
     assert.equal(received.length, 0);
   });
 
   it("handles message with missing data field gracefully", async () => {
     await service.testConnect();
     const received: Record<string, unknown>[] = [];
-    service.testSubscribe(FString.createOrThrow("ping"), (data) => received.push(data));
+    service.testSubscribe(FString.createOrThrow("ping"), (data) =>
+      received.push(data),
+    );
 
     assert.ok(mockSocketInstance !== null);
     mockSocketInstance.simulateMessage(JSON.stringify({ event: "ping" }));
@@ -475,7 +581,9 @@ describe("ServiceWebSocket — message handling", () => {
   it("silently drops array messages", async () => {
     await service.testConnect();
     const received: Record<string, unknown>[] = [];
-    service.testSubscribe(FString.createOrThrow("data"), (data) => received.push(data));
+    service.testSubscribe(FString.createOrThrow("data"), (data) =>
+      received.push(data),
+    );
 
     assert.ok(mockSocketInstance !== null);
     mockSocketInstance.simulateMessage(JSON.stringify([1, 2, 3]));
@@ -487,7 +595,9 @@ describe("ServiceWebSocket — URL conversion", () => {
   beforeEach(() => {
     mockSocketInstance = null;
     originalWebSocket = globalThis.WebSocket;
-    globalThis.WebSocket = createMockWebSocketClass("open") as unknown as typeof WebSocket;
+    globalThis.WebSocket = createMockWebSocketClass(
+      "open",
+    ) as unknown as typeof WebSocket;
   });
 
   afterEach(() => {
@@ -503,15 +613,25 @@ describe("ServiceWebSocket — URL conversion", () => {
 
   it("converts http://localhost to ws://localhost", async () => {
     class LocalService extends ServiceWebSocket {
-      protected readonly _classInfo = { name: "LocalService", version: "1.0.0", description: "Local dev service" };
-      override readonly endpoint = FUrlOrigin.createOrThrow("http://localhost:8080");
+      protected readonly _classInfo = {
+        name: "LocalService",
+        version: "1.0.0",
+        description: "Local dev service",
+      };
+      override readonly endpoint = FUrlOrigin.createOrThrow(
+        "http://localhost:8080",
+      );
       protected override async getAuthHeaders() {
         const headers: Record<string, FString> = {};
         return ok(headers);
       }
-      protected override async validateEndpointDns() { return true; }
+      protected override async validateEndpointDns() {
+        return true;
+      }
 
-      testConnect() { return this.connect(); }
+      testConnect() {
+        return this.connect();
+      }
     }
 
     const service = new LocalService();

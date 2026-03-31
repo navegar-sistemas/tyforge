@@ -22,11 +22,14 @@ export class NoPublicConstructorDomainRule extends AstRule {
       if (!ts.isClassDeclaration(node)) return;
       if (!node.name) return;
 
-      const isAbstract = node.modifiers?.some(m => m.kind === ts.SyntaxKind.AbstractKeyword);
+      const isAbstract = node.modifiers?.some(
+        (m) => m.kind === ts.SyntaxKind.AbstractKeyword,
+      );
       if (isAbstract) return;
 
-      const isDomainModel = AstAnalyzer.extendsFrom(context.checker, node, "ClassDomainModels")
-        || AstAnalyzer.extendsFrom(context.checker, node, "TypeField");
+      const isDomainModel =
+        AstAnalyzer.extendsFrom(context.checker, node, "ClassDomainModels") ||
+        AstAnalyzer.extendsFrom(context.checker, node, "TypeField");
       if (!isDomainModel) return;
 
       this.validateConstructorVisibility(node, context, violations);
@@ -45,13 +48,21 @@ export class NoPublicConstructorDomainRule extends AstRule {
       if (!ts.isConstructorDeclaration(member)) continue;
 
       const isPrivateOrProtected = member.modifiers?.some(
-        (m) => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword,
+        (m) =>
+          m.kind === ts.SyntaxKind.PrivateKeyword ||
+          m.kind === ts.SyntaxKind.ProtectedKeyword,
       );
 
       if (!isPrivateOrProtected) {
-        const line = context.sourceFile.getLineAndCharacterOfPosition(member.getStart()).line + 1;
+        const line =
+          context.sourceFile.getLineAndCharacterOfPosition(member.getStart())
+            .line + 1;
         violations.push(
-          this.violation(line, context.filePath, `Constructor must be private — use static create/assign factory methods`),
+          this.violation(
+            line,
+            context.filePath,
+            `Constructor must be private — use static create/assign factory methods`,
+          ),
         );
       }
       return;
@@ -69,10 +80,17 @@ export class NoPublicConstructorDomainRule extends AstRule {
     for (const member of classDecl.members) {
       if (!ts.isMethodDeclaration(member)) continue;
 
-      const methodName = member.name && ts.isIdentifier(member.name) ? member.name.text : "";
+      const methodName =
+        member.name && ts.isIdentifier(member.name) ? member.name.text : "";
       if (ALLOWED_FACTORY_METHODS.has(methodName)) continue;
 
-      this.walkForNewExpression(member, className, methodName, context, violations);
+      this.walkForNewExpression(
+        member,
+        className,
+        methodName,
+        context,
+        violations,
+      );
     }
   }
 
@@ -84,13 +102,29 @@ export class NoPublicConstructorDomainRule extends AstRule {
     violations: IRuleViolation[],
   ): void {
     ts.forEachChild(node, (child) => {
-      if (ts.isNewExpression(child) && ts.isIdentifier(child.expression) && child.expression.text === className) {
-        const line = context.sourceFile.getLineAndCharacterOfPosition(child.getStart()).line + 1;
+      if (
+        ts.isNewExpression(child) &&
+        ts.isIdentifier(child.expression) &&
+        child.expression.text === className
+      ) {
+        const line =
+          context.sourceFile.getLineAndCharacterOfPosition(child.getStart())
+            .line + 1;
         violations.push(
-          this.violation(line, context.filePath, `"new ${className}" only allowed inside static factory methods — found in instance method "${methodName}"`),
+          this.violation(
+            line,
+            context.filePath,
+            `"new ${className}" only allowed inside static factory methods — found in instance method "${methodName}"`,
+          ),
         );
       }
-      this.walkForNewExpression(child, className, methodName, context, violations);
+      this.walkForNewExpression(
+        child,
+        className,
+        methodName,
+        context,
+        violations,
+      );
     });
   }
 }

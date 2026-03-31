@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -7,7 +10,10 @@ import { TypeGuard } from "@tyforge/tools/type_guard";
 export type TDocumentMunicipalRegistration = string;
 export type TDocumentMunicipalRegistrationFormatted = string;
 
-export class FDocumentMunicipalRegistration extends TypeField<TDocumentMunicipalRegistration, TDocumentMunicipalRegistrationFormatted> {
+export class FDocumentMunicipalRegistration extends TypeField<
+  TDocumentMunicipalRegistration,
+  TDocumentMunicipalRegistrationFormatted
+> {
   private static readonly NUMERIC_REGEX = /^\d+$/;
   override readonly typeInference = "FDocumentMunicipalRegistration";
 
@@ -18,7 +24,10 @@ export class FDocumentMunicipalRegistration extends TypeField<TDocumentMunicipal
     serializeAsString: false,
   };
 
-  private constructor(value: TDocumentMunicipalRegistration, fieldPath: string) {
+  private constructor(
+    value: TDocumentMunicipalRegistration,
+    fieldPath: string,
+  ) {
     super(value, fieldPath);
   }
 
@@ -31,35 +40,60 @@ export class FDocumentMunicipalRegistration extends TypeField<TDocumentMunicipal
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!FDocumentMunicipalRegistration.NUMERIC_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Municipal registration must contain only numeric characters"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Municipal registration must contain only numeric characters",
+        ),
+      );
     }
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TDocumentMunicipalRegistration, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TDocumentMunicipalRegistration, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TDocumentMunicipalRegistration>(raw: T, fieldPath = "MunicipalRegistration"): Result<FDocumentMunicipalRegistration, ExceptionValidation> {
+  static create<T = TDocumentMunicipalRegistration>(
+    raw: T,
+    fieldPath = "MunicipalRegistration",
+  ): Result<FDocumentMunicipalRegistration, ExceptionValidation> {
     const typed = FDocumentMunicipalRegistration.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentMunicipalRegistration(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TDocumentMunicipalRegistration, fieldPath = "MunicipalRegistration"): FDocumentMunicipalRegistration {
+  static createOrThrow(
+    raw: TDocumentMunicipalRegistration,
+    fieldPath = "MunicipalRegistration",
+  ): FDocumentMunicipalRegistration {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDocumentMunicipalRegistration>(value: T, fieldPath = "MunicipalRegistration"): Result<FDocumentMunicipalRegistration, ExceptionValidation> {
+  static assign<T = TDocumentMunicipalRegistration>(
+    value: T,
+    fieldPath = "MunicipalRegistration",
+  ): Result<FDocumentMunicipalRegistration, ExceptionValidation> {
     const typed = FDocumentMunicipalRegistration.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentMunicipalRegistration(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

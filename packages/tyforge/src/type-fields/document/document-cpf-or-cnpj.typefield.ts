@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -10,7 +13,10 @@ export type TDocumentCpfOrCnpjFormatted = string;
 const CPF_REGEX = /^\d{11}$/;
 const CNPJ_REGEX = /^\d{14}$/;
 
-export class FDocumentCpfOrCnpj extends TypeField<TDocumentCpfOrCnpj, TDocumentCpfOrCnpjFormatted> {
+export class FDocumentCpfOrCnpj extends TypeField<
+  TDocumentCpfOrCnpj,
+  TDocumentCpfOrCnpjFormatted
+> {
   private static isValidCpfCheckDigits(cpf: string): boolean {
     if (/^(\d)\1{10}$/.test(cpf)) return false;
     let sum = 0;
@@ -63,15 +69,30 @@ export class FDocumentCpfOrCnpj extends TypeField<TDocumentCpfOrCnpj, TDocumentC
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!CPF_REGEX.test(value) && !CNPJ_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Document must be a valid CPF (11 digits) or CNPJ (14 digits)"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Document must be a valid CPF (11 digits) or CNPJ (14 digits)",
+        ),
+      );
     }
 
-    if (value.length === 11 && !FDocumentCpfOrCnpj.isValidCpfCheckDigits(value)) {
-      return err(ExceptionValidation.create(fieldPath, "CPF has invalid check digits."));
+    if (
+      value.length === 11 &&
+      !FDocumentCpfOrCnpj.isValidCpfCheckDigits(value)
+    ) {
+      return err(
+        ExceptionValidation.create(fieldPath, "CPF has invalid check digits."),
+      );
     }
 
-    if (value.length === 14 && !FDocumentCpfOrCnpj.isValidCnpjCheckDigits(value)) {
-      return err(ExceptionValidation.create(fieldPath, "CNPJ has invalid check digits."));
+    if (
+      value.length === 14 &&
+      !FDocumentCpfOrCnpj.isValidCnpjCheckDigits(value)
+    ) {
+      return err(
+        ExceptionValidation.create(fieldPath, "CNPJ has invalid check digits."),
+      );
     }
 
     return OK_TRUE;
@@ -85,30 +106,50 @@ export class FDocumentCpfOrCnpj extends TypeField<TDocumentCpfOrCnpj, TDocumentC
     return this.getValue().length === 14;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TDocumentCpfOrCnpj, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TDocumentCpfOrCnpj, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TDocumentCpfOrCnpj>(raw: T, fieldPath = "DocumentCpfOrCnpj"): Result<FDocumentCpfOrCnpj, ExceptionValidation> {
+  static create<T = TDocumentCpfOrCnpj>(
+    raw: T,
+    fieldPath = "DocumentCpfOrCnpj",
+  ): Result<FDocumentCpfOrCnpj, ExceptionValidation> {
     const typed = FDocumentCpfOrCnpj.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentCpfOrCnpj(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TDocumentCpfOrCnpj, fieldPath = "DocumentCpfOrCnpj"): FDocumentCpfOrCnpj {
+  static createOrThrow(
+    raw: TDocumentCpfOrCnpj,
+    fieldPath = "DocumentCpfOrCnpj",
+  ): FDocumentCpfOrCnpj {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDocumentCpfOrCnpj>(value: T, fieldPath = "DocumentCpfOrCnpj"): Result<FDocumentCpfOrCnpj, ExceptionValidation> {
+  static assign<T = TDocumentCpfOrCnpj>(
+    value: T,
+    fieldPath = "DocumentCpfOrCnpj",
+  ): Result<FDocumentCpfOrCnpj, ExceptionValidation> {
     const typed = FDocumentCpfOrCnpj.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentCpfOrCnpj(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -126,7 +167,11 @@ export class FDocumentCpfOrCnpj extends TypeField<TDocumentCpfOrCnpj, TDocumentC
   }
 
   override getDescription(): string {
-    return "Brazilian CPF (11 digits) or CNPJ (14 digits) document number. Use isCpf() and isCnpj() to determine the type.";
+    return (
+      "Brazilian CPF (11 digits) or CNPJ (14 digits)" +
+      " document number." +
+      " Use isCpf() and isCnpj() to determine the type."
+    );
   }
 
   override getShortDescription(): string {

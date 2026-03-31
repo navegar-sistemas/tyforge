@@ -1,4 +1,9 @@
-export type SagaStatus = "pending" | "running" | "completed" | "compensating" | "failed";
+export type SagaStatus =
+  | "pending"
+  | "running"
+  | "completed"
+  | "compensating"
+  | "failed";
 
 function assertType<T>(value: unknown): asserts value is T {
   void value;

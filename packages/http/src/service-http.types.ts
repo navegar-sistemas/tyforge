@@ -1,6 +1,13 @@
 import type { Result } from "tyforge/result";
 import type { Exceptions } from "tyforge/exceptions";
-import type { FInt, FHttpMethod, FHttpFormat, FBoolean, FUrlPath, FString } from "tyforge/type-fields";
+import type {
+  FInt,
+  FHttpMethod,
+  FHttpFormat,
+  FBoolean,
+  FUrlPath,
+  FString,
+} from "tyforge/type-fields";
 
 export interface IRequestParams<TData = unknown> {
   endpoint: FUrlPath;

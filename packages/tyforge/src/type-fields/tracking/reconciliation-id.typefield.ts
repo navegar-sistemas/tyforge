@@ -33,32 +33,53 @@ export class FReconciliationId extends FIdentifier {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!ALPHANUMERIC_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Reconciliation ID must contain only alphanumeric characters"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Reconciliation ID must contain only alphanumeric characters",
+        ),
+      );
     }
     return OK_TRUE;
   }
 
-
-  static create<T = TReconciliationId>(raw: T, fieldPath = "ReconciliationId"): Result<FReconciliationId, ExceptionValidation> {
+  static create<T = TReconciliationId>(
+    raw: T,
+    fieldPath = "ReconciliationId",
+  ): Result<FReconciliationId, ExceptionValidation> {
     const typed = FIdentifier.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FReconciliationId(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TReconciliationId, fieldPath = "ReconciliationId"): FReconciliationId {
+  static createOrThrow(
+    raw: TReconciliationId,
+    fieldPath = "ReconciliationId",
+  ): FReconciliationId {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TReconciliationId>(value: T, fieldPath = "ReconciliationId"): Result<FReconciliationId, ExceptionValidation> {
+  static assign<T = TReconciliationId>(
+    value: T,
+    fieldPath = "ReconciliationId",
+  ): Result<FReconciliationId, ExceptionValidation> {
     const typed = FReconciliationId.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FReconciliationId(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -72,7 +93,11 @@ export class FReconciliationId extends FIdentifier {
   }
 
   override getDescription(): string {
-    return "Reconciliation identifier for payment matching (alphanumeric, up to 35 characters).";
+    return (
+      "Reconciliation identifier for payment" +
+      " matching" +
+      " (alphanumeric, up to 35 characters)."
+    );
   }
 
   override getShortDescription(): string {

@@ -34,7 +34,10 @@ export abstract class Check {
     return { status: "fail", name: this.name, details };
   }
 
-  protected extractError(e: unknown, options: IExecErrorOptions = {}): string[] {
+  protected extractError(
+    e: unknown,
+    options: IExecErrorOptions = {},
+  ): string[] {
     const { stream = "both", filter, limit = 20 } = options;
     if (!(e instanceof Error)) return [String(e)];
 
@@ -62,7 +65,10 @@ export abstract class Check {
     return filtered.slice(0, limit);
   }
 
-  protected findFiles(namePatterns: string[], excludes: string[] = ["node_modules", "dist", "build"]): string[] {
+  protected findFiles(
+    namePatterns: string[],
+    excludes: string[] = ["node_modules", "dist", "build"],
+  ): string[] {
     const args: string[] = ["."];
     // Build name pattern: \( -name "X" -o -name "Y" \)
     if (namePatterns.length === 1) {
@@ -80,7 +86,11 @@ export abstract class Check {
       args.push("-not", "-path", `*/${e}/*`);
     }
     try {
-      const output = execFileSync("find", args, { stdio: "pipe", encoding: "utf-8", timeout: 10000 });
+      const output = execFileSync("find", args, {
+        stdio: "pipe",
+        encoding: "utf-8",
+        timeout: 10000,
+      });
       return output.trim().split("\n").filter(Boolean);
     } catch {
       return [];

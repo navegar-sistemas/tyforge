@@ -5,7 +5,11 @@ import { TypeGuard } from "tyforge/tools";
 import { FString, FInt } from "tyforge/type-fields";
 import { ServiceWebSocketSecurity } from "./service-websocket.security";
 import { ExceptionWebSocket } from "./exception-websocket";
-import type { IWebSocketOptions, TWebSocketHandler, TWebSocketResult } from "./service-websocket.types";
+import type {
+  IWebSocketOptions,
+  TWebSocketHandler,
+  TWebSocketResult,
+} from "./service-websocket.types";
 
 const MAX_TIMEOUT_MS = 300000;
 const DEFAULT_RECONNECT_ATTEMPTS = 3;
@@ -19,7 +23,6 @@ interface ISubscriptionEntry {
 }
 
 export abstract class ServiceWebSocket extends ServiceBase {
-
   private socket: WebSocket | null = null;
   private subscriptions: Map<string, ISubscriptionEntry> = new Map();
   private subscriptionCounter = 0;
@@ -36,11 +39,17 @@ export abstract class ServiceWebSocket extends ServiceBase {
     return this.executeDisconnect();
   }
 
-  protected send(event: FString, data: Record<string, unknown>): TWebSocketResult<void> {
+  protected send(
+    event: FString,
+    data: Record<string, unknown>,
+  ): TWebSocketResult<void> {
     return this.executeSend(event, data);
   }
 
-  protected subscribe(event: FString, handler: TWebSocketHandler): Result<FString, Exceptions> {
+  protected subscribe(
+    event: FString,
+    handler: TWebSocketHandler,
+  ): Result<FString, Exceptions> {
     return this.executeSubscribe(event, handler);
   }
 
@@ -48,18 +57,28 @@ export abstract class ServiceWebSocket extends ServiceBase {
     return this.executeUnsubscribe(subscriptionId);
   }
 
-  private async executeConnect(options?: IWebSocketOptions): TWebSocketResult<FString> {
+  private async executeConnect(
+    options?: IWebSocketOptions,
+  ): TWebSocketResult<FString> {
     if (options?.timeout !== undefined) {
       const timeoutMs = options.timeout.getValue();
       if (timeoutMs < 1 || timeoutMs > MAX_TIMEOUT_MS) {
-        return err(ExceptionWebSocket.invalidParams(`Timeout must be between 1 and ${MAX_TIMEOUT_MS} ms.`));
+        return err(
+          ExceptionWebSocket.invalidParams(
+            `Timeout must be between 1 and ${MAX_TIMEOUT_MS} ms.`,
+          ),
+        );
       }
     }
 
     if (options?.maxReconnectAttempts !== undefined) {
       const maxAttempts = options.maxReconnectAttempts.getValue();
       if (maxAttempts < 0) {
-        return err(ExceptionWebSocket.invalidParams("Max reconnect attempts must be a non-negative integer."));
+        return err(
+          ExceptionWebSocket.invalidParams(
+            "Max reconnect attempts must be a non-negative integer.",
+          ),
+        );
       }
       this.maxReconnectAttempts = maxAttempts;
     }
@@ -71,11 +90,14 @@ export abstract class ServiceWebSocket extends ServiceBase {
     return this.establishConnection(options);
   }
 
-  private async establishConnection(options?: IWebSocketOptions): TWebSocketResult<FString> {
+  private async establishConnection(
+    options?: IWebSocketOptions,
+  ): TWebSocketResult<FString> {
     let authHeaders: Record<string, FString> = {};
     if (options?.authenticated?.getValue() ?? false) {
       const authResult = await this.getAuthHeaders();
-      if (isFailure(authResult)) return err(ExceptionWebSocket.authFailed(authResult.error));
+      if (isFailure(authResult))
+        return err(ExceptionWebSocket.authFailed(authResult.error));
       authHeaders = authResult.value;
     }
 
@@ -110,9 +132,8 @@ export abstract class ServiceWebSocket extends ServiceBase {
       try {
         // Node.js (>=22) WebSocket supports { headers } in constructor options.
         // Reflect.construct avoids type cast since lib.dom.d.ts lacks the Node.js signature.
-        const constructorArgs: unknown[] = Object.keys(headers).length > 0
-          ? [url, { headers }]
-          : [url];
+        const constructorArgs: unknown[] =
+          Object.keys(headers).length > 0 ? [url, { headers }] : [url];
         this.socket = Reflect.construct(WebSocket, constructorArgs);
         this.attachSocketHandlers(resolve, timeout);
       } catch {
@@ -163,7 +184,10 @@ export abstract class ServiceWebSocket extends ServiceBase {
     };
 
     this.socket.onclose = () => {
-      if (this.shouldReconnect && this.reconnectAttempts < this.maxReconnectAttempts) {
+      if (
+        this.shouldReconnect &&
+        this.reconnectAttempts < this.maxReconnectAttempts
+      ) {
         this.attemptReconnect();
       }
     };
@@ -184,7 +208,9 @@ export abstract class ServiceWebSocket extends ServiceBase {
       if (typeof eventName !== "string") return;
 
       const rawData = parsed["data"];
-      const data: Record<string, unknown> = TypeGuard.isRecord(rawData) ? rawData : {};
+      const data: Record<string, unknown> = TypeGuard.isRecord(rawData)
+        ? rawData
+        : {};
 
       const sanitizeResult = ServiceWebSocketSecurity.sanitizeMessage(data);
       if (!sanitizeResult.success) return;
@@ -258,13 +284,17 @@ export abstract class ServiceWebSocket extends ServiceBase {
     });
   }
 
-  private async executeSend(event: FString, data: Record<string, unknown>): TWebSocketResult<void> {
+  private async executeSend(
+    event: FString,
+    data: Record<string, unknown>,
+  ): TWebSocketResult<void> {
     if (this.socket === null || this.socket.readyState !== WebSocket.OPEN) {
       return err(ExceptionWebSocket.sendFailed(event.getValue()));
     }
 
     const sanitizeResult = ServiceWebSocketSecurity.sanitizeMessage(data);
-    if (!sanitizeResult.success) return err(ExceptionWebSocket.invalidMessage());
+    if (!sanitizeResult.success)
+      return err(ExceptionWebSocket.invalidMessage());
 
     try {
       const payload = JSON.stringify({
@@ -278,23 +308,32 @@ export abstract class ServiceWebSocket extends ServiceBase {
     }
   }
 
-  private executeSubscribe(event: FString, handler: TWebSocketHandler): Result<FString, Exceptions> {
+  private executeSubscribe(
+    event: FString,
+    handler: TWebSocketHandler,
+  ): Result<FString, Exceptions> {
     if (this.socket === null) {
       return err(ExceptionWebSocket.subscriptionFailed(event.getValue()));
     }
 
     this.subscriptionCounter++;
-    const subscriptionId = FString.createOrThrow(`sub_${this.subscriptionCounter}`);
+    const subscriptionId = FString.createOrThrow(
+      `sub_${this.subscriptionCounter}`,
+    );
 
     this.subscriptions.set(subscriptionId.getValue(), { event, handler });
 
     return ok(subscriptionId);
   }
 
-  private executeUnsubscribe(subscriptionId: FString): Result<void, Exceptions> {
+  private executeUnsubscribe(
+    subscriptionId: FString,
+  ): Result<void, Exceptions> {
     const id = subscriptionId.getValue();
     if (!this.subscriptions.has(id)) {
-      return err(ExceptionWebSocket.invalidParams(`Subscription "${id}" not found.`));
+      return err(
+        ExceptionWebSocket.invalidParams(`Subscription "${id}" not found.`),
+      );
     }
 
     this.subscriptions.delete(id);

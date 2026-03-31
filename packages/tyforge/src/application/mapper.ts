@@ -12,5 +12,7 @@ export interface IMapper<
   toDomainMany(raw: TPersistence[]): Result<TAggregate[], Exceptions>;
   toPersistence(domain: TAggregate): Result<TPersistence, Exceptions>;
   toPersistenceMany(domains: TAggregate[]): Result<TPersistence[], Exceptions>;
-  toDomainPaginated(raw: Paginated<TPersistence>): Result<Paginated<TAggregate>, Exceptions>;
+  toDomainPaginated(
+    raw: Paginated<TPersistence>,
+  ): Result<Paginated<TAggregate>, Exceptions>;
 }

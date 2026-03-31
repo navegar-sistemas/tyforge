@@ -25,7 +25,10 @@ export class FUrlQuery extends TypeField<TUrlQuery, TUrlQueryFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath = "UrlQuery"): Result<TUrlQuery, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath = "UrlQuery",
+  ): Result<TUrlQuery, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath, 0, 4096);
   }
 
@@ -38,19 +41,36 @@ export class FUrlQuery extends TypeField<TUrlQuery, TUrlQueryFormatted> {
     if (!base.success) return base;
     if (validateLevel === "none") return ok(true);
     if (CRLF_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Query string must not contain CRLF characters."));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Query string must not contain CRLF characters.",
+        ),
+      );
     }
     if (NULL_BYTE_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Query string must not contain null bytes."));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Query string must not contain null bytes.",
+        ),
+      );
     }
     return ok(true);
   }
 
-  static create<T = TUrlQuery>(raw: T, fieldPath = "UrlQuery"): Result<FUrlQuery, ExceptionValidation> {
+  static create<T = TUrlQuery>(
+    raw: T,
+    fieldPath = "UrlQuery",
+  ): Result<FUrlQuery, ExceptionValidation> {
     const typed = FUrlQuery.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FUrlQuery(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -61,17 +81,32 @@ export class FUrlQuery extends TypeField<TUrlQuery, TUrlQueryFormatted> {
     return result.value;
   }
 
-  static assign<T = TUrlQuery>(value: T, fieldPath = "UrlQuery"): Result<FUrlQuery, ExceptionValidation> {
+  static assign<T = TUrlQuery>(
+    value: T,
+    fieldPath = "UrlQuery",
+  ): Result<FUrlQuery, ExceptionValidation> {
     const typed = FUrlQuery.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FUrlQuery(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  override formatted(): TUrlQueryFormatted { return this.getValue(); }
-  override toString(): string { return this.getValue(); }
-  override getDescription(): string { return "URL query string (e.g., page=1&limit=10)"; }
-  override getShortDescription(): string { return "Query"; }
+  override formatted(): TUrlQueryFormatted {
+    return this.getValue();
+  }
+  override toString(): string {
+    return this.getValue();
+  }
+  override getDescription(): string {
+    return "URL query string (e.g., page=1&limit=10)";
+  }
+  override getShortDescription(): string {
+    return "Query";
+  }
 }

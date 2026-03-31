@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -43,38 +46,70 @@ export class FPageNumber extends TypeField<TPageNumber, TPageNumberFormatted> {
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TPageNumber, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TPageNumber, ExceptionValidation> {
     return TypeGuard.extractNumber(value, fieldPath);
   }
 
-  static formCreate(raw: unknown, fieldPath = "PageNumber"): Result<FPageNumber, ExceptionValidation> {
-    return FPageNumber.create(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  static formCreate(
+    raw: unknown,
+    fieldPath = "PageNumber",
+  ): Result<FPageNumber, ExceptionValidation> {
+    return FPageNumber.create(
+      TypeField.normalizeFormInput(raw, "number"),
+      fieldPath,
+    );
   }
 
-  static formAssign(raw: unknown, fieldPath = "PageNumber"): Result<FPageNumber, ExceptionValidation> {
-    return FPageNumber.assign(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  static formAssign(
+    raw: unknown,
+    fieldPath = "PageNumber",
+  ): Result<FPageNumber, ExceptionValidation> {
+    return FPageNumber.assign(
+      TypeField.normalizeFormInput(raw, "number"),
+      fieldPath,
+    );
   }
 
-  static create<T = TPageNumber>(raw: T, fieldPath = "PageNumber"): Result<FPageNumber, ExceptionValidation> {
+  static create<T = TPageNumber>(
+    raw: T,
+    fieldPath = "PageNumber",
+  ): Result<FPageNumber, ExceptionValidation> {
     const typed = FPageNumber.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FPageNumber(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TPageNumber, fieldPath = "PageNumber"): FPageNumber {
+  static createOrThrow(
+    raw: TPageNumber,
+    fieldPath = "PageNumber",
+  ): FPageNumber {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TPageNumber>(value: T, fieldPath = "PageNumber"): Result<FPageNumber, ExceptionValidation> {
+  static assign<T = TPageNumber>(
+    value: T,
+    fieldPath = "PageNumber",
+  ): Result<FPageNumber, ExceptionValidation> {
     const typed = FPageNumber.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FPageNumber(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

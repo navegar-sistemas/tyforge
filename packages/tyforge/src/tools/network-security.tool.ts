@@ -11,12 +11,7 @@ const PRIVATE_IPV4_PATTERNS = [
   /^100\.(6[4-9]|[7-9]\d|1[0-2]\d)\./,
 ];
 
-const PRIVATE_IPV6_PATTERNS = [
-  /^::1$/,
-  /^fe80:/i,
-  /^fc00:/i,
-  /^fd/i,
-];
+const PRIVATE_IPV6_PATTERNS = [/^::1$/, /^fe80:/i, /^fc00:/i, /^fd/i];
 
 const IPV4_MAPPED_IPV6 = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/i;
 
@@ -36,7 +31,9 @@ export class ToolNetworkSecurity {
     return false;
   }
 
-  static async resolveAndValidate(hostname: string): Promise<{ valid: boolean; ip: string }> {
+  static async resolveAndValidate(
+    hostname: string,
+  ): Promise<{ valid: boolean; ip: string }> {
     // Localhost is exempt — development only
     if (hostname === "localhost" || hostname === "127.0.0.1") {
       return { valid: true, ip: hostname };

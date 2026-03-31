@@ -10,7 +10,10 @@ const GRAPHQL_OPERATION_REGEX = /\b(query|mutation|subscription)\b/;
 export type TGraphQLDocument = string;
 export type TGraphQLDocumentFormatted = string;
 
-export class FGraphQLDocument extends TypeField<TGraphQLDocument, TGraphQLDocumentFormatted> {
+export class FGraphQLDocument extends TypeField<
+  TGraphQLDocument,
+  TGraphQLDocumentFormatted
+> {
   override readonly typeInference = "FGraphQLDocument";
 
   override readonly config: ITypeFieldConfig<TGraphQLDocument> = {
@@ -24,7 +27,10 @@ export class FGraphQLDocument extends TypeField<TGraphQLDocument, TGraphQLDocume
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath = "GraphQLDocument"): Result<TGraphQLDocument, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath = "GraphQLDocument",
+  ): Result<TGraphQLDocument, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath, 1);
   }
 
@@ -37,40 +43,79 @@ export class FGraphQLDocument extends TypeField<TGraphQLDocument, TGraphQLDocume
     if (!base.success) return base;
     if (validateLevel === "none") return ok(true);
     if (!value.includes("{") || !value.includes("}")) {
-      return err(ExceptionValidation.create(fieldPath, "GraphQL document must contain at least one selection set."));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "GraphQL document must contain at least one selection set.",
+        ),
+      );
     }
-    if (validateLevel === "full" && !GRAPHQL_OPERATION_REGEX.test(value) && !value.trimStart().startsWith("{")) {
-      return err(ExceptionValidation.create(fieldPath, "GraphQL document must start with a query, mutation, subscription, or shorthand query."));
+    if (
+      validateLevel === "full" &&
+      !GRAPHQL_OPERATION_REGEX.test(value) &&
+      !value.trimStart().startsWith("{")
+    ) {
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "GraphQL document must start with a query, mutation, subscription, or shorthand query.",
+        ),
+      );
     }
     return ok(true);
   }
 
-  static create<T = TGraphQLDocument>(raw: T, fieldPath = "GraphQLDocument"): Result<FGraphQLDocument, ExceptionValidation> {
+  static create<T = TGraphQLDocument>(
+    raw: T,
+    fieldPath = "GraphQLDocument",
+  ): Result<FGraphQLDocument, ExceptionValidation> {
     const typed = FGraphQLDocument.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FGraphQLDocument(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(value: TGraphQLDocument, fieldPath = "GraphQLDocument"): FGraphQLDocument {
+  static createOrThrow(
+    value: TGraphQLDocument,
+    fieldPath = "GraphQLDocument",
+  ): FGraphQLDocument {
     const result = FGraphQLDocument.create(value, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TGraphQLDocument>(value: T, fieldPath = "GraphQLDocument"): Result<FGraphQLDocument, ExceptionValidation> {
+  static assign<T = TGraphQLDocument>(
+    value: T,
+    fieldPath = "GraphQLDocument",
+  ): Result<FGraphQLDocument, ExceptionValidation> {
     const typed = FGraphQLDocument.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FGraphQLDocument(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  override formatted(): TGraphQLDocumentFormatted { return this.getValue(); }
-  override toString(): string { return this.getValue(); }
-  override getDescription(): string { return "GraphQL query, mutation, or subscription document"; }
-  override getShortDescription(): string { return "GraphQL Document"; }
+  override formatted(): TGraphQLDocumentFormatted {
+    return this.getValue();
+  }
+  override toString(): string {
+    return this.getValue();
+  }
+  override getDescription(): string {
+    return "GraphQL query, mutation, or subscription document";
+  }
+  override getShortDescription(): string {
+    return "GraphQL Document";
+  }
 }

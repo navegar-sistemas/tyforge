@@ -1,0 +1,9 @@
+node_modules
+dist
+docs
+benchmark
+*.js
+*.d.ts
+*.map
+*.json
+*.md

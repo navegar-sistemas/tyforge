@@ -23,7 +23,9 @@ export class UpdateCommand {
 
     const existing = loadLintConfigExtended();
     if (!existing) {
-      prompt.printInfo("No existing config found. Run `npx tyforge-guard --init` first.");
+      prompt.printInfo(
+        "No existing config found. Run `npx tyforge-guard --init` first.",
+      );
       return;
     }
 

@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -33,14 +36,24 @@ export class FBankCode extends TypeField<TBankCode, TBankCodeFormatted> {
     if (!base.success) return base;
     if (validateLevel !== "full") return OK_TRUE;
     if (!DIGITS_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Bank code must contain only numeric digits"));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "Bank code must contain only numeric digits",
+        ),
+      );
     }
     switch (TypeField.localeRegion) {
       case "us":
         break;
       case "br":
         if (!ISPB_REGEX.test(value)) {
-          return err(ExceptionValidation.create(fieldPath, "ISPB bank code must be exactly 8 numeric digits"));
+          return err(
+            ExceptionValidation.create(
+              fieldPath,
+              "ISPB bank code must be exactly 8 numeric digits",
+            ),
+          );
         }
         break;
       default:
@@ -49,15 +62,25 @@ export class FBankCode extends TypeField<TBankCode, TBankCodeFormatted> {
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TBankCode, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TBankCode, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath);
   }
 
-  static create<T = TBankCode>(raw: T, fieldPath = "BankCode"): Result<FBankCode, ExceptionValidation> {
+  static create<T = TBankCode>(
+    raw: T,
+    fieldPath = "BankCode",
+  ): Result<FBankCode, ExceptionValidation> {
     const typed = FBankCode.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBankCode(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -68,11 +91,18 @@ export class FBankCode extends TypeField<TBankCode, TBankCodeFormatted> {
     return result.value;
   }
 
-  static assign<T = TBankCode>(value: T, fieldPath = "BankCode"): Result<FBankCode, ExceptionValidation> {
+  static assign<T = TBankCode>(
+    value: T,
+    fieldPath = "BankCode",
+  ): Result<FBankCode, ExceptionValidation> {
     const typed = FBankCode.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBankCode(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -86,7 +116,11 @@ export class FBankCode extends TypeField<TBankCode, TBankCodeFormatted> {
   }
 
   override getDescription(): string {
-    return "Bank identification code (numeric). Locale-aware: enforces ISPB 8-digit format when TypeField.localeRegion is 'br'.";
+    return (
+      "Bank identification code (numeric). " +
+      "Locale-aware: enforces ISPB 8-digit " +
+      "format when TypeField.localeRegion is 'br'."
+    );
   }
 
   override getShortDescription(): string {

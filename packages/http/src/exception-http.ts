@@ -39,7 +39,8 @@ export class ExceptionHttp extends Exceptions {
     return new ExceptionHttp({
       type: "http/unsafe-endpoint",
       title: "Unsafe Endpoint",
-      detail: "Endpoint contains path traversal, absolute URL, or CRLF characters.",
+      detail:
+        "Endpoint contains path traversal, absolute URL, or CRLF characters.",
       status: OHttpStatus.BAD_REQUEST,
       code: "UNSAFE_ENDPOINT",
       retriable: false,
@@ -119,7 +120,8 @@ export class ExceptionHttp extends Exceptions {
     return new ExceptionHttp({
       type: "http/timeout",
       title: "Request Timeout",
-      detail: "The external service did not respond within the configured timeout.",
+      detail:
+        "The external service did not respond within the configured timeout.",
       status: OHttpStatus.GATEWAY_TIMEOUT,
       code: "REQUEST_TIMEOUT",
       retriable: true,

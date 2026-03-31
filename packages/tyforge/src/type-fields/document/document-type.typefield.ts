@@ -16,7 +16,10 @@ export type TKeyDocumentType = keyof typeof ODocumentType;
 export type TDocumentType = (typeof ODocumentType)[TKeyDocumentType];
 export type TDocumentTypeFormatted = string;
 
-export class FDocumentType extends TypeField<TDocumentType, TDocumentTypeFormatted> {
+export class FDocumentType extends TypeField<
+  TDocumentType,
+  TDocumentTypeFormatted
+> {
   override readonly typeInference = "FDocumentType";
 
   override readonly config: ITypeFieldConfig<TDocumentType> = {
@@ -31,32 +34,52 @@ export class FDocumentType extends TypeField<TDocumentType, TDocumentTypeFormatt
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TDocumentType, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TDocumentType, ExceptionValidation> {
     const str = TypeGuard.isString(value, fieldPath);
     if (isFailure(str)) return err(str.error);
     return TypeField.resolveEnum(ODocumentType, str.value, fieldPath);
   }
 
-  static create<T = TDocumentType>(raw: T, fieldPath = "DocumentType"): Result<FDocumentType, ExceptionValidation> {
+  static create<T = TDocumentType>(
+    raw: T,
+    fieldPath = "DocumentType",
+  ): Result<FDocumentType, ExceptionValidation> {
     const typed = FDocumentType.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentType(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: TDocumentType, fieldPath = "DocumentType"): FDocumentType {
+  static createOrThrow(
+    raw: TDocumentType,
+    fieldPath = "DocumentType",
+  ): FDocumentType {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDocumentType>(value: T, fieldPath = "DocumentType"): Result<FDocumentType, ExceptionValidation> {
+  static assign<T = TDocumentType>(
+    value: T,
+    fieldPath = "DocumentType",
+  ): Result<FDocumentType, ExceptionValidation> {
     const typed = FDocumentType.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FDocumentType(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

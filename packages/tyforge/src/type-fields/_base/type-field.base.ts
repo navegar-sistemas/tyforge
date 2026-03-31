@@ -11,8 +11,14 @@ export type TLocaleRegion = "us" | "br";
 export type TLocaleData = "us" | "br";
 export type TFormatTarget = "display" | "data";
 
-const LOCALE_INTL_DISPLAY: Record<TLocaleDisplay, string> = { us: "en-US", br: "pt-BR" };
-const LOCALE_INTL_DATA: Record<TLocaleData, string> = { us: "en-US", br: "pt-BR" };
+const LOCALE_INTL_DISPLAY: Record<TLocaleDisplay, string> = {
+  us: "en-US",
+  br: "pt-BR",
+};
+const LOCALE_INTL_DATA: Record<TLocaleData, string> = {
+  us: "en-US",
+  br: "pt-BR",
+};
 
 const enumValuesCache = new WeakMap<object, unknown[]>();
 
@@ -59,9 +65,12 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
   }): void {
     if (options.create !== undefined) TypeField.createLevel = options.create;
     if (options.assign !== undefined) TypeField.assignLevel = options.assign;
-    if (options.localeDisplay !== undefined) TypeField.localeDisplay = options.localeDisplay;
-    if (options.localeRegion !== undefined) TypeField.localeRegion = options.localeRegion;
-    if (options.localeData !== undefined) TypeField.localeData = options.localeData;
+    if (options.localeDisplay !== undefined)
+      TypeField.localeDisplay = options.localeDisplay;
+    if (options.localeRegion !== undefined)
+      TypeField.localeRegion = options.localeRegion;
+    if (options.localeData !== undefined)
+      TypeField.localeData = options.localeData;
   }
 
   protected static assertNeverLocale(locale: never): never {
@@ -72,13 +81,19 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
 
   protected static formatNumber(
     value: number,
-    options?: { minimumFractionDigits?: number; maximumFractionDigits?: number },
+    options?: {
+      minimumFractionDigits?: number;
+      maximumFractionDigits?: number;
+    },
     target: TFormatTarget = "display",
   ): string {
-    const locale = target === "data"
-      ? LOCALE_INTL_DATA[TypeField.localeData]
-      : LOCALE_INTL_DISPLAY[TypeField.localeDisplay];
-    const key = `${target}:${locale}:${options?.minimumFractionDigits ?? ""}:${options?.maximumFractionDigits ?? ""}`;
+    const locale =
+      target === "data"
+        ? LOCALE_INTL_DATA[TypeField.localeData]
+        : LOCALE_INTL_DISPLAY[TypeField.localeDisplay];
+    const minFd = options?.minimumFractionDigits ?? "";
+    const maxFd = options?.maximumFractionDigits ?? "";
+    const key = `${target}:${locale}:${minFd}:${maxFd}`;
     let formatter = TypeField.formatterCache.get(key);
     if (!formatter) {
       formatter = new Intl.NumberFormat(locale, options);
@@ -89,7 +104,10 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
 
   // Progressive mask: applies separators only when enough digits exist.
   // Pattern example: [3, ".", 3, ".", 3, "-", 2] for CPF (XXX.XXX.XXX-XX).
-  protected static applyMask(value: string, pattern: (number | string)[]): string {
+  protected static applyMask(
+    value: string,
+    pattern: (number | string)[],
+  ): string {
     let result = "";
     let pos = 0;
     for (const part of pattern) {
@@ -106,7 +124,8 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
 
   // Normalizes form input (always string) to the expected primitive type.
   // Called by formCreate/formAssign before delegating to create/assign.
-  // Rejects hex (0x), octal (0o), binary (0b), scientific notation (1e5), Infinity.
+  // Rejects hex (0x), octal (0o), binary (0b),
+  // scientific notation (1e5), Infinity.
   // Supports locale decimal separators: "10,50" → 10.50 (comma → dot).
   private static readonly FORM_NUMBER_REGEX = /^-?\d+([.,]\d+)?$/;
 
@@ -152,12 +171,7 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
     if (isEnumValue<E>(raw, enumSet)) {
       return ok(raw);
     }
-    return err(
-      ExceptionValidation.create(
-        fieldPath,
-        "Invalid enum value",
-      ),
-    );
+    return err(ExceptionValidation.create(fieldPath, "Invalid enum value"));
   }
 
   protected validateRules(
@@ -189,25 +203,51 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
       case "string": {
         const len = String(value).length;
         if ("maxLength" in cfg && len > cfg.maxLength) {
-          return err(ExceptionValidation.create(fieldPath, `String must contain at most ${cfg.maxLength} characters.`));
+          return err(
+            ExceptionValidation.create(
+              fieldPath,
+              `String must contain at most ${cfg.maxLength} characters.`,
+            ),
+          );
         }
         if ("minLength" in cfg && len < cfg.minLength) {
-          return err(ExceptionValidation.create(fieldPath, `String must contain at least ${cfg.minLength} characters.`));
+          return err(
+            ExceptionValidation.create(
+              fieldPath,
+              `String must contain at least ${cfg.minLength} characters.`,
+            ),
+          );
         }
         return OK_TRUE;
       }
       case "number": {
         const n = Number(value);
         if ("max" in cfg && n > cfg.max) {
-          return err(ExceptionValidation.create(fieldPath, `Value must be at most ${cfg.max}.`));
+          return err(
+            ExceptionValidation.create(
+              fieldPath,
+              `Value must be at most ${cfg.max}.`,
+            ),
+          );
         }
         if ("min" in cfg && n < cfg.min) {
-          return err(ExceptionValidation.create(fieldPath, `Value must be at least ${cfg.min}.`));
+          return err(
+            ExceptionValidation.create(
+              fieldPath,
+              `Value must be at least ${cfg.min}.`,
+            ),
+          );
         }
         if ("decimalPrecision" in cfg) {
           const [, decimals] = n.toString().split(".");
           if ((decimals?.length ?? 0) > cfg.decimalPrecision) {
-            return err(ExceptionValidation.create(fieldPath, `Value must have at most ${cfg.decimalPrecision} decimal places.`));
+            return err(
+              ExceptionValidation.create(
+                fieldPath,
+                "Value must have at most " +
+                  `${cfg.decimalPrecision} decimal places.`,
+              ),
+            );
           }
         }
         return OK_TRUE;
@@ -243,11 +283,21 @@ export abstract class TypeField<TPrimitive, TFormatted = TPrimitive> {
     if (typeof this._value === "string") {
       const parsed = parseInt(this._value, 10);
       if (isNaN(parsed)) {
-        return err(ExceptionValidation.create(this.fieldPath, "Value cannot be converted to integer."));
+        return err(
+          ExceptionValidation.create(
+            this.fieldPath,
+            "Value cannot be converted to integer.",
+          ),
+        );
       }
       return ok(parsed);
     }
-    return err(ExceptionValidation.create(this.fieldPath, "toInt can only be used with strings or numbers."));
+    return err(
+      ExceptionValidation.create(
+        this.fieldPath,
+        "toInt can only be used with strings or numbers.",
+      ),
+    );
   }
 
   getDocumentationAux(): {

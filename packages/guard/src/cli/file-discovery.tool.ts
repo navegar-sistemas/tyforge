@@ -9,7 +9,7 @@ export class ToolFileDiscovery {
 
   findByExtension(extension: string): string[] {
     const files = this.walkDirectory(this.rootDir);
-    const filtered = files.filter(f => f.endsWith(extension));
+    const filtered = files.filter((f) => f.endsWith(extension));
     return this.applyExcludes(filtered);
   }
 
@@ -18,7 +18,11 @@ export class ToolFileDiscovery {
     const results: string[] = [];
     for (const p of paths) {
       const resolved = path.resolve(p);
-      if (!resolved.startsWith(basePath) && resolved !== path.resolve(this.rootDir)) continue;
+      if (
+        !resolved.startsWith(basePath) &&
+        resolved !== path.resolve(this.rootDir)
+      )
+        continue;
       if (fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()) {
         const sub = new ToolFileDiscovery(resolved, this.excludePatterns);
         results.push(...sub.findByExtension(extension));
@@ -52,7 +56,10 @@ export class ToolFileDiscovery {
 
   private applyExcludes(files: string[]): string[] {
     if (this.excludePatterns.length === 0) return files;
-    return files.filter(f => !this.excludePatterns.some(pattern => this.matchGlob(f, pattern)));
+    return files.filter(
+      (f) =>
+        !this.excludePatterns.some((pattern) => this.matchGlob(f, pattern)),
+    );
   }
 
   private matchGlob(filePath: string, pattern: string): boolean {

@@ -12,6 +12,7 @@ import { NoSatisfiesWithoutPrefixRule } from "./rules/convention/no-satisfies-wi
 import { NoConsoleRule } from "./rules/convention/no-console.rule";
 import { NoNumericSeparatorRule } from "./rules/convention/no-numeric-separator.rule";
 import { NoPrettierIgnoreRule } from "./rules/convention/no-prettier-ignore.rule";
+import { MaxLineLengthRule } from "./rules/convention/max-line-length.rule";
 import { NoThrowInDomainRule } from "./rules/architecture/no-throw-in-domain.rule";
 import { NoDirectDomainInstantiationRule } from "./rules/architecture/no-direct-domain-instantiation.rule";
 
@@ -33,11 +34,12 @@ export class RuleRegistry {
       new NoDirectDomainInstantiationRule(),
       new NoNumericSeparatorRule(),
       new NoPrettierIgnoreRule(),
+      new MaxLineLengthRule(),
     ];
   }
 
   static getDefaultRuleNames(): string[] {
-    return RuleRegistry.createDefault().map(r => r.name);
+    return RuleRegistry.createDefault().map((r) => r.name);
   }
 
   static getDefaultRuleCount(): number {
@@ -45,7 +47,10 @@ export class RuleRegistry {
   }
 
   private readonly rules: Rule[] = [];
-  private readonly severityOverrides = new Map<string, "error" | "warning" | "off">();
+  private readonly severityOverrides = new Map<
+    string,
+    "error" | "warning" | "off"
+  >();
 
   register(rule: Rule): void {
     this.rules.push(rule);
@@ -62,13 +67,16 @@ export class RuleRegistry {
   }
 
   getActive(): Rule[] {
-    return this.rules.filter(rule => {
+    return this.rules.filter((rule) => {
       const override = this.severityOverrides.get(rule.name);
       return override !== "off";
     });
   }
 
-  getSeverity(ruleName: string, defaultSeverity: "error" | "warning"): "error" | "warning" {
+  getSeverity(
+    ruleName: string,
+    defaultSeverity: "error" | "warning",
+  ): "error" | "warning" {
     const override = this.severityOverrides.get(ruleName);
     if (override === "error" || override === "warning") return override;
     return defaultSeverity;

@@ -13,7 +13,6 @@ const MAX_TIMEOUT_MS = 300000;
 const MAX_RESPONSE_BYTES = 10485760;
 
 export abstract class ServiceGraphQL extends ServiceBase {
-
   protected query(dto: DtoGraphQLRequest): TGraphQLResult<unknown> {
     return this.execute("query", dto);
   }
@@ -38,14 +37,16 @@ export abstract class ServiceGraphQL extends ServiceBase {
       sanitizedVars = sanitizeResult.value;
     }
 
-    const operationName = dto.operationName !== undefined
-      ? dto.operationName
-      : this.extractOperationName(dto.query);
+    const operationName =
+      dto.operationName !== undefined
+        ? dto.operationName
+        : this.extractOperationName(dto.query);
 
     let authHeaders: Record<string, FString> = {};
     if (dto.authenticated?.getValue() ?? false) {
       const authResult = await this.getAuthHeaders();
-      if (isFailure(authResult)) return err(ExceptionGraphQL.unauthorized(authResult.error));
+      if (isFailure(authResult))
+        return err(ExceptionGraphQL.unauthorized(authResult.error));
       authHeaders = authResult.value;
     }
 
@@ -68,13 +69,22 @@ export abstract class ServiceGraphQL extends ServiceBase {
     });
 
     const timeoutMs = dto.timeout?.getValue();
-    if (timeoutMs !== undefined && (timeoutMs < 1 || timeoutMs > MAX_TIMEOUT_MS)) {
-      return err(ExceptionGraphQL.invalidParams(`Timeout must be between 1 and ${MAX_TIMEOUT_MS} ms.`));
+    if (
+      timeoutMs !== undefined &&
+      (timeoutMs < 1 || timeoutMs > MAX_TIMEOUT_MS)
+    ) {
+      return err(
+        ExceptionGraphQL.invalidParams(
+          `Timeout must be between 1 and ${MAX_TIMEOUT_MS} ms.`,
+        ),
+      );
     }
-    const controller = timeoutMs !== undefined ? new AbortController() : undefined;
-    const timeoutId = controller !== undefined
-      ? setTimeout(() => controller.abort(), timeoutMs)
-      : undefined;
+    const controller =
+      timeoutMs !== undefined ? new AbortController() : undefined;
+    const timeoutId =
+      controller !== undefined
+        ? setTimeout(() => controller.abort(), timeoutMs)
+        : undefined;
 
     // DNS rebinding protection
     const dnsValid = await this.validateEndpointDns();
@@ -95,6 +105,14 @@ export abstract class ServiceGraphQL extends ServiceBase {
         return err(ExceptionGraphQL.networkError());
       }
 
+      const contentLength = response.headers.get("content-length");
+      if (
+        contentLength !== null &&
+        parseInt(contentLength, 10) > MAX_RESPONSE_BYTES
+      ) {
+        return err(ExceptionGraphQL.invalidResponse(operationName.getValue()));
+      }
+
       const responseText = await response.text();
       if (responseText.length > MAX_RESPONSE_BYTES) {
         return err(ExceptionGraphQL.invalidResponse(operationName.getValue()));
@@ -108,19 +126,26 @@ export abstract class ServiceGraphQL extends ServiceBase {
 
       const rawErrors = responseData["errors"];
       const errors: IGraphQLError[] = Array.isArray(rawErrors)
-        ? rawErrors.filter((e): e is IGraphQLError => TypeGuard.isRecord(e) && typeof e["message"] === "string")
+        ? rawErrors.filter(
+            (e): e is IGraphQLError =>
+              TypeGuard.isRecord(e) && typeof e["message"] === "string",
+          )
         : [];
 
       if (errors.length > 0) {
-        const isUnauth = errors.some((e) =>
-          (TypeGuard.isRecord(e["extensions"]) && e["extensions"]["code"] === "UNAUTHENTICATED") ||
-          e["message"] === "UNAUTHENTICATED",
+        const isUnauth = errors.some(
+          (e) =>
+            (TypeGuard.isRecord(e["extensions"]) &&
+              e["extensions"]["code"] === "UNAUTHENTICATED") ||
+            e["message"] === "UNAUTHENTICATED",
         );
         if (isUnauth) return err(ExceptionGraphQL.unauthorized());
 
         return operationType === "query"
           ? err(ExceptionGraphQL.queryFailed(operationName.getValue(), errors))
-          : err(ExceptionGraphQL.mutationFailed(operationName.getValue(), errors));
+          : err(
+              ExceptionGraphQL.mutationFailed(operationName.getValue(), errors),
+            );
       }
 
       const data: unknown = responseData["data"];
@@ -139,12 +164,18 @@ export abstract class ServiceGraphQL extends ServiceBase {
     }
   }
 
-  private extractOperationName(document: { getValue(): string }): FGraphQLOperationName {
+  private extractOperationName(document: {
+    getValue(): string;
+  }): FGraphQLOperationName {
     const match = OPERATION_NAME_REGEX.exec(document.getValue());
-    return FGraphQLOperationName.createOrThrow(match !== null ? match[1] : "Anonymous");
+    return FGraphQLOperationName.createOrThrow(
+      match !== null ? match[1] : "Anonymous",
+    );
   }
 
-  private unwrapStringMap(map: Record<string, FString>): Record<string, string> {
+  private unwrapStringMap(
+    map: Record<string, FString>,
+  ): Record<string, string> {
     const result: Record<string, string> = {};
     for (const [key, value] of Object.entries(map)) {
       result[key] = value.getValue();

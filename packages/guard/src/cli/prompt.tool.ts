@@ -45,7 +45,10 @@ export class ToolPrompt {
     return trimmed === "y" || trimmed === "yes";
   }
 
-  async select<T>(message: string, options: ReadonlyArray<ISelectOption<T>>): Promise<T> {
+  async select<T>(
+    message: string,
+    options: ReadonlyArray<ISelectOption<T>>,
+  ): Promise<T> {
     this.io.write(`\n${message}`);
     for (let i = 0; i < options.length; i++) {
       const opt = options[i];
@@ -58,7 +61,7 @@ export class ToolPrompt {
     const index = Number(trimmed) - 1;
 
     if (Number.isNaN(index) || index < 0 || index >= options.length) {
-      const recommended = options.find(o => o.recommended);
+      const recommended = options.find((o) => o.recommended);
       if (recommended) return recommended.value;
       return options[0].value;
     }

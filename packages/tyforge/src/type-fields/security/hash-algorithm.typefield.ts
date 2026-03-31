@@ -16,7 +16,10 @@ export type TKeyHashAlgorithm = keyof typeof OHashAlgorithm;
 export type THashAlgorithm = (typeof OHashAlgorithm)[TKeyHashAlgorithm];
 export type THashAlgorithmFormatted = string;
 
-export class FHashAlgorithm extends TypeField<THashAlgorithm, THashAlgorithmFormatted> {
+export class FHashAlgorithm extends TypeField<
+  THashAlgorithm,
+  THashAlgorithmFormatted
+> {
   override readonly typeInference = "FHashAlgorithm";
 
   override readonly config: ITypeFieldConfig<THashAlgorithm> = {
@@ -31,32 +34,52 @@ export class FHashAlgorithm extends TypeField<THashAlgorithm, THashAlgorithmForm
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<THashAlgorithm, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<THashAlgorithm, ExceptionValidation> {
     const str = TypeGuard.isString(value, fieldPath);
     if (isFailure(str)) return err(str.error);
     return TypeField.resolveEnum(OHashAlgorithm, str.value, fieldPath);
   }
 
-  static create<T = THashAlgorithm>(raw: T, fieldPath = "HashAlgorithm"): Result<FHashAlgorithm, ExceptionValidation> {
+  static create<T = THashAlgorithm>(
+    raw: T,
+    fieldPath = "HashAlgorithm",
+  ): Result<FHashAlgorithm, ExceptionValidation> {
     const typed = FHashAlgorithm.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FHashAlgorithm(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: THashAlgorithm, fieldPath = "HashAlgorithm"): FHashAlgorithm {
+  static createOrThrow(
+    raw: THashAlgorithm,
+    fieldPath = "HashAlgorithm",
+  ): FHashAlgorithm {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = THashAlgorithm>(value: T, fieldPath = "HashAlgorithm"): Result<FHashAlgorithm, ExceptionValidation> {
+  static assign<T = THashAlgorithm>(
+    value: T,
+    fieldPath = "HashAlgorithm",
+  ): Result<FHashAlgorithm, ExceptionValidation> {
     const typed = FHashAlgorithm.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FHashAlgorithm(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

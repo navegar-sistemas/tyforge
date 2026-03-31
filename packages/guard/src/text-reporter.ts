@@ -11,7 +11,9 @@ export class TextReporter implements IReporter {
 
   report(violations: IRuleViolation[], fixCount: number = 0): void {
     if (violations.length === 0 && fixCount === 0) {
-      console.log(`${TextReporter.BOLD}tyforge-guard:${TextReporter.RESET} no violations found`);
+      console.log(
+        `${TextReporter.BOLD}tyforge-guard:${TextReporter.RESET} no violations found`,
+      );
       return;
     }
 
@@ -20,40 +22,59 @@ export class TextReporter implements IReporter {
     for (const [filePath, fileViolations] of grouped) {
       console.log(`\n${TextReporter.BOLD}${filePath}${TextReporter.RESET}`);
       for (const v of fileViolations) {
-        const color = v.severity === "error" ? TextReporter.RED : TextReporter.YELLOW;
+        const color =
+          v.severity === "error" ? TextReporter.RED : TextReporter.YELLOW;
         const icon = v.severity === "error" ? "x" : "!";
-        console.log(`  ${color}${icon}${TextReporter.RESET} ${TextReporter.GRAY}line ${v.line}${TextReporter.RESET} — ${color}${v.rule}${TextReporter.RESET} — ${v.message}`);
+        console.log(
+          `  ${color}${icon}${TextReporter.RESET} ${TextReporter.GRAY}line ${v.line}${TextReporter.RESET} — ${color}${v.rule}${TextReporter.RESET} — ${v.message}`,
+        );
       }
     }
 
-    const errors = violations.filter(v => v.severity === "error").length;
-    const warnings = violations.filter(v => v.severity === "warning").length;
+    const errors = violations.filter((v) => v.severity === "error").length;
+    const warnings = violations.filter((v) => v.severity === "warning").length;
 
-    console.log(`\n${TextReporter.BOLD}tyforge-guard:${TextReporter.RESET} ${TextReporter.RED}${errors} error(s)${TextReporter.RESET}, ${TextReporter.YELLOW}${warnings} warning(s)${TextReporter.RESET}`);
+    console.log(
+      `\n${TextReporter.BOLD}tyforge-guard:${TextReporter.RESET} ${TextReporter.RED}${errors} error(s)${TextReporter.RESET}, ${TextReporter.YELLOW}${warnings} warning(s)${TextReporter.RESET}`,
+    );
 
     const byRule = this.groupByRule(violations);
     if (byRule.size > 0) {
       console.log("");
-      const maxRuleLen = Math.max(...[...byRule.keys()].map(k => k.length));
+      const maxRuleLen = Math.max(...[...byRule.keys()].map((k) => k.length));
       for (const [ruleName, ruleViolations] of byRule) {
-        const ruleErrors = ruleViolations.filter(v => v.severity === "error").length;
-        const ruleWarnings = ruleViolations.filter(v => v.severity === "warning").length;
+        const ruleErrors = ruleViolations.filter(
+          (v) => v.severity === "error",
+        ).length;
+        const ruleWarnings = ruleViolations.filter(
+          (v) => v.severity === "warning",
+        ).length;
         const padded = ruleName + ":";
         const parts: string[] = [];
-        if (ruleErrors > 0) parts.push(`${TextReporter.RED}${ruleErrors} error(s)${TextReporter.RESET}`);
-        if (ruleWarnings > 0) parts.push(`${TextReporter.YELLOW}${ruleWarnings} warning(s)${TextReporter.RESET}`);
+        if (ruleErrors > 0)
+          parts.push(
+            `${TextReporter.RED}${ruleErrors} error(s)${TextReporter.RESET}`,
+          );
+        if (ruleWarnings > 0)
+          parts.push(
+            `${TextReporter.YELLOW}${ruleWarnings} warning(s)${TextReporter.RESET}`,
+          );
         console.log(`  ${padded.padEnd(maxRuleLen + 2)} ${parts.join(", ")}`);
       }
     }
 
     if (fixCount > 0) {
-      console.log(`\n${TextReporter.GREEN}${fixCount} fix(es) applied${TextReporter.RESET}`);
+      console.log(
+        `\n${TextReporter.GREEN}${fixCount} fix(es) applied${TextReporter.RESET}`,
+      );
     }
 
     console.log("");
   }
 
-  private groupByFile(violations: IRuleViolation[]): Map<string, IRuleViolation[]> {
+  private groupByFile(
+    violations: IRuleViolation[],
+  ): Map<string, IRuleViolation[]> {
     const grouped = new Map<string, IRuleViolation[]>();
     for (const v of violations) {
       const existing = grouped.get(v.filePath) ?? [];
@@ -63,7 +84,9 @@ export class TextReporter implements IReporter {
     return grouped;
   }
 
-  private groupByRule(violations: IRuleViolation[]): Map<string, IRuleViolation[]> {
+  private groupByRule(
+    violations: IRuleViolation[],
+  ): Map<string, IRuleViolation[]> {
     const grouped = new Map<string, IRuleViolation[]>();
     for (const v of violations) {
       const existing = grouped.get(v.rule) ?? [];

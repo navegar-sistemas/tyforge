@@ -10,7 +10,11 @@ export interface ILintConfig {
   rules: Record<string, "error" | "warning" | "off">;
 }
 
-const OLintSeverity = { ERROR: "error", WARNING: "warning", OFF: "off" } as const;
+const OLintSeverity = {
+  ERROR: "error",
+  WARNING: "warning",
+  OFF: "off",
+} as const;
 
 const LINT_DEFAULTS: Record<string, unknown> = {
   root: "src",
@@ -32,7 +36,10 @@ function validateAndBuildLintConfig(raw: Record<string, unknown>): ILintConfig {
   if (isFailure(excludeResult)) throw new Error(excludeResult.error.detail);
   const exclude: string[] = [];
   for (let i = 0; i < excludeResult.value.length; i++) {
-    const itemResult = TypeGuard.isString(excludeResult.value[i], `exclude[${i}]`);
+    const itemResult = TypeGuard.isString(
+      excludeResult.value[i],
+      `exclude[${i}]`,
+    );
     if (isFailure(itemResult)) throw new Error(itemResult.error.detail);
     exclude.push(itemResult.value);
   }
@@ -44,7 +51,11 @@ function validateAndBuildLintConfig(raw: Record<string, unknown>): ILintConfig {
     if (isFailure(str)) throw new Error(str.error.detail);
     const enumCheck = TypeGuard.isEnumValue(OLintSeverity, str.value, key);
     if (isFailure(enumCheck)) throw new Error(enumCheck.error.detail);
-    if (str.value === "error" || str.value === "warning" || str.value === "off") {
+    if (
+      str.value === "error" ||
+      str.value === "warning" ||
+      str.value === "off"
+    ) {
       rules[key.slice(6)] = str.value;
     }
   }

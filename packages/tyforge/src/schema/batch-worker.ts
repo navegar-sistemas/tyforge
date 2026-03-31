@@ -10,7 +10,10 @@ function isFieldType(value: unknown): value is IFieldConfig["type"] {
   return TypeGuard.isCallable(value);
 }
 
-function buildFieldEntry(serialized: Record<string, unknown>, fieldType: IFieldConfig["type"]): IFieldConfig {
+function buildFieldEntry(
+  serialized: Record<string, unknown>,
+  fieldType: IFieldConfig["type"],
+): IFieldConfig {
   const req = serialized["required"];
   const isArr = serialized["isArray"];
   if (isArr === true) {
@@ -56,7 +59,10 @@ function deserializeSchema(raw: Record<string, unknown>): ISchema {
     if (TypeGuard.isRecord(value) && "type" in value) {
       const typeName = value["type"];
       const nameCheck = TypeGuard.isString(typeName, key);
-      if (nameCheck.success && Object.prototype.hasOwnProperty.call(FIELD_REGISTRY, nameCheck.value)) {
+      if (
+        nameCheck.success &&
+        Object.prototype.hasOwnProperty.call(FIELD_REGISTRY, nameCheck.value)
+      ) {
         const fieldClass = FIELD_REGISTRY[nameCheck.value];
         if (isFieldType(fieldClass)) {
           schema[key] = buildFieldEntry(value, fieldClass);
@@ -67,7 +73,10 @@ function deserializeSchema(raw: Record<string, unknown>): ISchema {
       if (TypeGuard.isRecord(entry) && "type" in entry) {
         const typeName = entry["type"];
         const nameCheck = TypeGuard.isString(typeName, key);
-        if (nameCheck.success && Object.prototype.hasOwnProperty.call(FIELD_REGISTRY, nameCheck.value)) {
+        if (
+          nameCheck.success &&
+          Object.prototype.hasOwnProperty.call(FIELD_REGISTRY, nameCheck.value)
+        ) {
           const fieldClass = FIELD_REGISTRY[nameCheck.value];
           if (isFieldType(fieldClass)) {
             schema[key] = [buildFieldEntry(entry, fieldClass)];
@@ -82,8 +91,15 @@ function deserializeSchema(raw: Record<string, unknown>): ISchema {
   return schema;
 }
 
-function postError(port: NonNullable<typeof parentPort>, detail: string, startIndex = 0): void {
-  port.postMessage({ successes: [], failures: [{ index: startIndex, error: { detail } }] });
+function postError(
+  port: NonNullable<typeof parentPort>,
+  detail: string,
+  startIndex = 0,
+): void {
+  port.postMessage({
+    successes: [],
+    failures: [{ index: startIndex, error: { detail } }],
+  });
 }
 
 if (parentPort) {
@@ -91,19 +107,47 @@ if (parentPort) {
 
   port.on("message", (msg: IWorkerMessage) => {
     const rootCheck = TypeGuard.isObject(msg, "message");
-    if (isFailure(rootCheck)) { postError(port, "Invalid worker message: expected object"); return; }
+    if (isFailure(rootCheck)) {
+      postError(port, "Invalid worker message: expected object");
+      return;
+    }
 
     const schemaCheck = TypeGuard.isObject(msg.schema, "schema");
-    if (isFailure(schemaCheck)) { postError(port, "Invalid worker message: schema must be an object", msg.startIndex); return; }
+    if (isFailure(schemaCheck)) {
+      postError(
+        port,
+        "Invalid worker message: schema must be an object",
+        msg.startIndex,
+      );
+      return;
+    }
 
     const itemsCheck = TypeGuard.isArray(msg.items, "items");
-    if (isFailure(itemsCheck)) { postError(port, "Invalid worker message: items must be an array", msg.startIndex); return; }
+    if (isFailure(itemsCheck)) {
+      postError(
+        port,
+        "Invalid worker message: items must be an array",
+        msg.startIndex,
+      );
+      return;
+    }
 
     const indexCheck = TypeGuard.isNumber(msg.startIndex, "startIndex");
-    if (isFailure(indexCheck)) { postError(port, "Invalid worker message: startIndex must be a number"); return; }
+    if (isFailure(indexCheck)) {
+      postError(port, "Invalid worker message: startIndex must be a number");
+      return;
+    }
 
     if (msg.items.length > 100000) {
-      port.postMessage({ successes: [], failures: [{ index: 0, error: { detail: "Chunk exceeds maximum size of 100000 items" } }] });
+      port.postMessage({
+        successes: [],
+        failures: [
+          {
+            index: 0,
+            error: { detail: "Chunk exceeds maximum size of 100000 items" },
+          },
+        ],
+      });
       return;
     }
 
@@ -116,7 +160,10 @@ if (parentPort) {
     for (let i = 0; i < msg.items.length; i++) {
       const item = msg.items[i];
       if (!TypeGuard.isRecord(item)) {
-        failures.push({ index: msg.startIndex + i, error: { detail: "Expected object" } });
+        failures.push({
+          index: msg.startIndex + i,
+          error: { detail: "Expected object" },
+        });
         continue;
       }
       const result = compiled.create<unknown>(item);
@@ -127,7 +174,10 @@ if (parentPort) {
         if (TypeGuard.isRecord(errJson)) {
           failures.push({ index: msg.startIndex + i, error: errJson });
         } else {
-          failures.push({ index: msg.startIndex + i, error: { detail: String(errJson) } });
+          failures.push({
+            index: msg.startIndex + i,
+            error: { detail: String(errJson) },
+          });
         }
       }
     }

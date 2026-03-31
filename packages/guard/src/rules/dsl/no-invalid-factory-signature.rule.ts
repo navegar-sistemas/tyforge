@@ -20,10 +20,16 @@ export class NoInvalidFactorySignatureRule extends AstRule {
       if (!ts.isClassDeclaration(node)) return;
       if (!node.name) return;
 
-      const isAbstract = node.modifiers?.some(m => m.kind === ts.SyntaxKind.AbstractKeyword);
+      const isAbstract = node.modifiers?.some(
+        (m) => m.kind === ts.SyntaxKind.AbstractKeyword,
+      );
       if (isAbstract) return;
 
-      const isTypeField = AstAnalyzer.extendsFrom(context.checker, node, "TypeField");
+      const isTypeField = AstAnalyzer.extendsFrom(
+        context.checker,
+        node,
+        "TypeField",
+      );
       if (isTypeField) {
         this.validateSchemaCompatible(node, context, violations);
         return;
@@ -34,21 +40,35 @@ export class NoInvalidFactorySignatureRule extends AstRule {
       if (isEntity) return;
 
       // DTOs have their own create pattern
-      const isDto = AstAnalyzer.extendsFrom(context.checker, node, "Dto")
-        || AstAnalyzer.extendsFrom(context.checker, node, "DtoReq")
-        || AstAnalyzer.extendsFrom(context.checker, node, "DtoRes");
+      const isDto =
+        AstAnalyzer.extendsFrom(context.checker, node, "Dto") ||
+        AstAnalyzer.extendsFrom(context.checker, node, "DtoReq") ||
+        AstAnalyzer.extendsFrom(context.checker, node, "DtoRes");
       if (isDto) return;
 
       // DomainEvent/IntegrationEvent have their own patterns
-      const isEvent = AstAnalyzer.extendsFrom(context.checker, node, "DomainEvent")
-        || AstAnalyzer.extendsFrom(context.checker, node, "IntegrationEvent");
+      const isEvent =
+        AstAnalyzer.extendsFrom(context.checker, node, "DomainEvent") ||
+        AstAnalyzer.extendsFrom(context.checker, node, "IntegrationEvent");
       if (isEvent) return;
 
       // ValueObjects extending ClassDomainModels that have both create AND assign → schema type
-      const isClassDomainModel = AstAnalyzer.extendsFrom(context.checker, node, "ClassDomainModels");
+      const isClassDomainModel = AstAnalyzer.extendsFrom(
+        context.checker,
+        node,
+        "ClassDomainModels",
+      );
       if (isClassDomainModel) {
-        const hasCreate = AstAnalyzer.hasStaticMethod(context.checker, node, "create");
-        const hasAssign = AstAnalyzer.hasStaticMethod(context.checker, node, "assign");
+        const hasCreate = AstAnalyzer.hasStaticMethod(
+          context.checker,
+          node,
+          "create",
+        );
+        const hasAssign = AstAnalyzer.hasStaticMethod(
+          context.checker,
+          node,
+          "assign",
+        );
         if (hasCreate && hasAssign) {
           this.validateSchemaCompatible(node, context, violations);
         }
@@ -73,15 +93,25 @@ export class NoInvalidFactorySignatureRule extends AstRule {
     context: IAstRuleContext,
     violations: IRuleViolation[],
   ): void {
-    const method = AstAnalyzer.hasStaticMethod(context.checker, classDecl, methodName);
+    const method = AstAnalyzer.hasStaticMethod(
+      context.checker,
+      classDecl,
+      methodName,
+    );
     if (!method) return;
 
-    const line = context.sourceFile.getLineAndCharacterOfPosition(method.getStart()).line + 1;
+    const line =
+      context.sourceFile.getLineAndCharacterOfPosition(method.getStart()).line +
+      1;
     const params = method.parameters;
 
     if (params.length !== 2) {
       violations.push(
-        this.violation(line, context.filePath, `static ${methodName}() has ${params.length} parameter(s) — requires exactly 2: (raw: T/unknown, fieldPath: string)`),
+        this.violation(
+          line,
+          context.filePath,
+          `static ${methodName}() has ${params.length} parameter(s) — requires exactly 2: (raw: T/unknown, fieldPath: string)`,
+        ),
       );
       return;
     }
@@ -90,13 +120,21 @@ export class NoInvalidFactorySignatureRule extends AstRule {
     const firstName = AstAnalyzer.getParamName(first);
     if (firstName !== "raw" && firstName !== "value") {
       violations.push(
-        this.violation(line, context.filePath, `static ${methodName}() first parameter must be named "raw" or "value" — found "${firstName}"`),
+        this.violation(
+          line,
+          context.filePath,
+          `static ${methodName}() first parameter must be named "raw" or "value" — found "${firstName}"`,
+        ),
       );
     }
     if (!AstAnalyzer.isParamTypeUnknownOrGeneric(first)) {
       const actualType = AstAnalyzer.getParamTypeName(first);
       violations.push(
-        this.violation(line, context.filePath, `static ${methodName}() first parameter type must be unknown or generic T — found "${actualType}"`),
+        this.violation(
+          line,
+          context.filePath,
+          `static ${methodName}() first parameter type must be unknown or generic T — found "${actualType}"`,
+        ),
       );
     }
 
@@ -104,14 +142,22 @@ export class NoInvalidFactorySignatureRule extends AstRule {
     const secondName = AstAnalyzer.getParamName(second);
     if (secondName !== "fieldPath") {
       violations.push(
-        this.violation(line, context.filePath, `static ${methodName}() second parameter must be named "fieldPath" — found "${secondName}"`),
+        this.violation(
+          line,
+          context.filePath,
+          `static ${methodName}() second parameter must be named "fieldPath" — found "${secondName}"`,
+        ),
       );
     }
 
     const secondType = AstAnalyzer.getParamTypeName(second);
     if (secondType !== "string" && secondType !== "") {
       violations.push(
-        this.violation(line, context.filePath, `static ${methodName}() second parameter type must be string — found "${secondType}"`),
+        this.violation(
+          line,
+          context.filePath,
+          `static ${methodName}() second parameter type must be string — found "${secondType}"`,
+        ),
       );
     }
   }

@@ -2,7 +2,8 @@ import { Rule } from "../../rule";
 import type { IRuleViolation } from "../../rule";
 
 export class NoDirectDomainInstantiationRule extends Rule {
-  private readonly pattern = /\bnew\s+(Entity|Aggregate|ValueObject|DomainEvent)\s*\(/;
+  private readonly pattern =
+    /\bnew\s+(Entity|Aggregate|ValueObject|DomainEvent)\s*\(/;
 
   constructor(severity: "error" | "warning" = "error") {
     super(
@@ -12,14 +13,23 @@ export class NoDirectDomainInstantiationRule extends Rule {
     );
   }
 
-  check(line: string, lineNumber: number, filePath: string): IRuleViolation | null {
+  check(
+    line: string,
+    lineNumber: number,
+    filePath: string,
+  ): IRuleViolation | null {
     if (this.isTestFile(filePath)) return null;
     if (filePath.includes("domain-models/")) return null;
 
     const code = this.stripLiterals(line);
 
     const trimmed = code.trim();
-    if (trimmed.startsWith("//") || trimmed.startsWith("*") || trimmed.startsWith("/*")) return null;
+    if (
+      trimmed.startsWith("//") ||
+      trimmed.startsWith("*") ||
+      trimmed.startsWith("/*")
+    )
+      return null;
 
     if (this.pattern.test(code)) {
       return this.violation(

@@ -23,11 +23,12 @@ export const OHookManagerType = {
   NONE: "none",
 } as const;
 
-export type THookManagerDetected = typeof OHookManagerType[keyof typeof OHookManagerType];
+export type THookManagerDetected =
+  (typeof OHookManagerType)[keyof typeof OHookManagerType];
 
 export class ToolDetect {
   static isCI(): boolean {
-    return CI_ENV_VARS.some(v => process.env[v] !== undefined);
+    return CI_ENV_VARS.some((v) => process.env[v] !== undefined);
   }
 
   static isTTY(): boolean {
@@ -39,16 +40,20 @@ export class ToolDetect {
   }
 
   static detectHookManager(cwd: string): THookManagerDetected {
-    if (fs.existsSync(path.resolve(cwd, ".husky"))) return OHookManagerType.HUSKY;
-    if (fs.existsSync(path.resolve(cwd, "lefthook.yml"))) return OHookManagerType.LEFTHOOK;
-    if (fs.existsSync(path.resolve(cwd, "lefthook.yaml"))) return OHookManagerType.LEFTHOOK;
+    if (fs.existsSync(path.resolve(cwd, ".husky")))
+      return OHookManagerType.HUSKY;
+    if (fs.existsSync(path.resolve(cwd, "lefthook.yml")))
+      return OHookManagerType.LEFTHOOK;
+    if (fs.existsSync(path.resolve(cwd, "lefthook.yaml")))
+      return OHookManagerType.LEFTHOOK;
     const nativeHook = path.resolve(cwd, ".git", "hooks", "pre-commit");
     if (fs.existsSync(nativeHook)) return OHookManagerType.NATIVE;
     return OHookManagerType.NONE;
   }
 
   static hasExistingConfig(cwd: string): boolean {
-    if (fs.existsSync(path.resolve(cwd, "tyforge-guard.config.json"))) return true;
+    if (fs.existsSync(path.resolve(cwd, "tyforge-guard.config.json")))
+      return true;
     if (fs.existsSync(path.resolve(cwd, "tyforge.config.json"))) return true;
     return false;
   }
@@ -56,7 +61,13 @@ export class ToolDetect {
   static getPackageVersion(): string {
     try {
       const currentDir = path.dirname(fileURLToPath(import.meta.url));
-      const pkgPath = path.resolve(currentDir, "..", "..", "..", "package.json");
+      const pkgPath = path.resolve(
+        currentDir,
+        "..",
+        "..",
+        "..",
+        "package.json",
+      );
       const content = fs.readFileSync(pkgPath, "utf-8");
       const parsed: unknown = JSON.parse(content);
       if (TypeGuard.isRecord(parsed)) {

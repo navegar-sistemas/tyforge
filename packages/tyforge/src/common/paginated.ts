@@ -6,7 +6,11 @@ import { TypeGuard } from "@tyforge/tools/type_guard";
 import { FInt } from "@tyforge/type-fields/primitive/int.typefield";
 import { FPageNumber } from "@tyforge/type-fields/pagination/page-number.typefield";
 import { FPageSize } from "@tyforge/type-fields/pagination/page-size.typefield";
-import type { ISchema, InferProps, InferJson } from "@tyforge/schema/schema-types";
+import type {
+  ISchema,
+  InferProps,
+  InferJson,
+} from "@tyforge/schema/schema-types";
 
 const paginatedSchema = {
   totalItems: { type: FInt },
@@ -15,13 +19,22 @@ const paginatedSchema = {
   totalPages: { type: FInt, required: false },
 } satisfies ISchema;
 
-type TPaginatedProps = InferProps<typeof paginatedSchema> & { items: unknown[] };
+type TPaginatedProps = InferProps<typeof paginatedSchema> & {
+  items: unknown[];
+};
 type TPaginatedJson = InferJson<typeof paginatedSchema> & { items: unknown[] };
 
 const paginatedValidator = SchemaBuilder.compile(paginatedSchema);
 
-export class Paginated<T = unknown> extends ValueObject<TPaginatedProps, TPaginatedJson> {
-  protected readonly _classInfo = { name: "Paginated", version: "1.0.0", description: "Paginated result container" };
+export class Paginated<T = unknown> extends ValueObject<
+  TPaginatedProps,
+  TPaginatedJson
+> {
+  protected readonly _classInfo = {
+    name: "Paginated",
+    version: "1.0.0",
+    description: "Paginated result container",
+  };
   protected readonly _schema = paginatedSchema;
 
   private _items: T[];
@@ -30,7 +43,12 @@ export class Paginated<T = unknown> extends ValueObject<TPaginatedProps, TPagina
   readonly page: FPageNumber;
   readonly pageSize: FPageSize;
 
-  private constructor(props: Omit<TPaginatedProps, "totalPages"> & { items: T[]; totalPages: FInt }) {
+  private constructor(
+    props: Omit<TPaginatedProps, "totalPages"> & {
+      items: T[];
+      totalPages: FInt;
+    },
+  ) {
     super();
     this._items = props.items;
     this._totalItems = props.totalItems;
@@ -58,22 +76,36 @@ export class Paginated<T = unknown> extends ValueObject<TPaginatedProps, TPagina
   }
 
   private static buildTotalPages(totalItems: FInt, pageSize: FPageSize): FInt {
-    return FInt.createOrThrow(Math.ceil(totalItems.getValue() / pageSize.getValue()));
+    return FInt.createOrThrow(
+      Math.ceil(totalItems.getValue() / pageSize.getValue()),
+    );
   }
 
-  static create<T = unknown, TItem = unknown>(raw: T, fieldPath = "Paginated"): Result<Paginated<TItem>, Exceptions> {
+  static create<T = unknown, TItem = unknown>(
+    raw: T,
+    fieldPath = "Paginated",
+  ): Result<Paginated<TItem>, Exceptions> {
     const result = paginatedValidator.create(raw, fieldPath);
     if (isFailure(result)) return result;
     const items = Paginated.extractItems<TItem>(raw);
-    const totalPages = Paginated.buildTotalPages(result.value.totalItems, result.value.pageSize);
+    const totalPages = Paginated.buildTotalPages(
+      result.value.totalItems,
+      result.value.pageSize,
+    );
     return ok(new Paginated<TItem>({ ...result.value, items, totalPages }));
   }
 
-  static assign<T = unknown, TItem = unknown>(raw: T, fieldPath = "Paginated"): Result<Paginated<TItem>, Exceptions> {
+  static assign<T = unknown, TItem = unknown>(
+    raw: T,
+    fieldPath = "Paginated",
+  ): Result<Paginated<TItem>, Exceptions> {
     const result = paginatedValidator.assign(raw, fieldPath);
     if (isFailure(result)) return result;
     const items = Paginated.extractItems<TItem>(raw);
-    const totalPages = Paginated.buildTotalPages(result.value.totalItems, result.value.pageSize);
+    const totalPages = Paginated.buildTotalPages(
+      result.value.totalItems,
+      result.value.pageSize,
+    );
     return ok(new Paginated<TItem>({ ...result.value, items, totalPages }));
   }
 }

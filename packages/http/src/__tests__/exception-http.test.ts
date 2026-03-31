@@ -38,12 +38,18 @@ describe("ExceptionHttp — factory methods", () => {
   });
 
   it("externalApiFailed with error details", () => {
-    const ex = ExceptionHttp.externalApiFailed({ status: 422, data: { message: "Invalid" } });
+    const ex = ExceptionHttp.externalApiFailed({
+      status: 422,
+      data: { message: "Invalid" },
+    });
     assert.ok(ex instanceof ExceptionHttp);
     assert.equal(ex.code, "EXTERNAL_API_FAILED");
     assert.equal(ex.status, OHttpStatus.BAD_GATEWAY);
     assert.equal(ex.detail, "External API returned status 422.");
-    assert.deepEqual(ex.externalError, { status: 422, data: { message: "Invalid" } });
+    assert.deepEqual(ex.externalError, {
+      status: 422,
+      data: { message: "Invalid" },
+    });
   });
 
   it("authFailed returns correct exception", () => {
@@ -100,20 +106,29 @@ describe("ExceptionHttp — serialization", () => {
   });
 
   it("toJSON does not leak externalError", () => {
-    const ex = ExceptionHttp.externalApiFailed({ status: 500, data: { secret: "token123" } });
+    const ex = ExceptionHttp.externalApiFailed({
+      status: 500,
+      data: { secret: "token123" },
+    });
     const json = ex.toJSON();
     assert.equal(json["externalError"], undefined);
   });
 
   it("externalError is non-enumerable (not in JSON.stringify)", () => {
-    const ex = ExceptionHttp.externalApiFailed({ status: 500, data: { secret: "token123" } });
+    const ex = ExceptionHttp.externalApiFailed({
+      status: 500,
+      data: { secret: "token123" },
+    });
     const serialized = JSON.stringify(ex);
     assert.equal(serialized.includes("token123"), false);
     assert.equal(serialized.includes("externalError"), false);
   });
 
   it("externalError is accessible programmatically", () => {
-    const ex = ExceptionHttp.externalApiFailed({ status: 500, data: { error: "details" } });
+    const ex = ExceptionHttp.externalApiFailed({
+      status: 500,
+      data: { error: "details" },
+    });
     assert.equal(ex.externalError?.status, 500);
     assert.deepEqual(ex.externalError?.data, { error: "details" });
   });

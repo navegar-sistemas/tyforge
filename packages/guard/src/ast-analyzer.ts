@@ -10,7 +10,11 @@ export class AstAnalyzer {
     if (tsconfigPath) {
       const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
       const configDir = nodePath.dirname(tsconfigPath);
-      const parsed = ts.parseJsonConfigFileContent(configFile.config, ts.sys, configDir);
+      const parsed = ts.parseJsonConfigFileContent(
+        configFile.config,
+        ts.sys,
+        configDir,
+      );
       // Use all files from tsconfig for full type resolution, lint only targets
       this.program = ts.createProgram(parsed.fileNames, parsed.options);
     } else {
@@ -35,7 +39,11 @@ export class AstAnalyzer {
       const resolved = nodePath.resolve(sourceFile.fileName);
       if (!targetSet.has(resolved)) continue;
 
-      const context: IAstRuleContext = { sourceFile, checker, filePath: resolved };
+      const context: IAstRuleContext = {
+        sourceFile,
+        checker,
+        filePath: resolved,
+      };
       for (const rule of rules) {
         violations.push(...rule.check(context));
       }
@@ -44,12 +52,21 @@ export class AstAnalyzer {
     return violations;
   }
 
-  static extendsFrom(checker: ts.TypeChecker, classDecl: ts.ClassDeclaration, ancestorName: string): boolean {
+  static extendsFrom(
+    checker: ts.TypeChecker,
+    classDecl: ts.ClassDeclaration,
+    ancestorName: string,
+  ): boolean {
     const type = checker.getTypeAtLocation(classDecl);
     return AstAnalyzer.typeExtendsFrom(checker, type, ancestorName, new Set());
   }
 
-  private static typeExtendsFrom(checker: ts.TypeChecker, type: ts.Type, ancestorName: string, visited: Set<string>): boolean {
+  private static typeExtendsFrom(
+    checker: ts.TypeChecker,
+    type: ts.Type,
+    ancestorName: string,
+    visited: Set<string>,
+  ): boolean {
     const symbol = type.getSymbol();
     const typeName = symbol?.getName() ?? "";
     if (visited.has(typeName)) return false;
@@ -69,7 +86,15 @@ export class AstAnalyzer {
           for (const decl of declarations) {
             if (ts.isClassDeclaration(decl)) {
               const declType = checker.getTypeAtLocation(decl);
-              if (AstAnalyzer.typeExtendsFrom(checker, declType, ancestorName, visited)) return true;
+              if (
+                AstAnalyzer.typeExtendsFrom(
+                  checker,
+                  declType,
+                  ancestorName,
+                  visited,
+                )
+              )
+                return true;
             }
           }
         }
@@ -79,11 +104,22 @@ export class AstAnalyzer {
     return false;
   }
 
-  static hasStaticMethod(_checker: ts.TypeChecker, classDecl: ts.ClassDeclaration, methodName: string): ts.MethodDeclaration | undefined {
+  static hasStaticMethod(
+    _checker: ts.TypeChecker,
+    classDecl: ts.ClassDeclaration,
+    methodName: string,
+  ): ts.MethodDeclaration | undefined {
     for (const member of classDecl.members) {
       if (!ts.isMethodDeclaration(member)) continue;
-      if (!member.modifiers?.some(m => m.kind === ts.SyntaxKind.StaticKeyword)) continue;
-      if (member.name && ts.isIdentifier(member.name) && member.name.text === methodName) {
+      if (
+        !member.modifiers?.some((m) => m.kind === ts.SyntaxKind.StaticKeyword)
+      )
+        continue;
+      if (
+        member.name &&
+        ts.isIdentifier(member.name) &&
+        member.name.text === methodName
+      ) {
         return member;
       }
     }
@@ -104,7 +140,10 @@ export class AstAnalyzer {
     if (param.type.kind === ts.SyntaxKind.StringKeyword) return "string";
     if (param.type.kind === ts.SyntaxKind.NumberKeyword) return "number";
     if (param.type.kind === ts.SyntaxKind.BooleanKeyword) return "boolean";
-    if (ts.isTypeReferenceNode(param.type) && ts.isIdentifier(param.type.typeName)) {
+    if (
+      ts.isTypeReferenceNode(param.type) &&
+      ts.isIdentifier(param.type.typeName)
+    ) {
       return param.type.typeName.text;
     }
     return "";

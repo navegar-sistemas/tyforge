@@ -33,7 +33,9 @@ export class ToolFormattingDateISO8601 {
   /** @example "2024-04-09" */
   static formatDate(value: Date): Result<string, ExceptionValidation> {
     if (!(value instanceof Date) || isNaN(value.getTime())) {
-      return err(ExceptionValidation.create("formatDate", "Invalid Date input"));
+      return err(
+        ExceptionValidation.create("formatDate", "Invalid Date input"),
+      );
     }
     const d = ToolFormattingDateISO8601.toUTCMinus3(value);
     const year = d.getUTCFullYear();

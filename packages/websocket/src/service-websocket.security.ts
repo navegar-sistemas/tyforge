@@ -9,7 +9,9 @@ const DANGEROUS_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 const MAX_SANITIZE_DEPTH = 50;
 
 export class ServiceWebSocketSecurity {
-  static sanitizeHeaders(headers: Record<string, FString>): Record<string, FString> {
+  static sanitizeHeaders(
+    headers: Record<string, FString>,
+  ): Record<string, FString> {
     const primitiveRecord: Record<string, string> = {};
     for (const [key, value] of Object.entries(headers)) {
       primitiveRecord[key] = value.getValue();
@@ -22,7 +24,10 @@ export class ServiceWebSocketSecurity {
     return result;
   }
 
-  static sanitizeMessage(data: Record<string, unknown>, depth = 0): Result<Record<string, unknown>, Exceptions> {
+  static sanitizeMessage(
+    data: Record<string, unknown>,
+    depth = 0,
+  ): Result<Record<string, unknown>, Exceptions> {
     if (depth >= MAX_SANITIZE_DEPTH) {
       return err(ExceptionWebSocket.invalidMessage());
     }
@@ -30,14 +35,20 @@ export class ServiceWebSocketSecurity {
     for (const [key, value] of Object.entries(data)) {
       if (DANGEROUS_KEYS.has(key)) continue;
       if (TypeGuard.isRecord(value)) {
-        const nested = ServiceWebSocketSecurity.sanitizeMessage(value, depth + 1);
+        const nested = ServiceWebSocketSecurity.sanitizeMessage(
+          value,
+          depth + 1,
+        );
         if (isFailure(nested)) return nested;
         sanitized[key] = nested.value;
       } else if (Array.isArray(value)) {
         const items: unknown[] = [];
         for (const item of value) {
           if (TypeGuard.isRecord(item)) {
-            const nested = ServiceWebSocketSecurity.sanitizeMessage(item, depth + 1);
+            const nested = ServiceWebSocketSecurity.sanitizeMessage(
+              item,
+              depth + 1,
+            );
             if (isFailure(nested)) return nested;
             items.push(nested.value);
           } else {

@@ -8,6 +8,8 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "guard": "npx tyforge-guard",
+    "format": "prettier --write \"packages/*/src/**/*.ts\"",
+    "format:check": "prettier --check \"packages/*/src/**/*.ts\"",
     "sandbox:build": "docker compose -f docker-compose.sandbox.yml build --no-cache && docker compose -f docker-compose.sandbox.yml -f docker-compose.override.yml build --no-cache",
     "sandbox": "script -q /dev/null docker compose -f docker-compose.sandbox.yml -f docker-compose.override.yml run --rm sandbox",
     "sandbox:sh": "docker compose -f docker-compose.sandbox.yml -f docker-compose.override.yml run --rm --entrypoint bash sandbox",
@@ -15,6 +17,7 @@
   },
   "devDependencies": {
     "husky": "9.1.7",
+    "prettier": "3.8.1",
     "typescript": "6.0.2"
   },
   "engines": {

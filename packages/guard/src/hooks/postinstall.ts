@@ -13,13 +13,21 @@ async function run(): Promise<void> {
     if (config?._meta) {
       const currentRuleCount = RuleRegistry.getDefaultRuleCount();
       if (currentRuleCount > config._meta.lastRulesCount) {
-        console.log("tyforge: new linter rules available. Run `npx tyforge-guard --init --update` to review.");
+        console.log(
+          "tyforge: new linter rules available. Run `npx tyforge-guard --init --update` to review.",
+        );
       }
     }
     return;
   }
 
-  console.log("tyforge: run `npx tyforge-guard --init` to configure pre-commit hooks.");
+  console.log(
+    "tyforge: run `npx tyforge-guard --init` to configure pre-commit hooks.",
+  );
 }
 
-try { run().catch(() => {}); } catch { /* Never fail npm install */ }
+try {
+  run().catch(() => {});
+} catch {
+  /* Never fail npm install */
+}

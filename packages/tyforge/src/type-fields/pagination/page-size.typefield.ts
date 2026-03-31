@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -37,7 +40,10 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
     }
     if (value < 1) {
       return err(
-        ExceptionValidation.create(fieldPath, "Page size must be greater than 0"),
+        ExceptionValidation.create(
+          fieldPath,
+          "Page size must be greater than 0",
+        ),
       );
     }
     if (value > 100) {
@@ -48,23 +54,45 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TPageSize, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TPageSize, ExceptionValidation> {
     return TypeGuard.extractNumber(value, fieldPath);
   }
 
-  static formCreate(raw: unknown, fieldPath = "PageSize"): Result<FPageSize, ExceptionValidation> {
-    return FPageSize.create(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  static formCreate(
+    raw: unknown,
+    fieldPath = "PageSize",
+  ): Result<FPageSize, ExceptionValidation> {
+    return FPageSize.create(
+      TypeField.normalizeFormInput(raw, "number"),
+      fieldPath,
+    );
   }
 
-  static formAssign(raw: unknown, fieldPath = "PageSize"): Result<FPageSize, ExceptionValidation> {
-    return FPageSize.assign(TypeField.normalizeFormInput(raw, "number"), fieldPath);
+  static formAssign(
+    raw: unknown,
+    fieldPath = "PageSize",
+  ): Result<FPageSize, ExceptionValidation> {
+    return FPageSize.assign(
+      TypeField.normalizeFormInput(raw, "number"),
+      fieldPath,
+    );
   }
 
-  static create<T = TPageSize>(raw: T, fieldPath = "PageSize"): Result<FPageSize, ExceptionValidation> {
+  static create<T = TPageSize>(
+    raw: T,
+    fieldPath = "PageSize",
+  ): Result<FPageSize, ExceptionValidation> {
     const typed = FPageSize.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FPageSize(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -75,11 +103,18 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
     return result.value;
   }
 
-  static assign<T = TPageSize>(value: T, fieldPath = "PageSize"): Result<FPageSize, ExceptionValidation> {
+  static assign<T = TPageSize>(
+    value: T,
+    fieldPath = "PageSize",
+  ): Result<FPageSize, ExceptionValidation> {
     const typed = FPageSize.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FPageSize(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -93,7 +128,10 @@ export class FPageSize extends TypeField<TPageSize, TPageSizeFormatted> {
   }
 
   override getDescription(): string {
-    return "Tamanho da página para paginação. Deve ser um inteiro entre 1 e 100.";
+    return (
+      "Tamanho da página para paginação." +
+      " Deve ser um inteiro entre 1 e 100."
+    );
   }
 
   override getShortDescription(): string {

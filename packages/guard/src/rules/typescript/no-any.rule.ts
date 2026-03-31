@@ -25,7 +25,11 @@ export class NoAnyRule extends Rule {
     super("no-any", "Forbids 'any' usage in production code", severity);
   }
 
-  check(line: string, lineNumber: number, filePath: string): IRuleViolation | null {
+  check(
+    line: string,
+    lineNumber: number,
+    filePath: string,
+  ): IRuleViolation | null {
     if (this.isTestFile(filePath)) return null;
 
     const code = this.stripLiterals(line);
@@ -38,7 +42,11 @@ export class NoAnyRule extends Rule {
 
     for (const tp of this.typePositions) {
       if (tp.test(code)) {
-        return this.violation(lineNumber, filePath, "'any' usage is forbidden in production code");
+        return this.violation(
+          lineNumber,
+          filePath,
+          "'any' usage is forbidden in production code",
+        );
       }
     }
 

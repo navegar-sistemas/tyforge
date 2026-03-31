@@ -5,7 +5,8 @@ import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 import type { TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
 
-const DNS_REGEX = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i;
+const DNS_REGEX =
+  /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i;
 
 export type TUrlDns = string;
 export type TUrlDnsFormatted = string;
@@ -24,7 +25,10 @@ export class FUrlDns extends TypeField<TUrlDns, TUrlDnsFormatted> {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath = "UrlDns"): Result<TUrlDns, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath = "UrlDns",
+  ): Result<TUrlDns, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath, 1, 253);
   }
 
@@ -37,16 +41,25 @@ export class FUrlDns extends TypeField<TUrlDns, TUrlDnsFormatted> {
     if (!base.success) return base;
     if (validateLevel === "none") return ok(true);
     if (!DNS_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "Invalid DNS hostname format."));
+      return err(
+        ExceptionValidation.create(fieldPath, "Invalid DNS hostname format."),
+      );
     }
     return ok(true);
   }
 
-  static create<T = TUrlDns>(raw: T, fieldPath = "UrlDns"): Result<FUrlDns, ExceptionValidation> {
+  static create<T = TUrlDns>(
+    raw: T,
+    fieldPath = "UrlDns",
+  ): Result<FUrlDns, ExceptionValidation> {
     const typed = FUrlDns.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FUrlDns(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -57,17 +70,32 @@ export class FUrlDns extends TypeField<TUrlDns, TUrlDnsFormatted> {
     return result.value;
   }
 
-  static assign<T = TUrlDns>(value: T, fieldPath = "UrlDns"): Result<FUrlDns, ExceptionValidation> {
+  static assign<T = TUrlDns>(
+    value: T,
+    fieldPath = "UrlDns",
+  ): Result<FUrlDns, ExceptionValidation> {
     const typed = FUrlDns.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FUrlDns(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  override formatted(): TUrlDnsFormatted { return this.getValue(); }
-  override toString(): string { return this.getValue(); }
-  override getDescription(): string { return "DNS hostname (e.g., api.example.com)"; }
-  override getShortDescription(): string { return "DNS"; }
+  override formatted(): TUrlDnsFormatted {
+    return this.getValue();
+  }
+  override toString(): string {
+    return this.getValue();
+  }
+  override getDescription(): string {
+    return "DNS hostname (e.g., api.example.com)";
+  }
+  override getShortDescription(): string {
+    return "DNS";
+  }
 }

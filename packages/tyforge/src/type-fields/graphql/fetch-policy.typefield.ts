@@ -14,7 +14,10 @@ export type TKeyFetchPolicy = keyof typeof OFetchPolicy;
 export type TFetchPolicy = (typeof OFetchPolicy)[TKeyFetchPolicy];
 export type TFetchPolicyFormatted = string;
 
-export class FFetchPolicy extends TypeField<TFetchPolicy, TFetchPolicyFormatted> {
+export class FFetchPolicy extends TypeField<
+  TFetchPolicy,
+  TFetchPolicyFormatted
+> {
   override readonly typeInference = "FFetchPolicy";
 
   override readonly config: ITypeFieldConfig<TFetchPolicy> = {
@@ -29,38 +32,66 @@ export class FFetchPolicy extends TypeField<TFetchPolicy, TFetchPolicyFormatted>
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath = "FetchPolicy"): Result<TFetchPolicy, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath = "FetchPolicy",
+  ): Result<TFetchPolicy, ExceptionValidation> {
     const str = TypeGuard.isString(value, fieldPath);
     if (isFailure(str)) return err(str.error);
     return TypeField.resolveEnum(OFetchPolicy, str.value, fieldPath);
   }
 
-  static create<T = TFetchPolicy>(raw: T, fieldPath = "FetchPolicy"): Result<FFetchPolicy, ExceptionValidation> {
+  static create<T = TFetchPolicy>(
+    raw: T,
+    fieldPath = "FetchPolicy",
+  ): Result<FFetchPolicy, ExceptionValidation> {
     const typed = FFetchPolicy.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FFetchPolicy(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(value: TFetchPolicy, fieldPath = "FetchPolicy"): FFetchPolicy {
+  static createOrThrow(
+    value: TFetchPolicy,
+    fieldPath = "FetchPolicy",
+  ): FFetchPolicy {
     const result = FFetchPolicy.create(value, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TFetchPolicy>(value: T, fieldPath = "FetchPolicy"): Result<FFetchPolicy, ExceptionValidation> {
+  static assign<T = TFetchPolicy>(
+    value: T,
+    fieldPath = "FetchPolicy",
+  ): Result<FFetchPolicy, ExceptionValidation> {
     const typed = FFetchPolicy.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FFetchPolicy(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  override formatted(): TFetchPolicyFormatted { return this.getValue(); }
-  override toString(): string { return this.getValue(); }
-  override getDescription(): string { return "Fetch policy (network-only, cache-first, no-cache)"; }
-  override getShortDescription(): string { return "Fetch Policy"; }
+  override formatted(): TFetchPolicyFormatted {
+    return this.getValue();
+  }
+  override toString(): string {
+    return this.getValue();
+  }
+  override getDescription(): string {
+    return "Fetch policy (network-only, cache-first, no-cache)";
+  }
+  override getShortDescription(): string {
+    return "Fetch Policy";
+  }
 }

@@ -1,14 +1,23 @@
 import { Result } from "@tyforge/result/result";
-import { TypeField, type TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  type TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { Entity, IEntityProps } from "@tyforge/domain-models/entity.base";
 import { Exceptions } from "@tyforge/exceptions/base.exceptions";
 
 export type { TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
 
-export const OExposeLevel = { PUBLIC: "public", PRIVATE: "private", REDACTED: "redacted" } as const;
-export type TExposeLevel = typeof OExposeLevel[keyof typeof OExposeLevel];
+export const OExposeLevel = {
+  PUBLIC: "public",
+  PRIVATE: "private",
+  REDACTED: "redacted",
+} as const;
+export type TExposeLevel = (typeof OExposeLevel)[keyof typeof OExposeLevel];
 
-export type TAssignFn<TSchema extends ISchema> = (data: unknown) => Result<InferProps<TSchema>, Exceptions>;
+export type TAssignFn<TSchema extends ISchema> = (
+  data: unknown,
+) => Result<InferProps<TSchema>, Exceptions>;
 
 export interface IParallelProcessor {
   process<TSchema extends ISchema>(
@@ -36,19 +45,27 @@ export interface IBatchCreateOptions {
 }
 
 export function getVisibilityLevel(expose: TExposeLevel | undefined): number {
-  const levels: Record<TExposeLevel, number> = { public: 1, private: 2, redacted: 3 };
+  const levels: Record<TExposeLevel, number> = {
+    public: 1,
+    private: 2,
+    redacted: 3,
+  };
   return levels[expose ?? "public"];
 }
 
 /**
  * Interface for TypeField types with static `create` method.
- * The generic `<T = TPrimitive>` on create allows accepting `unknown` when called explicitly.
+ * The generic `<T = TPrimitive>` on create allows
+ * accepting `unknown` when called explicitly.
  */
 export interface IValueObjectStatic<
   TPrimitive,
   TInstance extends TypeField<TPrimitive>,
 > {
-  create<T = TPrimitive>(value: T, fieldPath?: string): Result<TInstance, Exceptions>;
+  create<T = TPrimitive>(
+    value: T,
+    fieldPath?: string,
+  ): Result<TInstance, Exceptions>;
 }
 
 /**
@@ -61,8 +78,10 @@ export interface IEntityStatic<
 }
 
 /**
- * Generic interface for any schema-compatible class with static create/assign.
- * Accepts ValueObjects, composite VOs, or any class following the factory pattern.
+ * Generic interface for any schema-compatible class
+ * with static create/assign. Accepts ValueObjects,
+ * composite VOs, or any class following the factory
+ * pattern.
  */
 export interface ICreatableStatic<TInstance = unknown> {
   create(value: unknown, fieldPath?: string): Result<TInstance, Exceptions>;
@@ -108,7 +127,10 @@ interface IFieldConfigMap extends IFieldConfigBase {
   isArray?: never;
 }
 
-export type IFieldConfig = IFieldConfigSingle | IFieldConfigArray | IFieldConfigMap;
+export type IFieldConfig =
+  | IFieldConfigSingle
+  | IFieldConfigArray
+  | IFieldConfigMap;
 
 /**
  * Inline schema object with nested fields.
@@ -136,22 +158,24 @@ type InferPrimitive<T> =
     : T extends IEntityStatic<Entity<IEntityProps, infer TJson>>
       ? TJson
       : T extends ICreatableStatic<infer TI>
-        ? (TI extends { toJSON(): infer TJ } ? TJ : unknown)
+        ? TI extends { toJSON(): infer TJ }
+          ? TJ
+          : unknown
         : T extends ISchema
           ? InferJson<T>
           : never;
 
 /**
  * Builds the JSON input type:
- * - for each field, if `isArray` then InferPrimitive[]; otherwise InferPrimitive
+ * - for each field, if `isArray` then InferPrimitive[];
+ *   otherwise InferPrimitive
  * - fields with `required: false` become optional (`?`)
  */
-type InferJsonField<T extends IFieldConfig> =
-  T extends { isMap: true }
-    ? Record<string, InferPrimitive<T["type"]>>
-    : T extends { isArray: true }
-      ? InferPrimitive<T["type"]>[]
-      : InferPrimitive<T["type"]>;
+type InferJsonField<T extends IFieldConfig> = T extends { isMap: true }
+  ? Record<string, InferPrimitive<T["type"]>>
+  : T extends { isArray: true }
+    ? InferPrimitive<T["type"]>[]
+    : InferPrimitive<T["type"]>;
 
 export type InferJson<TSchema extends ISchema> = {
   [K in keyof TSchema as TSchema[K] extends { required: false }
@@ -189,12 +213,11 @@ type InferInstance<T> =
  * Builds the final props type:
  * - analogous to InferJson, but uses InferInstance
  */
-type InferPropsField<T extends IFieldConfig> =
-  T extends { isMap: true }
-    ? Record<string, InferInstance<T["type"]>>
-    : T extends { isArray: true }
-      ? InferInstance<T["type"]>[]
-      : InferInstance<T["type"]>;
+type InferPropsField<T extends IFieldConfig> = T extends { isMap: true }
+  ? Record<string, InferInstance<T["type"]>>
+  : T extends { isArray: true }
+    ? InferInstance<T["type"]>[]
+    : InferInstance<T["type"]>;
 
 export type InferProps<TSchema extends ISchema> = {
   [K in keyof TSchema as TSchema[K] extends { required: false }
@@ -213,4 +236,3 @@ export type InferProps<TSchema extends ISchema> = {
       ? InferProps<TSchema[K]>
       : never;
 };
-

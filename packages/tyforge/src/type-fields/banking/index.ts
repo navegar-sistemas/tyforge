@@ -1,7 +1,13 @@
 export { FBankAccountNumber } from "./bank-account-number.typefield";
-export type { TBankAccountNumber, TBankAccountNumberFormatted } from "./bank-account-number.typefield";
+export type {
+  TBankAccountNumber,
+  TBankAccountNumberFormatted,
+} from "./bank-account-number.typefield";
 export { FBankBranch } from "./bank-branch.typefield";
-export type { TBankBranch, TBankBranchFormatted } from "./bank-branch.typefield";
+export type {
+  TBankBranch,
+  TBankBranchFormatted,
+} from "./bank-branch.typefield";
 export { FBankCode } from "./bank-code.typefield";
 export type { TBankCode, TBankCodeFormatted } from "./bank-code.typefield";
 export { FBankE2eId } from "./bank-e2e-id.typefield";
@@ -15,6 +21,13 @@ export type { TCurrency, TCurrencyFormatted } from "./currency.typefield";
 export { FPixKey } from "./pix-key.typefield";
 export type { TPixKey, TPixKeyFormatted } from "./pix-key.typefield";
 export { FPixKeyType, OPixKeyType } from "./pix-key-type.typefield";
-export type { TPixKeyType, TPixKeyTypeFormatted, TKeyPixKeyType } from "./pix-key-type.typefield";
+export type {
+  TPixKeyType,
+  TPixKeyTypeFormatted,
+  TKeyPixKeyType,
+} from "./pix-key-type.typefield";
 export { FEmvQrCodePayload } from "./emv-qr-code-payload.typefield";
-export type { TEmvQrCodePayload, TEmvQrCodePayloadFormatted } from "./emv-qr-code-payload.typefield";
+export type {
+  TEmvQrCodePayload,
+  TEmvQrCodePayloadFormatted,
+} from "./emv-qr-code-payload.typefield";

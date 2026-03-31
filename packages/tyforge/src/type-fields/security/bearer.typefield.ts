@@ -1,4 +1,7 @@
-import { TypeField, TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
+import {
+  TypeField,
+  TValidationLevel,
+} from "@tyforge/type-fields/_base/type-field.base";
 import { ITypeFieldConfig } from "@tyforge/type-fields/_base/type-field.config";
 import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result";
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
@@ -43,15 +46,25 @@ export class FBearer extends TypeField<TBearer, TBearerFormatted> {
     return OK_TRUE;
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<TBearer, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<TBearer, ExceptionValidation> {
     return TypeGuard.extractString(value, fieldPath);
   }
 
-  static create<T = TBearer>(raw: T, fieldPath = "Bearer"): Result<FBearer, ExceptionValidation> {
+  static create<T = TBearer>(
+    raw: T,
+    fieldPath = "Bearer",
+  ): Result<FBearer, ExceptionValidation> {
     const typed = FBearer.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBearer(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -62,11 +75,18 @@ export class FBearer extends TypeField<TBearer, TBearerFormatted> {
     return result.value;
   }
 
-  static assign<T = TBearer>(value: T, fieldPath = "Bearer"): Result<FBearer, ExceptionValidation> {
+  static assign<T = TBearer>(
+    value: T,
+    fieldPath = "Bearer",
+  ): Result<FBearer, ExceptionValidation> {
     const typed = FBearer.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FBearer(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -80,7 +100,11 @@ export class FBearer extends TypeField<TBearer, TBearerFormatted> {
   }
 
   override getDescription(): string {
-    return "Bearer access token for API authentication. Must be a valid JWT string.";
+    return (
+      "Bearer access token for API" +
+      " authentication." +
+      " Must be a valid JWT string."
+    );
   }
 
   override getShortDescription(): string {

@@ -1,7 +1,12 @@
 import type { FInt } from "@tyforge/type-fields/primitive/int.typefield";
 
-export const OCircuitBreakerState = { CLOSED: "closed", OPEN: "open", HALF_OPEN: "half-open" } as const;
-export type TCircuitBreakerState = typeof OCircuitBreakerState[keyof typeof OCircuitBreakerState];
+export const OCircuitBreakerState = {
+  CLOSED: "closed",
+  OPEN: "open",
+  HALF_OPEN: "half-open",
+} as const;
+export type TCircuitBreakerState =
+  (typeof OCircuitBreakerState)[keyof typeof OCircuitBreakerState];
 
 export interface ICircuitBreakerConfig {
   failureThreshold: FInt;

@@ -8,9 +8,15 @@ import { SchemaRunner } from "./schema-runner";
 export class SchemaCompiler {
   constructor(private readonly maxDepth: number) {}
 
-  compile(schema: Record<string, unknown>, basePath: string, depth = 0): ICompiledField[] {
+  compile(
+    schema: Record<string, unknown>,
+    basePath: string,
+    depth = 0,
+  ): ICompiledField[] {
     if (depth >= this.maxDepth) {
-      throw new Error(`Schema nesting exceeds maximum depth of ${this.maxDepth} at path: ${basePath}`);
+      throw new Error(
+        `Schema nesting exceeds maximum depth of ${this.maxDepth} at path: ${basePath}`,
+      );
     }
 
     const fields: ICompiledField[] = [];
@@ -26,29 +32,63 @@ export class SchemaCompiler {
         const levels = SchemaCompiler.extractValidateLevels(entry);
 
         if (isMap && SchemaCompiler.isCreatable(target)) {
-          fields.push(SchemaCompiler.buildMapField(key, path, entry, target, levels));
+          fields.push(
+            SchemaCompiler.buildMapField(key, path, entry, target, levels),
+          );
         } else if (SchemaCompiler.isCreatable(target)) {
-          fields.push(SchemaCompiler.buildCreatableField(key, path, entry, target, isArray, levels));
+          fields.push(
+            SchemaCompiler.buildCreatableField(
+              key,
+              path,
+              entry,
+              target,
+              isArray,
+              levels,
+            ),
+          );
         } else if (target && TypeGuard.isRecord(target)) {
-          fields.push(this.buildNestedField(key, path, entry.required !== false, target, isArray, depth, levels));
+          fields.push(
+            this.buildNestedField(
+              key,
+              path,
+              entry.required !== false,
+              target,
+              isArray,
+              depth,
+              levels,
+            ),
+          );
         }
       } else if (entry && TypeGuard.isRecord(entry)) {
-        fields.push(this.buildNestedField(key, path, true, entry, false, depth, {
-          assignValidateLevel: "type",
-          createValidateLevel: "full",
-        }));
+        fields.push(
+          this.buildNestedField(key, path, true, entry, false, depth, {
+            assignValidateLevel: "type",
+            createValidateLevel: "full",
+          }),
+        );
       }
     }
 
     return fields;
   }
 
-  private static hasType(entry: unknown): entry is { type: unknown; required?: boolean; isArray?: boolean; isMap?: boolean; keyType?: unknown } {
+  private static hasType(entry: unknown): entry is {
+    type: unknown;
+    required?: boolean;
+    isArray?: boolean;
+    isMap?: boolean;
+    keyType?: unknown;
+  } {
     return !!entry && typeof entry === "object" && "type" in entry;
   }
 
   private static isCreatable(target: unknown): target is Creatable {
-    return !!target && (typeof target === "object" || typeof target === "function") && "create" in target && typeof target.create === "function";
+    return (
+      !!target &&
+      (typeof target === "object" || typeof target === "function") &&
+      "create" in target &&
+      typeof target.create === "function"
+    );
   }
 
   private static hasAssign(target: Creatable): boolean {
@@ -56,7 +96,11 @@ export class SchemaCompiler {
   }
 
   private static normalizeArraySyntax(entry: unknown): unknown {
-    if (Array.isArray(entry) && entry.length > 0 && SchemaCompiler.hasType(entry[0])) {
+    if (
+      Array.isArray(entry) &&
+      entry.length > 0 &&
+      SchemaCompiler.hasType(entry[0])
+    ) {
       const config = entry[0];
       if (typeof config !== "object" || config === null) return entry;
       return { type: config.type, required: config.required, isArray: true };
@@ -64,32 +108,55 @@ export class SchemaCompiler {
     return entry;
   }
 
-  private static extractValidateLevels(entry: unknown): { assignValidateLevel: TValidationLevel; createValidateLevel: TValidationLevel } {
-    const defaults = { assignValidateLevel: TypeField.assignLevel, createValidateLevel: TypeField.createLevel };
+  private static extractValidateLevels(entry: unknown): {
+    assignValidateLevel: TValidationLevel;
+    createValidateLevel: TValidationLevel;
+  } {
+    const defaults = {
+      assignValidateLevel: TypeField.assignLevel,
+      createValidateLevel: TypeField.createLevel,
+    };
     if (!TypeGuard.isRecord(entry)) return defaults;
     const validate = entry["validate"];
     if (!TypeGuard.isRecord(validate)) return defaults;
     const assign = validate["assign"];
     const create = validate["create"];
     return {
-      assignValidateLevel: (assign === "full" || assign === "type" || assign === "none") ? assign : TypeField.assignLevel,
-      createValidateLevel: (create === "full" || create === "type" || create === "none") ? create : TypeField.createLevel,
+      assignValidateLevel:
+        assign === "full" || assign === "type" || assign === "none"
+          ? assign
+          : TypeField.assignLevel,
+      createValidateLevel:
+        create === "full" || create === "type" || create === "none"
+          ? create
+          : TypeField.createLevel,
     };
   }
 
   private static buildMapField(
-    key: string, path: string,
-    entry: { type: unknown; required?: boolean; isMap?: boolean; keyType?: unknown },
+    key: string,
+    path: string,
+    entry: {
+      type: unknown;
+      required?: boolean;
+      isMap?: boolean;
+      keyType?: unknown;
+    },
     target: Creatable,
-    levels: { assignValidateLevel: TValidationLevel; createValidateLevel: TValidationLevel },
+    levels: {
+      assignValidateLevel: TValidationLevel;
+      createValidateLevel: TValidationLevel;
+    },
   ): ICompiledField {
     const keyType = entry.keyType;
     return {
-      key, path,
+      key,
+      path,
       required: entry.required !== false,
       kind: EFieldKind.MapCreatable,
       creatable: target,
-      keyCreatable: keyType && SchemaCompiler.isCreatable(keyType) ? keyType : null,
+      keyCreatable:
+        keyType && SchemaCompiler.isCreatable(keyType) ? keyType : null,
       hasAssign: SchemaCompiler.hasAssign(target),
       nestedValidator: null,
       ...levels,
@@ -97,14 +164,19 @@ export class SchemaCompiler {
   }
 
   private static buildCreatableField(
-    key: string, path: string,
+    key: string,
+    path: string,
     entry: { required?: boolean; isArray?: boolean },
     target: Creatable,
     isArray: boolean,
-    levels: { assignValidateLevel: TValidationLevel; createValidateLevel: TValidationLevel },
+    levels: {
+      assignValidateLevel: TValidationLevel;
+      createValidateLevel: TValidationLevel;
+    },
   ): ICompiledField {
     return {
-      key, path,
+      key,
+      path,
       required: entry.required !== false,
       kind: isArray ? EFieldKind.ArrayCreatable : EFieldKind.Creatable,
       creatable: target,
@@ -116,16 +188,22 @@ export class SchemaCompiler {
   }
 
   private buildNestedField(
-    key: string, path: string,
+    key: string,
+    path: string,
     required: boolean,
     nestedSchema: Record<string, unknown>,
     isArray: boolean,
     depth: number,
-    levels: { assignValidateLevel: TValidationLevel; createValidateLevel: TValidationLevel },
+    levels: {
+      assignValidateLevel: TValidationLevel;
+      createValidateLevel: TValidationLevel;
+    },
   ): ICompiledField {
     const runner = new SchemaRunner();
     return {
-      key, path, required,
+      key,
+      path,
+      required,
       kind: isArray ? EFieldKind.ArrayNestedSchema : EFieldKind.NestedSchema,
       creatable: null,
       keyCreatable: null,

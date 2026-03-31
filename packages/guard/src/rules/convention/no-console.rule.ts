@@ -4,17 +4,21 @@ import type { IRuleViolation } from "../../rule";
 export class NoConsoleRule extends Rule {
   private readonly pattern = /\bconsole\.(log|warn|error|debug|info)\s*\(/;
 
-  private readonly ignoredPaths = [
-    "guard/",
-    "pre-commit/",
-    "reporters/",
-  ];
+  private readonly ignoredPaths = ["guard/", "pre-commit/", "reporters/"];
 
   constructor(severity: "error" | "warning" = "error") {
-    super("no-console", "Use Result<T, E> or ILogger instead of console methods in production code", severity);
+    super(
+      "no-console",
+      "Use Result<T, E> or ILogger instead of console methods in production code",
+      severity,
+    );
   }
 
-  check(line: string, lineNumber: number, filePath: string): IRuleViolation | null {
+  check(
+    line: string,
+    lineNumber: number,
+    filePath: string,
+  ): IRuleViolation | null {
     if (this.isTestFile(filePath)) return null;
     if (filePath.includes("examples/")) return null;
 
@@ -25,10 +29,19 @@ export class NoConsoleRule extends Rule {
     const code = this.stripLiterals(line);
 
     const trimmed = code.trim();
-    if (trimmed.startsWith("//") || trimmed.startsWith("*") || trimmed.startsWith("/*")) return null;
+    if (
+      trimmed.startsWith("//") ||
+      trimmed.startsWith("*") ||
+      trimmed.startsWith("/*")
+    )
+      return null;
 
     if (this.pattern.test(code)) {
-      return this.violation(lineNumber, filePath, "Use Result<T, E> or ILogger instead of console methods in production code");
+      return this.violation(
+        lineNumber,
+        filePath,
+        "Use Result<T, E> or ILogger instead of console methods in production code",
+      );
     }
 
     return null;

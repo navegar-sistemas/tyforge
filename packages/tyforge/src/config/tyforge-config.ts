@@ -7,9 +7,17 @@ import { OHttpStatus } from "@tyforge/constants/http-status.constants";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 import type { TValidationLevel } from "@tyforge/type-fields/_base/type-field.base";
 
-export const OValidateLevel = { FULL: "full", TYPE: "type", NONE: "none" } as const;
-export const ORuleSeverity = { ERROR: "error", WARNING: "warning", OFF: "off" } as const;
-export type TRuleSeverity = typeof ORuleSeverity[keyof typeof ORuleSeverity];
+export const OValidateLevel = {
+  FULL: "full",
+  TYPE: "type",
+  NONE: "none",
+} as const;
+export const ORuleSeverity = {
+  ERROR: "error",
+  WARNING: "warning",
+  OFF: "off",
+} as const;
+export type TRuleSeverity = (typeof ORuleSeverity)[keyof typeof ORuleSeverity];
 
 export interface ILintConfigSection {
   root?: string;
@@ -38,13 +46,18 @@ export interface IResolvedTyForgeConfig {
   lint?: Record<string, unknown>;
 }
 
-const ALLOWED_CONFIG_NAMES = new Set(["tyforge.config.json", "tyforge-lint.config.json"]);
+const ALLOWED_CONFIG_NAMES = new Set([
+  "tyforge.config.json",
+  "tyforge-lint.config.json",
+]);
 const ABSOLUTE_URL_REGEX = /^(?:[a-z]+:)?\/\//i;
 const PATH_TRAVERSAL_REGEX = /(?:^|[/\\])\.\.(?:[/\\]|$)/;
 const NULL_BYTE_REGEX = /\0/;
 const MAX_CONFIG_SIZE = 1048576;
 
-const DEFAULTS: IResolvedTyForgeConfig = { schema: { validate: { create: "full", assign: "type" } } };
+const DEFAULTS: IResolvedTyForgeConfig = {
+  schema: { validate: { create: "full", assign: "type" } },
+};
 
 export class TyForgeConfig {
   private static cached: IResolvedTyForgeConfig | null = null;
@@ -56,7 +69,8 @@ export class TyForgeConfig {
       return ok(TyForgeConfig.cached);
     }
 
-    const filePath = configPath ?? nodePath.resolve(process.cwd(), "tyforge.config.json");
+    const filePath =
+      configPath ?? nodePath.resolve(process.cwd(), "tyforge.config.json");
 
     if (!TyForgeConfig.validatePath(filePath)) {
       if (configPath === undefined) TyForgeConfig.cached = DEFAULTS;
@@ -66,13 +80,25 @@ export class TyForgeConfig {
     try {
       const stat = fs.statSync(filePath);
       if (stat.size > MAX_CONFIG_SIZE) {
-        return err(ExceptionGeneric.create(OHttpStatus.BAD_REQUEST, {},"Config file exceeds 1MB limit."));
+        return err(
+          ExceptionGeneric.create(
+            OHttpStatus.BAD_REQUEST,
+            {},
+            "Config file exceeds 1MB limit.",
+          ),
+        );
       }
 
       const content = fs.readFileSync(filePath, "utf-8");
       const parsed: unknown = JSON.parse(content);
       if (!TypeGuard.isRecord(parsed)) {
-        return err(ExceptionGeneric.create(OHttpStatus.BAD_REQUEST, {},"Config file must be a JSON object."));
+        return err(
+          ExceptionGeneric.create(
+            OHttpStatus.BAD_REQUEST,
+            {},
+            "Config file must be a JSON object.",
+          ),
+        );
       }
 
       const resolved = TyForgeConfig.resolve(parsed);
@@ -103,7 +129,8 @@ export class TyForgeConfig {
 
     try {
       const realPath = fs.realpathSync(filePath);
-      if (realPath !== filePath && PATH_TRAVERSAL_REGEX.test(realPath)) return false;
+      if (realPath !== filePath && PATH_TRAVERSAL_REGEX.test(realPath))
+        return false;
     } catch {
       return false;
     }
@@ -118,21 +145,54 @@ export class TyForgeConfig {
   ): Result<TValidationLevel, Exceptions> {
     if (value === undefined) return ok(defaultValue);
     const str = TypeGuard.isString(value, fieldName);
-    if (isFailure(str)) return err(ExceptionGeneric.create(OHttpStatus.BAD_REQUEST, {},str.error.detail));
-    const enumCheck = TypeGuard.isEnumValue(OValidateLevel, str.value, fieldName);
-    if (isFailure(enumCheck)) return err(ExceptionGeneric.create(OHttpStatus.BAD_REQUEST, {},enumCheck.error.detail));
-    if (str.value === "full" || str.value === "type" || str.value === "none") return ok(str.value);
-    return err(ExceptionGeneric.create(OHttpStatus.BAD_REQUEST, {},`${fieldName}: invalid value`));
+    if (isFailure(str))
+      return err(
+        ExceptionGeneric.create(OHttpStatus.BAD_REQUEST, {}, str.error.detail),
+      );
+    const enumCheck = TypeGuard.isEnumValue(
+      OValidateLevel,
+      str.value,
+      fieldName,
+    );
+    if (isFailure(enumCheck))
+      return err(
+        ExceptionGeneric.create(
+          OHttpStatus.BAD_REQUEST,
+          {},
+          enumCheck.error.detail,
+        ),
+      );
+    if (str.value === "full" || str.value === "type" || str.value === "none")
+      return ok(str.value);
+    return err(
+      ExceptionGeneric.create(
+        OHttpStatus.BAD_REQUEST,
+        {},
+        `${fieldName}: invalid value`,
+      ),
+    );
   }
 
-  private static resolve(raw: Record<string, unknown>): Result<IResolvedTyForgeConfig, Exceptions> {
+  private static resolve(
+    raw: Record<string, unknown>,
+  ): Result<IResolvedTyForgeConfig, Exceptions> {
     const schema = TypeGuard.isRecord(raw["schema"]) ? raw["schema"] : {};
-    const validate = TypeGuard.isRecord(schema["validate"]) ? schema["validate"] : {};
+    const validate = TypeGuard.isRecord(schema["validate"])
+      ? schema["validate"]
+      : {};
 
-    const createLevel = TyForgeConfig.resolveValidateLevel(validate["create"], "schema.validate.create", "full");
+    const createLevel = TyForgeConfig.resolveValidateLevel(
+      validate["create"],
+      "schema.validate.create",
+      "full",
+    );
     if (isFailure(createLevel)) return createLevel;
 
-    const assignLevel = TyForgeConfig.resolveValidateLevel(validate["assign"], "schema.validate.assign", "type");
+    const assignLevel = TyForgeConfig.resolveValidateLevel(
+      validate["assign"],
+      "schema.validate.assign",
+      "type",
+    );
     if (isFailure(assignLevel)) return assignLevel;
 
     return ok({

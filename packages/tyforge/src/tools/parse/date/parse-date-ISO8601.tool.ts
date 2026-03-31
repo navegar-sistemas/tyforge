@@ -20,7 +20,8 @@ export class ToolParseDateISO8601 {
     return ExceptionDate.invalid("data");
   }
   /**
-   * Faz o parse de um datetime no formato ISO8601 com UTC obrigatório (sufixo "Z").
+   * Faz o parse de um datetime no formato ISO8601
+   * com UTC obrigatório (sufixo "Z").
    * Exemplo válido: "2025-03-24T15:30:45Z"
    */
   static parseDateTimeUTC(value: unknown): Result<Date, ExceptionDate> {
@@ -48,8 +49,11 @@ export class ToolParseDateISO8601 {
     return this.isValidDate(date) ? ok(date) : err(this.createError());
   }
   /**
-   * Parses a string potentially representing a full ISO 8601 DateTime (like '2025-03-24T15:30:45' or '2025-03-24T15:30:45Z').
-   * Also accepts existing Date objects. Relies on the Date constructor's parsing and validates the result.
+   * Parses a string potentially representing a full
+   * ISO 8601 DateTime (like '2025-03-24T15:30:45' or
+   * '2025-03-24T15:30:45Z'). Also accepts existing
+   * Date objects. Relies on the Date constructor's
+   * parsing and validates the result.
    * @param value The input value (string, Date, or other).
    * @returns Result<Date, ExceptionDate>
    */
@@ -72,8 +76,10 @@ export class ToolParseDateISO8601 {
   }
 
   /**
-   * Parses a string potentially representing an ISO 8601 Date only (like '2025-03-24').
-   * Also accepts existing Date objects (normalizes time to UTC midnight).
+   * Parses a string potentially representing an
+   * ISO 8601 Date only (like '2025-03-24'). Also
+   * accepts existing Date objects (normalizes time
+   * to UTC midnight).
    * @param value The input value (string, Date, or other).
    * @returns Result<Date, ExceptionDate>
    */
@@ -142,8 +148,10 @@ export class ToolParseDateISO8601 {
   }
 
   /**
-   * Parses a compact ISO 8601 DateTime string where date is compact but time has separators (like '20250324T15:30:45').
-   * Also accepts existing Date objects.
+   * Parses a compact ISO 8601 DateTime string where
+   * date is compact but time has separators
+   * (like '20250324T15:30:45'). Also accepts
+   * existing Date objects.
    * @param value The input value (string, Date, or other).
    * @returns Result<Date, ExceptionDate>
    */
@@ -169,7 +177,8 @@ export class ToolParseDateISO8601 {
     const month = value.substring(4, 6);
     const day = value.substring(6, 8);
     const time = value.substring(9); // e.g., 15:30:45
-    // NOTE: Creates date in local timezone unless input implies otherwise (e.g., if T time was Z or offset)
+    // NOTE: Creates date in local timezone unless input
+    // implies otherwise (e.g., if time was Z or offset)
     const isoString = `${year}-${month}-${day}T${time}`;
 
     const date = new Date(isoString);

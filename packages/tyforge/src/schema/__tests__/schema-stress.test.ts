@@ -14,21 +14,32 @@ import { TClassInfo } from "@tyforge/domain-models/class.base";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
-function assertSuccess<T, E>(result: Result<T, E>): asserts result is { success: true; value: T } {
+function assertSuccess<T, E>(
+  result: Result<T, E>,
+): asserts result is { success: true; value: T } {
   if (!isSuccess(result)) {
-    assert.fail(`Expected success but got failure: ${JSON.stringify(result.error)}`);
+    assert.fail(
+      `Expected success but got failure: ${JSON.stringify(result.error)}`,
+    );
   }
 }
 
-function assertFailure<T, E>(result: Result<T, E>): asserts result is { success: false; error: E } {
+function assertFailure<T, E>(
+  result: Result<T, E>,
+): asserts result is { success: false; error: E } {
   if (!isFailure(result)) {
     assert.fail("Expected failure but got success");
   }
 }
 
-function createWithUntypedData<T extends ISchema>(schema: T, data: unknown): Result<Record<string, unknown>, Exceptions> {
+function createWithUntypedData<T extends ISchema>(
+  schema: T,
+  data: unknown,
+): Result<Record<string, unknown>, Exceptions> {
   const validator = SchemaBuilder.compile(schema);
-  const result = validator.create(data as Parameters<typeof validator.create>[0]);
+  const result = validator.create(
+    data as Parameters<typeof validator.create>[0],
+  );
   return result as Result<Record<string, unknown>, Exceptions>;
 }
 
@@ -54,34 +65,38 @@ const orderSchema = {
     email: { type: FEmail },
     age: { type: FInt },
     active: { type: FBoolean },
-    addresses: { type: {
-      street: { type: FString },
-      city: { type: FString },
-      location: {
-        lat: { type: FInt },
-        lng: { type: FInt },
-        metadata: {
-          source: { type: FString },
-          accuracy: { type: FInt },
-          tags: { type: FString, isArray: true },
-          history: { type: {
-            timestamp: { type: FString },
-            value: { type: FInt },
-            details: {
-              reason: { type: FString },
-              codes: { type: FInt, isArray: true },
-              audit: {
-                by: { type: FString },
-                level: { type: FInt },
-                flags: { type: FString, isArray: true },
-                nested: {
-                  deep1: {
-                    deep2: {
-                      deep3: {
-                        deep4: {
-                          deep5: {
-                            value: { type: FString },
-                            items: { type: FString, isArray: true },
+    addresses: {
+      type: {
+        street: { type: FString },
+        city: { type: FString },
+        location: {
+          lat: { type: FInt },
+          lng: { type: FInt },
+          metadata: {
+            source: { type: FString },
+            accuracy: { type: FInt },
+            tags: { type: FString, isArray: true },
+            history: {
+              type: {
+                timestamp: { type: FString },
+                value: { type: FInt },
+                details: {
+                  reason: { type: FString },
+                  codes: { type: FInt, isArray: true },
+                  audit: {
+                    by: { type: FString },
+                    level: { type: FInt },
+                    flags: { type: FString, isArray: true },
+                    nested: {
+                      deep1: {
+                        deep2: {
+                          deep3: {
+                            deep4: {
+                              deep5: {
+                                value: { type: FString },
+                                items: { type: FString, isArray: true },
+                              },
+                            },
                           },
                         },
                       },
@@ -89,33 +104,44 @@ const orderSchema = {
                   },
                 },
               },
+              isArray: true,
             },
-          }, isArray: true },
+          },
         },
       },
-    }, isArray: true },
+      isArray: true,
+    },
   },
-  items: { type: {
-    productId: { type: FId },
-    name: { type: FString },
-    quantity: { type: FInt },
-    tags: { type: FString, isArray: true },
-    variants: { type: {
-      sku: { type: FString },
-      price: { type: FInt },
-      attributes: {
-        color: { type: FString },
-        sizes: { type: FString, isArray: true },
+  items: {
+    type: {
+      productId: { type: FId },
+      name: { type: FString },
+      quantity: { type: FInt },
+      tags: { type: FString, isArray: true },
+      variants: {
+        type: {
+          sku: { type: FString },
+          price: { type: FInt },
+          attributes: {
+            color: { type: FString },
+            sizes: { type: FString, isArray: true },
+          },
+        },
+        isArray: true,
       },
-    }, isArray: true },
-  }, isArray: true },
+    },
+    isArray: true,
+  },
   payment: {
     method: { type: FString },
     amount: { type: FInt },
-    installments: { type: {
-      number: { type: FInt },
-      value: { type: FInt },
-    }, isArray: true },
+    installments: {
+      type: {
+        number: { type: FInt },
+        value: { type: FInt },
+      },
+      isArray: true,
+    },
   },
 } satisfies ISchema;
 
@@ -242,13 +268,17 @@ class Order extends Aggregate<
     description: "Aggregate de pedido complexo",
   };
 
-  static create(data: InferJson<typeof orderSchema>): Result<Order, Exceptions> {
+  static create(
+    data: InferJson<typeof orderSchema>,
+  ): Result<Order, Exceptions> {
     const validator = SchemaBuilder.compile(orderSchema);
     const result = validator.create(data);
     if (isFailure(result)) return result;
 
     const order = new Order();
-    Object.assign(order, result.value, { id: result.value.id ?? FId.generate() });
+    Object.assign(order, result.value, {
+      id: result.value.id ?? FId.generate(),
+    });
     return ok(order);
   }
 }
@@ -256,7 +286,6 @@ class Order extends Aggregate<
 // ── Tests ───────────────────────────────────────────────────────
 
 describe("SchemaBuilder — Stress test (15+ níveis)", () => {
-
   it("dados válidos completos passam validação", () => {
     const data = makeValidOrderData();
     const result = Order.create(data);
@@ -279,16 +308,17 @@ describe("SchemaBuilder — Stress test (15+ níveis)", () => {
     assert.equal(json.items.length, 2);
   });
 
-  it("campo profundo inválido (nível 15) — deep5.value vazio", () => {
+  it("campo profundo inválido (nível 15)", () => {
     const data = makeValidOrderData();
-    data.customer.addresses[0].location.metadata.history[0].details.audit.nested.deep1.deep2.deep3.deep4.deep5.value = "";
+    const hist = data.customer.addresses[0].location.metadata.history[0];
+    hist.details.audit.nested.deep1.deep2.deep3.deep4.deep5.value = "";
     const result = createWithUntypedData(orderSchema, data);
     assertFailure(result);
     assert.ok(result.error.field);
     assert.ok(result.error.field.includes("deep5"));
   });
 
-  it("item inválido dentro de array aninhado — variants[0].attributes.color vazio", () => {
+  it("item inválido dentro de array aninhado", () => {
     const data = makeValidOrderData();
     data.items[0].variants[0].attributes.color = "";
     const result = createWithUntypedData(orderSchema, data);
@@ -297,9 +327,10 @@ describe("SchemaBuilder — Stress test (15+ níveis)", () => {
     assert.ok(result.error.field.includes("color"));
   });
 
-  it("array de objetos com item inválido — history[0].details.reason vazio", () => {
+  it("array de objetos com item inválido", () => {
     const data = makeValidOrderData();
-    data.customer.addresses[0].location.metadata.history[0].details.reason = "";
+    const hist = data.customer.addresses[0].location.metadata.history[0];
+    hist.details.reason = "";
     const result = createWithUntypedData(orderSchema, data);
     assertFailure(result);
     assert.ok(result.error.field);
@@ -338,7 +369,9 @@ describe("SchemaBuilder — Stress test (15+ níveis)", () => {
 
   it("item inválido em array de códigos (codes) — decimal em FInt", () => {
     const data = makeValidOrderData();
-    data.customer.addresses[0].location.metadata.history[0].details.codes = [1, 3.14, 3];
+    data.customer.addresses[0].location.metadata.history[0].details.codes = [
+      1, 3.14, 3,
+    ];
     const result = createWithUntypedData(orderSchema, data);
     assertFailure(result);
     assert.ok(result.error.field);
@@ -347,7 +380,8 @@ describe("SchemaBuilder — Stress test (15+ níveis)", () => {
 
   it("string vazia em array de flags rejeita", () => {
     const data = makeValidOrderData();
-    data.customer.addresses[0].location.metadata.history[0].details.audit.flags = ["ok", "", "fail"];
+    const hist = data.customer.addresses[0].location.metadata.history[0];
+    hist.details.audit.flags = ["ok", "", "fail"];
     const result = createWithUntypedData(orderSchema, data);
     assertFailure(result);
     assert.ok(result.error.field);
@@ -364,7 +398,7 @@ describe("SchemaBuilder — Stress test (15+ níveis)", () => {
     assertSuccess(result);
   });
 
-  it("segundo endereço com campo inválido rejeita com path contendo street", () => {
+  it("segundo endereço com campo inválido rejeita", () => {
     const data = makeValidOrderData();
     const addr2 = JSON.parse(JSON.stringify(data.customer.addresses[0]));
     addr2.street = "";
@@ -381,8 +415,12 @@ describe("SchemaBuilder — Stress test (15+ níveis)", () => {
     const data2 = makeValidOrderData();
     data2.customer.name = "João";
 
-    const r1 = validator.create(data1 as Parameters<typeof validator.create>[0]);
-    const r2 = validator.create(data2 as Parameters<typeof validator.create>[0]);
+    const r1 = validator.create(
+      data1 as Parameters<typeof validator.create>[0],
+    );
+    const r2 = validator.create(
+      data2 as Parameters<typeof validator.create>[0],
+    );
     assertSuccess(r1);
     assertSuccess(r2);
   });
@@ -422,20 +460,42 @@ describe("SchemaBuilder — Stress test (15+ níveis)", () => {
     assert.equal(output.customer.active, input.customer.active);
 
     // Customer → addresses[0]
-    assert.equal(output.customer.addresses[0].street, input.customer.addresses[0].street);
-    assert.equal(output.customer.addresses[0].city, input.customer.addresses[0].city);
+    assert.equal(
+      output.customer.addresses[0].street,
+      input.customer.addresses[0].street,
+    );
+    assert.equal(
+      output.customer.addresses[0].city,
+      input.customer.addresses[0].city,
+    );
 
     // Customer → addresses[0] → location
-    assert.equal(output.customer.addresses[0].location.lat, input.customer.addresses[0].location.lat);
-    assert.equal(output.customer.addresses[0].location.lng, input.customer.addresses[0].location.lng);
+    assert.equal(
+      output.customer.addresses[0].location.lat,
+      input.customer.addresses[0].location.lat,
+    );
+    assert.equal(
+      output.customer.addresses[0].location.lng,
+      input.customer.addresses[0].location.lng,
+    );
 
     // Customer → addresses[0] → location → metadata
-    assert.equal(output.customer.addresses[0].location.metadata.source, input.customer.addresses[0].location.metadata.source);
-    assert.equal(output.customer.addresses[0].location.metadata.accuracy, input.customer.addresses[0].location.metadata.accuracy);
-    assert.deepEqual(output.customer.addresses[0].location.metadata.tags, input.customer.addresses[0].location.metadata.tags);
+    assert.equal(
+      output.customer.addresses[0].location.metadata.source,
+      input.customer.addresses[0].location.metadata.source,
+    );
+    assert.equal(
+      output.customer.addresses[0].location.metadata.accuracy,
+      input.customer.addresses[0].location.metadata.accuracy,
+    );
+    assert.deepEqual(
+      output.customer.addresses[0].location.metadata.tags,
+      input.customer.addresses[0].location.metadata.tags,
+    );
 
     // Customer → addresses[0] → location → metadata → history[0]
-    const outHistory = output.customer.addresses[0].location.metadata.history[0];
+    const outHistory =
+      output.customer.addresses[0].location.metadata.history[0];
     const inHistory = input.customer.addresses[0].location.metadata.history[0];
     assert.equal(outHistory.timestamp, inHistory.timestamp);
     assert.equal(outHistory.value, inHistory.value);
@@ -447,10 +507,14 @@ describe("SchemaBuilder — Stress test (15+ níveis)", () => {
     // history[0] → details → audit
     assert.equal(outHistory.details.audit.by, inHistory.details.audit.by);
     assert.equal(outHistory.details.audit.level, inHistory.details.audit.level);
-    assert.deepEqual(outHistory.details.audit.flags, inHistory.details.audit.flags);
+    assert.deepEqual(
+      outHistory.details.audit.flags,
+      inHistory.details.audit.flags,
+    );
 
-    // history[0] → details → audit → nested → deep1 → deep2 → deep3 → deep4 → deep5
-    const outDeep = outHistory.details.audit.nested.deep1.deep2.deep3.deep4.deep5;
+    // history[0] → ... → deep5
+    const outDeep =
+      outHistory.details.audit.nested.deep1.deep2.deep3.deep4.deep5;
     const inDeep = inHistory.details.audit.nested.deep1.deep2.deep3.deep4.deep5;
     assert.equal(outDeep.value, inDeep.value);
     assert.deepEqual(outDeep.items, inDeep.items);
@@ -463,25 +527,58 @@ describe("SchemaBuilder — Stress test (15+ níveis)", () => {
     assert.deepEqual(output.items[0].tags, input.items[0].tags);
 
     // Items → variants
-    assert.equal(output.items[0].variants.length, input.items[0].variants.length);
-    assert.equal(output.items[0].variants[0].sku, input.items[0].variants[0].sku);
-    assert.equal(output.items[0].variants[0].price, input.items[0].variants[0].price);
-    assert.equal(output.items[0].variants[0].attributes.color, input.items[0].variants[0].attributes.color);
-    assert.deepEqual(output.items[0].variants[0].attributes.sizes, input.items[0].variants[0].attributes.sizes);
+    assert.equal(
+      output.items[0].variants.length,
+      input.items[0].variants.length,
+    );
+    assert.equal(
+      output.items[0].variants[0].sku,
+      input.items[0].variants[0].sku,
+    );
+    assert.equal(
+      output.items[0].variants[0].price,
+      input.items[0].variants[0].price,
+    );
+    assert.equal(
+      output.items[0].variants[0].attributes.color,
+      input.items[0].variants[0].attributes.color,
+    );
+    assert.deepEqual(
+      output.items[0].variants[0].attributes.sizes,
+      input.items[0].variants[0].attributes.sizes,
+    );
 
     // Items[1]
     assert.equal(output.items[1].productId, input.items[1].productId);
     assert.equal(output.items[1].name, input.items[1].name);
-    assert.equal(output.items[1].variants[0].sku, input.items[1].variants[0].sku);
+    assert.equal(
+      output.items[1].variants[0].sku,
+      input.items[1].variants[0].sku,
+    );
 
     // Payment
     assert.equal(output.payment.method, input.payment.method);
     assert.equal(output.payment.amount, input.payment.amount);
-    assert.equal(output.payment.installments.length, input.payment.installments.length);
-    assert.equal(output.payment.installments[0].number, input.payment.installments[0].number);
-    assert.equal(output.payment.installments[0].value, input.payment.installments[0].value);
-    assert.equal(output.payment.installments[2].number, input.payment.installments[2].number);
-    assert.equal(output.payment.installments[2].value, input.payment.installments[2].value);
+    assert.equal(
+      output.payment.installments.length,
+      input.payment.installments.length,
+    );
+    assert.equal(
+      output.payment.installments[0].number,
+      input.payment.installments[0].number,
+    );
+    assert.equal(
+      output.payment.installments[0].value,
+      input.payment.installments[0].value,
+    );
+    assert.equal(
+      output.payment.installments[2].number,
+      input.payment.installments[2].number,
+    );
+    assert.equal(
+      output.payment.installments[2].value,
+      input.payment.installments[2].value,
+    );
 
     // output.id matches generated id
     assert.ok(output.id);
@@ -506,7 +603,9 @@ describe("SchemaBuilder — Stress test (15+ níveis)", () => {
     assert.equal(json.customer.active, true);
 
     // Nível 15 — deep5
-    const deep5 = json.customer.addresses[0].location.metadata.history[0].details.audit.nested.deep1.deep2.deep3.deep4.deep5;
+    const deep5 =
+      json.customer.addresses[0].location.metadata.history[0].details.audit
+        .nested.deep1.deep2.deep3.deep4.deep5;
     assert.equal(deep5.value, "bottom-level-value");
     assert.deepEqual(deep5.items, ["x", "y", "z"]);
 
@@ -521,20 +620,22 @@ describe("SchemaBuilder — Stress test (15+ níveis)", () => {
 
   it("erro de validação profundo tem status 400", () => {
     const data = makeValidOrderData();
-    data.customer.addresses[0].location.metadata.history[0].details.audit.nested.deep1.deep2.deep3.deep4.deep5.value = "";
+    const hist = data.customer.addresses[0].location.metadata.history[0];
+    hist.details.audit.nested.deep1.deep2.deep3.deep4.deep5.value = "";
     const result = createWithUntypedData(orderSchema, data);
     assertFailure(result);
     assert.equal(result.error.status, 400);
   });
 
-  it("múltiplos campos inválidos retorna primeiro erro encontrado", () => {
+  it("múltiplos campos inválidos retorna primeiro erro", () => {
     const data = makeValidOrderData();
     data.customer.name = "";
     data.customer.email = "invalid";
     data.payment.method = "";
     const result = createWithUntypedData(orderSchema, data);
     assertFailure(result);
-    // Retorna o PRIMEIRO erro — que é customer.name (processado antes de email e payment)
+    // Retorna o PRIMEIRO erro — customer.name
+    // (processado antes de email e payment)
     assert.ok(result.error.field);
     assert.ok(result.error.field.includes("name"));
   });

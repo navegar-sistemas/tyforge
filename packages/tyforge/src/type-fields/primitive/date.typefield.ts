@@ -1,11 +1,5 @@
 import { ExceptionValidation } from "@tyforge/exceptions/validation.exception";
-import {
-  Result,
-  ok,
-  err,
-  isFailure,
-  OK_TRUE,
-} from "@tyforge/result/result";
+import { Result, ok, err, isFailure, OK_TRUE } from "@tyforge/result/result";
 import { ToolFormattingDateISO8601 } from "@tyforge/tools/formatting/date/date-formatting.tool";
 import { ToolParse } from "@tyforge/tools/parse/parse.tool";
 import { TypeField, TValidationLevel } from "../_base/type-field.base";
@@ -65,9 +59,13 @@ export class FDateTimeISOZMillis extends FDate {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<Date, ExceptionValidation> {
     const parsed = ToolParse.dateISO8601.parseDateTimeZuluWithMillis(value);
-    if (isFailure(parsed)) return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
+    if (isFailure(parsed))
+      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
     return ok(parsed.value);
   }
 
@@ -77,7 +75,8 @@ export class FDateTimeISOZMillis extends FDate {
     validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
     if (validateLevel === "none") return OK_TRUE;
-    if (validateLevel === "type") return super.validateRules(value, fieldPath, validateLevel);
+    if (validateLevel === "type")
+      return super.validateRules(value, fieldPath, validateLevel);
     const result = FDateTimeISOZMillis.validateType(value, fieldPath);
     if (!result.success) return err(result.error);
     return OK_TRUE;
@@ -93,22 +92,36 @@ export class FDateTimeISOZMillis extends FDate {
     const typed = FDateTimeISOZMillis.validateType(raw, fieldPath);
     if (!typed.success) return err(typed.error);
     const instance = new FDateTimeISOZMillis(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(date: Date, fieldPath = "FDateTimeISOZMillis"): FDateTimeISOZMillis {
+  static createOrThrow(
+    date: Date,
+    fieldPath = "FDateTimeISOZMillis",
+  ): FDateTimeISOZMillis {
     const result = this.create(date, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDate>(value: T, fieldPath = "FDateTimeISOZMillis"): Result<FDateTimeISOZMillis, ExceptionValidation> {
+  static assign<T = TDate>(
+    value: T,
+    fieldPath = "FDateTimeISOZMillis",
+  ): Result<FDateTimeISOZMillis, ExceptionValidation> {
     const typed = FDateTimeISOZMillis.validateType(value, fieldPath);
     if (!typed.success) return err(typed.error);
     const instance = new FDateTimeISOZMillis(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -138,9 +151,13 @@ export class FDateISODate extends FDate {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<Date, ExceptionValidation> {
     const parsed = ToolParse.dateISO8601.parseDate(value);
-    if (isFailure(parsed)) return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
+    if (isFailure(parsed))
+      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
     return ok(parsed.value);
   }
 
@@ -150,7 +167,8 @@ export class FDateISODate extends FDate {
     validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
     if (validateLevel === "none") return OK_TRUE;
-    if (validateLevel === "type") return super.validateRules(value, fieldPath, validateLevel);
+    if (validateLevel === "type")
+      return super.validateRules(value, fieldPath, validateLevel);
     const result = FDateISODate.validateType(value, fieldPath);
     if (!result.success) return err(result.error);
     return OK_TRUE;
@@ -169,22 +187,36 @@ export class FDateISODate extends FDate {
     const typed = FDateISODate.validateType(raw, fieldPath);
     if (!typed.success) return err(typed.error);
     const instance = new FDateISODate(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: string | Date, fieldPath = "FDateISODate"): FDateISODate {
+  static createOrThrow(
+    raw: string | Date,
+    fieldPath = "FDateISODate",
+  ): FDateISODate {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDate>(value: T, fieldPath = "FDateISODate"): Result<FDateISODate, ExceptionValidation> {
+  static assign<T = TDate>(
+    value: T,
+    fieldPath = "FDateISODate",
+  ): Result<FDateISODate, ExceptionValidation> {
     const typed = FDateISODate.validateType(value, fieldPath);
     if (!typed.success) return err(typed.error);
     const instance = new FDateISODate(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -204,9 +236,13 @@ export class FDateTimeISOZ extends FDate {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<Date, ExceptionValidation> {
     const parsed = ToolParse.dateISO8601.parseDateTimeUTC(value);
-    if (isFailure(parsed)) return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
+    if (isFailure(parsed))
+      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
     return ok(parsed.value);
   }
 
@@ -216,7 +252,8 @@ export class FDateTimeISOZ extends FDate {
     validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
     if (validateLevel === "none") return OK_TRUE;
-    if (validateLevel === "type") return super.validateRules(value, fieldPath, validateLevel);
+    if (validateLevel === "type")
+      return super.validateRules(value, fieldPath, validateLevel);
     const result = FDateTimeISOZ.validateType(value, fieldPath);
     if (!result.success) return err(result.error);
     return OK_TRUE;
@@ -232,22 +269,36 @@ export class FDateTimeISOZ extends FDate {
     const typed = FDateTimeISOZ.validateType(raw, fieldPath);
     if (!typed.success) return err(typed.error);
     const instance = new FDateTimeISOZ(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: string | Date, fieldPath = "FDateTimeISOZ"): FDateTimeISOZ {
+  static createOrThrow(
+    raw: string | Date,
+    fieldPath = "FDateTimeISOZ",
+  ): FDateTimeISOZ {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDate>(value: T, fieldPath = "FDateTimeISOZ"): Result<FDateTimeISOZ, ExceptionValidation> {
+  static assign<T = TDate>(
+    value: T,
+    fieldPath = "FDateTimeISOZ",
+  ): Result<FDateTimeISOZ, ExceptionValidation> {
     const typed = FDateTimeISOZ.validateType(value, fieldPath);
     if (!typed.success) return err(typed.error);
     const instance = new FDateTimeISOZ(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -271,9 +322,13 @@ export class FDateISOCompact extends FDate {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<Date, ExceptionValidation> {
     const parsed = ToolParse.dateISO8601.parseDateCompact(value);
-    if (isFailure(parsed)) return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
+    if (isFailure(parsed))
+      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
     return ok(parsed.value);
   }
 
@@ -283,7 +338,8 @@ export class FDateISOCompact extends FDate {
     validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
     if (validateLevel === "none") return OK_TRUE;
-    if (validateLevel === "type") return super.validateRules(value, fieldPath, validateLevel);
+    if (validateLevel === "type")
+      return super.validateRules(value, fieldPath, validateLevel);
     const result = FDateISOCompact.validateType(value, fieldPath);
     if (!result.success) return err(result.error);
     return OK_TRUE;
@@ -299,22 +355,36 @@ export class FDateISOCompact extends FDate {
     const typed = FDateISOCompact.validateType(raw, fieldPath);
     if (!typed.success) return err(typed.error);
     const instance = new FDateISOCompact(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: string | Date, fieldPath = "FDateISOCompact"): FDateISOCompact {
+  static createOrThrow(
+    raw: string | Date,
+    fieldPath = "FDateISOCompact",
+  ): FDateISOCompact {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDate>(value: T, fieldPath = "FDateISOCompact"): Result<FDateISOCompact, ExceptionValidation> {
+  static assign<T = TDate>(
+    value: T,
+    fieldPath = "FDateISOCompact",
+  ): Result<FDateISOCompact, ExceptionValidation> {
     const typed = FDateISOCompact.validateType(value, fieldPath);
     if (!typed.success) return err(typed.error);
     const instance = new FDateISOCompact(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -334,9 +404,13 @@ export class FDateTimeISOCompact extends FDate {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<Date, ExceptionValidation> {
     const parsed = ToolParse.dateISO8601.parseDateTimeCompactWithT(value);
-    if (isFailure(parsed)) return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
+    if (isFailure(parsed))
+      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
     return ok(parsed.value);
   }
 
@@ -346,7 +420,8 @@ export class FDateTimeISOCompact extends FDate {
     validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
     if (validateLevel === "none") return OK_TRUE;
-    if (validateLevel === "type") return super.validateRules(value, fieldPath, validateLevel);
+    if (validateLevel === "type")
+      return super.validateRules(value, fieldPath, validateLevel);
     const result = FDateTimeISOCompact.validateType(value, fieldPath);
     if (!result.success) return err(result.error);
     return OK_TRUE;
@@ -362,22 +437,36 @@ export class FDateTimeISOCompact extends FDate {
     const typed = FDateTimeISOCompact.validateType(raw, fieldPath);
     if (!typed.success) return err(typed.error);
     const instance = new FDateTimeISOCompact(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: string | Date, fieldPath = "FDateTimeISOCompact"): FDateTimeISOCompact {
+  static createOrThrow(
+    raw: string | Date,
+    fieldPath = "FDateTimeISOCompact",
+  ): FDateTimeISOCompact {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDate>(value: T, fieldPath = "FDateTimeISOCompact"): Result<FDateTimeISOCompact, ExceptionValidation> {
+  static assign<T = TDate>(
+    value: T,
+    fieldPath = "FDateTimeISOCompact",
+  ): Result<FDateTimeISOCompact, ExceptionValidation> {
     const typed = FDateTimeISOCompact.validateType(value, fieldPath);
     if (!typed.success) return err(typed.error);
     const instance = new FDateTimeISOCompact(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
@@ -397,9 +486,13 @@ export class FDateTimeISOFullCompact extends FDate {
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath: string): Result<Date, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath: string,
+  ): Result<Date, ExceptionValidation> {
     const parsed = ToolParse.dateISO8601.parseDateTimeFullCompact(value);
-    if (isFailure(parsed)) return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
+    if (isFailure(parsed))
+      return err(ExceptionValidation.create(fieldPath, parsed.error.detail));
     return ok(parsed.value);
   }
 
@@ -409,7 +502,8 @@ export class FDateTimeISOFullCompact extends FDate {
     validateLevel: TValidationLevel = "full",
   ): Result<true, ExceptionValidation> {
     if (validateLevel === "none") return OK_TRUE;
-    if (validateLevel === "type") return super.validateRules(value, fieldPath, validateLevel);
+    if (validateLevel === "type")
+      return super.validateRules(value, fieldPath, validateLevel);
     const result = FDateTimeISOFullCompact.validateType(value, fieldPath);
     if (!result.success) return err(result.error);
     return OK_TRUE;
@@ -425,22 +519,36 @@ export class FDateTimeISOFullCompact extends FDate {
     const typed = FDateTimeISOFullCompact.validateType(raw, fieldPath);
     if (!typed.success) return err(typed.error);
     const instance = new FDateTimeISOFullCompact(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(raw: string | Date, fieldPath = "FDateTimeISOFullCompact"): FDateTimeISOFullCompact {
+  static createOrThrow(
+    raw: string | Date,
+    fieldPath = "FDateTimeISOFullCompact",
+  ): FDateTimeISOFullCompact {
     const result = this.create(raw, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TDate>(value: T, fieldPath = "FDateTimeISOFullCompact"): Result<FDateTimeISOFullCompact, ExceptionValidation> {
+  static assign<T = TDate>(
+    value: T,
+    fieldPath = "FDateTimeISOFullCompact",
+  ): Result<FDateTimeISOFullCompact, ExceptionValidation> {
     const typed = FDateTimeISOFullCompact.validateType(value, fieldPath);
     if (!typed.success) return err(typed.error);
     const instance = new FDateTimeISOFullCompact(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }

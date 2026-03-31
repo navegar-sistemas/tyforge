@@ -1,6 +1,7 @@
 import { Check } from "./check.base";
 import { CheckTypecheck } from "./checks/typecheck";
 import { CheckTests } from "./checks/tests";
+import { CheckFormat } from "./checks/format";
 import { CheckLint } from "./checks/lint";
 import { CheckDocsBuild } from "./checks/docs-build";
 import { CheckDockerBuild } from "./checks/docker-build";
@@ -17,6 +18,7 @@ async function main(): Promise<void> {
   const blockingChecks: Check[] = [
     new CheckTypecheck(),
     new CheckTests(),
+    new CheckFormat(),
     new CheckLint(),
     new CheckDocsBuild(),
     new CheckDockerBuild(),
@@ -24,9 +26,7 @@ async function main(): Promise<void> {
     new CheckPublishReady(),
   ];
 
-  const confirmableChecks: Check[] = [
-    new CheckVersions(),
-  ];
+  const confirmableChecks: Check[] = [new CheckVersions()];
 
   const allChecks = [...blockingChecks, ...confirmableChecks];
   reporter.setTotal(allChecks.length);
@@ -62,6 +62,8 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  process.stderr.write(`Pre-commit error: ${err instanceof Error ? err.message : String(err)}\n`);
+  process.stderr.write(
+    `Pre-commit error: ${err instanceof Error ? err.message : String(err)}\n`,
+  );
   process.exit(1);
 });

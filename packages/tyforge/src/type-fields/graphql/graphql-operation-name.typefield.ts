@@ -10,7 +10,10 @@ const GRAPHQL_IDENTIFIER_REGEX = /^[A-Za-z_][A-Za-z0-9_]*$/;
 export type TGraphQLOperationName = string;
 export type TGraphQLOperationNameFormatted = string;
 
-export class FGraphQLOperationName extends TypeField<TGraphQLOperationName, TGraphQLOperationNameFormatted> {
+export class FGraphQLOperationName extends TypeField<
+  TGraphQLOperationName,
+  TGraphQLOperationNameFormatted
+> {
   override readonly typeInference = "FGraphQLOperationName";
 
   override readonly config: ITypeFieldConfig<TGraphQLOperationName> = {
@@ -24,7 +27,10 @@ export class FGraphQLOperationName extends TypeField<TGraphQLOperationName, TGra
     super(value, fieldPath);
   }
 
-  static validateType(value: unknown, fieldPath = "GraphQLOperationName"): Result<TGraphQLOperationName, ExceptionValidation> {
+  static validateType(
+    value: unknown,
+    fieldPath = "GraphQLOperationName",
+  ): Result<TGraphQLOperationName, ExceptionValidation> {
     return TypeGuard.isString(value, fieldPath, 1, 255);
   }
 
@@ -37,37 +43,67 @@ export class FGraphQLOperationName extends TypeField<TGraphQLOperationName, TGra
     if (!base.success) return base;
     if (validateLevel === "none") return ok(true);
     if (!GRAPHQL_IDENTIFIER_REGEX.test(value)) {
-      return err(ExceptionValidation.create(fieldPath, "GraphQL operation name must be a valid identifier (letters, digits, underscores, starting with letter or underscore)."));
+      return err(
+        ExceptionValidation.create(
+          fieldPath,
+          "GraphQL operation name must be a valid identifier (letters, digits, underscores, starting with letter or underscore).",
+        ),
+      );
     }
     return ok(true);
   }
 
-  static create<T = TGraphQLOperationName>(raw: T, fieldPath = "GraphQLOperationName"): Result<FGraphQLOperationName, ExceptionValidation> {
+  static create<T = TGraphQLOperationName>(
+    raw: T,
+    fieldPath = "GraphQLOperationName",
+  ): Result<FGraphQLOperationName, ExceptionValidation> {
     const typed = FGraphQLOperationName.validateType(raw, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FGraphQLOperationName(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.createLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.createLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  static createOrThrow(value: TGraphQLOperationName, fieldPath = "GraphQLOperationName"): FGraphQLOperationName {
+  static createOrThrow(
+    value: TGraphQLOperationName,
+    fieldPath = "GraphQLOperationName",
+  ): FGraphQLOperationName {
     const result = FGraphQLOperationName.create(value, fieldPath);
     if (isFailure(result)) throw result.error;
     return result.value;
   }
 
-  static assign<T = TGraphQLOperationName>(value: T, fieldPath = "GraphQLOperationName"): Result<FGraphQLOperationName, ExceptionValidation> {
+  static assign<T = TGraphQLOperationName>(
+    value: T,
+    fieldPath = "GraphQLOperationName",
+  ): Result<FGraphQLOperationName, ExceptionValidation> {
     const typed = FGraphQLOperationName.validateType(value, fieldPath);
     if (isFailure(typed)) return err(typed.error);
     const instance = new FGraphQLOperationName(typed.value, fieldPath);
-    const rules = instance.validateRules(typed.value, fieldPath, TypeField.assignLevel);
+    const rules = instance.validateRules(
+      typed.value,
+      fieldPath,
+      TypeField.assignLevel,
+    );
     if (!rules.success) return err(rules.error);
     return ok(instance);
   }
 
-  override formatted(): TGraphQLOperationNameFormatted { return this.getValue(); }
-  override toString(): string { return this.getValue(); }
-  override getDescription(): string { return "GraphQL operation name (valid identifier)"; }
-  override getShortDescription(): string { return "Operation Name"; }
+  override formatted(): TGraphQLOperationNameFormatted {
+    return this.getValue();
+  }
+  override toString(): string {
+    return this.getValue();
+  }
+  override getDescription(): string {
+    return "GraphQL operation name (valid identifier)";
+  }
+  override getShortDescription(): string {
+    return "Operation Name";
+  }
 }

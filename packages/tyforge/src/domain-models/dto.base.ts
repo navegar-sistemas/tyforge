@@ -1,9 +1,9 @@
 import { ValueObject } from "./value-object.base";
 
-export abstract class Dto<
+export abstract class Dto<TProps, TPropsJson> extends ValueObject<
   TProps,
-  TPropsJson,
-> extends ValueObject<TProps, TPropsJson> {
+  TPropsJson
+> {
   protected constructor() {
     super();
   }

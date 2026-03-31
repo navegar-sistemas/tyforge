@@ -18,7 +18,9 @@ export class CheckDeprecated extends Check {
     const totalDeps = allDepsMap.size;
 
     if (totalDeps > 50) {
-      process.stdout.write(`  ⚠️  ${totalDeps} unique dependencies found — deprecated check may take a while.\n`);
+      process.stdout.write(
+        `  ⚠️  ${totalDeps} unique dependencies found — deprecated check may take a while.\n`,
+      );
     }
 
     for (const [name, sources] of allDepsMap) {
@@ -31,7 +33,12 @@ export class CheckDeprecated extends Check {
 
   private collectAllDeps(packageFiles: string[]): Map<string, string[]> {
     const depsMap = new Map<string, string[]>();
-    const depKeys = ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies"];
+    const depKeys = [
+      "dependencies",
+      "devDependencies",
+      "peerDependencies",
+      "optionalDependencies",
+    ];
 
     for (const pkgPath of packageFiles) {
       try {
@@ -44,7 +51,8 @@ export class CheckDeprecated extends Check {
           if (TypeGuard.isRecord(section)) {
             for (const [name, version] of Object.entries(section)) {
               if (typeof version !== "string") continue;
-              if (name.startsWith("file:") || name.startsWith("link:")) continue;
+              if (name.startsWith("file:") || name.startsWith("link:"))
+                continue;
               const sources = depsMap.get(name);
               if (sources) {
                 sources.push(pkgPath);
@@ -62,7 +70,11 @@ export class CheckDeprecated extends Check {
     return depsMap;
   }
 
-  private checkSingleDep(name: string, sources: string[], details: string[]): void {
+  private checkSingleDep(
+    name: string,
+    sources: string[],
+    details: string[],
+  ): void {
     if (this.checkedPackages.has(name)) return;
     this.checkedPackages.add(name);
 
@@ -82,5 +94,4 @@ export class CheckDeprecated extends Check {
       // npm view failed — package might be private or not published, skip
     }
   }
-
 }
