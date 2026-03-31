@@ -100,8 +100,7 @@
     "prepublishOnly": "npm run build",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test src/**/*.test.ts",
-    "lint": "node dist/lint/index.js",
-    "postinstall": "node dist/lint/hooks/postinstall.js || true"
+    "precommit": "tsx src/pre-commit/index.ts"
   },
   "dependencies": {
     "uuid": "13.0.0"

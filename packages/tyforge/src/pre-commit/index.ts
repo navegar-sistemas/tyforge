@@ -5,6 +5,7 @@ import { CheckLint } from "./checks/lint";
 import { CheckDocsBuild } from "./checks/docs-build";
 import { CheckDockerBuild } from "./checks/docker-build";
 import { CheckDeprecated } from "./checks/deprecated-check";
+import { CheckPublishReady } from "./checks/publish-ready";
 import { CheckVersions } from "./checks/version-check";
 import { TerminalReporter } from "./reporters/terminal";
 
@@ -13,26 +14,35 @@ async function main(): Promise<void> {
 
   const reporter = new TerminalReporter();
 
-  const checks: Check[] = [
+  const blockingChecks: Check[] = [
     new CheckTypecheck(),
     new CheckTests(),
     new CheckLint(),
     new CheckDocsBuild(),
     new CheckDockerBuild(),
     new CheckDeprecated(),
+    new CheckPublishReady(),
+  ];
+
+  const confirmableChecks: Check[] = [
     new CheckVersions(),
   ];
 
-  reporter.setTotal(checks.length);
+  const allChecks = [...blockingChecks, ...confirmableChecks];
+  reporter.setTotal(allChecks.length);
 
-  for (const check of checks) {
+  for (const check of blockingChecks) {
     reporter.start(check.name);
     const result = await check.run();
     reporter.result(result);
-
     if (result.status === "fail") {
       process.exit(1);
     }
+  }
+
+  for (const check of confirmableChecks) {
+    reporter.start(check.name);
+    const result = await check.run();
 
     if (result.status === "warn") {
       reporter.versionWarnings(result);

@@ -12,7 +12,7 @@ export class CheckDockerBuild extends Check {
 
   async run() {
     if (!this.isDockerAvailable()) {
-      return this.warn(["Docker not available — skipping Docker build check"]);
+      return this.fail(["Docker not available — install Docker to run pre-commit checks"]);
     }
     try {
       execFileSync("docker", ["build", "-f", "docs/Dockerfile", "docs/", "--quiet"], { cwd: ROOT, stdio: "pipe", encoding: "utf-8", timeout: 300000 });
