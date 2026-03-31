@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.2.15] - 2026-03-31
+
+### Changed
+- `CheckPublishReady`: validacao expandida para todos os pacotes internos do monorepo — verifica consistencia de versao e pinagem de qualquer dependencia `tyforge` ou `@tyforge/*` entre pacotes (antes verificava apenas `tyforge` core)
+- `CheckPublishReady`: removido `as` cast no catch — usa `extractError()` da classe base
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.15`
+
 ## [0.2.13] - 2026-03-31
 
 ### Changed
@@ -93,15 +100,6 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 ### Changed
 - Exemplos movidos de `packages/tyforge/src/examples` para `packages/examples/simple`
 - `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.3`
-
-## [0.2.2] - 2026-03-30
-
-### Fixed
-- Nginx container restart loop: `mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)` — diretórios temp criados no Dockerfile com `chown nginx:nginx` e tmpfs montado com `uid=101,gid=101`
-
-### Changed
-- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.2`
-- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.2`
 
 
 

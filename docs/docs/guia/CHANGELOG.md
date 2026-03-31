@@ -10,6 +10,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.15] - 2026-03-31
+
+### Changed
+- `CheckPublishReady`: validacao expandida para todos os pacotes internos do monorepo — verifica consistencia de versao e pinagem de qualquer dependencia `tyforge` ou `@tyforge/*` entre pacotes (antes verificava apenas `tyforge` core)
+- `CheckPublishReady`: removido `as` cast no catch — usa `extractError()` da classe base
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.15`
+
 ## [0.2.13] - 2026-03-31
 
 ### Changed

@@ -6,6 +6,18 @@ import { Check } from "../check.base";
 import { TypeGuard } from "@tyforge/tools/type_guard";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../../..");
+const RANGE_REGEX = /^[\^~>=<*x|]|[\s-]\d/;
+const INTERNAL_PREFIXES = ["tyforge", "@tyforge/"];
+
+function isInternalDep(name: string): boolean {
+  return INTERNAL_PREFIXES.some((prefix) => name === prefix.replace(/\/$/, "") || name.startsWith(prefix));
+}
+
+interface IInternalDep {
+  readonly name: string;
+  readonly version: string;
+  readonly section: string;
+}
 
 export class CheckPublishReady extends Check {
   constructor() {
@@ -16,7 +28,7 @@ export class CheckPublishReady extends Check {
     const details: string[] = [];
     const packageFiles = this.findAllWorkspacePackageJsons();
 
-    const packages: { name: string; version: string; isPrivate: boolean; tyforgeVersions: string[] }[] = [];
+    const packages: { name: string; version: string; isPrivate: boolean; internalDeps: IInternalDep[] }[] = [];
 
     for (const pkg of packageFiles) {
       try {
@@ -29,19 +41,23 @@ export class CheckPublishReady extends Check {
         if (!nameResult.success || !versionResult.success) continue;
 
         const isPrivate = parsed["private"] === true;
-        const tyforgeVersions: string[] = [];
+        const internalDeps: IInternalDep[] = [];
 
-        for (const depKey of ["peerDependencies", "devDependencies"]) {
+        for (const depKey of ["dependencies", "peerDependencies", "devDependencies"]) {
           const deps = parsed[depKey];
           if (!TypeGuard.isRecord(deps)) continue;
-          const tf = deps["tyforge"];
-          const tfResult = TypeGuard.extractString(tf, "tyforge");
-          if (tfResult.success && !tyforgeVersions.includes(tfResult.value)) {
-            tyforgeVersions.push(tfResult.value);
+          for (const [depName, depVersion] of Object.entries(deps)) {
+            if (!isInternalDep(depName)) continue;
+            const vResult = TypeGuard.extractString(depVersion, depName);
+            if (!vResult.success) continue;
+            const alreadyTracked = internalDeps.some((d) => d.name === depName && d.version === vResult.value);
+            if (!alreadyTracked) {
+              internalDeps.push({ name: depName, version: vResult.value, section: depKey });
+            }
           }
         }
 
-        packages.push({ name: nameResult.value, version: versionResult.value, isPrivate, tyforgeVersions });
+        packages.push({ name: nameResult.value, version: versionResult.value, isPrivate, internalDeps });
       } catch {
         continue;
       }
@@ -57,23 +73,28 @@ export class CheckPublishReady extends Check {
           details.push(`${pkg.name}@${pkg.version} already published — increment version`);
         }
       } catch (e) {
-        if (e && typeof e === "object" && "stderr" in e) {
-          const stderr = String((e as Record<string, unknown>)["stderr"] ?? "");
-          if (!stderr.includes("E404") && !stderr.includes("is not in this registry")) {
-            details.push(`${pkg.name}: npm registry unreachable — cannot verify version`);
-          }
+        const stderr = this.extractError(e, { stream: "stderr" }).join("\n");
+        if (!stderr.includes("E404") && !stderr.includes("is not in this registry")) {
+          details.push(`${pkg.name}: npm registry unreachable — cannot verify version`);
         }
       }
     }
 
-    const core = packages.find((p) => p.name === "tyforge");
-    if (core) {
-      for (const pkg of packages) {
-        if (pkg.name === "tyforge" || pkg.isPrivate) continue;
-        for (const depVersion of pkg.tyforgeVersions) {
-          if (depVersion !== core.version) {
-            details.push(`${pkg.name} depends on tyforge@${depVersion} but core is ${core.version}`);
-          }
+    const internalVersions = new Map<string, string>();
+    for (const pkg of packages) {
+      if (!pkg.isPrivate) internalVersions.set(pkg.name, pkg.version);
+    }
+
+    for (const pkg of packages) {
+      if (pkg.isPrivate) continue;
+      for (const dep of pkg.internalDeps) {
+        const expectedVersion = internalVersions.get(dep.name);
+        if (!expectedVersion) continue;
+        if (dep.version !== expectedVersion) {
+          details.push(`${pkg.name} depends on ${dep.name}@${dep.version} but local is ${expectedVersion}`);
+        }
+        if (RANGE_REGEX.test(dep.version)) {
+          details.push(`${pkg.name} has unpinned internal dep ${dep.name}@${dep.version} — must be exact version`);
         }
       }
     }

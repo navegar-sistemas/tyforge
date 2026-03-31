@@ -12,14 +12,14 @@
     }
   },
   "peerDependencies": {
-    "tyforge": "0.2.13"
+    "tyforge": "0.2.15"
   },
   "devDependencies": {
     "@types/node": "25.5.0",
     "tsdown": "0.21.6",
     "tsx": "4.21.0",
     "typescript": "6.0.2",
-    "tyforge": "0.2.13"
+    "tyforge": "0.2.15"
   },
   "scripts": {
     "build": "tsdown",
