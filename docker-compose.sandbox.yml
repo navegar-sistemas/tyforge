@@ -1,0 +1,25 @@
+services:
+  sandbox:
+    build:
+      context: .
+      dockerfile: Dockerfile.sandbox
+    volumes:
+      - .:/workspace
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 4G
+          pids: 256
+        reservations:
+          cpus: "1"
+          memory: 512M
+    tmpfs:
+      - /tmp:size=512M
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    network_mode: bridge

@@ -21,6 +21,7 @@ support/
 
 # Docker
 docker-compose.override.yml
+Dockerfile.sandbox.override
 
 # Docs
 docs/node_modules

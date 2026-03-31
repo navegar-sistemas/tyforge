@@ -8,6 +8,9 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "guard": "npx tyforge-guard",
+    "sandbox:build": "docker compose -f docker-compose.sandbox.yml build --no-cache && docker compose -f docker-compose.sandbox.yml -f docker-compose.override.yml build --no-cache",
+    "sandbox": "script -q /dev/null docker compose -f docker-compose.sandbox.yml -f docker-compose.override.yml run --rm sandbox",
+    "sandbox:sh": "docker compose -f docker-compose.sandbox.yml -f docker-compose.override.yml run --rm --entrypoint bash sandbox",
     "prepare": "husky"
   },
   "devDependencies": {
