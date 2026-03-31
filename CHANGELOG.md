@@ -6,6 +6,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.2.16] - 2026-03-31
+
+### Fixed
+- `isInternalDep`: lógica corrigida — `startsWith("tyforge")` dava falso positivo em pacotes externos como `tyforge-xyz`; substituído por match exato `tyforge` + prefix `@tyforge/`
+- `RANGE_REGEX`: removida segunda alternativa `[\s-]\d` que flagrava pre-releases numéricos (`1.0.0-1`) como versão não pinada
+- `IInternalDep.section`: campo removido — era coletado mas nunca lido (dead code)
+- CHANGELOG: adicionada entry retroativa para `0.2.14` (publicada no npm sem entry)
+- CHANGELOG: acentos corrigidos na entry `0.2.14`
+
+### Changed
+- `@tyforge/graphql` (`0.2.1`), `@tyforge/http` (`0.1.12`), `@tyforge/websocket` (`0.1.12`), `@tyforge/guard` (`0.1.7`): bump de versão para publicação
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.16`
+
+## [0.2.15] - 2026-03-31
+
+### Changed
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.15`
+
+## [0.2.14] - 2026-03-31
+
+### Changed
+- `CheckPublishReady`: validação expandida para todos os pacotes internos do monorepo — verifica consistência de versão e pinagem de qualquer dependência `tyforge` ou `@tyforge/*` entre pacotes (antes verificava apenas `tyforge` core)
+- `CheckPublishReady`: removido `as` cast no catch — usa `extractError()` da classe base
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.14`
+
+## [0.2.13] - 2026-03-31
+
+### Changed
+- `@tyforge/graphql` (`0.2.0`): transport layer migrado para `graphql-request` (v7.4.0) — substitui implementação manual com fetch
+- `@tyforge/graphql` (`0.2.0`): `DtoGraphQLRequest.variables` alterado de `Record<string, FString>` para `FJson` — corrige double-serialization de variáveis complexas
+- `@tyforge/graphql` (`0.2.0`): null-data guard — retorna `invalidResponse` quando `data` é `null`/`undefined` sem erros GraphQL
+- `@tyforge/graphql` (`0.2.0`): HTTP 5xx em `ClientError` mapeado para `networkError` (antes era `invalidResponse`)
+- `@tyforge/graphql` (`0.2.0`): erro GraphQL `IGraphQLError` mapeado via `.map()` em vez de type predicate — compatível com `GraphQLError` do pacote `graphql`
+- Pre-commit: `CheckPublishReady` movido para posição 3 (após typecheck e tests, antes de lint)
+- `@tyforge/http` (`0.1.11`), `@tyforge/websocket` (`0.1.11`), `@tyforge/guard` (`0.1.6`): bump de versão para publicação
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.13`
+
+### Fixed
+- `@tyforge/graphql`: double-serialization de variáveis — objetos complexos eram stringificados duas vezes via `Record<string, FString>` + `unwrapStringMap()`
+
 ## [0.2.9] - 2026-03-31
 
 ### Fixed
@@ -55,47 +95,6 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 - `@tyforge/guard` atualizado para `0.1.1`
 - `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.5`
 
-## [0.2.4] - 2026-03-30
-
-### Fixed
-- Runtime crash em React Native/Hermes: `react-native` field no formato objeto corrompia resolução de módulos no Metro — removido
-
-### Added
-- Pacote `@tyforge/guard` — análise estática separada do core com regras classificadas em typescript, convention, architecture e dsl
-
-### Changed
-- Lint movido de `packages/tyforge/src/lint` para `packages/guard` (`@tyforge/guard`)
-- CLI renomeado de `tyforge-lint` para `tyforge-guard`
-- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.4`
-
-## [0.2.3] - 2026-03-30
-
-### Added
-- Browser/React Native stubs para `TyForgeConfig`, `ToolNetworkSecurity` e `ServiceBase` via `browser` e `react-native` fields no package.json
-- Exemplo React Native com Expo para teste de compatibilidade
-- Pacote `@tyforge/examples` com exemplos simples e React Native
-
-### Changed
-- Exemplos movidos de `packages/tyforge/src/examples` para `packages/examples/simple`
-- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.3`
-
-## [0.2.2] - 2026-03-30
-
-### Fixed
-- Nginx container restart loop: `mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)` — diretórios temp criados no Dockerfile com `chown nginx:nginx` e tmpfs montado com `uid=101,gid=101`
-
-### Changed
-- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.2`
-- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.2`
-
-## [0.2.1] - 2026-03-30
-
-### Added
-- README.md em todos os pacotes (`packages/tyforge`, `packages/http`, `packages/graphql`, `packages/websocket`)
-
-### Changed
-- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` atualizados para `0.1.1`
-- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.1`
 
 
 

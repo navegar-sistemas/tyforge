@@ -19,11 +19,11 @@ async function main(): Promise<void> {
     new CheckTypecheck(),
     new CheckTests(),
     new CheckFormat(),
+    new CheckPublishReady(),
     new CheckLint(),
     new CheckDocsBuild(),
     new CheckDockerBuild(),
     new CheckDeprecated(),
-    new CheckPublishReady(),
   ];
 
   const confirmableChecks: Check[] = [new CheckVersions()];

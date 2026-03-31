@@ -10,5 +10,5 @@ export default defineConfig({
   platform: "node",
   sourcemap: false,
   fixedExtension: false,
-  deps: { neverBundle: ["tyforge"] },
+  deps: { neverBundle: ["tyforge", "graphql-request", "graphql"] },
 });

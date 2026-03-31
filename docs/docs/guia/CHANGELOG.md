@@ -10,6 +10,46 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.16] - 2026-03-31
+
+### Fixed
+- `isInternalDep`: lógica corrigida — `startsWith("tyforge")` dava falso positivo em pacotes externos como `tyforge-xyz`; substituído por match exato `tyforge` + prefix `@tyforge/`
+- `RANGE_REGEX`: removida segunda alternativa `[\s-]\d` que flagrava pre-releases numéricos (`1.0.0-1`) como versão não pinada
+- `IInternalDep.section`: campo removido — era coletado mas nunca lido (dead code)
+- CHANGELOG: adicionada entry retroativa para `0.2.14` (publicada no npm sem entry)
+- CHANGELOG: acentos corrigidos na entry `0.2.14`
+
+### Changed
+- `@tyforge/graphql` (`0.2.1`), `@tyforge/http` (`0.1.12`), `@tyforge/websocket` (`0.1.12`), `@tyforge/guard` (`0.1.7`): bump de versão para publicação
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.16`
+
+## [0.2.15] - 2026-03-31
+
+### Changed
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.15`
+
+## [0.2.14] - 2026-03-31
+
+### Changed
+- `CheckPublishReady`: validação expandida para todos os pacotes internos do monorepo — verifica consistência de versão e pinagem de qualquer dependência `tyforge` ou `@tyforge/*` entre pacotes (antes verificava apenas `tyforge` core)
+- `CheckPublishReady`: removido `as` cast no catch — usa `extractError()` da classe base
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.14`
+
+## [0.2.13] - 2026-03-31
+
+### Changed
+- `@tyforge/graphql` (`0.2.0`): transport layer migrado para `graphql-request` (v7.4.0) — substitui implementação manual com fetch
+- `@tyforge/graphql` (`0.2.0`): `DtoGraphQLRequest.variables` alterado de `Record<string, FString>` para `FJson` — corrige double-serialization de variáveis complexas
+- `@tyforge/graphql` (`0.2.0`): null-data guard — retorna `invalidResponse` quando `data` é `null`/`undefined` sem erros GraphQL
+- `@tyforge/graphql` (`0.2.0`): HTTP 5xx em `ClientError` mapeado para `networkError` (antes era `invalidResponse`)
+- `@tyforge/graphql` (`0.2.0`): erro GraphQL `IGraphQLError` mapeado via `.map()` em vez de type predicate — compatível com `GraphQLError` do pacote `graphql`
+- Pre-commit: `CheckPublishReady` movido para posição 3 (após typecheck e tests, antes de lint)
+- `@tyforge/http` (`0.1.11`), `@tyforge/websocket` (`0.1.11`), `@tyforge/guard` (`0.1.6`): bump de versão para publicação
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.13`
+
+### Fixed
+- `@tyforge/graphql`: double-serialization de variáveis — objetos complexos eram stringificados duas vezes via `Record<string, FString>` + `unwrapStringMap()`
+
 ## [0.2.9] - 2026-03-31
 
 ### Fixed

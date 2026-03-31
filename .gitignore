@@ -12,6 +12,7 @@ benchmark/
 # Claude
 CLAUDE.md
 .claude/
+.mcp.json
 todo/
 planejamento.rb
 /seguranca.md

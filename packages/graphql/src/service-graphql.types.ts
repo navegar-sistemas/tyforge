@@ -7,11 +7,12 @@ import type {
   FFetchPolicy,
   FGraphQLDocument,
   FGraphQLOperationName,
+  FJson,
 } from "tyforge/type-fields";
 
 export interface IGraphQLRequest {
   query: FGraphQLDocument;
-  variables?: Record<string, FString>;
+  variables?: FJson;
   operationName?: FGraphQLOperationName;
   headers?: Record<string, FString>;
   authenticated?: FBoolean;

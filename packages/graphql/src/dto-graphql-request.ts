@@ -9,12 +9,13 @@ import {
   FInt,
   FBoolean,
   FFetchPolicy,
+  FJson,
 } from "tyforge/type-fields";
 
 const graphqlRequestSchema = {
   query: { type: FGraphQLDocument },
   operationName: { type: FGraphQLOperationName, required: false },
-  variables: { type: FString, keyType: FString, isMap: true, required: false },
+  variables: { type: FJson, required: false },
   headers: { type: FString, keyType: FString, isMap: true, required: false },
   authenticated: { type: FBoolean, required: false },
   timeout: { type: FInt, required: false },
@@ -39,7 +40,7 @@ export class DtoGraphQLRequest
 
   readonly query: FGraphQLDocument;
   readonly operationName: FGraphQLOperationName | undefined;
-  readonly variables: Record<string, FString> | undefined;
+  readonly variables: FJson | undefined;
   readonly headers: Record<string, FString> | undefined;
   readonly authenticated: FBoolean | undefined;
   readonly timeout: FInt | undefined;
