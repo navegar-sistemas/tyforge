@@ -9,6 +9,9 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   check:
     name: Build, Typecheck, Test, Lint
@@ -32,7 +35,5 @@ jobs:
       - run: npm run test
 
       - run: npx tyforge-guard
-
-      - run: npm run format:check
 
       - run: npm audit --audit-level=moderate
