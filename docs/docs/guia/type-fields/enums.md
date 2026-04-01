@@ -11,14 +11,14 @@ Type Fields baseados em enums (`const` objects) para valores controlados e finit
 
 | Classe | Enum | Valores | Arquivo |
 |--------|------|---------|---------|
-| `FPersonType` | `OPersonType` | `INDIVIDUAL`, `LEGAL_ENTITY` | `person-type.format_vo.ts` |
-| `FGender` | `OGender` | `MALE`, `FEMALE`, `OTHER`, `NOT_INFORMED` | `gender.format_vo.ts` |
-| `FMaritalStatus` | `OMaritalStatus` | `SINGLE`, `MARRIED`, `DIVORCED`, `WIDOWED`, `COMMON_LAW` | `marital-status.format_vo.ts` |
-| `FTransactionStatus` | `OTransactionStatus` | `SUCCESS`, `PENDING`, `FAILED`, `CANCELED`, `PROCESSING` | `transaction-status.format_vo.ts` |
-| `FAppStatus` | `OAppStatus` | `ACTIVE` (`"active"`), `INACTIVE` (`"inactive"`) | `app-status.format_vo.ts` |
-| `FHttpStatus` | `OHttpStatus` | Códigos HTTP (200, 201, 400, 404, 500...) | `http-status.format_vo.ts` |
-| `FStateCode` | — | 2 letras maiúsculas; locale `br`: UFs válidas | `state-code.format_vo.ts` |
-| `FBoolInt` | `OBoolInt` | `0` (INVALIDO), `1` (VALIDO) | `bool-int.format_vo.ts` |
+| `FPersonType` | `OPersonType` | `INDIVIDUAL`, `LEGAL_ENTITY` | `person-type.typefield.ts` |
+| `FGender` | `OGender` | `MALE`, `FEMALE`, `OTHER`, `NOT_INFORMED` | `gender.typefield.ts` |
+| `FMaritalStatus` | `OMaritalStatus` | `SINGLE`, `MARRIED`, `DIVORCED`, `WIDOWED`, `COMMON_LAW` | `marital-status.typefield.ts` |
+| `FTransactionStatus` | `OTransactionStatus` | `SUCCESS`, `PENDING`, `FAILED`, `CANCELED`, `PROCESSING` | `transaction-status.typefield.ts` |
+| `FAppStatus` | `OAppStatus` | `ACTIVE` (`"active"`), `INACTIVE` (`"inactive"`) | `app-status.typefield.ts` |
+| `FHttpStatus` | `OHttpStatus` | Códigos HTTP (200, 201, 400, 404, 500...) | `http-status.typefield.ts` |
+| `FStateCode` | — | 2 letras maiúsculas; locale `br`: UFs válidas | `state-code.typefield.ts` |
+| `FBoolInt` | `OBoolInt` | `0` (INVALIDO), `1` (VALIDO) | `bool-int.typefield.ts` |
 
 ---
 

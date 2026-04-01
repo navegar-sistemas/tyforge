@@ -11,8 +11,8 @@ Type Fields para o sistema de pagamentos instantâneos PIX do Banco Central do B
 
 | Classe | Min | Max | Validação extra | Arquivo |
 |--------|-----|-----|-----------------|---------|
-| `FPixKey` | 1 | 77 | CPF, CNPJ, telefone, email ou EVP | `pix-key.format_vo.ts` |
-| `FPixKeyType` | 1 | 10 | Enum `OPixKeyType` | `pix-key-type.format_vo.ts` |
+| `FPixKey` | 1 | 77 | CPF, CNPJ, telefone, email ou EVP | `pix-key.typefield.ts` |
+| `FPixKeyType` | 1 | 10 | Enum `OPixKeyType` | `pix-key-type.typefield.ts` |
 
 ---
 

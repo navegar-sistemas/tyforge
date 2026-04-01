@@ -11,11 +11,11 @@ Type Fields numéricos encapsulam e validam valores inteiros com regras de faixa
 
 | Classe | Min | Max | Decimal | Validação extra | Arquivo |
 |--------|-----|-----|---------|-----------------|---------|
-| `FInt` | -2147483648 | 2147483647 | 0 | `Number.isInteger()` | `int.format_vo.ts` |
-| `FPageNumber` | 1 | `MAX_SAFE_INTEGER` | 0 | Inteiro >= 1 | `page-number.format_vo.ts` |
-| `FPageSize` | 1 | 100 | 0 | Inteiro entre 1 e 100 | `page-size.format_vo.ts` |
-| `FFloat` | `MIN_SAFE_INTEGER` | `MAX_SAFE_INTEGER` | 10 | `Number.isFinite()` | `float.format_vo.ts` |
-| `FBoolInt` | 0 | 1 | 0 | Enum `OBoolInt` (0 ou 1) | `bool-int.format_vo.ts` |
+| `FInt` | -2147483648 | 2147483647 | 0 | `Number.isInteger()` | `int.typefield.ts` |
+| `FPageNumber` | 1 | `MAX_SAFE_INTEGER` | 0 | Inteiro >= 1 | `page-number.typefield.ts` |
+| `FPageSize` | 1 | 100 | 0 | Inteiro entre 1 e 100 | `page-size.typefield.ts` |
+| `FFloat` | `MIN_SAFE_INTEGER` | `MAX_SAFE_INTEGER` | 10 | `Number.isFinite()` | `float.typefield.ts` |
+| `FBoolInt` | 0 | 1 | 0 | Enum `OBoolInt` (0 ou 1) | `bool-int.typefield.ts` |
 
 ---
 

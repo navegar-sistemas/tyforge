@@ -35,7 +35,7 @@ Todos os identificadores públicos devem seguir o sistema de prefixos abaixo. O 
 
 | Tipo de artefato | Padrão de nome | Exemplo |
 |-----------------|----------------|---------|
-| TypeField | `{nome-em-ingles}.format_vo.ts` | `email.format_vo.ts`, `money.format_vo.ts` |
+| TypeField | `{nome-em-ingles}.typefield.ts` | `email.typefield.ts`, `money.typefield.ts` |
 | Teste | `*.test.ts` dentro de `__tests__/` | `currency.test.ts`, `rules.test.ts` |
 | Exception | `{nome}.exception.ts` | `validation.exception.ts` |
 | Regra do linter | `{nome}.rule.ts` | `no-any.rule.ts` |

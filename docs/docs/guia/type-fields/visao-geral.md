@@ -185,7 +185,7 @@ protected static resolveEnum<E extends Record<string, string | number>>(
 |-----------|---------|
 | Prefixo `F` no nome da classe | `FString`, `FEmail`, `FId` |
 | Prefixo `T` no tipo primitivo | `TString`, `TEmail`, `TId` |
-| Arquivo com sufixo `.format_vo.ts` | `email.format_vo.ts` |
+| Arquivo com sufixo `.typefield.ts` | `email.typefield.ts` |
 
 ## Exemplo: criando um TypeField customizado
 
@@ -282,7 +282,7 @@ export class FCpf extends TypeField<TCpf, TCpfFormatted> {
 - [Numéricos](/guia/type-fields/numerico) — FInt, FFloat, FPageNumber, FPageSize, FBoolInt
 - [Moeda](/guia/type-fields/moeda) — FMoney, FCurrency
 - [Datas](/guia/type-fields/data) — FDateTimeISOZMillis, FDateTimeISOZ, FDateISODate, FDateISOCompact
-- [Identificadores](/guia/type-fields/identificador) — FIdentifier, FId, FIdReq, FTraceId, FTransactionId, FDeviceId, FCorrelationId, FReconciliationId, FIdempotencyKey
+- [Identificadores](/guia/type-fields/identificador) — FIdentifier, FId, FIdSeq, FIdReq, FTraceId, FTransactionId, FDeviceId, FCorrelationId, FReconciliationId, FIdempotencyKey
 - [Documentos](/guia/type-fields/documento) — FDocumentId, FDocumentCpf, FDocumentCnpj, FDocumentCpfOrCnpj, FDocumentRg, FDocumentType, FDocumentStateRegistration, FDocumentMunicipalRegistration
 - [Bancário](/guia/type-fields/bancario) — FBankCode, FBankBranch, FBankAccountNumber, FBankNsu, FBankE2eId, FEmvQrCodePayload
 - [PIX](/guia/type-fields/pix) — FPixKey, FPixKeyType

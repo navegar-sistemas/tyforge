@@ -11,8 +11,8 @@ Type Fields monetários encapsulam valores financeiros com precisão inteira (ce
 
 | Classe | Tipo primitivo | Armazenamento | Validação extra | Arquivo |
 |--------|---------------|---------------|-----------------|---------|
-| `FMoney` | `number` (inteiro) | Centavos | `Number.isInteger()` | `money.format_vo.ts` |
-| `FCurrency` | `number` (decimal) | Centavos (converte automaticamente) | Herda de `FMoney` | `currency.format_vo.ts` |
+| `FMoney` | `number` (inteiro) | Centavos | `Number.isInteger()` | `money.typefield.ts` |
+| `FCurrency` | `number` (decimal) | Centavos (converte automaticamente) | Herda de `FMoney` | `currency.typefield.ts` |
 
 ---
 

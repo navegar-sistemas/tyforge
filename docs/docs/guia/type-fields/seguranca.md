@@ -11,14 +11,14 @@ Type Fields para autenticação, criptografia e segurança. Cobrem API keys, tok
 
 | Classe | Min | Max | Validação extra | Arquivo |
 |--------|-----|-----|-----------------|---------|
-| `FApiKey` | 36 | 36 | UUID v4 válido | `api-key.format_vo.ts` |
-| `FBearer` | 100 | 5000 | Prefixo `Bearer ` | `bearer.format_vo.ts` |
-| `FSignature` | 64 | 512 | Base64 válido | `signature.format_vo.ts` |
-| `FPublicKeyPem` | 100 | 1000 | Headers PEM BEGIN/END + base64 | `public-key-pem.format_vo.ts` |
-| `FCertificateThumbprint` | 40 | 64 | Hexadecimal, 40 (SHA-1) ou 64 (SHA-256) chars | `certificate-thumbprint.format_vo.ts` |
-| `FHashAlgorithm` | 1 | 30 | Enum `OHashAlgorithm` | `hash-algorithm.format_vo.ts` |
-| `FTotpCode` | 6 | 6 | Exatamente 6 dígitos numéricos | `totp-code.format_vo.ts` |
-| `FTotpSecret` | 16 | 128 | Base32 válido | `totp-secret.format_vo.ts` |
+| `FApiKey` | 36 | 36 | UUID v4 válido | `api-key.typefield.ts` |
+| `FBearer` | 100 | 5000 | Prefixo `Bearer ` | `bearer.typefield.ts` |
+| `FSignature` | 64 | 512 | Base64 válido | `signature.typefield.ts` |
+| `FPublicKeyPem` | 100 | 1000 | Headers PEM BEGIN/END + base64 | `public-key-pem.typefield.ts` |
+| `FCertificateThumbprint` | 40 | 64 | Hexadecimal, 40 (SHA-1) ou 64 (SHA-256) chars | `certificate-thumbprint.typefield.ts` |
+| `FHashAlgorithm` | 1 | 30 | Enum `OHashAlgorithm` | `hash-algorithm.typefield.ts` |
+| `FTotpCode` | 6 | 6 | Exatamente 6 dígitos numéricos | `totp-code.typefield.ts` |
+| `FTotpSecret` | 16 | 128 | Base32 válido | `totp-secret.typefield.ts` |
 
 :::info Dados sensíveis
 `FBearer`, `FSignature` e `FPublicKeyPem` preservam whitespace (sem trim) para garantir a integridade de dados sensíveis. Para controlar visibilidade em JSON, utilize `expose: "redacted"` no schema.

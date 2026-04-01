@@ -1,6 +1,6 @@
 {
   "name": "@tyforge/http",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Type-safe HTTP client with Result pattern, security hardening, and exception mapping for TyForge",
   "type": "module",
   "main": "dist/index.js",
@@ -12,14 +12,14 @@
     }
   },
   "peerDependencies": {
-    "tyforge": "0.2.18"
+    "tyforge": "0.2.19"
   },
   "devDependencies": {
     "@types/node": "25.5.0",
     "tsdown": "0.21.6",
     "tsx": "4.21.0",
     "typescript": "6.0.2",
-    "tyforge": "0.2.18"
+    "tyforge": "0.2.19"
   },
   "scripts": {
     "build": "tsdown",

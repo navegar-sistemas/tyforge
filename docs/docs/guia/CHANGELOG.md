@@ -10,6 +10,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.19] - 2026-04-01
+
+### Added
+- `FIdSeq`: TypeField para IDs sequenciais de banco (auto-increment) — valida inteiro positivo, sem dependência de UUID
+- `TEntityId`: union type `FId | FIdSeq` — Entity e RepositoryCrud aceitam ambos os tipos de identificador
+
+### Changed
+- `Entity.id` alterado de `FId` para `TEntityId` — suporta UUID e auto-increment
+- `Repository`, `RepositoryRead`, `RepositoryWrite`, `RepositoryCrud` aceitam `TEntityId` em vez de `FId`
+- `@tyforge/graphql` (`0.2.4`), `@tyforge/http` (`0.1.15`), `@tyforge/websocket` (`0.1.15`), `@tyforge/guard` (`0.1.10`): bump de versão para publicação
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.19`
+- `.mcp.json` removido do tracking git (host-specific)
+- Documentação: filenames `.format_vo.ts` corrigidos para `.typefield.ts` em todos os docs
+
 ## [0.2.18] - 2026-03-31
 
 ### Changed

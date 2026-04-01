@@ -57,7 +57,7 @@ Um teste completo de TypeField deve cobrir todos os cenários de uso da classe. 
 ```typescript
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
-import { FFloat } from "@tyforge/type-fields/float.format_vo";
+import { FFloat } from "@tyforge/type-fields/float.typefield";
 import { isSuccess, isFailure } from "@tyforge/result/result";
 
 // ── create ──────────────────────────────────────────────────────
@@ -137,7 +137,7 @@ Quando o TypeField representa um enum, adicionar cenários de validação dos va
 ```typescript
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
-import { FGender, OGender } from "@tyforge/type-fields/gender.format_vo";
+import { FGender, OGender } from "@tyforge/type-fields/gender.typefield";
 import { isSuccess, isFailure } from "@tyforge/result/result";
 
 describe("FGender - create", () => {

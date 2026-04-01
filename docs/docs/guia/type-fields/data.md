@@ -13,12 +13,12 @@ Todos os campos de data aceitam tanto `string` quanto `Date` no método `create(
 
 | Classe | Formato de saída | Exemplo | Arquivo |
 |--------|-----------------|---------|---------|
-| `FDateTimeISOZMillis` | `YYYY-MM-DDTHH:mm:ss.sssZ` | `2024-01-15T10:30:00.000Z` | `date.format_vo.ts` |
-| `FDateTimeISOZ` | `YYYY-MM-DDTHH:mm:ssZ` | `2024-01-15T10:30:00Z` | `date.format_vo.ts` |
-| `FDateISODate` | `YYYY-MM-DD` | `2024-01-15` | `date.format_vo.ts` |
-| `FDateISOCompact` | `YYYYMMDD` | `20240115` | `date.format_vo.ts` |
-| `FDateTimeISOCompact` | `YYYYMMDDTHH:mm:ss` | `20240115T10:30:00` | `date.format_vo.ts` |
-| `FDateTimeISOFullCompact` | `YYYYMMDDHHmmss` | `20240115103000` | `date.format_vo.ts` |
+| `FDateTimeISOZMillis` | `YYYY-MM-DDTHH:mm:ss.sssZ` | `2024-01-15T10:30:00.000Z` | `date.typefield.ts` |
+| `FDateTimeISOZ` | `YYYY-MM-DDTHH:mm:ssZ` | `2024-01-15T10:30:00Z` | `date.typefield.ts` |
+| `FDateISODate` | `YYYY-MM-DD` | `2024-01-15` | `date.typefield.ts` |
+| `FDateISOCompact` | `YYYYMMDD` | `20240115` | `date.typefield.ts` |
+| `FDateTimeISOCompact` | `YYYYMMDDTHH:mm:ss` | `20240115T10:30:00` | `date.typefield.ts` |
+| `FDateTimeISOFullCompact` | `YYYYMMDDHHmmss` | `20240115103000` | `date.typefield.ts` |
 
 ---
 

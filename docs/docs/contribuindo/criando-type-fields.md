@@ -13,7 +13,7 @@ Se o projeto consumidor precisar de um formato que não existe (ex: CPF, CNPJ, t
 
 ## Estrutura obrigatória
 
-Arquivo: `src/type-fields/{nome-em-ingles}.format_vo.ts`
+Arquivo: `src/type-fields/{nome-em-ingles}.typefield.ts`
 
 O exemplo abaixo mostra a estrutura completa de um TypeField para CPF:
 
@@ -134,7 +134,7 @@ Após criar o arquivo do TypeField, registrar os exports em dois locais.
 ### 1. `src/type-fields/index.ts`
 
 ```typescript
-export { FCpf, TCpf, TCpfFormatted } from "./cpf.format_vo";
+export { FCpf, TCpf, TCpfFormatted } from "./cpf.typefield";
 ```
 
 Exportar sempre os três artefatos: a classe `F`, o tipo primitivo `T` e o tipo formatado `TFormatted`.
@@ -144,7 +144,7 @@ Exportar sempre os três artefatos: a classe `F`, o tipo primitivo `T` e o tipo 
 Na seção de Type Fields:
 
 ```typescript
-export { FCpf } from "./type-fields/cpf.format_vo";
+export { FCpf } from "./type-fields/cpf.typefield";
 ```
 
 Na API pública, exportar apenas a classe.
@@ -258,7 +258,7 @@ No barrel, exportar também o objeto `O`:
 // src/type-fields/index.ts
 export {
   FPaymentMethod, TPaymentMethod, TPaymentMethodFormatted, OPaymentMethod,
-} from "./payment-method.format_vo";
+} from "./payment-method.typefield";
 ```
 
 ## TypeFields locale-aware
@@ -312,7 +312,7 @@ protected override validateRules(
 
 Antes de considerar um TypeField como concluído, verificar **todos** os itens:
 
-- [ ] Arquivo em `src/type-fields/{nome}.format_vo.ts`
+- [ ] Arquivo em `src/type-fields/{nome}.typefield.ts`
 - [ ] Exporta 2 type aliases: `T{Nome}` + `T{Nome}Formatted`
 - [ ] Nome da classe em inglês com prefixo `F`
 - [ ] Constructor é `private`

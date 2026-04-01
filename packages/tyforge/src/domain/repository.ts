@@ -1,11 +1,11 @@
 import type { ResultPromise } from "@tyforge/result/result";
 import type { Exceptions } from "@tyforge/exceptions/base.exceptions";
-import type { FId } from "@tyforge/type-fields/identity/id.typefield";
+import type { TEntityId } from "@tyforge/domain-models/entity.base";
 import type { FBoolean } from "@tyforge/type-fields/primitive/boolean.typefield";
 
 export abstract class Repository {
-  abstract exists(id: FId): ResultPromise<FBoolean, Exceptions>;
+  abstract exists(id: TEntityId): ResultPromise<FBoolean, Exceptions>;
   abstract existsMany(
-    ids: FId[],
+    ids: TEntityId[],
   ): ResultPromise<Map<string, FBoolean>, Exceptions>;
 }

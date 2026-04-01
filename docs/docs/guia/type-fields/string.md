@@ -11,13 +11,13 @@ Type Fields do tipo string encapsulam e validam textos com regras específicas d
 
 | Classe | Min | Max | Validação extra | Arquivo |
 |--------|-----|-----|-----------------|---------|
-| `FString` | 1 | 255 | — | `string.format_vo.ts` |
-| `FEmail` | 5 | 200 | Regex RFC 5322 + lowercase/trim | `email.format_vo.ts` |
-| `FPassword` | 8 | 128 | Maiúscula + minúscula + dígito + especial | `password.format_vo.ts` |
-| `FFullName` | 2 | 140 | — | `nome-completo.format_vo.ts` |
-| `FDescription` | 1 | 1000 | — | `descricao.format_vo.ts` |
-| `FText` | 1 | 4000 | — | `text.format_vo.ts` |
-| `FBusinessName` | 1 | 100 | — | `business-name.format_vo.ts` |
+| `FString` | 1 | 255 | — | `string.typefield.ts` |
+| `FEmail` | 5 | 200 | Regex RFC 5322 + lowercase/trim | `email.typefield.ts` |
+| `FPassword` | 8 | 128 | Maiúscula + minúscula + dígito + especial + detecção de padrões previsíveis | `password.typefield.ts` |
+| `FFullName` | 2 | 140 | — | `full-name.typefield.ts` |
+| `FDescription` | 1 | 500 | — | `description.typefield.ts` |
+| `FText` | 1 | 4000 | — | `text.typefield.ts` |
+| `FBusinessName` | 1 | 100 | — | `business-name.typefield.ts` |
 
 ---
 
@@ -70,7 +70,7 @@ email.formatted(); // "usuario@email.com" (lowercase + trim)
 
 ## FPassword
 
-Senha segura para autenticação de usuários. Exige complexidade mínima para proteger contra ataques de força bruta.
+Senha segura para autenticação de usuários. Exige complexidade mínima (NIST SP 800-63B) e rejeita padrões previsíveis.
 
 ```typescript
 import { FPassword } from "tyforge";
@@ -88,6 +88,45 @@ senha.getValue(); // "Senh@Forte1"
 - Pelo menos uma letra minúscula (`/[a-z]/`)
 - Pelo menos um dígito (`/[0-9]/`)
 - Pelo menos um caractere especial (`/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/`)
+- Rejeita senhas previsíveis (padrões de teclado, dígitos sequenciais, caracteres repetidos)
+
+### Indicador de força (`getStrength`)
+
+Método estático que retorna o resultado individual de cada regra. Não cria instância — ideal para indicadores de força em tempo real no UI.
+
+```typescript
+import { FPassword } from "tyforge";
+import type { IPasswordStrength } from "tyforge";
+
+const strength: IPasswordStrength = FPassword.getStrength("Abc1");
+// {
+//   length: false,     // < 8 chars
+//   uppercase: true,   // tem [A-Z]
+//   lowercase: true,   // tem [a-z]
+//   digit: true,       // tem [0-9]
+//   special: false,    // sem caractere especial
+// }
+```
+
+### Detecção de senhas previsíveis (`isWeak`)
+
+Método estático que detecta senhas que passam as regras individuais mas contêm padrões previsíveis.
+
+```typescript
+import { FPassword } from "tyforge";
+
+FPassword.isWeak("Qwerty12!");  // true — padrão de teclado
+FPassword.isWeak("Abcd1234!");  // true — dígitos sequenciais
+FPassword.isWeak("Abcd4321!");  // true — dígitos descendentes
+FPassword.isWeak("aaaa1111");   // true — caracteres repetidos
+FPassword.isWeak("K9#mPx2!vR"); // false — sem padrões
+```
+
+**Padrões detectados:**
+- Caracteres repetidos (≤ 2 caracteres únicos após lowercase)
+- Dígitos sequenciais ascendentes (4+ consecutivos: `1234`, `5678`)
+- Dígitos sequenciais descendentes (4+ consecutivos: `4321`, `8765`)
+- Padrões de teclado: `qwerty`, `qwertz`, `azerty`, `asdfgh`, `zxcvbn`, `!@#$%^`, `1qaz2wsx`, `qazwsx`
 
 ---
 

@@ -1,15 +1,18 @@
 import { FId } from "@tyforge/type-fields/identity/id.typefield";
+import { FIdSeq } from "@tyforge/type-fields/identity/id-seq.typefield";
 import { ClassDomainModels } from "./class-domain-models.base";
 
+export type TEntityId = FId | FIdSeq;
+
 export interface IEntityProps {
-  id?: FId;
+  id?: TEntityId;
 }
 
 export abstract class Entity<
   TProps extends IEntityProps,
   TPropsJson = unknown,
 > extends ClassDomainModels<TProps, TPropsJson> {
-  readonly id?: FId;
+  readonly id?: TEntityId;
 
   protected constructor() {
     super();

@@ -11,20 +11,21 @@ Type Fields de identificação encapsulam UUIDs, tokens de autenticação e assi
 
 | Classe | Tipo | Comprimento | Validação extra | Arquivo |
 |--------|------|-------------|-----------------|---------|
-| `FId` | UUID (qualquer versão) | 36 | Regex UUID | `id.format_vo.ts` |
-| `FIdReq` | String livre | 1–36 | — | `id-req.format_vo.ts` |
-| `FTraceId` | UUID v7 | 36 | Regex UUID v7 (RFC 9562) | `trace-id.format_vo.ts` |
-| `FApiKey` | UUID v4 | 36 | `uuid.validate()` + versão 4 | `api-key.format_vo.ts` |
-| `FBearer` | Token JWT | 100–5000 | Prefixo `"Bearer "` | `bearer.format_vo.ts` |
-| `FSignature` | Base64 | 64–512 | Regex base64 | `signature.format_vo.ts` |
-| `FIdentifier` | Classe base abstrata | — | `validateType` + `generateId` | `identifier.format_vo.ts` |
-| `FTransactionId` | UUID | 36 | `uuid.validate()` | `transaction-id.format_vo.ts` |
-| `FDeviceId` | UUID | 36 | `uuid.validate()` | `device-id.format_vo.ts` |
-| `FCorrelationId` | UUID | 36 | `uuid.validate()` | `correlation-id.format_vo.ts` |
-| `FReconciliationId` | Alfanumérico | 1–35 | Regex `^[a-zA-Z0-9]+$` | `reconciliation-id.format_vo.ts` |
-| `FIdempotencyKey` | Alfanumérico + hifens | 32–36 | Regex `^[a-zA-Z0-9\-]+$` | `idempotency-key.format_vo.ts` |
-| `FCertificateThumbprint` | Hexadecimal | 40 ou 64 | Regex hex + comprimento exato | `certificate-thumbprint.format_vo.ts` |
-| `FBankNsu` | Alfanumérico | 1–20 | Regex `^[a-zA-Z0-9]+$` | `bank-nsu.format_vo.ts` |
+| `FId` | UUID (qualquer versão) | 36 | Regex UUID | `id.typefield.ts` |
+| `FIdSeq` | Inteiro positivo | 1–MAX_SAFE_INTEGER | `Number.isInteger` | `id-seq.typefield.ts` |
+| `FIdReq` | String livre | 1–36 | — | `id-req.typefield.ts` |
+| `FTraceId` | UUID v7 | 36 | Regex UUID v7 (RFC 9562) | `trace-id.typefield.ts` |
+| `FApiKey` | UUID v4 | 36 | `uuid.validate()` + versão 4 | `api-key.typefield.ts` |
+| `FBearer` | Token JWT | 100–5000 | Prefixo `"Bearer "` | `bearer.typefield.ts` |
+| `FSignature` | Base64 | 64–512 | Regex base64 | `signature.typefield.ts` |
+| `FIdentifier` | Classe base abstrata | — | `validateType` + `generateId` | `identifier.typefield.ts` |
+| `FTransactionId` | UUID | 36 | `uuid.validate()` | `transaction-id.typefield.ts` |
+| `FDeviceId` | UUID | 36 | `uuid.validate()` | `device-id.typefield.ts` |
+| `FCorrelationId` | UUID | 36 | `uuid.validate()` | `correlation-id.typefield.ts` |
+| `FReconciliationId` | Alfanumérico | 1–35 | Regex `^[a-zA-Z0-9]+$` | `reconciliation-id.typefield.ts` |
+| `FIdempotencyKey` | Alfanumérico + hifens | 32–36 | Regex `^[a-zA-Z0-9\-]+$` | `idempotency-key.typefield.ts` |
+| `FCertificateThumbprint` | Hexadecimal | 40 ou 64 | Regex hex + comprimento exato | `certificate-thumbprint.typefield.ts` |
+| `FBankNsu` | Alfanumérico | 1–20 | Regex `^[a-zA-Z0-9]+$` | `bank-nsu.typefield.ts` |
 
 ---
 
@@ -53,6 +54,66 @@ const uuidStr = FId.generateId();
 - `createOrThrow(raw, fieldPath?)` — lança exceção se inválido
 - `generate()` — gera nova instância com UUID v7
 - `generateId()` — retorna string UUID v7 sem wrapper
+
+---
+
+## FIdSeq
+
+Identificador sequencial para chaves primárias auto-increment de banco de dados. Aceita inteiros positivos (≥ 1) até `Number.MAX_SAFE_INTEGER`. Não gera IDs — o banco de dados é responsável pela geração.
+
+```typescript
+import { FIdSeq } from "tyforge";
+
+// Criar a partir de número
+const result = FIdSeq.create(42);
+// Result<FIdSeq, ExceptionValidation>
+
+// Hidratar do banco
+const fromDb = FIdSeq.assign(1);
+if (isSuccess(fromDb)) {
+  fromDb.value.getValue(); // 1
+}
+
+const id = FIdSeq.createOrThrow(100);
+id.getValue(); // 100
+id.toString(); // "100"
+```
+
+**Métodos estáticos:**
+- `create(raw, fieldPath?)` — valida e cria instância
+- `createOrThrow(raw, fieldPath?)` — lança exceção se inválido
+- `assign(value, fieldPath?)` — hidratação do banco
+
+**Regras de validação:**
+- Deve ser um inteiro (`Number.isInteger`)
+- Mínimo: 1
+- Máximo: `Number.MAX_SAFE_INTEGER`
+
+**Uso com Entity:**
+
+```typescript
+import { Entity, FIdSeq } from "tyforge";
+
+// Entity com id sequencial
+class Product extends Entity<TProductProps, TProductJson>
+  implements TProductProps {
+  readonly id: FIdSeq | undefined;
+  // ...
+
+  static create(data: TInput): Result<Product, Exceptions> {
+    // id undefined — banco gera
+    return ok(new Product({ ...data }));
+  }
+
+  static assign(data: TProductJson): Result<Product, Exceptions> {
+    // id vem do banco
+    return ok(new Product({
+      id: FIdSeq.createOrThrow(data.id),
+      ...data,
+    }));
+  }
+}
+```
 
 ---
 

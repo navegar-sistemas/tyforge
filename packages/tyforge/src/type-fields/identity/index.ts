@@ -1,5 +1,7 @@
 export { FId } from "./id.typefield";
 export type { TId, TIdFormatted } from "./id.typefield";
+export { FIdSeq } from "./id-seq.typefield";
+export type { TIdSeq, TIdSeqFormatted } from "./id-seq.typefield";
 export { FIdReq } from "./id-req.typefield";
 export type { TIdReq, TIdReqFormatted } from "./id-req.typefield";
 export { FIdentifier } from "./identifier.typefield";

@@ -11,14 +11,14 @@ Type Fields para validação de documentos de identificação. Inclui documentos
 
 | Classe | Min | Max | Validação extra | Arquivo |
 |--------|-----|-----|-----------------|---------|
-| `FDocumentId` | 1 | 20 | Alfanumérico; locale `br`: 11 dígitos (CPF) ou 14 (CNPJ) | `document-id.format_vo.ts` |
-| `FDocumentCpf` | 11 | 11 | Exatamente 11 dígitos numéricos | `document-cpf.format_vo.ts` |
-| `FDocumentCnpj` | 14 | 14 | Exatamente 14 dígitos numéricos | `document-cnpj.format_vo.ts` |
-| `FDocumentCpfOrCnpj` | 11 | 14 | 11 dígitos (CPF) ou 14 dígitos (CNPJ) | `document-cpf-or-cnpj.format_vo.ts` |
-| `FDocumentRg` | 7 | 14 | Alfanumérico | `document-rg.format_vo.ts` |
-| `FDocumentType` | 1 | 20 | Enum `ODocumentType` | `document-type.format_vo.ts` |
-| `FDocumentStateRegistration` | 1 | 20 | Apenas dígitos numéricos | `document-state-registration.format_vo.ts` |
-| `FDocumentMunicipalRegistration` | 1 | 20 | Apenas dígitos numéricos | `document-municipal-registration.format_vo.ts` |
+| `FDocumentId` | 1 | 20 | Alfanumérico; locale `br`: 11 dígitos (CPF) ou 14 (CNPJ) | `document-id.typefield.ts` |
+| `FDocumentCpf` | 11 | 11 | Exatamente 11 dígitos numéricos | `document-cpf.typefield.ts` |
+| `FDocumentCnpj` | 14 | 14 | Exatamente 14 dígitos numéricos | `document-cnpj.typefield.ts` |
+| `FDocumentCpfOrCnpj` | 11 | 14 | 11 dígitos (CPF) ou 14 dígitos (CNPJ) | `document-cpf-or-cnpj.typefield.ts` |
+| `FDocumentRg` | 7 | 14 | Alfanumérico | `document-rg.typefield.ts` |
+| `FDocumentType` | 1 | 20 | Enum `ODocumentType` | `document-type.typefield.ts` |
+| `FDocumentStateRegistration` | 1 | 20 | Apenas dígitos numéricos | `document-state-registration.typefield.ts` |
+| `FDocumentMunicipalRegistration` | 1 | 20 | Apenas dígitos numéricos | `document-municipal-registration.typefield.ts` |
 
 ---
 

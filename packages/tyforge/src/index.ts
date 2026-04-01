@@ -74,7 +74,7 @@ export type { TClassInfo, TClassMetadata } from "./domain-models/class.base";
 export { ClassDomainModels } from "./domain-models/class-domain-models.base";
 export { Aggregate } from "./domain-models/aggregate.base";
 export { Entity } from "./domain-models/entity.base";
-export type { IEntityProps } from "./domain-models/entity.base";
+export type { IEntityProps, TEntityId } from "./domain-models/entity.base";
 export { ValueObject } from "./domain-models/value-object.base";
 export { Dto } from "./domain-models/dto.base";
 export { DtoReq } from "./domain-models/dto-req.base";

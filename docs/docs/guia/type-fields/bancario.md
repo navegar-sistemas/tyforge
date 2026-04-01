@@ -11,12 +11,12 @@ Type Fields para dados bancários e de pagamento. Vários campos são locale-awa
 
 | Classe | Min | Max | Validação extra | Arquivo |
 |--------|-----|-----|-----------------|---------|
-| `FBankCode` | 1 | 20 | Numérico; locale `br`: ISPB 8 dígitos | `bank-code.format_vo.ts` |
-| `FBankBranch` | 1 | 20 | Numérico; locale `br`: 4 dígitos | `bank-branch.format_vo.ts` |
-| `FBankAccountNumber` | 1 | 34 | Alfanumérico; locale `br`: 1-13 dígitos + dígito verificador | `bank-account-number.format_vo.ts` |
-| `FBankNsu` | 1 | 20 | Alfanumérico | `bank-nsu.format_vo.ts` |
-| `FBankE2eId` | 1 | 35 | Alfanumérico | `bank-e2e-id.format_vo.ts` |
-| `FEmvQrCodePayload` | 1 | 1000 | String genérica | `emv-qr-code-payload.format_vo.ts` |
+| `FBankCode` | 1 | 20 | Numérico; locale `br`: ISPB 8 dígitos | `bank-code.typefield.ts` |
+| `FBankBranch` | 1 | 20 | Numérico; locale `br`: 4 dígitos | `bank-branch.typefield.ts` |
+| `FBankAccountNumber` | 1 | 34 | Alfanumérico; locale `br`: 1-13 dígitos + dígito verificador | `bank-account-number.typefield.ts` |
+| `FBankNsu` | 1 | 20 | Alfanumérico | `bank-nsu.typefield.ts` |
+| `FBankE2eId` | 1 | 35 | Alfanumérico | `bank-e2e-id.typefield.ts` |
+| `FEmvQrCodePayload` | 1 | 1000 | String genérica | `emv-qr-code-payload.typefield.ts` |
 
 :::tip Configuração de locale
 Para ativar as validações específicas do Brasil, configure o locale no bootstrap da aplicação:

@@ -11,11 +11,11 @@ Type Fields complementares para booleanos, objetos JSON, status HTTP, status de 
 
 | Classe | Tipo primitivo | Validação | Arquivo |
 |--------|---------------|-----------|---------|
-| `FBoolean` | `boolean` | Coerção de string/number para boolean | `boolean.format_vo.ts` |
-| `FJson` | `Record<string, unknown>` | Objeto JSON válido | `json.format_vo.ts` |
-| `FHttpStatus` | `number` (enum) | Enum `OHttpStatus` | `http-status.format_vo.ts` |
-| `FAppStatus` | `string` (enum) | `"active"` ou `"inactive"` | `status-aplicacao.format_vo.ts` |
-| `FPublicKeyPem` | `string` | Formato PEM com headers BEGIN/END | `public-key-pem.format_vo.ts` |
+| `FBoolean` | `boolean` | Coerção de string/number para boolean | `boolean.typefield.ts` |
+| `FJson` | `Record<string, unknown>` | Objeto JSON válido | `json.typefield.ts` |
+| `FHttpStatus` | `number` (enum) | Enum `OHttpStatus` | `http-status.typefield.ts` |
+| `FAppStatus` | `string` (enum) | `"active"` ou `"inactive"` | `status-aplicacao.typefield.ts` |
+| `FPublicKeyPem` | `string` | Formato PEM com headers BEGIN/END | `public-key-pem.typefield.ts` |
 
 ---
 
