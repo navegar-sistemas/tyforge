@@ -13,7 +13,7 @@
     "format": "prettier --write \"packages/*/src/**/*.ts\"",
     "format:check": "prettier --check \"packages/*/src/**/*.ts\"",
     "sandbox:build": "docker compose -f docker-compose.sandbox.yml build --no-cache && docker compose -f docker-compose.sandbox.yml -f docker-compose.override.yml build --no-cache",
-    "sandbox": "script -q /dev/null docker compose -f docker-compose.sandbox.yml -f docker-compose.override.yml run --rm sandbox",
+    "sandbox": "docker compose -f docker-compose.sandbox.yml -f docker-compose.override.yml run --rm sandbox",
     "sandbox:sh": "docker compose -f docker-compose.sandbox.yml -f docker-compose.override.yml run --rm --entrypoint bash sandbox",
     "prepare": "husky"
   },

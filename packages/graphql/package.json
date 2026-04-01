@@ -1,6 +1,6 @@
 {
   "name": "@tyforge/graphql",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Type-safe GraphQL client with Result pattern, introspection blocking, and exception mapping for TyForge",
   "type": "module",
   "main": "dist/index.js",
@@ -12,13 +12,13 @@
     "graphql": "16.13.2",
     "graphql-request": "7.4.0"
   },
-  "peerDependencies": { "tyforge": "0.2.19" },
+  "peerDependencies": { "tyforge": "0.2.20" },
   "devDependencies": {
     "@types/node": "25.5.0",
     "tsdown": "0.21.6",
     "tsx": "4.21.0",
     "typescript": "6.0.2",
-    "tyforge": "0.2.19"
+    "tyforge": "0.2.20"
   },
   "scripts": {
     "build": "tsdown",

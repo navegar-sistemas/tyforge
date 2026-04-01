@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
+## [0.2.20] - 2026-04-01
+
+### Fixed
+- Sandbox: remove wrapper `script` do comando sandbox para corrigir resize do terminal (SIGWINCH não era propagado)
+
+### Changed
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.20`
+
 ## [0.2.19] - 2026-04-01
 
 ### Added
@@ -99,13 +107,5 @@ Full history at [docs/CHANGELOG](docs/docs/guia/CHANGELOG.md).
 
 ### Changed
 - Documentação de `ToolNetworkSecurity` corrigida — não é chamado automaticamente, disponível via subpath para override
-
-## [0.2.7] - 2026-03-31
-
-### Fixed
-- `@tyforge/http`, `@tyforge/graphql`, `@tyforge/websocket` (`0.1.8`): `ToolNetworkSecurity` via lazy `await import()` — elimina `node:dns/promises` do bundle React Native
-
-### Changed
-- `CheckVersions` agora é blocking — bloqueia commit se versão já publicada no npm ou peerDependencies desatualizadas
 
 

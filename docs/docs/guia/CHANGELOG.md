@@ -10,6 +10,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.20] - 2026-04-01
+
+### Fixed
+- Sandbox: remove wrapper `script` do comando sandbox para corrigir resize do terminal (SIGWINCH não era propagado)
+
+### Changed
+- `peerDependencies` e `devDependencies` atualizados para `tyforge@0.2.20`
+
 ## [0.2.19] - 2026-04-01
 
 ### Added
