@@ -34,6 +34,6 @@ jobs:
 
       - run: npm run test
 
-      - run: npx tyforge-guard
+      - run: node packages/guard/dist/index.js
 
       - run: npm audit --audit-level=moderate
