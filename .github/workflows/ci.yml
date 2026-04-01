@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, security]
+  push:
+    branches: [main, security]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Build, Typecheck, Test, Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - run: npm run typecheck
+
+      - run: npm run test
+
+      - run: npx tyforge-guard
+
+      - run: npm run format:check
+
+      - run: npm audit --audit-level=moderate
